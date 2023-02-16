@@ -1,0 +1,711 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/blog/img/fluid.png">
+  <link rel="icon" href="/blog/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="rx-ted">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="【国民技术N32项目移植】基于 Windows 的 ARM GCC 开发环境 目录 基于 Windows 的 ARM GCC 开发环境 概述 开发工具 软件 硬件   开发环境搭建 安装 VScode 软件 安装 gcc 编译工具链 安装 make for Windows 安装 JLink 工具   目录详细说明 编译和下载    概述本文以 N32G4FR 系列 MCU 为例，介绍了在 Wind">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【国民技术N32项目移植】基于Windows的ARMGCC开发环境">
+<meta property="og:url" content="https://rx-ted.github.io/blog/2023/02/16/%E3%80%90%E5%9B%BD%E6%B0%91%E6%8A%80%E6%9C%AFN32%E9%A1%B9%E7%9B%AE%E7%A7%BB%E6%A4%8D%E3%80%91%E5%9F%BA%E4%BA%8EWindows%E7%9A%84ARMGCC%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/index.html">
+<meta property="og:site_name" content="Hexo-blog">
+<meta property="og:description" content="【国民技术N32项目移植】基于 Windows 的 ARM GCC 开发环境 目录 基于 Windows 的 ARM GCC 开发环境 概述 开发工具 软件 硬件   开发环境搭建 安装 VScode 软件 安装 gcc 编译工具链 安装 make for Windows 安装 JLink 工具   目录详细说明 编译和下载    概述本文以 N32G4FR 系列 MCU 为例，介绍了在 Wind">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-02-16T12:59:51.000Z">
+<meta property="article:modified_time" content="2023-02-16T13:02:52.531Z">
+<meta property="article:author" content="rx-ted">
+<meta property="article:tag" content="国民技术N32项目移植">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>【国民技术N32项目移植】基于Windows的ARMGCC开发环境 - Hexo-blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/blog/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/blog/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/blog/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"rx-ted.github.io","root":"/blog/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":true,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/blog/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/blog/js/utils.js" ></script>
+  <script  src="/blog/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/blog/">
+      <strong>Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/blog/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/blog/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="【国民技术N32项目移植】基于Windows的ARMGCC开发环境"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-02-16 20:59" pubdate>
+          2023年2月16日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          11 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">【国民技术N32项目移植】基于Windows的ARMGCC开发环境</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="【国民技术N32项目移植】基于-Windows-的-ARM-GCC-开发环境"><a href="#【国民技术N32项目移植】基于-Windows-的-ARM-GCC-开发环境" class="headerlink" title="【国民技术N32项目移植】基于 Windows 的 ARM GCC 开发环境"></a>【国民技术N32项目移植】基于 Windows 的 ARM GCC 开发环境</h1><ul>
+<li><strong>目录</strong></li>
+<li><a href="#%E5%9F%BA%E4%BA%8E-windows-%E7%9A%84-arm-gcc-%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83">基于 Windows 的 ARM GCC 开发环境</a><ul>
+<li><a href="#%E6%A6%82%E8%BF%B0">概述</a></li>
+<li><a href="#%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7">开发工具</a><ul>
+<li><a href="#%E8%BD%AF%E4%BB%B6">软件</a></li>
+<li><a href="#%E7%A1%AC%E4%BB%B6">硬件</a></li>
+</ul>
+</li>
+<li><a href="#%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA">开发环境搭建</a><ul>
+<li><a href="#%E5%AE%89%E8%A3%85-vscode-%E8%BD%AF%E4%BB%B6">安装 VScode 软件</a></li>
+<li><a href="#%E5%AE%89%E8%A3%85-gcc-%E7%BC%96%E8%AF%91%E5%B7%A5%E5%85%B7%E9%93%BE">安装 gcc 编译工具链</a></li>
+<li><a href="#%E5%AE%89%E8%A3%85-make-for-windows">安装 make for Windows</a></li>
+<li><a href="#%E5%AE%89%E8%A3%85-jlink-%E5%B7%A5%E5%85%B7">安装 JLink 工具</a></li>
+</ul>
+</li>
+<li><a href="#%E7%9B%AE%E5%BD%95%E8%AF%A6%E7%BB%86%E8%AF%B4%E6%98%8E">目录详细说明</a></li>
+<li><a href="#%E7%BC%96%E8%AF%91%E5%92%8C%E4%B8%8B%E8%BD%BD">编译和下载</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>本文以 N32G4FR 系列 MCU 为例，介绍了在 Windows 环境下基于 vscode 编辑器、GCC 编<br>译工具链和 GDB 调试工具进行搭建开发环境、编译、固件下载和代码调试的方法。</p>
+<h2 id="开发工具"><a href="#开发工具" class="headerlink" title="开发工具"></a>开发工具</h2><h3 id="软件"><a href="#软件" class="headerlink" title="软件"></a>软件</h3><ol>
+<li>编辑器 Visual Studio Code</li>
+<li>编译工具链 arm-none-eabi-gcc</li>
+<li>Make for Windows</li>
+<li>下载工具</li>
+<li>调试工具 <strong>（略）</strong></li>
+</ol>
+<h3 id="硬件"><a href="#硬件" class="headerlink" title="硬件"></a>硬件</h3><ol>
+<li>开发板 N32G4FR</li>
+<li>一条数据线</li>
+</ol>
+<h2 id="开发环境搭建"><a href="#开发环境搭建" class="headerlink" title="开发环境搭建"></a>开发环境搭建</h2><h3 id="安装-VScode-软件"><a href="#安装-VScode-软件" class="headerlink" title="安装 VScode 软件"></a>安装 VScode 软件</h3><p>下载软件：<a target="_blank" rel="noopener" href="https://code.visualstudio.com/">VScode</a></p>
+<h3 id="安装-gcc-编译工具链"><a href="#安装-gcc-编译工具链" class="headerlink" title="安装 gcc 编译工具链"></a>安装 gcc 编译工具链</h3><p>下载地址：<a target="_blank" rel="noopener" href="https://launchpad.net/gcc-arm-embedded">gcc</a></p>
+<h3 id="安装-make-for-Windows"><a href="#安装-make-for-Windows" class="headerlink" title="安装 make for Windows"></a>安装 make for Windows</h3><p>下载地址：<a target="_blank" rel="noopener" href="http://www.equation.com/servlet/equation.cmd?fa=make">make</a></p>
+<h3 id="安装-JLink-工具"><a href="#安装-JLink-工具" class="headerlink" title="安装 JLink 工具"></a>安装 JLink 工具</h3><p>略</p>
+<h2 id="目录详细说明"><a href="#目录详细说明" class="headerlink" title="目录详细说明"></a>目录详细说明</h2><p>├─build  生成文件<br>├─doc  文档<br>├─firmware  固件<br>│  ├─CMSIS  系统如下<br>│  │  ├─core  核心文件<br>│  │  └─device  设备文件<br>│  │      └─startup  启动文件<br>│  ├─n32g4fr_algo_lib  算法库<br>│  ├─n32g4fr_std_periph_driver  静态<br>│  └─n32g4fr_usbfs_driver  USB<br>├─include  头文件<br>├─note  随笔<br>└─src  源代码  </p>
+<h2 id="编译和下载"><a href="#编译和下载" class="headerlink" title="编译和下载"></a>编译和下载</h2><p>在第一个目录下运行</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cmd">make<br></code></pre></td></tr></table></figure>
+
+<p>可以得到运行结果</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs cmd">PS D:\N32G4FR&gt; make <br>arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=soft   -Wall -Os -ffunction-sections -fdata-sections -g -gdwarf-<span class="hljs-number">2</span> -MMD -MP -MF&quot;build/delay.d&quot; -DN32G4fr -DUSE_STDPERIPH_DRIVER -Ifirmware/CMSIS/core/ -Ifirmware/CMSIS/device/ -Ifirmware/n32g4fr_std_periph_driver/inc/ -Ifirmware/n32g4fr_usbfs_driver/inc/ -Iinclude/ -Ifirmware/n32g4fr_algo_lib/inc/  -c -Wa,-a,-ad,-alms=build/delay.lst src/delay.c -o build/delay.o<br>...<br>arm-none-eabi-size build/output.elf<br>   text    data     bss     dec     hex filename<br>   <span class="hljs-number">1516</span>    <span class="hljs-number">1088</span>    <span class="hljs-number">4904</span>    <span class="hljs-number">7508</span>    <span class="hljs-number">1</span>d54 build/output.elf<br>arm-none-eabi-objcopy -O ihex -S build/output.elf build/output.hex<br>arm-none-eabi-objcopy -O binary -S build/output.elf build/output.bin<br></code></pre></td></tr></table></figure>
+
+<h2 id="源代码下载"><a href="#源代码下载" class="headerlink" title="源代码下载"></a>源代码下载</h2><p>传送门：<a target="_blank" rel="noopener" href="https://github.com/rx-ted/N32G4FR.git">rx-ted</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/blog/tags/%E5%9B%BD%E6%B0%91%E6%8A%80%E6%9C%AFN32%E9%A1%B9%E7%9B%AE%E7%A7%BB%E6%A4%8D/">#国民技术N32项目移植</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>【国民技术N32项目移植】基于Windows的ARMGCC开发环境</div>
+      <div>https://rx-ted.github.io/blog/2023/02/16/【国民技术N32项目移植】基于Windows的ARMGCC开发环境/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>rx-ted</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年2月16日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/blog/2023/02/16/%E3%80%90%E8%B8%A9%E5%9D%91%E7%AC%94%E8%AE%B0%E3%80%91QtScrcpy%E5%88%A9%E7%94%A8tcp-ip%E6%8A%8A%E6%89%8B%E6%9C%BA%E6%8A%95%E5%BD%B1%E5%88%B0%E7%94%B5%E8%84%91%E4%B8%8A/" title="【踩坑笔记】QtScrcpy利用tcp_ip把手机投影到电脑上">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">【踩坑笔记】QtScrcpy利用tcp_ip把手机投影到电脑上</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/blog/2023/02/15/hello-world/" title="Hello World">
+                        <span class="hidden-mobile">Hello World</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments">
+      
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/blog/js/events.js" ></script>
+<script  src="/blog/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    
+      <script  src="/blog/js/img-lazyload.js" ></script>
+    
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/blog/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/blog/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
