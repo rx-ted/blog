@@ -103,5 +103,6 @@ theme: hexo-theme-fluid
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
   type: git
-  repository: https://github.com/rx-ted/blog-website.git
+    # repository: https://github.com/rx-ted/blog-website.git
+  repository: git@github.com:rx-ted/blog.git
   branch: main
