@@ -1,7 +1,8 @@
 ---
 title: My English Resume
 date: 2023-5-16 10:00:00
-tag: 前端
+excerpt: my english resume ,use table webpages to put resume.
+tags: [前端,简历]
 ---
 
 # My Resume Online

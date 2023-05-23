@@ -4,12 +4,12 @@
 
 # Site
 title: Hexo-blog
-subtitle: ''
-description: ''
+subtitle: rx-ted's blog
+description: 'Record the crip'
 keywords:
 author: rx-ted
 language: zh-CN
-timezone: ''
+timezone: 'Asia/Shanghai'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
@@ -97,7 +97,8 @@ ignore:
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: hexo-theme-fluid
+# theme: hexo-theme-fluid
+theme: butterfly
 
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
