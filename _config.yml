@@ -98,7 +98,8 @@ ignore:
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
 # theme: hexo-theme-fluid
-theme: butterfly
+# theme: butterfly
+theme: example
 
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
@@ -107,3 +108,5 @@ deploy:
     # repository: https://github.com/rx-ted/blog-website.git
   repository: git@github.com:rx-ted/blog.git
   branch: main
+  message: update content
+
