@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="zh"><head>
+<title>DSC28034PNT-搭建环境推荐以usart串口烧录下载 - Hexo-blog</title>
+<meta charset="UTF-8">
+<meta name="keywords" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+<meta name="description" content="DSC28034PNT">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DSC28034PNT-搭建环境推荐以usart串口烧录下载">
+<meta property="og:url" content="https://rx-ted.github.io/blog/2023/07/31/DSC28034PNT-%E6%90%AD%E5%BB%BA%E7%8E%AF%E5%A2%83%E6%8E%A8%E8%8D%90%E4%BB%A5usart%E4%B8%B2%E5%8F%A3%E7%83%A7%E5%BD%95%E4%B8%8B%E8%BD%BD/index.html">
+<meta property="og:site_name" content="Hexo-blog">
+<meta property="og:description" content="DSC28034PNT">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-07-31T13:25:43.000Z">
+<meta property="article:modified_time" content="2023-12-10T06:12:39.857Z">
+<meta property="article:author" content="rx-ted">
+<meta property="article:tag" content="IOT">
+<meta property="article:tag" content="嵌入式">
+<meta name="twitter:card" content="summary">
+
+<link rel="stylesheet" href="/blog/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/blog/lib/mdui_043tiny/mdui.css">
+
+
+<link rel="stylesheet" href="/blog/lib/iconfont/iconfont.css?v=1702191050719">
+
+<link rel="stylesheet" href="/blog/css/style.css?v=1702191050719">
+
+
+
+
+    
+        <link rel="stylesheet" href="/blog/page/custom.css?v=1702191050719">
+    
+
+
+
+<script src="/blog/lib/mdui_043tiny/mdui.js" async></script>
+<script src="/blog/lib/fancybox/fancybox.umd.js" async></script>
+<script src="/blog/lib/lax.min.js" async></script>
+
+
+<script async src="/blog/js/app.js?v=1702191050719"></script>
+
+ 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4D4ZJ9G024"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+
+  gtag("config", "G-4D4ZJ9G024");
+</script>
+
+
+<link rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+<meta name="generator" content="Hexo 7.0.0"></head><body class="nexmoe mdui-drawer-body-left"><div id="nexmoe-background"><div class="nexmoe-bg"></div><div class="mdui-appbar mdui-shadow-0"><div class="mdui-toolbar"><a class="mdui-btn mdui-btn-icon mdui-ripple" mdui-drawer="{target: &#039;#drawer&#039;, swipe: true}" title="menu"><i class="mdui-icon nexmoefont icon-menu"></i></a><div class="mdui-toolbar-spacer"></div><a class="mdui-btn mdui-btn-icon" href="/blog/" title="rx-ted"><img src="https://rx-ted.github.io/blog/img/avatar.jpg" alt="rx-ted"></a></div></div></div><div id="nexmoe-header"><div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/blog/" title="rx-ted">
+            <img src="https://rx-ted.github.io/blog/img/avatar.jpg" alt="rx-ted" alt="rx-ted">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>28</div>
+        <div><span>标签</span>9</div>
+        <div><span>分类</span>0</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/blog/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/blog/archive.html" title="文章归档">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                文章归档
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/blog/about.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=site:rx-ted.github.io" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="搜索"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+	<div class="nexmoe-widget nexmoe-social">
+		<a
+			class="mdui-ripple"
+			href="https://github.com/rx-ted/"
+			target="_blank"
+			mdui-tooltip="{content: 'GitHub'}"
+			style="
+				color: rgb(25, 23, 23);
+				background-color: rgba(25, 23, 23, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-github"
+			></i> </a
+		><a
+			class="mdui-ripple"
+			href="mailto:gjy.18sui@gmail.com"
+			target="_blank"
+			mdui-tooltip="{content: 'Gmail'}"
+			style="
+				color: rgb(25, 23, 23);
+				background-color: rgba(25, 23, 23, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-mail-fill"
+			></i> </a
+		>
+	</div>
+</div>
+
+    
+        
+        
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/blog/tags/IOT/" style="font-size: 17.5px;">IOT</a> <a href="/blog/tags/Python/" style="font-size: 10px;">Python</a> <a href="/blog/tags/rt-thread%E7%A7%BB%E6%A4%8D/" style="font-size: 12.5px;">rt-thread移植</a> <a href="/blog/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 15px;">前端</a> <a href="/blog/tags/%E5%9B%BD%E6%B0%91%E6%8A%80%E6%9C%AFN32%E9%A1%B9%E7%9B%AE%E7%A7%BB%E6%A4%8D/" style="font-size: 15px;">国民技术N32项目移植</a> <a href="/blog/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" style="font-size: 20px;">嵌入式</a> <a href="/blog/tags/%E7%AE%80%E5%8E%86/" style="font-size: 10px;">简历</a> <a href="/blog/tags/%E7%BB%8F%E9%AA%8C/" style="font-size: 12.5px;">经验</a> <a href="/blog/tags/%E8%B8%A9%E5%9D%91%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">踩坑笔记</a>
+    </div>
+    
+      <script>
+        var maxTagcloud = parseInt(17);
+        var tags_length = parseInt(9);
+        var tags_arr = [];
+        for(var i = 0; i < tags_length; i++){
+          tags_arr.push(i);
+        }
+        tags_arr.sort(function (l, r) {
+          return Math.random() > 0.5 ? -1 : 1;
+        });
+        tags_arr = tags_arr.slice(0, maxTagcloud < tags_length ? tags_length - maxTagcloud : 0);
+        for(var tag_i = 0; tag_i < tags_arr.length; tag_i++){
+          document.getElementById("randomtagcloud").children[tags_arr[tag_i]].style.display = 'none';
+        }
+      </script>
+    
+  </div>
+
+    
+        
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章归档</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2023/">2023</a><span class="archive-list-count">28</span></li></ul>
+    </div>
+  </div>
+
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">最新文章</h3>
+    <div class="nexmoe-widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2023/07/31/DSC28034PNT-%E5%9F%BA%E4%BA%8E%E5%AE%9A%E6%97%B6%E5%99%A8%E5%92%8CPWM%E8%BE%93%E5%87%BA%E4%B8%89%E8%89%B2%E7%81%AF/">DSC28034PNT-基于定时器和PWM输出三色灯</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2023/07/31/DSC28034PNT-%E6%90%AD%E5%BB%BA%E7%8E%AF%E5%A2%83%E6%8E%A8%E8%8D%90%E4%BB%A5usart%E4%B8%B2%E5%8F%A3%E7%83%A7%E5%BD%95%E4%B8%8B%E8%BD%BD/">DSC28034PNT-搭建环境推荐以usart串口烧录下载</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2023/07/31/%E6%97%B6%E9%97%B4%E6%98%BE%E7%A4%BA-%E5%9F%BA%E4%BA%8Essd1306%20I2C%20%E8%B0%83%E7%94%A8%E5%BC%80%E6%BA%90%E5%BA%93%20%E4%BA%8B%E5%8D%8A%E5%8A%9F%E5%80%8D/">时间显示 基于ssd1306 I2C 调用开源库 事半功倍</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2023/07/29/DSC28034PNT-%E5%BC%80%E7%AE%B1%E5%B9%B6%E7%82%B9%E4%BA%AELED/">DSC28034PNT-开箱并点亮LED</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2023/07/18/milkv-duo-i2c-ssd1306/">【Milk-V Duo 开发板免费体验】Linux下i2c驱动OLED ssd1306</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+    
+        
+   
+    <div class="nexmoe-copyright">
+        &copy; 2023 rx-ted
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        <br><a href="https://rx-ted.github.io/blog">仅供笔记</a>
+<br><a target="_blank" href="https://rx-ted.github.io/blog/about.html">
+<img src="https://rx-ted.github.io/blog/img/avatar.jpgimg/official.png" width="150px"></a>
+
+    </div>
+</div><!-- .nexmoe-drawer --></div><div id="nexmoe-content"><div class="nexmoe-primary"><div class="nexmoe-post">
+    <article>
+        <div class="nexmoe-post-cover absolute" style="padding-top: NaN%;">
+            <h1>
+                DSC28034PNT-搭建环境推荐以usart串口烧录下载
+            </h1>
+        </div>
+        <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2023年07月31日</a>
+        
+                
+                    
+                        <a href="/blog/tags/IOT/">#IOT</a>
+                        
+                        <a href="/blog/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/">#嵌入式</a>
+                        
+
+                            
+    </div>
+
+    
+            
+                    
+                            
+</div>
+
+            <!--
+ * @Author: rx-ted
+ * @Date: 2023-08-05 09:10:30
+ * @LastEditors: rx-ted
+ * @LastEditTime: 2023-08-05 09:24:17
+-->
+<h1 id="DSC28034PNT-搭建环境推荐以usart串口烧录下载"><a href="#DSC28034PNT-搭建环境推荐以usart串口烧录下载" class="headerlink" title="DSC28034PNT-搭建环境推荐以usart串口烧录下载"></a>DSC28034PNT-搭建环境推荐以usart串口烧录下载</h1><p>DSC28034PNT作为一款高性能嵌入式开发平台，广泛应用于各种领域。<br>在开发过程中，一个高效稳定的烧录下载环境至关重要。<br>本报告将介绍以USART串口烧录下载的方式搭建DSC28034PNT开发环境的方法和优势。</p>
+<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>DSC28034PNT是一款强大的嵌入式开发平台，广泛应用于工业控制、物联网和智能家居等领域。<br>为了实现高效的开发和调试，本报告推荐使用USART串口烧录下载的方法来搭建DSC28034PNT开发环境。<br>通过该方法，可以实现简单快速的程序下载，提高开发效率，同时兼顾稳定性和灵活性。<br>条件不够好的话，那就推荐用usart串口烧录下载。</p>
+<h2 id="USART串口烧录下载的原理和优势"><a href="#USART串口烧录下载的原理和优势" class="headerlink" title="USART串口烧录下载的原理和优势"></a>USART串口烧录下载的原理和优势</h2><ul>
+<li><p>USART串口烧录下载是一种通过串口通信实现程序下载的方法。<br>在DSC28034PNT上，USART接口与计算机之间进行通信，将编译好的程序文件传输到开发板上，实现程序下载。该方法具有以下优势：</p>
+<ul>
+<li><p>简单快速：USART串口烧录下载是一种简单快速的下载方式，不需要额外的下载器或调试器。只需通过串口连接开发板和计算机，即可完成下载过程。</p>
+</li>
+<li><p>稳定可靠：USART串口烧录下载具有稳定可靠的特性，传输过程中数据校验和错误处理能力保证了下载的准确性和可靠性。</p>
+</li>
+<li><p>灵活性强：USART串口烧录下载适用于不同操作系统和开发环境，具有较好的兼容性。同时，不受地域限制，可在各种场景下灵活应用。</p>
+</li>
+</ul>
+</li>
+<li><p>搭建环境步骤<br>以下是搭建DSC28034PNT开发环境以USART串口烧录下载为主要方式的步骤</p>
+<ul>
+<li><p>准备软件：有官方提供的烧录下载器。</p>
+</li>
+<li><p>准备硬件：首先需要准备好一台计算机和DSC28034PNT开发板。确保计算机上已安装串口通信软件，如串口调试软件等，只要能接通串口即可，不限制什么软件。</p>
+</li>
+<li><p>连接硬件：将计算机的串口接口rxd txd 与DSC28034PNT的USART接口相连，确保连接牢固。</p>
+</li>
+<li><p>配置串口：打开计算机上的串口通信软件，选择正确的串口号和波特率，与DSC28034PNT上的USART配置一致。比如开发板上是115200，那么电脑上面也是115200</p>
+</li>
+<li><p>编译程序：使用相应的开发环境，编写并编译好需要下载的程序，生成程序文件。</p>
+</li>
+<li><p>下载程序：在串口通信软件中选择“发送文件”或类似选项，将编译好的程序文件传输到DSC28034PNT上，即可完成下载。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过本报告的介绍，我们了解了以USART串口烧录下载的方式搭建DSC28034PNT开发环境的原理和优势。USART串口烧录下载具有简单快速、稳定可靠和灵活性强等特点，为DSC28034PNT开发提供了高效的解决方案。通过正确连接硬件，配置串口和正确下载程序，我们可以轻松地搭建一个稳定可靠的开发环境，并进行高效的开发和调试工作。</p>
+
+                <p><img src="https://rx-ted.github.io/blog/img/official.png" loading="lazy"></p>
+
+    </article>
+
+    
+        
+    <div class="nexmoe-post-copyright">
+        <strong>本文作者：</strong>rx-ted<br>
+        <strong>本文链接：</strong><a href="https://rx-ted.github.io/blog/2023/07/31/DSC28034PNT-%E6%90%AD%E5%BB%BA%E7%8E%AF%E5%A2%83%E6%8E%A8%E8%8D%90%E4%BB%A5usart%E4%B8%B2%E5%8F%A3%E7%83%A7%E5%BD%95%E4%B8%8B%E8%BD%BD/" title="https:&#x2F;&#x2F;rx-ted.github.io&#x2F;blog&#x2F;2023&#x2F;07&#x2F;31&#x2F;DSC28034PNT-%E6%90%AD%E5%BB%BA%E7%8E%AF%E5%A2%83%E6%8E%A8%E8%8D%90%E4%BB%A5usart%E4%B8%B2%E5%8F%A3%E7%83%A7%E5%BD%95%E4%B8%8B%E8%BD%BD&#x2F;" target="_blank" rel="noopener">https:&#x2F;&#x2F;rx-ted.github.io&#x2F;blog&#x2F;2023&#x2F;07&#x2F;31&#x2F;DSC28034PNT-%E6%90%AD%E5%BB%BA%E7%8E%AF%E5%A2%83%E6%8E%A8%E8%8D%90%E4%BB%A5usart%E4%B8%B2%E5%8F%A3%E7%83%A7%E5%BD%95%E4%B8%8B%E8%BD%BD&#x2F;</a><br>
+        
+            <strong>版权声明：</strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/deed.zh" target="_blank">CC BY-NC-SA 3.0 CN</a> 协议进行许可
+
+        
+    </div>
+
+
+            
+
+                <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+        <a class="nexmoefont icon-tag-fill -none-link" href="/blog/tags/IOT/" rel="tag">IOT</a> <a class="nexmoefont icon-tag-fill -none-link" href="/blog/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" rel="tag">嵌入式</a>
+    
+</div>
+
+                    
+                        <script async src="/blog/js/copy-codeblock.js?v=1702191050549"></script>
+                            
+
+                                
+                                    <div class="nexmoe-post-footer">
+                                        
+                                    </div>
+                                    
+</div></div><div class="nexmoe-post-right">    <div class="nexmoe-fixed">
+        <div class="nexmoe-tool">
+
+            
+
+            
+            
+            <button class="mdui-fab catalog" style="overflow:unset;">
+                <i class="nexmoefont icon-i-catalog"></i>
+                <div class="nexmoe-toc">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#DSC28034PNT-%E6%90%AD%E5%BB%BA%E7%8E%AF%E5%A2%83%E6%8E%A8%E8%8D%90%E4%BB%A5usart%E4%B8%B2%E5%8F%A3%E7%83%A7%E5%BD%95%E4%B8%8B%E8%BD%BD"><span class="toc-number">1.</span> <span class="toc-text">DSC28034PNT-搭建环境推荐以usart串口烧录下载</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%91%98%E8%A6%81"><span class="toc-number">1.1.</span> <span class="toc-text">摘要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#USART%E4%B8%B2%E5%8F%A3%E7%83%A7%E5%BD%95%E4%B8%8B%E8%BD%BD%E7%9A%84%E5%8E%9F%E7%90%86%E5%92%8C%E4%BC%98%E5%8A%BF"><span class="toc-number">1.2.</span> <span class="toc-text">USART串口烧录下载的原理和优势</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.3.</span> <span class="toc-text">总结</span></a></li></ol></li></ol>
+                </div>
+            </button>
+            
+
+            
+
+            <a href="#nexmoe-content" class="backtop toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+        </div>
+    </div>
+</div></div><div id="nexmoe-footer"><!--!--></div><div id="nexmoe-search-space"><div class="search-container"><div class="search-header"><div class="search-input-container"><input class="search-input" type="text" placeholder="搜索" onInput="sinput();"></div><a class="search-close" onclick="sclose();">×</a></div><div class="search-body"></div></div></div><div><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2058306854838448" crossorigin="anonymous"></script>
+</div></body></html>

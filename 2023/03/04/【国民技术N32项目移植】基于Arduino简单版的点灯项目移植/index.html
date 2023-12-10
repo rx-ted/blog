@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="zh"><head>
+<title>【国民技术N32项目移植】基于Arduino简单版的点灯项目移植 - Hexo-blog</title>
+<meta charset="UTF-8">
+<meta name="keywords" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+<meta name="description" content="【国民技术N32项目移植】基于Arduino简单版的点灯项目移植N32G4FR 简单移植arduino库，简单点灯熄灯，延迟开灯等反复的点亮LED一秒钟，然后关闭LED一秒钟。 功能1234567891011121314151617181920212223242526272829303132&#x2F;&#x2F; 创建Arduino.h&#x2F;&#x2F; 模仿函数&#x2F;** *  pinMode() * @param pin—引脚">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【国民技术N32项目移植】基于Arduino简单版的点灯项目移植">
+<meta property="og:url" content="https://rx-ted.github.io/blog/2023/03/04/%E3%80%90%E5%9B%BD%E6%B0%91%E6%8A%80%E6%9C%AFN32%E9%A1%B9%E7%9B%AE%E7%A7%BB%E6%A4%8D%E3%80%91%E5%9F%BA%E4%BA%8EArduino%E7%AE%80%E5%8D%95%E7%89%88%E7%9A%84%E7%82%B9%E7%81%AF%E9%A1%B9%E7%9B%AE%E7%A7%BB%E6%A4%8D/index.html">
+<meta property="og:site_name" content="Hexo-blog">
+<meta property="og:description" content="【国民技术N32项目移植】基于Arduino简单版的点灯项目移植N32G4FR 简单移植arduino库，简单点灯熄灯，延迟开灯等反复的点亮LED一秒钟，然后关闭LED一秒钟。 功能1234567891011121314151617181920212223242526272829303132&#x2F;&#x2F; 创建Arduino.h&#x2F;&#x2F; 模仿函数&#x2F;** *  pinMode() * @param pin—引脚">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://video-community.csdnimg.cn/vod-84deb4/36fe8520b0c171eda8877035d0b20102/snapshots/8b5c53c1787646d9b1859a01c2fe8ae9-00002.jpg?auth_key=4830457980-0-0-b219a611407df248052228c34bc1797f">
+<meta property="article:published_time" content="2023-03-04T14:53:38.000Z">
+<meta property="article:modified_time" content="2023-12-10T06:12:38.641Z">
+<meta property="article:author" content="rx-ted">
+<meta property="article:tag" content="国民技术N32项目移植">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://video-community.csdnimg.cn/vod-84deb4/36fe8520b0c171eda8877035d0b20102/snapshots/8b5c53c1787646d9b1859a01c2fe8ae9-00002.jpg?auth_key=4830457980-0-0-b219a611407df248052228c34bc1797f">
+
+<link rel="stylesheet" href="/blog/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/blog/lib/mdui_043tiny/mdui.css">
+
+
+<link rel="stylesheet" href="/blog/lib/iconfont/iconfont.css?v=1702191050924">
+
+<link rel="stylesheet" href="/blog/css/style.css?v=1702191050924">
+
+
+
+
+    
+        <link rel="stylesheet" href="/blog/page/custom.css?v=1702191050925">
+    
+
+
+
+<script src="/blog/lib/mdui_043tiny/mdui.js" async></script>
+<script src="/blog/lib/fancybox/fancybox.umd.js" async></script>
+<script src="/blog/lib/lax.min.js" async></script>
+
+
+<script async src="/blog/js/app.js?v=1702191050925"></script>
+
+ 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4D4ZJ9G024"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+
+  gtag("config", "G-4D4ZJ9G024");
+</script>
+
+
+<link rel="stylesheet"  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+<meta name="generator" content="Hexo 7.0.0"></head><body class="nexmoe mdui-drawer-body-left"><div id="nexmoe-background"><div class="nexmoe-bg"></div><div class="mdui-appbar mdui-shadow-0"><div class="mdui-toolbar"><a class="mdui-btn mdui-btn-icon mdui-ripple" mdui-drawer="{target: &#039;#drawer&#039;, swipe: true}" title="menu"><i class="mdui-icon nexmoefont icon-menu"></i></a><div class="mdui-toolbar-spacer"></div><a class="mdui-btn mdui-btn-icon" href="/blog/" title="rx-ted"><img src="https://rx-ted.github.io/blog/img/avatar.jpg" alt="rx-ted"></a></div></div></div><div id="nexmoe-header"><div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/blog/" title="rx-ted">
+            <img src="https://rx-ted.github.io/blog/img/avatar.jpg" alt="rx-ted" alt="rx-ted">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>28</div>
+        <div><span>标签</span>9</div>
+        <div><span>分类</span>0</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/blog/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/blog/archive.html" title="文章归档">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                文章归档
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/blog/about.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=site:rx-ted.github.io" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="搜索"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+	<div class="nexmoe-widget nexmoe-social">
+		<a
+			class="mdui-ripple"
+			href="https://github.com/rx-ted/"
+			target="_blank"
+			mdui-tooltip="{content: 'GitHub'}"
+			style="
+				color: rgb(25, 23, 23);
+				background-color: rgba(25, 23, 23, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-github"
+			></i> </a
+		><a
+			class="mdui-ripple"
+			href="mailto:gjy.18sui@gmail.com"
+			target="_blank"
+			mdui-tooltip="{content: 'Gmail'}"
+			style="
+				color: rgb(25, 23, 23);
+				background-color: rgba(25, 23, 23, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-mail-fill"
+			></i> </a
+		>
+	</div>
+</div>
+
+    
+        
+        
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/blog/tags/IOT/" style="font-size: 17.5px;">IOT</a> <a href="/blog/tags/Python/" style="font-size: 10px;">Python</a> <a href="/blog/tags/rt-thread%E7%A7%BB%E6%A4%8D/" style="font-size: 12.5px;">rt-thread移植</a> <a href="/blog/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 15px;">前端</a> <a href="/blog/tags/%E5%9B%BD%E6%B0%91%E6%8A%80%E6%9C%AFN32%E9%A1%B9%E7%9B%AE%E7%A7%BB%E6%A4%8D/" style="font-size: 15px;">国民技术N32项目移植</a> <a href="/blog/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" style="font-size: 20px;">嵌入式</a> <a href="/blog/tags/%E7%AE%80%E5%8E%86/" style="font-size: 10px;">简历</a> <a href="/blog/tags/%E7%BB%8F%E9%AA%8C/" style="font-size: 12.5px;">经验</a> <a href="/blog/tags/%E8%B8%A9%E5%9D%91%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">踩坑笔记</a>
+    </div>
+    
+      <script>
+        var maxTagcloud = parseInt(17);
+        var tags_length = parseInt(9);
+        var tags_arr = [];
+        for(var i = 0; i < tags_length; i++){
+          tags_arr.push(i);
+        }
+        tags_arr.sort(function (l, r) {
+          return Math.random() > 0.5 ? -1 : 1;
+        });
+        tags_arr = tags_arr.slice(0, maxTagcloud < tags_length ? tags_length - maxTagcloud : 0);
+        for(var tag_i = 0; tag_i < tags_arr.length; tag_i++){
+          document.getElementById("randomtagcloud").children[tags_arr[tag_i]].style.display = 'none';
+        }
+      </script>
+    
+  </div>
+
+    
+        
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章归档</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2023/">2023</a><span class="archive-list-count">28</span></li></ul>
+    </div>
+  </div>
+
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">最新文章</h3>
+    <div class="nexmoe-widget">
+      <ul>
+        
+          <li>
+            <a href="/blog/2023/07/31/DSC28034PNT-%E5%9F%BA%E4%BA%8E%E5%AE%9A%E6%97%B6%E5%99%A8%E5%92%8CPWM%E8%BE%93%E5%87%BA%E4%B8%89%E8%89%B2%E7%81%AF/">DSC28034PNT-基于定时器和PWM输出三色灯</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2023/07/31/DSC28034PNT-%E6%90%AD%E5%BB%BA%E7%8E%AF%E5%A2%83%E6%8E%A8%E8%8D%90%E4%BB%A5usart%E4%B8%B2%E5%8F%A3%E7%83%A7%E5%BD%95%E4%B8%8B%E8%BD%BD/">DSC28034PNT-搭建环境推荐以usart串口烧录下载</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2023/07/31/%E6%97%B6%E9%97%B4%E6%98%BE%E7%A4%BA-%E5%9F%BA%E4%BA%8Essd1306%20I2C%20%E8%B0%83%E7%94%A8%E5%BC%80%E6%BA%90%E5%BA%93%20%E4%BA%8B%E5%8D%8A%E5%8A%9F%E5%80%8D/">时间显示 基于ssd1306 I2C 调用开源库 事半功倍</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2023/07/29/DSC28034PNT-%E5%BC%80%E7%AE%B1%E5%B9%B6%E7%82%B9%E4%BA%AELED/">DSC28034PNT-开箱并点亮LED</a>
+          </li>
+        
+          <li>
+            <a href="/blog/2023/07/18/milkv-duo-i2c-ssd1306/">【Milk-V Duo 开发板免费体验】Linux下i2c驱动OLED ssd1306</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+    
+        
+   
+    <div class="nexmoe-copyright">
+        &copy; 2023 rx-ted
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        <br><a href="https://rx-ted.github.io/blog">仅供笔记</a>
+<br><a target="_blank" href="https://rx-ted.github.io/blog/about.html">
+<img src="https://rx-ted.github.io/blog/img/avatar.jpgimg/official.png" width="150px"></a>
+
+    </div>
+</div><!-- .nexmoe-drawer --></div><div id="nexmoe-content"><div class="nexmoe-primary"><div class="nexmoe-post">
+    <article>
+        <div class="nexmoe-post-cover absolute" style="padding-top: NaN%;">
+            <h1>
+                【国民技术N32项目移植】基于Arduino简单版的点灯项目移植
+            </h1>
+        </div>
+        <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2023年03月04日</a>
+        
+                
+                    
+                        <a href="/blog/tags/%E5%9B%BD%E6%B0%91%E6%8A%80%E6%9C%AFN32%E9%A1%B9%E7%9B%AE%E7%A7%BB%E6%A4%8D/">#国民技术N32项目移植</a>
+                        
+
+                            
+    </div>
+
+    
+            
+                    
+                            
+</div>
+
+            <!--
+ * @Author: rx-ted
+ * @Date: 2023-02-18 21:30:26
+ * @LastEditors: rx-ted
+ * @LastEditTime: 2023-03-04 22:59:06
+-->
+<h1 id="【国民技术N32项目移植】基于Arduino简单版的点灯项目移植"><a href="#【国民技术N32项目移植】基于Arduino简单版的点灯项目移植" class="headerlink" title="【国民技术N32项目移植】基于Arduino简单版的点灯项目移植"></a>【国民技术N32项目移植】基于Arduino简单版的点灯项目移植</h1><p>N32G4FR 简单移植arduino库，简单点灯熄灯，延迟开灯等<br>反复的点亮LED一秒钟，然后关闭LED一秒钟。</p>
+<h2 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建Arduino.h</span></span><br><span class="line"><span class="comment">// 模仿函数</span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *  pinMode()</span></span><br><span class="line"><span class="comment"> * @param pin—引脚 GPIO序号 查看pin.c源代码</span></span><br><span class="line"><span class="comment"> * @param Mode—模式 1.输出(OUTPUT)模式;2.输入(INPUT)模式;3.输入上拉（INPUT_PULLUP）模式 </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">pinMode(pin,Mode) <span class="comment">// 函数：定义引脚模式</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * digitalWrite()</span></span><br><span class="line"><span class="comment"> * @param pin：GPIO序号 查看pin.c源代码</span></span><br><span class="line"><span class="comment"> * @param value：HIGH或LOW</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">digitalWrite(pin, value)</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * delay()</span></span><br><span class="line"><span class="comment"> * @param ms 多少毫秒</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">delay(ms)</span><br><span class="line"><span class="comment">//for example</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">int</span> ledPin = PIN_GET(B,<span class="number">5</span>);<span class="comment">//定义引脚D3</span></span><br><span class="line">    pinMode( ledPin, OUTPUT);</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)&#123;</span><br><span class="line">    digitalWrite(ledPin, HIGH);<span class="comment">//LED灯亮</span></span><br><span class="line">    delay(<span class="number">1000</span>);<span class="comment">//等待1秒</span></span><br><span class="line">    digitalWrite(ledPin, LOW);<span class="comment">//LED灯灭</span></span><br><span class="line">    delay(<span class="number">1000</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;drv_gpio.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;drv_usart.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;pin.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;serial.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;rtthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> RT_USING_DFS</span></span><br><span class="line"><span class="comment">/* dfs filesystem:ELM filesystem init */</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;dfs_elm.h&gt;</span></span></span><br><span class="line"><span class="comment">/* dfs Filesystem APIs */</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;dfs_fs.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> RT_USING_RTGUI</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;rtgui/calibration.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;rtgui/driver.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;rtgui/rtgui.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;rtgui/rtgui_server.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;rtgui/rtgui_system.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* Official Arduino */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOW 0x0</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HIGH 0x1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> CHANGE 0x2</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FALLING 0x3</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RISING 0x4</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> INPUT 0x0</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> OUTPUT 0x1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> INPUT_PULLUP 0x2</span></span><br><span class="line"><span class="comment">/* RT-Thread extension */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> INPUT_FLOATING INPUT</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> INPUT_PULLDOWN 0x3</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> OUTPUT_OPEN_DRAIN 0x4</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ALIGN(RT_ALIGN_SIZE)</span><br><span class="line"><span class="type">static</span> <span class="type">rt_uint8_t</span> led0_stack[<span class="number">512</span>], led1_stack[<span class="number">512</span>];</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">rt_thread</span> <span class="title">led0_thread</span>;</span></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">rt_thread</span> <span class="title">led1_thread</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LED1_PIN GET_PIN(A, 8)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LED3_PIN GET_PIN(B, 5)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief  led0 thread entry</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">led0_thread_entry</span><span class="params">(<span class="type">void</span> *parameter)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        rt_thread_delay(<span class="number">50</span>); <span class="comment">// delay 500ms</span></span><br><span class="line">        rt_pin_write(LED1_PIN, PIN_HIGH);</span><br><span class="line">        rt_thread_delay(<span class="number">50</span>); <span class="comment">// delay 500ms</span></span><br><span class="line">        rt_pin_write(LED1_PIN, PIN_LOW);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief  led1 thread entry</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">led1_thread_entry</span><span class="params">(<span class="type">void</span> *parameter)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        rt_thread_delay(<span class="number">25</span>); <span class="comment">// delay 250ms</span></span><br><span class="line">        rt_pin_write(LED3_PIN, PIN_HIGH);</span><br><span class="line">        rt_thread_delay(<span class="number">25</span>); <span class="comment">// delay 250ms</span></span><br><span class="line">        rt_pin_write(LED3_PIN, PIN_LOW);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> RT_USING_RTGUI</span></span><br><span class="line"><span class="type">rt_bool_t</span> <span class="title function_">cali_setup</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    rt_kprintf(<span class="string">&quot;cali setup entered\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> RT_FALSE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">cali_store</span><span class="params">(<span class="keyword">struct</span> calibration_data *data)</span></span><br><span class="line">&#123;</span><br><span class="line">    rt_kprintf(<span class="string">&quot;cali finished (%d, %d), (%d, %d)\n&quot;</span>,</span><br><span class="line">               data-&gt;min_x,</span><br><span class="line">               data-&gt;max_x,</span><br><span class="line">               data-&gt;min_y,</span><br><span class="line">               data-&gt;max_y);</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span> <span class="comment">/* RT_USING_RTGUI */</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">led1</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    rt_pin_mode(LED1_PIN, PIN_MODE_OUTPUT);</span><br><span class="line">    <span class="type">rt_err_t</span> result;</span><br><span class="line">    <span class="comment">/* init led0 thread */</span></span><br><span class="line">    result = rt_thread_init(&amp;led0_thread, <span class="string">&quot;led0&quot;</span>, led0_thread_entry, RT_NULL, (<span class="type">rt_uint8_t</span> *)&amp;led0_stack[<span class="number">0</span>], <span class="keyword">sizeof</span>(led0_stack), <span class="number">4</span>, <span class="number">5</span>);</span><br><span class="line">    <span class="keyword">if</span> (result != RT_EOK)</span><br><span class="line">    &#123;</span><br><span class="line">        rt_kprintf(<span class="string">&quot;create task for red led is failed!\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    rt_thread_startup(&amp;led0_thread);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">led2</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    rt_pin_mode(LED3_PIN, PIN_MODE_OUTPUT);</span><br><span class="line">    <span class="type">rt_err_t</span> result;</span><br><span class="line">    <span class="comment">/* init led1 thread */</span></span><br><span class="line">    result = rt_thread_init(&amp;led1_thread, <span class="string">&quot;led1&quot;</span>, led1_thread_entry, RT_NULL, (<span class="type">rt_uint8_t</span> *)&amp;led1_stack[<span class="number">0</span>], <span class="keyword">sizeof</span>(led1_stack), <span class="number">5</span>, <span class="number">5</span>);</span><br><span class="line">    <span class="keyword">if</span> (result != RT_EOK)</span><br><span class="line">    &#123;</span><br><span class="line">        rt_kprintf(<span class="string">&quot;create task for green led is failed!\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    rt_thread_startup(&amp;led1_thread);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">pinMode</span><span class="params">(<span class="type">uint8_t</span> pin, <span class="type">uint8_t</span> mode)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">rt_base_t</span> rt_mode;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">switch</span>(mode)</span><br><span class="line">    &#123;</span><br><span class="line">    <span class="keyword">case</span> INPUT:</span><br><span class="line">        rt_mode = PIN_MODE_INPUT;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> OUTPUT:</span><br><span class="line">        rt_mode = PIN_MODE_OUTPUT;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> INPUT_PULLUP:</span><br><span class="line">        rt_mode = PIN_MODE_INPUT_PULLUP;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> INPUT_PULLDOWN:</span><br><span class="line">        rt_mode = PIN_MODE_INPUT_PULLDOWN;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> OUTPUT_OPEN_DRAIN:</span><br><span class="line">        rt_mode = PIN_MODE_OUTPUT_OD;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        rt_mode = RT_NULL;</span><br><span class="line">        <span class="comment">// LOG_E(&quot;pinMode mode parameter is illegal&quot;);</span></span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    rt_pin_mode(pin, rt_mode);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">digitalWrite</span><span class="params">(<span class="type">uint8_t</span> pin, <span class="type">uint8_t</span> val)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">rt_base_t</span> rt_val;</span><br><span class="line">    <span class="keyword">if</span>(val == HIGH)</span><br><span class="line">    &#123;</span><br><span class="line">        rt_val = PIN_HIGH;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(val == LOW)</span><br><span class="line">    &#123;</span><br><span class="line">        rt_val = PIN_LOW;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    rt_pin_write(pin, rt_val);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">delay</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> ms)</span>&#123;</span><br><span class="line">    rt_thread_mdelay(ms);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief  Main program</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    pinMode( LED1_PIN, OUTPUT);</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)&#123;</span><br><span class="line">    digitalWrite(LED1_PIN, HIGH);<span class="comment">//LED灯亮</span></span><br><span class="line">    delay(<span class="number">1000</span>);<span class="comment">//等待1秒</span></span><br><span class="line">    digitalWrite(LED1_PIN, LOW);<span class="comment">//LED灯灭</span></span><br><span class="line">    delay(<span class="number">1000</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">MSH_CMD_EXPORT(led1, <span class="string">&quot;red led blink&quot;</span>)</span><br><span class="line">MSH_CMD_EXPORT(led2, <span class="string">&quot;blue led blink&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">/*@&#125;*/</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>实现了，脑子会想到与N32G4FR和Arduino完全相同的，是的arduino上的语法N32G4FR都兼容的。这让我们面对N32G4FR时省了不少的功夫.</p>
+<h2 id="演示结果"><a href="#演示结果" class="headerlink" title="演示结果"></a>演示结果</h2><p><img src="https://video-community.csdnimg.cn/vod-84deb4/36fe8520b0c171eda8877035d0b20102/snapshots/8b5c53c1787646d9b1859a01c2fe8ae9-00002.jpg?auth_key=4830457980-0-0-b219a611407df248052228c34bc1797f" alt="title-ledBlink"></p>
+<p><video controls height='200px' width='200px' src="https://live.csdn.net/v/embed/277081"></video></p>
+
+                <p><img src="https://rx-ted.github.io/blog/img/official.png" loading="lazy"></p>
+
+    </article>
+
+    
+        
+    <div class="nexmoe-post-copyright">
+        <strong>本文作者：</strong>rx-ted<br>
+        <strong>本文链接：</strong><a href="https://rx-ted.github.io/blog/2023/03/04/%E3%80%90%E5%9B%BD%E6%B0%91%E6%8A%80%E6%9C%AFN32%E9%A1%B9%E7%9B%AE%E7%A7%BB%E6%A4%8D%E3%80%91%E5%9F%BA%E4%BA%8EArduino%E7%AE%80%E5%8D%95%E7%89%88%E7%9A%84%E7%82%B9%E7%81%AF%E9%A1%B9%E7%9B%AE%E7%A7%BB%E6%A4%8D/" title="https:&#x2F;&#x2F;rx-ted.github.io&#x2F;blog&#x2F;2023&#x2F;03&#x2F;04&#x2F;%E3%80%90%E5%9B%BD%E6%B0%91%E6%8A%80%E6%9C%AFN32%E9%A1%B9%E7%9B%AE%E7%A7%BB%E6%A4%8D%E3%80%91%E5%9F%BA%E4%BA%8EArduino%E7%AE%80%E5%8D%95%E7%89%88%E7%9A%84%E7%82%B9%E7%81%AF%E9%A1%B9%E7%9B%AE%E7%A7%BB%E6%A4%8D&#x2F;" target="_blank" rel="noopener">https:&#x2F;&#x2F;rx-ted.github.io&#x2F;blog&#x2F;2023&#x2F;03&#x2F;04&#x2F;%E3%80%90%E5%9B%BD%E6%B0%91%E6%8A%80%E6%9C%AFN32%E9%A1%B9%E7%9B%AE%E7%A7%BB%E6%A4%8D%E3%80%91%E5%9F%BA%E4%BA%8EArduino%E7%AE%80%E5%8D%95%E7%89%88%E7%9A%84%E7%82%B9%E7%81%AF%E9%A1%B9%E7%9B%AE%E7%A7%BB%E6%A4%8D&#x2F;</a><br>
+        
+            <strong>版权声明：</strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/deed.zh" target="_blank">CC BY-NC-SA 3.0 CN</a> 协议进行许可
+
+        
+    </div>
+
+
+            
+
+                <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+        <a class="nexmoefont icon-tag-fill -none-link" href="/blog/tags/%E5%9B%BD%E6%B0%91%E6%8A%80%E6%9C%AFN32%E9%A1%B9%E7%9B%AE%E7%A7%BB%E6%A4%8D/" rel="tag">国民技术N32项目移植</a>
+    
+</div>
+
+                    
+                        <script async src="/blog/js/copy-codeblock.js?v=1702191050573"></script>
+                            
+
+                                
+                                    <div class="nexmoe-post-footer">
+                                        
+                                    </div>
+                                    
+</div></div><div class="nexmoe-post-right">    <div class="nexmoe-fixed">
+        <div class="nexmoe-tool">
+
+            
+
+            
+            
+            <button class="mdui-fab catalog" style="overflow:unset;">
+                <i class="nexmoefont icon-i-catalog"></i>
+                <div class="nexmoe-toc">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E3%80%90%E5%9B%BD%E6%B0%91%E6%8A%80%E6%9C%AFN32%E9%A1%B9%E7%9B%AE%E7%A7%BB%E6%A4%8D%E3%80%91%E5%9F%BA%E4%BA%8EArduino%E7%AE%80%E5%8D%95%E7%89%88%E7%9A%84%E7%82%B9%E7%81%AF%E9%A1%B9%E7%9B%AE%E7%A7%BB%E6%A4%8D"><span class="toc-number">1.</span> <span class="toc-text">【国民技术N32项目移植】基于Arduino简单版的点灯项目移植</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%9F%E8%83%BD"><span class="toc-number">1.1.</span> <span class="toc-text">功能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81"><span class="toc-number">1.2.</span> <span class="toc-text">代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.3.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BC%94%E7%A4%BA%E7%BB%93%E6%9E%9C"><span class="toc-number">1.4.</span> <span class="toc-text">演示结果</span></a></li></ol></li></ol>
+                </div>
+            </button>
+            
+
+            
+
+            <a href="#nexmoe-content" class="backtop toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+        </div>
+    </div>
+</div></div><div id="nexmoe-footer"><!--!--></div><div id="nexmoe-search-space"><div class="search-container"><div class="search-header"><div class="search-input-container"><input class="search-input" type="text" placeholder="搜索" onInput="sinput();"></div><a class="search-close" onclick="sclose();">×</a></div><div class="search-body"></div></div></div><div><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2058306854838448" crossorigin="anonymous"></script>
+</div></body></html>
