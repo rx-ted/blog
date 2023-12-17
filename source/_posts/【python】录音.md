@@ -1,8 +1,10 @@
 ---
 title: 【python】录音
 date: 2023-02-16 21:41:47
-tags: Python
+tags: [Python]
+categories: [technology]
 excerpt: MASR致力于简单，实用的语音识别项目
+description: MASR致力于简单，实用的语音识别项目
 ---
 # 一、MASR是什么？
 MASR是一款基于Pytorch实现的自动语音识别框架，MASR全称是神奇的自动语音识别框架（Magical Automatic Speech Recognition），MASR致力于简单，实用的语音识别项目。 
