@@ -1335,3 +1335,10 @@ CDN:
     # waterfall:
     # ali_iconfont_css:
     # accesskey_js:
+
+editor: 
+  mode: 
+    - RENDER MODE
+    - SOURCE_AND_PREVIEW MODE
+    - SOURCE MODE
+    - PREVIEW MODE
