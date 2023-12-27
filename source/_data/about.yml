@@ -1,0 +1,52 @@
+- class_name: 关于页
+  subtitle: 人生如戏 生活如诗 祸福难料 把握眼前✨
+  avatarImg: https://s1.imagehub.cc/images/2023/12/16/41933c4cf16a7aa4a21ccdc7376afcb4.jpeg
+  avatarSkills:
+    left:
+      - 🤖️ 数码科技爱好者
+      - 🔧 DIY狂热者
+      - 🚀 动手能力超强
+      - 💡 解决问题小能手
+      - 📚 知识探索者
+      - 🤝 善于沟通的协调者
+      # - 💡 创新思维引领者   
+      - 🏠 智能家居小能手
+    
+    right:
+      - 创新改造能手 🔧
+      - 创造与分享达人 💡
+      - 语言学习爱好者 🌍
+      - 冒险与挑战的追求者 🚀
+      - 高效时间管理者 ⏰
+      - 坚持健身的践行者 🏋️
+      # - 执行力超强 💯
+      - 脚踏实地行动派 🏃
+    
+  name: Ben Gao
+  description: 是一名 软硬件工程师、DIY爱好者、博主
+  aboutsiteTips:
+    tips: 追求
+    title1: 源于
+    title2: 热爱而去 感受
+    word:
+      - 学习
+      - 生活
+      - 程序
+      - 体验
+  helloAbout: Hello there!
+  
+  selfInfo:
+    selfInfoTips1: 生于
+    selfInfoContentYear: 1998
+    selfInfoTips2: 特殊教育学院
+    selfInfoContent2: 计算机科学与技术
+    selfInfoTips3: 现在职业
+    selfInfoContent3: 谷歌软件工程师
+  maxim:
+    maxim_tips: 座右铭
+    maxim_top: 人生如戏 生活如诗 
+    maxim_bottom: 祸福难料 把握眼前
+  buff:
+    buff_tips: 特长
+    buff_top: 脑回路新奇的 咸鱼
+    buff_bottom: 二次元 MAX

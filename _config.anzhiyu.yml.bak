@@ -1,24 +1,22 @@
-menu:
-  文章:
-    隧道: /archives/ || anzhiyu-icon-box-archive
-    分类: /categories/ || anzhiyu-icon-shapes
-    标签: /tags/ || anzhiyu-icon-tags
+# menu:
+#   文章:
+#     隧道: /archives/ || anzhiyu-icon-box-archive
+#     分类: /categories/ || anzhiyu-icon-shapes
+#     标签: /tags/ || anzhiyu-icon-tags
 
-  笔记:
-    写作: /editor/ || anzhiyu-icon-box-archive
 #   友链:
 #     友人帐: /link/ || anzhiyu-icon-link
 #     朋友圈: /fcircle/ || anzhiyu-icon-artstation
 #     留言板: /comments/ || anzhiyu-icon-envelope
 
-  我的:
-    关于本人: /about/ || anzhiyu-icon-paper-plane
-    # 音乐馆: /music/ || anzhiyu-icon-music
+#   我的:
+#     音乐馆: /music/ || anzhiyu-icon-music
 #     追番页: /bangumis/ || anzhiyu-icon-bilibili
 #     相册集: /album/ || anzhiyu-icon-images
 #     小空调: /air-conditioner/ || anzhiyu-icon-fan
 
-  # 关于:
+#   关于:
+#     关于本人: /about/ || anzhiyu-icon-paper-plane
 #     闲言碎语: /essay/ || anzhiyu-icon-lightbulb
 #     随便逛逛: javascript:toRandomPost() || anzhiyu-icon-shoe-prints1
 
@@ -42,7 +40,7 @@ nav:
 # mourn （哀悼日，指定日期网站简单变灰，不包括滚动条）
 # 注意： 仅网站首页变灰，其他页面正常显示
 mourn:
-  enable: true
+  enable: false
   # days: [4-5, 5-12, 7-7, 9-18, 12-13]
   days: [1-12]
 
@@ -78,20 +76,14 @@ author_status:
   # 可以是任何图片，建议放表情包或者emoji图片，效果都很好，[表情包速查](https://emotion.xiaokang.me/)
   statusImg: "https://s1.imagehub.cc/images/2023/12/16/b26ce2eb3e088bf9dde874a6f2659967.png"
   skills:
-      - 数码科技爱好者 🤖️
-      - DIY狂热者 🔧
-      - 动手能力超强 🚀
-      - 解决问题小能手 💡
-      - 知识探索者 📚
-      - 善于沟通的协调者 🤝
-      - 智能家居小能手 🏠
-      - 创新改造能手 🔧
-      - 创造与分享达人 💡
-      - 语言学习爱好者 🌍
-      - 冒险与挑战的追求者 🚀
-      - 高效时间管理者 ⏰
-      - 坚持健身的践行者 🏋️
-      - 脚踏实地行动派 🏃
+    - 🤖️ 数码科技爱好者
+    - 🔍 分享与热心帮助
+    - 🏠 智能家居小能手
+    - 🔨 设计开发一条龙
+    # - 🤝 专修交互与设计
+    - 🏃 脚踏实地行动派
+    # - 🧱 团队小组发动机
+    - 💢 壮汉人狠话不多
 
 # search (搜索)
 # see https://blog.anheyu.com/posts/c27d.html#搜索系统
@@ -346,7 +338,7 @@ valine:
   pageSize: 10 # comment list page size
   avatar: mp # gravatar style https://valine.js.org/#/avatar
   lang: zh-CN # i18n: zh-CN/zh-TW/en/ja
-  placeholder: 1552488649 # 填写QQ邮箱就会使用QQ头像喔~. # valine comment input placeholder (like: Please leave your footprints)
+  placeholder: 填写QQ邮箱就会使用QQ头像喔~. # valine comment input placeholder (like: Please leave your footprints)
   guest_info: nick,mail,link # valine comment header info (nick/mail/link)
   recordIP: false # Record reviewer IP
   serverURLs: # This configuration is suitable for domestic custom domain name users, overseas version will be automatically detected (no need to manually fill in)
@@ -1102,7 +1094,7 @@ universe:
 
 # 页面卡片顶部气泡升起效果
 bubble:
-  enable: true
+  enable: false
 
 #  控制台打印信息
 console:
@@ -1220,7 +1212,7 @@ pageThumbnailSuffix: ""
 
 # 隐私协议弹窗
 agreementPopup:
-  enable: true
+  enable: false
   url: /privacy
 
 # 右键菜单
