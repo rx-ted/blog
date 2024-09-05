@@ -22,4 +22,4 @@ blog:
 pagefind-indexed: false
 ---
 
-期待你提交[案例](./notes/author/@sugarat/example/index.md) 😄
+<!-- 期待你提交[案例](./notes/author/@sugarat/example/index.md) 😄 -->
