@@ -6,3 +6,4 @@ cache
 blog.tar.gz
 .DS_Store
 _pagefind
+yarn.lock
