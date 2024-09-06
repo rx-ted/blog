@@ -34,20 +34,8 @@ export const blogTheme = getThemeConfig({
       return +new Date(b.meta.date) - +new Date(a.meta.date)
     },
   },
-  // RSS,
-  /*
-  oml2d: {
-    mobileDisplay: true,
-    models: [
-      {
-        path: 'https://oml2d-models.sugarat.top/Senko_Normals/senko.model3.json',
-      },
-      {
-        path: 'https://oml2d-models.sugarat.top/mai/model.json',
-      }
-    ],
-  },
-  */
+  //  RSS,
+  // oml2d,   
   friend: [
     {
       nickname: '粥里有勺糖',
@@ -66,10 +54,9 @@ export const blogTheme = getThemeConfig({
   // 文章默认作者
   author: 'rx-ted',
   authorImgUrl: "/author.jpg",
-  search: false, // weird! if I set search to true, it will be got error.
-  // search: {
-  //   pageResultCount: 5
-  // },
+  search: {
+    pageResultCount: 5
+  },
   // 评论
   comment: {
     type: 'giscus',
@@ -100,11 +87,6 @@ export const blogTheme = getThemeConfig({
         content: '欢迎大家私信交流'
       },
       {
-        type: 'text',
-        content: '文章首/文尾有群二维码',
-        style: 'padding-top:0'
-      },
-      {
         type: 'button',
         content: '作者博客',
         link: 'https://rx-ted.github.io/blog'
@@ -115,7 +97,7 @@ export const blogTheme = getThemeConfig({
         props: {
           type: 'success'
         },
-        link: '/about/wechat',
+        link: '/blog/notes/about/wechat',
       }
     ],
     duration: 0
@@ -125,21 +107,29 @@ export const blogTheme = getThemeConfig({
   }
 })
 
-export const extraHead: any
-  = process.env.NODE_ENV === 'production'
-    ? [
-      [
-        'script',
-        {
-          charset: 'UTF-8',
-          id: 'LA_COLLECT',
-          src: '//sdk.51.la/js-sdk-pro.min.js'
-        }
-      ],
-      [
-        'script',
-        {},
-        'LA.init({id:"xxxx",ck:"xxxx",hashMode:true})'
-      ]
-    ]
-    : []
+
+
+export const extraHead
+  = [
+    ['link',
+      {
+        href: '/blog/logo.png',
+        type: "image/x-icon",
+        rel: "shortcut icon"
+      }
+    ],
+    [
+      'script',
+      {
+        charset: 'UTF-8',
+        id: 'LA_COLLECT',
+        src: '//sdk.51.la/js-sdk-pro.min.js'
+      },
+    ],
+    [
+      'script',
+      {},
+     `LA.init({id:"3JYAa4Wu44u52ZV9",ck:"3JYAa4Wu44u52ZV9"})`
+    ],
+  ]
+

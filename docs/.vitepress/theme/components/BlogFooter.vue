@@ -29,8 +29,8 @@ const renderData = computed(() => {
       const versionItem = typeof version === 'object' ? version : {}
 
       data.push({
-        name: versionItem?.name || `rx-ted/theme@${packageJSON.version}`,
-        link: versionItem?.link || 'https://example.com/',
+        name: versionItem?.name || `rx-ted/blog@${packageJSON.version}`,
+        link: versionItem?.link || 'https://github.com/rx-ted/blog/tree/vitepress',
         icon: versionItem?.icon || themeSVG
       })
     }

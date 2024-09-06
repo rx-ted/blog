@@ -14,6 +14,8 @@ import 'element-plus/theme-chalk/el-alert.css'
 import 'element-plus/theme-chalk/dark/css-vars.css'
 // 引入时间线组件样式
 import 'vitepress-markdown-timeline/dist/theme/index.css'
+import './styles/index.scss'
+// import './styles/style.scss'
 
 import DefaultTheme from 'vitepress/theme'
 import { Theme } from 'vitepress'
@@ -21,8 +23,6 @@ import { withConfigProvider } from './config/blog'
 import { enhanceAppWithTabs } from 'vitepress-plugin-tabs/client'
 import UserWorks from './components/UserWorks.vue'
 import BlogApp from './components/BlogApp.vue'
-import { h } from 'vue'
-
 
 const components = {
     'UserWorks': UserWorks,
@@ -37,7 +37,6 @@ export const BlogTheme: Theme = {
         Object.keys(components).forEach(name => {
             ctx.app.component(name, components[name])
         })
-
     }
 }
 

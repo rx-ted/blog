@@ -10,8 +10,9 @@ export default defineConfig({
   cleanUrls: false,
   metaChunk: true,
   sitemap: {
-    hostname: 'https://rx-ted.fun',
+    hostname: 'https://rx-ted.github.io/blog',
   },
+  base:'/blog/',
   lang: 'zh-cn',
   head: [...extraHead],
   extends: blogTheme,

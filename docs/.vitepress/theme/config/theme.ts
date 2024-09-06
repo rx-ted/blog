@@ -407,7 +407,6 @@ export namespace Theme {
         | false
         | PagefindConfig
 
-
     export interface UserWorks {
         title: string
         description?: string
