@@ -39,4 +39,4 @@ jobs:
         with:
           project: "blog123"
           entrypoint: ""
-          root: "/"
+          root: "docs/.vitepress/dist"
