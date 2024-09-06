@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { joinPath } from '@sugarat/theme-shared'
+import { joinPath } from '../../shared/index'
 
 export function aliasObjectToArray(obj: Record<string, string>) {
   return Object.entries(obj).map(([find, replacement]) => ({

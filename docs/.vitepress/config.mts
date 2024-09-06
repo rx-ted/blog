@@ -12,7 +12,7 @@ export default defineConfig({
   sitemap: {
     hostname: 'https://rx-ted.github.io/blog',
   },
-  base:'/blog/',
+  base: '/blog/',
   lang: 'zh-cn',
   head: [...extraHead],
   extends: blogTheme,
@@ -54,6 +54,10 @@ export default defineConfig({
             text: '个人图床',
             link: 'https://telegraph-image-659.pages.dev'
           },
+          {
+            text: 'ChatGPT',
+            link: 'https://wechat-bot.pages.dev/'
+          }
         ]
       },
 

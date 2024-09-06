@@ -23,7 +23,13 @@ wget XXXXXXXXXXXXXXXX
 
 :::
 
-## v1.0.0 (2024/09/05)
+## v0.0.2 (2024/09/06)
+
+### Patch Changes
+
+- remove the package: @sugarat/theme-shared
+
+## v0.0.1 (2024/09/05)
 
 ### Patch Changes
 

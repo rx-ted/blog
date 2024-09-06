@@ -7,7 +7,7 @@ import {
 } from 'vitepress-plugin-pagefind'
 import { RssPlugin } from 'vitepress-plugin-rss'
 import type { PluginOption } from 'vite'
-import { joinPath } from '@sugarat/theme-shared'
+import { joinPath } from '../../shared/index'
 import type { Theme } from '../../config/theme'
 import { _require } from './mdPlugins'
 import { themeReloadPlugin } from './hot-reload-plugin'
