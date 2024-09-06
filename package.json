@@ -3,10 +3,12 @@
   "version": "0.0.1",
   "scripts": {
     "deploy": "sh ./deploy.sh",
+    "clean": "rm -rf .env",
     "dev": "vitepress dev docs ",
-    "build": "vitepress build docs ",
-    "preview": "vitepress preview docs ",
-    "clean": "rm -rf docs/.vitepress/dist"
+    "env:blog": "echo 'VITE_BASE_URL=/blog' > .env",
+    "build:blog": "npm run env:blog && vitepress build docs && npm run clean",
+    "build": "vitepress build docs",
+    "preview": "vitepress preview docs "
   },
   "keywords": [
     "vitepress",
@@ -23,6 +25,7 @@
     "@types/node": "^22.5.4",
     "artalk": "^2.9.0",
     "cross-spawn": "^7.0.3",
+    "dotenv": "^16.4.5",
     "element-plus": "^2.8.1",
     "fast-glob": "^3.3.2",
     "gray-matter": "^4.0.3",

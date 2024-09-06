@@ -1,5 +1,6 @@
 import { getThemeConfig } from './theme/config/theme'
 import workConfig from './works'
+import { loadEnv } from 'vitepress'
 
 
 export const blogTheme = getThemeConfig({
@@ -96,7 +97,7 @@ export const blogTheme = getThemeConfig({
         props: {
           type: 'success'
         },
-        link: '/blog/notes/about/wechat',
+        link: getUrl() + '/notes/about/wechat',
       }
     ],
     duration: 0
@@ -106,13 +107,16 @@ export const blogTheme = getThemeConfig({
   }
 })
 
-
+export function getUrl() {
+  const env = loadEnv('', process.cwd());
+  return env?.VITE_BASE_URL === undefined ? "" : env?.VITE_BASE_URL
+}
 
 export const extraHead
   = [
     ['link',
       {
-        href: '/blog/logo.png',
+        href: getUrl() + '/logo.png',
         type: "image/x-icon",
         rel: "shortcut icon"
       }
@@ -128,7 +132,7 @@ export const extraHead
     [
       'script',
       {},
-     `LA.init({id:"3JYAa4Wu44u52ZV9",ck:"3JYAa4Wu44u52ZV9"})`
+      `LA.init({id:"3JYAa4Wu44u52ZV9",ck:"3JYAa4Wu44u52ZV9"})`
     ],
   ]
 

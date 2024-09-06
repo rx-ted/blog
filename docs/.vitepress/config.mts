@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress'
-import { blogTheme, extraHead } from './blog-theme'
+import { blogTheme, extraHead, getUrl } from './blog-theme'
 import packageJSON from '../../package.json'
 
 // https://vitepress.dev/reference/site-config
@@ -12,7 +12,7 @@ export default defineConfig({
   sitemap: {
     hostname: 'https://rx-ted.github.io/blog',
   },
-  base: '/blog/',
+  base: getUrl(),
   lang: 'zh-cn',
   head: [...extraHead],
   extends: blogTheme,
