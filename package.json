@@ -38,6 +38,7 @@
     "vitepress-markdown-timeline": "^1.2.1",
     "vitepress-plugin-pagefind": "^0.4.10",
     "vitepress-plugin-rss": "^0.2.10",
-    "vitepress-plugin-tabs": "^0.5.0"
+    "vitepress-plugin-tabs": "^0.5.0",
+    "web-editor-markdown": "^1.0.8"
   }
 }

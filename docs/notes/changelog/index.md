@@ -23,6 +23,12 @@ wget XXXXXXXXXXXXXXXX
 
 :::
 
+## v0.0.3 (2024/09/08)
+
+### Patch Changes
+
+- Feature: add markdown editor
+
 ## v0.0.2 (2024/09/06)
 
 ### Patch Changes

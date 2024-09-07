@@ -57,6 +57,10 @@ export default defineConfig({
           {
             text: 'ChatGPT',
             link: 'https://wechat-bot.pages.dev/'
+          },
+          {
+            text: 'Editor',
+            link: '/notes/work/editor'
           }
         ]
       },

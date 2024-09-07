@@ -23,9 +23,11 @@ import { withConfigProvider } from './config/blog'
 import { enhanceAppWithTabs } from 'vitepress-plugin-tabs/client'
 import UserWorks from './components/UserWorks.vue'
 import BlogApp from './components/BlogApp.vue'
+import BlogEditor from './components/BlogEditor.vue'
 
 const components = {
     'UserWorks': UserWorks,
+    "BlogEditor": BlogEditor
 };
 
 export const BlogTheme: Theme = {
