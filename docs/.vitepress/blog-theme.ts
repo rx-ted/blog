@@ -35,7 +35,7 @@ export const blogTheme = getThemeConfig({
     },
   },
   //  RSS,
-  // oml2d,   
+  // oml2d,
   friend: [
     {
       nickname: '粥里有勺糖',
@@ -134,5 +134,11 @@ export const extraHead
       {},
       `LA.init({id:"3JYAa4Wu44u52ZV9",ck:"3JYAa4Wu44u52ZV9"})`
     ],
+    [
+      'meta',
+      {
+        name: "google-adsense-account",
+        content: "ca-pub-8298257926987022"
+      },
+    ],
   ]
-
