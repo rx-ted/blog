@@ -2,20 +2,23 @@
   <div ref="editor" id="blog-editor"></div>
 </template>
 
-<script >
-import { Editor, withUndoRedo } from "web-editor-markdown";
-import { web_editor_markdown } from "../constants/web-editor-markdown";
-
+<script lang="ts" >
+import { TEXT_web_editor_markdown } from "../constants/text";
 export default {
   mounted() {
-    this.$nextTick(() => {
-      // 确保 DOM 更新完成后访问元素
-      let editor = new Editor(this.$refs.editor);
-      editor = withUndoRedo(editor); // UndoRedo Plugin
-      editor.insertTextAtCursor(web_editor_markdown);
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    this.$nextTick(async () => {
+      const web_editor_markdown = await import('web-editor-markdown');
+      let editor = new web_editor_markdown.Editor(this.$refs.editor);
+      editor = web_editor_markdown.withUndoRedo(editor); // UndoRedo Plugin
+      editor.insertTextAtCursor(TEXT_web_editor_markdown);
     });
   },
 };
+
 </script>
 
 <style lang="scss" scoped>

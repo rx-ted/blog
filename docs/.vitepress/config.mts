@@ -16,7 +16,6 @@ export default defineConfig({
   lang: 'zh-cn',
   head: [...extraHead],
   extends: blogTheme,
-
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     logo: '/logo.png',
