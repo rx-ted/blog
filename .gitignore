@@ -1,4 +1,6 @@
 docs/.vuepress/dist
+docs/.vuepress/cache
+docs/.vuepress/**/dist
 node_modules
 dist
 cache

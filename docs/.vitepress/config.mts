@@ -34,8 +34,6 @@ export default defineConfig({
         text: 'Editor',
         link: '/notes/work/editor'
       },
-
-
       {
         text: 'work',
         // link:'/notes/work'

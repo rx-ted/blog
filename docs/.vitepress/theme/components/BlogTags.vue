@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { WordCloud } from '@antv/g2plot';
 import { ElButton, ElTag } from 'element-plus'
 import { useData } from 'vitepress'
 import { useBlogConfig } from '../config/blog'
@@ -7,7 +6,7 @@ import {
     useArticles,
     useConfig,
 } from '../config/blog'
-import { onMounted, onBeforeUnmount, computed, ref } from 'vue';
+import { onMounted, nextTick, onBeforeUnmount, computed, ref } from 'vue';
 import { tagsSvg } from '../constants/svg'
 const { frontmatter, site } = useData()
 const { home } = useBlogConfig()
@@ -41,7 +40,6 @@ interface tagListConfig {
 
 const tagList: tagListConfig = {}
 docs.value.map(v => {
-    console.log(v.meta.original)
     if (v.meta.tag === undefined || v.meta.tag.length === 0) { return; }
     const tags = v.meta.tag;
     const title = v.meta.title
@@ -78,25 +76,29 @@ Object.keys(tagList).forEach(name => {
 // 渲染 WordCloud
 let wordCloud;
 onMounted(() => {
-    wordCloud = new WordCloud("wordcloud-container", {
-        data: dataList,
-        wordField: 'name',
-        weightField: 'value',
-        colorField: 'name',
-        height: 150,
-        wordStyle: {
-            fontFamily: 'Verdana',
-            fontSize: [14, 35],
-            rotation: 0,
-        },
-        random: () => 0.5,
-    });
-    wordCloud.render();
+    nextTick(async () => {
+        const g2plot = await import('@antv/g2plot')
+        wordCloud = new g2plot.WordCloud("wordcloud-container", {
+            data: dataList,
+            wordField: 'name',
+            weightField: 'value',
+            colorField: 'name',
+            height: 150,
+            wordStyle: {
+                fontFamily: 'Verdana',
+                fontSize: [14, 35],
+                rotation: 0,
+            },
+            random: () => 0.5,
+        });
+        wordCloud.render();
+    })
 });
 
 
 onBeforeUnmount(() => {
-    wordCloud.destroy();
+    if (wordCloud)
+        wordCloud.destroy();
 });
 
 // 点击指定Tag后进行选中
