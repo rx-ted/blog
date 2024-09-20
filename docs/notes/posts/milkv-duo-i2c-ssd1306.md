@@ -1,17 +1,11 @@
 ---
-title:  【Milk-V Duo 开发板免费体验】Linux下i2c驱动OLED ssd1306
+title: milkv-Linux下i2c驱动OLED ssd1306
 date: 2023-07-18 17:45:19
-tags: [IOT,嵌入式]
+tag: [IOT,嵌入式,milkv]
+description: linux驱动移植-I2C驱动移植（OLED SSD1306）
 ---
-<!--
- * @Author: rx-ted
- * @Date: 2023-07-18 17:45:19
- * @LastEditors: rx-ted
- * @LastEditTime: 2023-07-18 18:49:11
- * @title: 【Milk-V Duo 开发板免费体验】Linux下i2c驱动OLED ssd1306
--->
 
-# Linux下i2c驱动OLED ssd1306
+# linux驱动移植-I2C驱动移植(OLED SSD1306)
 
 ## 参数
 

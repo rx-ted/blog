@@ -67,6 +67,7 @@ export namespace Theme {
         author?: string
         hidden?: boolean
         layout?: string
+        original?:boolean
         // old
         categories: string[]
         tags: string[]

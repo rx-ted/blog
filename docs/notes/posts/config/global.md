@@ -1,5 +1,6 @@
 ---
-auther: 粥里有勺糖
+author: 粥里有勺糖
+original: false
 description: 详细介绍主题提供的全局能力
 title: 🔧 主题配置 - 全局
 readingTime: false

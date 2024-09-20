@@ -1,12 +1,13 @@
 ---
-layout: page
-title: Blog Editor
+title: 我的标签
 editLink: false
 lastUpdated: false
 publish: false
 comment: false
 sidebar: false
-sticky: 1
+sticky: 5
 ---
 
-<BlogEditor />
+<ClientOnly>
+ <BlogTags />
+</ClientOnly>

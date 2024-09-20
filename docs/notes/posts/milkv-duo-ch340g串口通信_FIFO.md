@@ -1,10 +1,10 @@
 ---
-title: milkv-duo 申请成功体验 DSC28034PNT-ch340g串口通信_FIFO
+title: milkv-duo-ch340g串口通信_FIFO
 date: 2023-05-20 13:15:05
-excerpt: 实现DSC28034PNT与其他设备之间的数据交互。我们将使用CH340G作为USB转串口芯片，将DSC28034PNT与计算机或其他外部设备连接。通过串口通信，DSC28034PNT可以接收来自计算机或其他外部设备的命令和数据，并将其用于控制和操作
-tags: [IOT,嵌入式]
+description: 实现DSC28034PNT与其他设备之间的数据交互。我们将使用CH340G作为USB转串口芯片，将DSC28034PNT与计算机或其他外部设备连接。通过串口通信，DSC28034PNT可以接收来自计算机或其他外部设备的命令和数据，并将其用于控制和操作
+tag: [IOT,嵌入式,milkv]
 ---
-# DSC28034PNT-ch340g串口通信_FIFO
+# ch340g串口通信_FIFO
 
 ## 项目概述
 
@@ -28,47 +28,47 @@ DSC28034PNT是一款功能强大的数字信号控制器，而CH340G是一种常
 /*主程序入口*/
 int main(void)
 {
-	uint8 receiveData[4],i; //只接受4个字符，多余的补发
+ uint8 receiveData[4],i; //只接受4个字符，多余的补发
 
-	/*初始化系统控制*/
-	InitSysCtrl();
+ /*初始化系统控制*/
+ InitSysCtrl();
 
-	/*初始化内存控制寄存器，使能内存流水线模式*/
-	InitFlash();
+ /*初始化内存控制寄存器，使能内存流水线模式*/
+ InitFlash();
 
-	/*初始化串口通信的GPIO口*/
-	/*GPIO28: SCIRXDA*/
-	/*GPIO29: SCITXDA*/
-	InitSciGpio();
+ /*初始化串口通信的GPIO口*/
+ /*GPIO28: SCIRXDA*/
+ /*GPIO29: SCITXDA*/
+ InitSciGpio();
 
 
-	/*SCI寄存器配置*/
-	Scia_Config(9600);
+ /*SCI寄存器配置*/
+ Scia_Config(9600);
 
-	/*通过SCI发送字符串*/
-	Scia_Print("----------- serial fifo test ------------\r\n");
-	Scia_Print("Baud Rate: 9600\r\n");
-	Scia_Print("Data Bits: 8\r\n");
-	Scia_Print("Parity:    none\r\n");
-	Scia_Print("Stop Bits: 1\r\n");
-	Scia_Print("\r\n");
-	Scia_Print("I love H28034\r\n");
+ /*通过SCI发送字符串*/
+ Scia_Print("----------- serial fifo test ------------\r\n");
+ Scia_Print("Baud Rate: 9600\r\n");
+ Scia_Print("Data Bits: 8\r\n");
+ Scia_Print("Parity:    none\r\n");
+ Scia_Print("Stop Bits: 1\r\n");
+ Scia_Print("\r\n");
+ Scia_Print("I love H28034\r\n");
 
-	for (;;)
-	{
-		/*判断SCI是否接收到数据*/
-		if(SciaRegs.SCIFFRX.bit.RXFFST == 4)
-		{
-			for(i = 0; i < 4; i++)
-			{
-				receiveData[i] = SciaRegs.SCIRXBUF.bit.RXDT;
-			}
-			Scia_Print((char*)receiveData);
-			Scia_Print("\r\n");
-		}
-	}
+ for (;;)
+ {
+  /*判断SCI是否接收到数据*/
+  if(SciaRegs.SCIFFRX.bit.RXFFST == 4)
+  {
+   for(i = 0; i < 4; i++)
+   {
+    receiveData[i] = SciaRegs.SCIRXBUF.bit.RXDT;
+   }
+   Scia_Print((char*)receiveData);
+   Scia_Print("\r\n");
+  }
+ }
 
-	return 0;
+ return 0;
 }
 ```
 

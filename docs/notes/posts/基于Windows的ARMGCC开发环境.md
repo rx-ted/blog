@@ -1,25 +1,12 @@
 ---
-title: 【国民技术N32项目移植】基于Windows的ARMGCC开发环境
+title: 基于Windows的ARMGCC开发环境
 date: 2023-02-16 20:59:51
-tags: 国民技术N32项目移植
+tag: [IOT,嵌入式,配置]
 author: rx-ted
-excerpt: 本文以 N32G4FR 系列 MCU 为例，介绍了在 Windows 环境下基于 vscode 编辑器、GCC 编译工具链和 GDB 调试工具进行搭建开发环境、编译、固件下载和代码调试的方法。
+description: 本文以 N32G4FR 系列 MCU 为例，介绍了在 Windows 环境下基于 vscode 编辑器、GCC 编译工具链和 GDB 调试工具进行搭建开发环境、编译、固件下载和代码调试的方法。
 ---
-# 【国民技术N32项目移植】基于 Windows 的 ARM GCC 开发环境
 
-- **目录**
-- [基于 Windows 的 ARM GCC 开发环境](#基于-windows-的-arm-gcc-开发环境)
-  - [概述](#概述)
-  - [开发工具](#开发工具)
-    - [软件](#软件)
-    - [硬件](#硬件)
-  - [开发环境搭建](#开发环境搭建)
-    - [安装 VScode 软件](#安装-vscode-软件)
-    - [安装 gcc 编译工具链](#安装-gcc-编译工具链)
-    - [安装 make for Windows](#安装-make-for-windows)
-    - [安装 JLink 工具](#安装-jlink-工具)
-  - [目录详细说明](#目录详细说明)
-  - [编译和下载](#编译和下载)
+# 基于Windows的ARMGCC开发环境
 
 ## 概述
 
@@ -96,4 +83,5 @@ arm-none-eabi-objcopy -O binary -S build/output.elf build/output.bin
 ```
 
 ## 源代码下载
+
 传送门：[rx-ted](https://github.com/rx-ted/N32G4FR.git)

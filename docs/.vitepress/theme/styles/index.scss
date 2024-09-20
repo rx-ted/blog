@@ -25,7 +25,7 @@ html.dark {
 .VPHome {
   min-height: 100vh;
   background: radial-gradient(ellipse, rgba(var(--bg-gradient-home), 1) 0%, rgba(var(--bg-gradient-home), 0) 700%);
-  
+
   &::before {
     content: "";
     inset: 0;
@@ -194,7 +194,7 @@ span.svg-icon {
   }
 }
 
-.VPImage.logo{
+.VPImage.logo {
   width: 24px;
   height: 24px;
 }

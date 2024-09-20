@@ -1,13 +1,12 @@
 ---
 title: 基于milkv-duo环境编译
 date: 2023-05-20 13:15:05
-excerpt: Milk-V Duo是一个基于CV1800B芯片的超紧凑嵌入式开发平台。它可以运行Linux和RTOS，为专业人士、工业ODM厂商、AIoT爱好者、DIY爱好者和创作者提供了一个可靠、低成本和高性能的平台。
-tags: [IOT,嵌入式]
+description: Milk-V Duo是一个基于CV1800B芯片的超紧凑嵌入式开发平台。它可以运行Linux和RTOS，为专业人士、工业ODM厂商、AIoT爱好者、DIY爱好者和创作者提供了一个可靠、低成本和高性能的平台。
+tag: [IOT,嵌入式,milkv]
 ---
 
-# milkv-duo envronment compilation
 
-基于milkv-duo环境编译
+# 基于milkv-duo环境编译
 
 Milk-V Duo是一个基于CV1800B芯片的超紧凑嵌入式开发平台。它可以运行Linux和RTOS，为专业人士、工业ODM厂商、AIoT爱好者、DIY爱好者和创作者提供了一个可靠、低成本和高性能的平台。
 
@@ -16,7 +15,6 @@ Milk-V Duo是一个基于CV1800B芯片的超紧凑嵌入式开发平台。它可
 ### 虚拟机
 
 VBox + Ubuntu20.04
-<!-- ![vBox-Ubuntu](./img/VBox+Ubuntu.png) -->
 
 ### 依赖
 
@@ -174,10 +172,8 @@ install/soc_cv1800b_milkv_duo_sd/milkv-duo.img
 
 ## 判断是否成功
 
-测试ping 192.168.42.1  
-<!-- ![rndis](../doc/img/RNDIS.png)   -->
-需要安装依赖驱动哈  
-<!-- ![ssh milkv](../doc/img/ssh-milkv.png) -->
+- 测试ping 192.168.42.1  
+- 需要安装依赖驱动哈  
 
 ## 建议
 

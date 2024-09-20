@@ -1,15 +1,15 @@
 ---
 title: 实时显示 更进一步 又快又准
 date: 2023-05-20 13:15:05
-excerpt: FireBeetle 2 ESP32-S3可以使用Arduino IDE、ESP-IDF、MicroPython进行编程，C语言、python都可以轻松的操纵硬件。我选择以vscode为主，插件platformio，需要安装python3. Purple Pi开发板通过J12排针提供了丰富的GPIO接口，包括UART、SPI、I2C、GPIO等（还包括DC5V、DC3.3V、GND）。
-tags: [IOT,嵌入式]
+description: FireBeetle 2 ESP32-S3可以使用Arduino IDE、ESP-IDF、MicroPython进行编程，C语言、python都可以轻松的操纵硬件。我选择以vscode为主，插件platformio，需要安装python3. Purple Pi开发板通过J12排针提供了丰富的GPIO接口，包括UART、SPI、I2C、GPIO等（还包括DC5V、DC3.3V、GND）。
+tag: [IOT,嵌入式,Arduino]
+author: rx-ted
 ---
-
 # 实时显示 更进一步 又快又准
 
 ## 简介
 
-FireBeetle 2 ESP32-S3可以使用Arduino IDE、ESP-IDF、MicroPython进行编程，C语言、python都可以轻松的操纵硬件。我选择以vscode为主，插件platformio，需要安装python3.
+FireBeetle 2 ESP32-S3可以使用Arduino IDE、ESP-IDF、MicroPython进行编程，C语言、python都可以轻松的操纵硬件。我选择以vscode为主，插件platformio，需要安装python3.  
 Purple Pi开发板通过J12排针提供了丰富的GPIO接口，包括UART、SPI、I2C、GPIO等（还包括DC5V、DC3.3V、GND）。
 
 ## 引脚概述
@@ -287,5 +287,3 @@ void loop()
 }
 
 ```
-
-## 演示

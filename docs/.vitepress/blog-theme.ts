@@ -1,6 +1,6 @@
 import { getThemeConfig } from './theme/config/theme'
 import workConfig from './works'
-import { loadEnv } from 'vitepress'
+import { HeadConfig, loadEnv } from 'vitepress'
 
 
 export const blogTheme = getThemeConfig({
@@ -112,7 +112,7 @@ export function getUrl() {
   return env?.VITE_BASE_URL === undefined ? "" : env?.VITE_BASE_URL
 }
 
-export const extraHead
+export const extraHead: HeadConfig[]
   = [
     ['link',
       {

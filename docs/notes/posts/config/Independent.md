@@ -1,5 +1,6 @@
 ---
-auther: 粥里有勺糖
+author: 粥里有勺糖
+original: false
 description: 介绍如何在存量VitePress中引入使用或者使用主题中的部分功能
 readingTime: false
 tag:

@@ -1,5 +1,10 @@
 ---
 date: 2022-7-1
+sidebar: false
+description: 描述关于我的信息。
+tag:
+  - 关于
+sticky: 9
 ---
 
 # 关于我
@@ -52,23 +57,3 @@ Vitepress以其基于Vue.js与TypeScript的架构脱颖而出，不仅符合当�
 - 7月 在北京联合大学顺利毕业，拿到本科。
 - 同月 转正了。
 :::
-
-## Language List
-
-- [X] C/C++
-- [X] Python
-- [X] Typescript
-
-## IOT DIY
-
-- [X] Arduino/C/C++
-
-- [ ] RTOS
-  - RTThread
-  - FreeRTOS
-  - ...
-- [x] I2C
-- [ ] USART
-- [ ] SPI
-- [X] 8080
-- [ ] RGB565 RGB888 RGB666

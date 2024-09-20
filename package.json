@@ -20,6 +20,7 @@
   "license": "MIT",
   "description": "blog theme, based on vitepress",
   "dependencies": {
+    "@antv/g2plot": "^2.4.32",
     "@giscus/vue": "^3.0.0",
     "@mdit-vue/shared": "^2.1.3",
     "@types/node": "^22.5.4",
@@ -33,7 +34,9 @@
     "oh-my-live2d": "^0.19.3",
     "p-limit": "^6.1.0",
     "sass-embedded": "^1.78.0",
+    "sass-loader": "^16.0.1",
     "swiper": "^11.1.12",
+    "vite-plugin-sass": "^0.1.0",
     "vitepress": "^1.3.4",
     "vitepress-markdown-timeline": "^1.2.1",
     "vitepress-plugin-pagefind": "^0.4.10",

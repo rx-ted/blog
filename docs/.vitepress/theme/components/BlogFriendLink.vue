@@ -6,7 +6,7 @@ import Swiper from 'swiper'
 import { useBlogConfig } from '../config/blog'
 import { getImageUrl, shuffleArray } from '../utils/client'
 import type { Theme } from '../config/theme'
-import { friendLinkSvgStr } from '../constants/svg'
+import { friendLinkSvg } from '../constants/svg'
 
 const isDark = useDark({
   storageKey: 'vitepress-theme-appearance'
@@ -17,7 +17,7 @@ const friendConfig = computed<Theme.FriendConfig>(() => ({
   list: [],
   random: false,
   limit: Number.MAX_SAFE_INTEGER,
-  title: `${friendLinkSvgStr}友情链接`,
+  title: `${friendLinkSvg}友情链接`,
   ...(Array.isArray(friend) ? { list: friend } : friend)
 }))
 

@@ -1,8 +1,8 @@
 ---
-auther: 粥里有勺糖
+author: 粥里有勺糖
+original: false
 description: 详细介绍主题内置提供的全局组件，三方插件，三方组件等能力。
 title: 🔧 主题配置 - 组件能力
-recommend: 5
 tag:
  - 配置
 ---
@@ -374,7 +374,7 @@ const blogTheme = getThemeConfig({
         url: 'https://theme.sugarat.top',
         cover:
           'https://img.cdn.sugarat.top/mdImg/MTY3MzE3MDUxOTMwMw==673170519303',
-        tags: ['Vitepress', 'Vue'],
+        tag: ['Vitepress', 'Vue'],
         links: [
           {
             title: '一个简约风的VitePress博客主题',

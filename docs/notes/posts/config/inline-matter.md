@@ -1,10 +1,10 @@
 ---
-auther: 粥里有勺糖
+author: 粥里有勺糖
+original: false
 description: 介绍Vitepress内置常用能力
 title: VitePress - 常用配置
 tag:
  - 配置
-sticky: 5
 ---
 
 # 文章配置

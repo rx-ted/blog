@@ -1,30 +1,32 @@
 ---
-title: 【python】录音
+author: rx-ted
+title: Python 录音
 date: 2023-02-16 21:41:47
-tags: [Python]
-categories: [technology]
-excerpt: MASR致力于简单，实用的语音识别项目
+tag: [Python]
 description: MASR致力于简单，实用的语音识别项目
 ---
-# 一、MASR是什么？
+
+# Python 录音
+
+## 一、MASR是什么？
 
 MASR是一款基于Pytorch实现的自动语音识别框架，MASR全称是神奇的自动语音识别框架（Magical Automatic Speech Recognition），MASR致力于简单，实用的语音识别项目。
 本程序基于作者作品MASR简单录音并语音识别，感谢作者提供代码。
 
-# 二、使用步骤
+## 二、使用步骤
 
 在github 上 clone [code:record.py](https://github.com/rx-ted/ASR)
 其中MASR需要训练模型，需要很多时间，随你们折腾。
 若不想训练模型，则可以在MASR上下载模型。
 [模型->下载](https://github.com/yeyupiaoling/MASR)
 
-## 1.必要的条件
+### 1.必要的条件
 
 - python3
 - ffmpeg (MASR需要用到)
 - pytorch、wave、pyaudio、masr（pip install XXX）
 
-## 2.引入库
+### 2.引入库
 
 代码如下（示例）：
 
@@ -41,7 +43,7 @@ device = torch.device("cpu") # 若有GPU，则修改GPU
 tk = tkinter.Tk()  # 界面控件
 ```
 
-## 2.Recording类
+### 2.Recording类
 
 - 初始定义
 代码如下（示例）：
@@ -150,7 +152,7 @@ def speechRecognition(self, wav_path):
 
 ---
 
-# 三、单纯使用录音功能
+## 三、单纯使用录音功能
 
 代码如下（实例）：
 
@@ -261,6 +263,6 @@ if __name__ == '__main__':
 
 这个例子，简单录音，不具备识别语音。
 
-# 总结
+## 总结
 
 我叫高敬义，笔名是rx-ted，高兴和大家认识，希望和大家一起成长，一起收获能量的共振，使人开心的想要原地起飞。

@@ -1,5 +1,6 @@
 ---
-auther: 粥里有勺糖
+author: 粥里有勺糖
+original: false
 description: 详细介绍首页&文章相关的各个配置项
 title: 🔧 主题配置 - 首页&文章
 readingTime: false

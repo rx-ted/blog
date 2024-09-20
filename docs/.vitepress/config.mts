@@ -7,7 +7,7 @@ export default defineConfig({
   title: "Blog",
   description: "blog, recording",
   lastUpdated: true,
-  cleanUrls: false,
+  cleanUrls: true,
   metaChunk: true,
   sitemap: {
     hostname: 'https://rx-ted.github.io/blog',
@@ -22,31 +22,22 @@ export default defineConfig({
 
     nav: [
       { text: 'Index', link: '/' },
-
       {
         text: `v${packageJSON.version}`,
         link: '/notes/changelog'
       },
-
       {
-        text: 'Notes',
-        items: [{
-          text: 'Archives',
-          link: '/notes/archives'
-        },
-        {
-          text: 'Tags',
-          link: '/notes/tags'
-        },
-        {
-          text: 'Categories',
-          link: '/notes/categories'
-        },
-        ]
+        text: 'Tags',
+        link: '/notes/article/tags'
+      },
+      {
+        text: 'Editor',
+        link: '/notes/work/editor'
       },
 
+
       {
-        text: '线上作品',
+        text: 'work',
         // link:'/notes/work'
         items: [
           {
@@ -57,18 +48,8 @@ export default defineConfig({
             text: 'ChatGPT',
             link: 'https://wechat-bot.pages.dev/'
           },
-          {
-            text: 'Editor',
-            link: '/notes/work/editor'
-          }
         ]
       },
-
-      {
-        text: 'Friend',
-        link: '/notes/friend'
-      },
-
       {
         text: 'About',
         link: '/notes/about'
@@ -87,7 +68,7 @@ export default defineConfig({
     },
     lastUpdatedText: '上次更新于',
     outline: {
-      level: [2, 3],
+      level: "deep",
       label: '目录'
     },
     returnToTopLabel: '回到顶部',

@@ -1,17 +1,19 @@
 ---
-title: 【踩坑笔记】QtScrcpy利用tcp_ip把手机投影到电脑上
+title: QtScrcpy利用tcp_ip把手机投影到电脑上
 date: 2023-02-16 21:38:55
-tags: 踩坑笔记
+tag: [踩坑笔记]
 author: rx-ted
-excerpt: 利用tcp/ip把手机投影到电脑上，不需要数据线连接，利用同一个局限网，实现无线连接。
+description: 利用tcp/ip把手机投影到电脑上，不需要数据线连接，利用同一个局限网，实现无线连接。
 ---
 
+# QtScrcpy利用tcp_ip把手机投影到电脑上
 
+## 目的
 
-# 目的：
 利用tcp/ip把手机投影到电脑上，不需要数据线连接，利用同一个局限网，实现无线连接。
 我找了很多资料，还是选择QtScrcpy。
 其中原因有三：
+
 - 第一，学习值得学的内容；
 - 第二，如何编译使用，遇到困难如何解决；
 - 第三，作为笔记。
@@ -23,12 +25,13 @@ QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和
 
 接下来，如何下载、如何编译、如何使用。
 
-
 ---
 
-# 准备
+## 准备
+
 准备什么，首先阅读作者的README.md,其中有说明安装过程，[传送](https://github.com/barry-ran/QtScrcpy/blob/dev/README.md#build)
-```
+
+```bash
 Build
 All the dependencies are provided and it is easy to compile.
 PC client
@@ -37,19 +40,23 @@ PC client
 3. Open the project root directory all.pro or CMakeLists.txt with QtCreator
 4. Compile and run
 ```
+
 上面描述，我们需要下载一些必备的依赖软件。
+
 - cmake >=3.19
 - Qt >= 5.12
--  MSVC 2019 及其以上 或者 MingW (我版本是:4.3.5)
-- 	Visual Studio 或者 make
+- MSVC 2019 及其以上 或者 MingW (我版本是:4.3.5)
+- Visual Studio 或者 make
 
 缺了一个，那就不行了。至于如何安装，就不讲了。
 
-# 下载
+## 下载
+
 下载方式很多，能下载就OK。
 我选择git克隆方法，于是打开**poewrshell**这个命令行。
 如下代码：
 > 按照我步骤去做，总算没错吧。
+
 ```powershell
 cd d:\
 mkdir tools
@@ -59,8 +66,10 @@ cd QtScrcpy\QtScrcpy
 mkdir build 
 cd build
 ```
+
 目前位置：d:\tools\QtScrcpy\QtScrcpy\build
 命令输出结果：
+
 ```powershell
 
 PS D:\> cd tools
@@ -78,17 +87,22 @@ PS D:\tools\QtScrcpy\QtScrcpy> mkdir build
 PS D:\tools\QtScrcpy\QtScrcpy> cd build
 PS D:\tools\QtScrcpy\QtScrcpy\build>
 ```
+
 提示：下载过程中数据不时出现断开网络或者没反应的情况，换个方式下载吧。
 
-# 编译
+## 编译
+
 编译时首先检查QT_DIR环境变量是否存在，若没有则设置
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/4a6846812352496ba7fad8e77964bf86.png)
 如下代码:
+
 ```powershell
  cmake -G "MinGW Makefiles" ..
  # 选择MingW编译器，利用cmake编译一下.
 ```
+
 结果输出如下:
+
 ```powershell
 PS D:\tools\QtScrcpy\QtScrcpy\build> cmake -G "MinGW Makefiles" ..
 -- The CXX compiler identification is GNU 8.1.0
@@ -109,11 +123,15 @@ PS D:\tools\QtScrcpy\QtScrcpy\build> cmake -G "MinGW Makefiles" ..
 -- Build files have been written to: D:/tools/QtScrcpy/QtScrcpy/build
 PS D:\tools\QtScrcpy\QtScrcpy\build>
 ```
+
 这时候在D:\tools\QtScrcpy\QtScrcpy\build上出现几个文件，其中Makefile文件，则表示可以用make命令,如下代码:
+
 ```powershell
 make
 ```
+
 make命令后会发现有些问题，错误结果是：
+
 ```powershell
 PS D:\tools\QtScrcpy\QtScrcpy\build> make
 [  2%] Automatic MOC and UIC for target QtScrcpy
@@ -165,17 +183,19 @@ make[1]: *** [CMakeFiles\Makefile2:83: CMakeFiles/QtScrcpy.dir/all] Error 2
 make: *** [makefile:90: all] Error 2
 PS D:\tools\QtScrcpy\QtScrcpy\build>
 ```
-请移步看下**错误1**的原因分析和解决方案。
 
+请移步看下**错误1**的原因分析和解决方案。
 
 ---
 
-
 做好了，接下来，如下命令:
+
 ```powershell
 make
 ```
+
 输出结果如下:
+
 ```powershell
 PS D:\tools\QtScrcpy\QtScrcpy\build> make
 [  2%] Automatic MOC and UIC for target QtScrcpy
@@ -187,15 +207,19 @@ make[1]: *** [CMakeFiles\Makefile2:83: CMakeFiles/QtScrcpy.dir/all] Error 2
 make: *** [makefile:90: all] Error 2
 PS D:\tools\QtScrcpy\QtScrcpy\build>
 ```
+
 请移步看下**错误2**的原因分析和解决方案。
 
 ----
 
 做好了，接下来，如下命令:
+
 ```powershell
 make
 ```
+
 输出结果如下:
+
 ```powershell
 PS D:\tools\QtScrcpy\QtScrcpy\build> make
 [  2%] Automatic MOC and UIC for target QtScrcpy
@@ -210,6 +234,7 @@ D:\tools\QtScrcpy\QtScrcpy\res\QtScrcpy.rc:5: warning: "VERSION_RC_STR" redefine
 [  9%] Linking CXX executable D:\tools\QtScrcpy\output\x64\RelWithDebInfo\QtScrcpy.exe
 [100%] Built target QtScrcpy
 ```
+
 意味着成功了，定位到 D:\tools\QtScrcpy\output\x64\RelWithDebInfo这个文件夹，并打开这个程序，是否运行成功。
 如下截图：
 
@@ -217,11 +242,12 @@ D:\tools\QtScrcpy\QtScrcpy\res\QtScrcpy.rc:5: warning: "VERSION_RC_STR" redefine
 
 上面如何下载，编译，使用，我就讲完了。 不管遇到问题，学会思考，为什么会出现错误，尝试能不能独立解决这个问题，并总结一下，若时间允许的话，可以记笔记。
 
-
 ---
 
-# 原因分析：
-## 错误1
+## 原因分析
+
+### 错误1
+
 ```
 D:\tools\QtScrcpy\QtScrcpy\res\QtScrcpy.rc:1:10: fatal error: winres.h: No such file or directory
  #include "winres.h"
@@ -232,9 +258,11 @@ make[2]: *** [CMakeFiles\QtScrcpy.dir\build.make:623: CMakeFiles/QtScrcpy.dir/re
 make[1]: *** [CMakeFiles\Makefile2:83: CMakeFiles/QtScrcpy.dir/all] Error 2
 make: *** [makefile:90: all] Error 2
 ```
+
 这个错误告诉我winres.h没有这个库，只要找到winres.h源代码，然后导入库，就行了。
 
-## 错误2
+### 错误2
+
 ```
 PS D:\tools\QtScrcpy\QtScrcpy\build> make
 [  2%] Automatic MOC and UIC for target QtScrcpy
@@ -245,12 +273,15 @@ make[2]: *** [CMakeFiles\QtScrcpy.dir\build.make:623: CMakeFiles/QtScrcpy.dir/re
 make[1]: *** [CMakeFiles\Makefile2:83: CMakeFiles/QtScrcpy.dir/all] Error 2
 make: *** [makefile:90: all] Error 2
 ```
+
 这个是语法错误，要么注释，要么修改winres.h源代码。
 
 ---
 
-# 解决方案：
-## 解决错误1
+## 解决方案
+
+### 解决错误1
+
 D:\tools\QtScrcpy\QtScrcpy\res\QtScrcpy.rc:1:10到这行就错了，说明附近没有winres.h,那么我们只要在D:\tools\QtScrcpy\QtScrcpy\res上新建winres.h就行了，如下代码:
 
 ```c
@@ -306,13 +337,14 @@ D:\tools\QtScrcpy\QtScrcpy\res\QtScrcpy.rc:1:10到这行就错了，说明附近
 
 ```
 
+### 解决错误2
 
-## 解决错误2
  D:\\tools\\QtScrcpy\\QtScrcpy\\res\\QtScrcpy.rc:25: syntax error
- 
+
 >方法1
 
 打开QtScrcpy.rc这个文件，然后注释一下。
+
 ```c
  #include "winres.h"
 
@@ -397,6 +429,3 @@ BEGIN
     END
 END
 ```
-
-
----

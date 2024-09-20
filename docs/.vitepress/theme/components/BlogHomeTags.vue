@@ -9,14 +9,14 @@ import {
   useConfig,
   useCurrentPageNum,
 } from '../config/blog'
-import { tagsSvgStr } from '../constants/svg'
+import { tagsSvg } from '../constants/svg'
 
 const route = useRoute()
 const docs = useArticles()
 const homeTagsConfig = useConfig()?.config?.blog?.homeTags
 const showTags = computed(() => !!(homeTagsConfig ?? true))
 const title = computed(() => (typeof homeTagsConfig === 'boolean' || !homeTagsConfig?.title)
-  ? `${tagsSvgStr}标签`
+  ? `${tagsSvg}标签`
   : homeTagsConfig?.title
 )
 const tags = computed(() => {

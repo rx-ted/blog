@@ -2,10 +2,14 @@
 title: 更新日志
 description: 每次迭代有变化，作为记录。
 author: rx-ted
-tag: 日志
+tag:
+  - 日志
+sidebar: false
+date: 2024-9-20
+sticky: 5
 ---
 
-# Changelog
+# 更新日志
 
 克隆主题，如下命令
 
@@ -23,20 +27,21 @@ wget XXXXXXXXXXXXXXXX
 
 :::
 
-## v0.0.3 (2024/09/08)
+## v0.0.4 (2024/09/18)
 
-### Patch Changes
+- Feature: Improve several pages: archives/tags/categories
+- Feature: Add ADs
+- Feature: Add tag page.
+- Fix: Remove undesirable contents
+
+## v0.0.3 (2024/09/08)
 
 - Feature: add markdown editor
 
 ## v0.0.2 (2024/09/06)
 
-### Patch Changes
-
 - remove the package: @sugarat/theme-shared
 
 ## v0.0.1 (2024/09/05)
 
-### Patch Changes
-
-- feat: 完成初版博客主题的开发 from [theme](https://theme.sugarat.top) {target="_blank"}
+- feat: 完成初版博客主题的开发 from [theme](https://theme.sugarat.top/)

@@ -24,10 +24,11 @@ import { enhanceAppWithTabs } from 'vitepress-plugin-tabs/client'
 import UserWorks from './components/UserWorks.vue'
 import BlogApp from './components/BlogApp.vue'
 import BlogEditor from './components/BlogEditor.vue'
-
+import BlogTags from './components/BlogTags.vue'
 const components = {
     'UserWorks': UserWorks,
-    "BlogEditor": BlogEditor
+    "BlogEditor": BlogEditor,
+    "BlogTags": BlogTags,
 };
 
 export const BlogTheme: Theme = {

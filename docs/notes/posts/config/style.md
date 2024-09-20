@@ -1,5 +1,6 @@
 ---
-auther: 粥里有勺糖
+author: 粥里有勺糖
+original: false
 description: 介绍一下自定义主题的部分样式
 title: 🔧 主题配置 - 样式配置
 readingTime: false
