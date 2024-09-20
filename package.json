@@ -1,6 +1,6 @@
 {
   "name": "blog",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "scripts": {
     "deploy": "sh ./deploy.sh",
     "clean": "rm -rf .env",
