@@ -8,6 +8,7 @@ import {
 } from '../config/blog'
 import { onMounted, nextTick, onBeforeUnmount, computed, ref } from 'vue';
 import { tagsSvg } from '../constants/svg'
+import { envConfig } from "../config/env";
 const { frontmatter, site } = useData()
 const { home } = useBlogConfig()
 const homeTagsConfig = useConfig()?.config?.blog?.homeTags
@@ -48,7 +49,11 @@ docs.value.map(v => {
     if (v.meta.original === undefined || v.meta.original === true) {
         original = true
     }
-    const route = v.route
+    let baseUrl;
+    if (envConfig.baseUrl.endsWith('/')) {
+        baseUrl = envConfig.baseUrl.slice(0, -1)
+    }
+    const route = baseUrl + v.route
     tags.forEach((tagName) => {
         if (!(tagName in tagList)) {
             tagList[tagName] = []
