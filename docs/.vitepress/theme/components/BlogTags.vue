@@ -55,7 +55,6 @@ docs.value.map(v => {
         baseUrl = envConfig.baseUrl.slice(0, -1)
     }
     const route = baseUrl + v.route
-    console.log(withBase(route))
     tags.forEach((tagName) => {
         if (!(tagName in tagList)) {
             tagList[tagName] = []
