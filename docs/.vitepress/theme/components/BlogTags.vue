@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ElButton, ElTag } from 'element-plus'
-import { useData } from 'vitepress'
+import { useData, useRouter, withBase } from 'vitepress'
 import { useBlogConfig } from '../config/blog'
 import {
     useArticles,
@@ -24,6 +24,7 @@ const author = computed(() =>
     ?? home?.author
     ?? site.value.themeConfig?.blog?.author
 )
+const router = useRouter()
 
 interface articleConfig {
     title: string
@@ -54,6 +55,7 @@ docs.value.map(v => {
         baseUrl = envConfig.baseUrl.slice(0, -1)
     }
     const route = baseUrl + v.route
+    console.log(withBase(route))
     tags.forEach((tagName) => {
         if (!(tagName in tagList)) {
             tagList[tagName] = []
@@ -142,7 +144,8 @@ function toggleTag(tagTitle) {
                     <div class="info-part">
                         <!-- 标题 -->
                         <p class="title">
-                            <a :href="item.route" target="_blank">{{ item.title }}</a>
+                            <a :href="withBase(item.route)" class="title" @click="router.go(withBase(item.route))">{{
+                                item.title }}</a>
                         </p>
                         <div class="badge-list">
                             <span class="split">
