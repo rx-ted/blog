@@ -7,7 +7,7 @@ export default defineConfig({
   title: "Blog",
   description: "blog, recording",
   lastUpdated: true,
-  cleanUrls: true,
+  cleanUrls: false,
   metaChunk: true,
   sitemap: {
     hostname: 'https://rx-ted.github.io/blog',
