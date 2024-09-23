@@ -1,7 +1,7 @@
 import { getThemeConfig } from './theme/config/theme'
+import { notificationSvg } from './theme/constants/svg'
 import workConfig from './works'
 import { HeadConfig, loadEnv } from 'vitepress'
-
 
 export const blogTheme = getThemeConfig({
   works: workConfig,
@@ -76,6 +76,7 @@ export const blogTheme = getThemeConfig({
   },
   popover: {
     title: '公告',
+    icon: notificationSvg,
     body: [
       { type: 'text', content: '👇 微信 👇' },
       {

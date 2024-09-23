@@ -1,13 +1,15 @@
 <script lang="ts" setup>
-import { ElButton, ElTag } from 'element-plus'
-import { useData, withBase } from 'vitepress'
+import { ElButton, ElTag, ElLink } from 'element-plus'
+import { useData, useRouter, withBase } from 'vitepress'
 import { useBlogConfig } from '../config/blog'
 import {
     useArticles,
     useConfig,
 } from '../config/blog'
-import { onMounted, nextTick, onBeforeUnmount, computed, ref } from 'vue';
+import { onMounted, nextTick, onBeforeUnmount, computed, ref, h } from 'vue';
 import { tagsSvg } from '../constants/svg'
+import { envConfig } from '../config/env'
+
 const { frontmatter, site } = useData()
 const { home } = useBlogConfig()
 const homeTagsConfig = useConfig()?.config?.blog?.homeTags
@@ -47,7 +49,17 @@ docs.value.map(v => {
     if (v.meta.original === undefined || v.meta.original === true) {
         original = true
     }
-    const route = v.route
+    let baseUrl;
+    if (envConfig.baseUrl.endsWith('/')) {
+        baseUrl = envConfig.baseUrl.slice(0, -1)
+    }
+    let route;
+    if (v.route.endsWith('.html')) {
+        route = baseUrl + v.route
+    }
+    else {
+        route = baseUrl + v.route + '.html'
+    }
     tags.forEach((tagName) => {
         if (!(tagName in tagList)) {
             tagList[tagName] = []
@@ -71,6 +83,17 @@ Object.keys(tagList).forEach(name => {
         "value": tagList[name].length
     });
 })
+
+function tagTitle(items) {
+    return h(
+        ElLink,
+        {
+            href: items.path,
+            target: '_blank'
+        },
+        items.title
+    )
+}
 
 // 渲染 WordCloud
 let wordCloud;
@@ -135,10 +158,7 @@ function toggleTag(tagTitle) {
                     <!-- 左侧信息 -->
                     <div class="info-part">
                         <!-- 标题 -->
-                        <p class="title">
-                            <a :href="withBase(item.route)" class="title" target="_blank">{{
-                                item.title }}</a>
-                        </p>
+                        <tagTitle :path="item.route" :title="item.title" />
                         <div class="badge-list">
                             <span class="split">
                                 <ElTag :type="item.type">

@@ -2,6 +2,7 @@ import { defineConfig } from 'vitepress'
 import { blogTheme, extraHead, getUrl } from './blog-theme'
 import packageJSON from '../../package.json'
 
+
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "Blog",
@@ -16,6 +17,16 @@ export default defineConfig({
   lang: 'zh-cn',
   head: [...extraHead],
   extends: blogTheme,
+  vite: {
+    // https://vitejs.dev/config/shared-options.html#css-postcss
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler', // or "modern", "legacy"
+        }
+      }
+    }
+  },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     logo: '/logo.png',
