@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ElButton, ElTag } from 'element-plus'
-import { useData, useRouter, withBase } from 'vitepress'
+import { useData, withBase } from 'vitepress'
 import { useBlogConfig } from '../config/blog'
 import {
     useArticles,
@@ -8,7 +8,6 @@ import {
 } from '../config/blog'
 import { onMounted, nextTick, onBeforeUnmount, computed, ref } from 'vue';
 import { tagsSvg } from '../constants/svg'
-import { envConfig } from "../config/env";
 const { frontmatter, site } = useData()
 const { home } = useBlogConfig()
 const homeTagsConfig = useConfig()?.config?.blog?.homeTags
@@ -24,8 +23,6 @@ const author = computed(() =>
     ?? home?.author
     ?? site.value.themeConfig?.blog?.author
 )
-const router = useRouter()
-
 interface articleConfig {
     title: string
     author: string
@@ -50,11 +47,7 @@ docs.value.map(v => {
     if (v.meta.original === undefined || v.meta.original === true) {
         original = true
     }
-    let baseUrl;
-    if (envConfig.baseUrl.endsWith('/')) {
-        baseUrl = envConfig.baseUrl.slice(0, -1)
-    }
-    const route = baseUrl + v.route
+    const route = v.route
     tags.forEach((tagName) => {
         if (!(tagName in tagList)) {
             tagList[tagName] = []
@@ -143,7 +136,7 @@ function toggleTag(tagTitle) {
                     <div class="info-part">
                         <!-- 标题 -->
                         <p class="title">
-                            <a :href="withBase(item.route)" class="title" @click="router.go(withBase(item.route))">{{
+                            <a :href="withBase(item.route)" class="title" target="_blank">{{
                                 item.title }}</a>
                         </p>
                         <div class="badge-list">
