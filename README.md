@@ -7,6 +7,12 @@
 
 ## 功能
 
+### deploy
+
+- [x] github page
+- [x] deno
+- [ ] cloudflare
+
 ### 任务列表
 
 支持渲染 markdown 任务列表，内置 markdown-it-task-checkbox 插件提供支持
@@ -14,9 +20,9 @@
 语法如下
 
 ```md
-* [ ] 🥔 TODO
-* [ ] 真不戳
-* [x] 内置任务列表
+- [ ] 🥔 TODO
+- [ ] 真不戳
+- [x] 内置任务列表
 ```
 
 ### 时间轴
