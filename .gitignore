@@ -11,3 +11,4 @@ _pagefind
 yarn.lock
 .env
 .env.*
+package-lock.json
