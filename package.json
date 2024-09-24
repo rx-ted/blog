@@ -31,6 +31,7 @@
     "fast-glob": "^3.3.2",
     "gray-matter": "^4.0.3",
     "markdown-it-task-checkbox": "^1.0.6",
+    "npx": "^10.2.2",
     "oh-my-live2d": "^0.19.3",
     "p-limit": "^6.1.0",
     "sass-embedded": "^1.78.0",
