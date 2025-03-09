@@ -1,60 +1,83 @@
 package asia.rxted.blog.config.bean;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 
+import io.swagger.v3.oas.models.ExternalDocumentation;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+
+@ConfigurationProperties(prefix = "swagger")
 @Configuration
 public class SwaggerConfig {
-    // @Bean
-    // public Docket docket() {
-    // return new Docket(DocumentationType.OAS_30)
-    // .apiInfo(apiInfo())
-    // .enable(true)
-    // // 通过.select()方法，去配置扫描接口
-    // .select()
-    // .apis(RequestHandlerSelectors.basePackage("asia.rxted.blog.controller"))
-    // // 配置如何通过path过滤
-    // .paths(PathSelectors.any())
-    // .build();
-    // }
 
-    // Contact contact = new Contact("xx", "xxx", "xxxxxx");
+    @Autowired
+    private Environment environment;
 
-    // // 配置Swagger 信息 = ApiInfo
-    // private ApiInfo apiInfo() {
-    // return new ApiInfo("Api文档",
-    // "备注",
-    // "1.0",
-    // "123",
-    // contact,
-    // "Apache 2.0",
-    // "http://www.apache.org/licenses/LICENSE-2.0",
-    // new ArrayList<>());
-    // }
+    @Value("${swagger.title}")
+    private String title;
+    @Value("${swagger.version}")
+    private String version;
+    @Value("${swagger.description}")
+    private String description;
+    @Value("${swagger.termsOfServiceUrl}")
+    private String termsOfServiceUrl;
+    @Value("${swagger.contact.name}")
+    private String name;
+    @Value("${swagger.contact.url}")
+    private String url;
+    @Value("${swagger.contact.email}")
+    private String email;
 
-    // @Override
-    // public void configure(WebSecurity web) {
-    // // 忽略swagger3所需要用到的静态资源，允许访问
-    // String[] swaggerUrl = new String[] {
-    // "/swagger-ui/**",
-    // "/swagger-resources/**",
-    // "/v2/api-docs",
-    // "/v3/api-docs",
-    // "/webjars/**",
-    // };
-    // web.ignoring().antMatchers(swaggerUrl);
-    // }
+    private boolean checkDevOrTest() {
+        Profiles profiles = Profiles.of("dev", "test");
+        boolean flag = environment.acceptsProfiles(profiles);
+        System.out.println("Environment: " + profiles);
+        System.out.println("Enable Swagger: " + flag);
+        return flag;
 
-    // @Bean
-    // public OpenAPI customOpenAPI() {
-    // return new OpenAPI()
-    // .info(new Info()
-    // .title("测试API")
-    // .version("1.0")
-    // .description("项目学习")
-    // .termsOfService("https://test.com")
-    // // .contact(contact)
-    // );
-    // }
+    }
 
+    private License license() {
+        return new License()
+                .name("MIT")
+                .url("https://opensource.org/licenses/MIT");
+    }
+
+    private Contact contact() {
+        Contact contact = new Contact();
+        contact.setName(name);
+        contact.setUrl(url);
+        contact.setEmail(email);
+        return contact;
+    }
+
+    private Info info() {
+        return new Info()
+                .contact(contact())
+                .title(title)
+                .description(description)
+                .version(version)
+                .license(license());
+    }
+
+    private ExternalDocumentation externalDocumentation() {
+        return new ExternalDocumentation()
+                .description(description)
+                .url(termsOfServiceUrl);
+    }
+
+    @Bean
+    public OpenAPI springShopOpenAPI() {
+        return new OpenAPI()
+                .info(info())
+                .externalDocs(externalDocumentation());
+    }
 }

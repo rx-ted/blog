@@ -18,7 +18,6 @@
 # log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # debug log
 # map-underscore-to-camel-case: false
 
-
 spring:
   profiles:
     active: dev
@@ -47,22 +46,21 @@ spring:
     type: redis
     redis:
       time-to-live: 6000
+swagger:
+  production: false
+  basic:
+    enable: true
+    username: rx
+    password: rx
+  title: blog API接口文档
+  description: Blog Api Documentation
+  version: 1.0.0
+  termsOfServiceUrl: https://127.0.0.1:8080
+  contact:
+    name: rx-ted
+    url: https://127.0.0.1:8080
+    email: gjy.18sui@gmail.com
 
-# Swagger界面内容配置
-# swagger:
-#   production: false
-#   basic:
-#     enable: true
-#     username: rx
-#     password: rx
-#   title: blog API接口文档
-#   description: Blog Api Documentation
-#   version: 1.0.0
-#   termsOfServiceUrl: https://127.0.0.1:8080
-#   contact:
-#     name: rx-ted
-#     url: https://127.0.0.1:8080
-# email: gjy.18sui@gmail.com
 ---
 spring:
   config:
