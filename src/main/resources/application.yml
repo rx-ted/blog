@@ -1,0 +1,81 @@
+#下面这些内容是为了让MyBatis映射
+#指定Mybatis的Mapper文件
+# mybatis:
+#   mapper-locations: classpath:mappers/*xml
+#   #指定Mybatis的实体目录
+#   type-aliases-package: asia.rxted.blog.mybatis.entity
+
+mybatis-plus:
+  mapper-locations:
+    - "classpath*:mappers/**/*.xml"
+  # global-config:
+  #   db-config:
+  #     id-type: auto
+logging:
+  level:
+    "[asia.rxted.blog.modules.article.mapper]": DEBUG
+
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # debug log
+    # map-underscore-to-camel-case: false
+spring:
+  profiles:
+    active: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/blog?serverTimezone=UTC
+    username: root
+    password: root
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: root # Redis 服务器密码。
+      database: 0 # Redis 数据库号，默认为 0。
+      timeout: 1000 # Redis 连接超时时间，单位：毫秒。
+      lettuce:
+        pool:
+          max-active: 8 # 连接池最大连接数，默认为 8 。使用负数表示没有限制。
+          max-idle: 8 # 默认连接数最小空闲的连接数，默认为 8 。使用负数表示没有限制。
+          min-idle: 0 # 默认连接池最小空闲的连接数，默认为 0 。允许设置 0 和 正数。
+          max-wait: -1 # 连接池最大阻塞等待时间，单位：毫秒。默认为 -1 ，表示不限制。
+  cache:
+    type: redis
+    redis:
+      time-to-live: 6000
+
+# Swagger界面内容配置
+swagger:
+  production: false
+  basic:
+    enable: true
+    username: rx
+    password: rx
+  title: blog API接口文档
+  description: Blog Api Documentation
+  version: 1.0.0
+  termsOfServiceUrl: https://127.0.0.1:8080
+  contact:
+    name: rx-ted
+    url: https://127.0.0.1:8080
+    email: gjy.18sui@gmail.com
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+# 应用服务 WEB 访问端口
+server:
+  port: 8080
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+# 应用服务 WEB 访问端口
+server:
+  port: 80
