@@ -1,4 +1,4 @@
-package asia.rxted.blog.controller;
+package asia.rxted.blog.modules.article.controller;
 
 import java.util.List;
 
@@ -19,25 +19,27 @@ import asia.rxted.blog.common.ResultCode;
 import asia.rxted.blog.common.ResultMessage;
 import asia.rxted.blog.common.ResultUtil;
 import asia.rxted.blog.modules.article.dto.Article;
-import asia.rxted.blog.modules.article.mapper.ArticleMapper;
+import asia.rxted.blog.modules.article.service.ArticleServer;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
+@Tag(name = "文章管理", description = "文章管理相关API")
 @RestController()
 @RequestMapping("articles")
 
 public class ArticleController {
     @Autowired
-    private ArticleMapper articleMapper;
+    private ArticleServer articleServer;
 
-    @Operation(summary = "get all articles")
+    @Operation(summary = "获取所有的文章")
     @GetMapping()
     public ResultMessage<List<Article>> getArticles() {
         try {
-            List<Article> articles = articleMapper.selectList(null);
+            List<Article> articles = articleServer.list();
             return ResultUtil.data(articles);
         } catch (Exception e) {
             e.printStackTrace();
@@ -45,40 +47,45 @@ public class ArticleController {
         }
     }
 
+    @Operation(summary = "根据id读取对应的文章")
     @GetMapping("{id}")
     public ResultMessage<Article> getArticle(@PathVariable Integer id) {
         try {
-            return ResultUtil.data(articleMapper.selectById(id));
+            return ResultUtil.data(articleServer.getById(id));
         } catch (Exception e) {
             e.printStackTrace();
             return ResultUtil.error(ResultCode.ERROR);
         }
     }
 
+    @Operation(summary="保存文章的一些信息")
     @PostMapping()
     public ResultMessage<Boolean> setArticle(@Valid @RequestBody Article article) {
-        return ResultUtil.data(articleMapper.insert(article) > 0);
+        return ResultUtil.data(
+                articleServer.save(article));
     }
 
+    @Operation(summary="更新文章的一些信息")
     @PutMapping()
     public ResultMessage<Boolean> putArticle(@RequestBody Article article) {
         return ResultUtil.data(
-                articleMapper.updateById(article) > 0);
+                articleServer.updateById(article));
     }
 
+    @Operation(summary="根据id删除文章")
     @DeleteMapping("{id}")
     public ResultMessage<Boolean> deleteArticle(@PathVariable Integer id) {
         return ResultUtil.data(
-                articleMapper.deleteById(id) > 0);
+                articleServer.removeById(id));
     }
 
+    @Operation(summary="根据页码和每页读取大小获取文章")
     @GetMapping("query")
     public ResultMessage<Object> getPage(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize) {
         IPage<Article> iPage = new Page<>(page, pageSize);
-        IPage<Article> result = articleMapper.selectPage(iPage, null);
+        IPage<Article> result = articleServer.page(iPage, null);
         return ResultUtil.data(result);
     }
-
 }

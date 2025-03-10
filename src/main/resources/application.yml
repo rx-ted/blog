@@ -1,23 +1,3 @@
-#下面这些内容是为了让MyBatis映射
-#指定Mybatis的Mapper文件
-# mybatis:
-#   mapper-locations: classpath:mappers/*xml
-#   #指定Mybatis的实体目录
-#   type-aliases-package: asia.rxted.blog.mybatis.entity
-
-# mybatis-plus:
-#   mapper-locations:
-#     - "classpath*:mappers/**/*.xml"
-# global-config:
-#   db-config:
-#     id-type: auto
-# logging:
-#   level:
-# "[asia.rxted.blog.modules.article.mapper]": DEBUG
-#   configuration:
-# log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # debug log
-# map-underscore-to-camel-case: false
-
 spring:
   profiles:
     active: dev
@@ -46,6 +26,7 @@ spring:
     type: redis
     redis:
       time-to-live: 6000
+
 swagger:
   production: false
   basic:
@@ -61,11 +42,21 @@ swagger:
     url: https://127.0.0.1:8080
     email: gjy.18sui@gmail.com
 
+logging:
+  file:
+    name: "logging.log"
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # debug log
+
 ---
 spring:
   config:
     activate:
       on-profile: dev
+
+
 # 应用服务 WEB 访问端口
 server:
   port: 8080

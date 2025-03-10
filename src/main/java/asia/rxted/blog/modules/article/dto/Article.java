@@ -9,21 +9,20 @@ import lombok.Data;
 
 @Data
 @TableName(value = "Articles")
-@Schema(name = "Articles", description = "$!{table.comment}")
 public class Article {
     @TableId(type = IdType.AUTO)
     @Schema(description = "Article Id")
     private Integer id;
-    // @ApiModelProperty(value = "Article Is Original")
+    @Schema(description = "Article Is Original")
     private Boolean is_origin;
-    // @ApiModelProperty(value = "Article Title")
+    @Schema(description = "Article Title")
     private String title;
-    // @ApiModelProperty(value = "Article Author")
+    @Schema(description = "Article Author")
     private String author;
-    // @ApiModelProperty(value = "Article Tags")
+    @Schema(description = "Article Tags")
     private String tags;
-    // @ApiModelProperty(value = "Article Content")
+    @Schema(description = "Article Content")
     private String content;
-    // @ApiModelProperty(value = "Article Description")
+    @Schema(description = "Article Description")
     private String description;
 }
