@@ -56,11 +56,11 @@ public class ResultUtil<T> {
     }
 
     public static <T> ResultMessage<T> error(ResultCode resultCode) {
-        return new ResultUtil<T>().setSuccessMsg(resultCode);
+        return new ResultUtil<T>().setErrorMsg(resultCode);
     }
 
     public static <T> ResultMessage<T> error() {
-        return new ResultUtil<T>().setSuccessMsg(ResultCode.ERROR);
+        return new ResultUtil<T>().setErrorMsg(ResultCode.ERROR);
     }
 
 }

@@ -40,10 +40,9 @@ public class AuthUser implements Serializable {
     private Boolean longTerm = false;
 
     /**
-     * @see UserRoleEnum
-     *      角色
+     * 角色
      */
-    private UserRoleEnum role;
+    private String role;
 
     /**
      * 如果角色是商家，则存在此店铺id字段
@@ -72,11 +71,10 @@ public class AuthUser implements Serializable {
      */
     private String tenantId;
 
-    public AuthUser(String username, String id, String nickName, String face, UserRoleEnum role) {
+    public AuthUser(String username, String id, String nickName, String face) {
         this.username = username;
         this.face = face;
         this.id = id;
-        this.role = role;
         this.nickName = nickName;
     }
 

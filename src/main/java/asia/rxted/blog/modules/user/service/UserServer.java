@@ -5,13 +5,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import asia.rxted.blog.common.ResultMessage;
 import asia.rxted.blog.config.base.Token;
 import asia.rxted.blog.modules.user.config.UserRegister;
 import asia.rxted.blog.modules.user.dto.User;
 
 public interface UserServer extends IService<User> {
     // Pls add your different function.
-    Token login(String username, String password);
+    ResultMessage<Token> login(String username, String password);
 
     Token logout(String username);
 

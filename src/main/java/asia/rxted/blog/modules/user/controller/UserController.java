@@ -14,6 +14,7 @@ import asia.rxted.blog.common.ResultCode;
 import asia.rxted.blog.common.ResultMessage;
 import asia.rxted.blog.common.ResultUtil;
 import asia.rxted.blog.common.ServiceException;
+import asia.rxted.blog.config.base.Token;
 import asia.rxted.blog.modules.cache.RedisCache;
 import asia.rxted.blog.modules.user.config.UserRegister;
 import asia.rxted.blog.modules.user.dto.User;
@@ -65,15 +66,11 @@ public class UserController {
 
     @Operation(summary = "用户登录")
     @PostMapping("/login")
-    public ResultMessage<Object> loginUser(
+    public ResultMessage<Token> loginUser(
             @NotNull(message = "用户名不能为空") @RequestParam String username,
             @NotNull(message = "密码不能为空") @RequestParam String password,
             @RequestHeader String uuid) {
-        if (verificationService.check(uuid, VerificationEnum.LOGIN)) {
-            return ResultUtil.data(userServer.login(username, password));
-        } else {
-            throw new ServiceException(ResultCode.VERIFICATION_ERROR);
-        }
+        return userServer.login(username, password);
     }
 
     @Operation(summary = "用户忘记密码")

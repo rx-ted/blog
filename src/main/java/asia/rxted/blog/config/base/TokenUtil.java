@@ -26,13 +26,13 @@ public class TokenUtil {
 
         String accessToken = createToken(authUser, expirationTime);
 
-        cache.put(CachePrefix.ACCESS_TOKEN.getPrefix(authUser.getRole(), authUser.getId()) + accessToken, 1,
+        cache.put(CachePrefix.ACCESS_TOKEN.getPrefix(authUser.getId()) + accessToken, 1,
                 expirationTime, TimeUnit.MINUTES);
 
         Long expireTime = authUser.getLongTerm() ? 15 * 24 * 60L : expirationTime * 2;
         String refreshToken = createToken(authUser, expireTime);
 
-        cache.put(CachePrefix.REFRESH_TOKEN.getPrefix(authUser.getRole(), authUser.getId()) + refreshToken, 1,
+        cache.put(CachePrefix.REFRESH_TOKEN.getPrefix(authUser.getId()) + refreshToken, 1,
                 expireTime, TimeUnit.MINUTES);
 
         token.setAccessToken(accessToken);

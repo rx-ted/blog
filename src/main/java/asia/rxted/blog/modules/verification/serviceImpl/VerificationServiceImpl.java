@@ -24,7 +24,7 @@ public class VerificationServiceImpl implements VerificationService {
 
     public String cacheCheck(VerificationEnum verificationEnum, String uuid) {
         return CachePrefix.VERIFICATION_RESULT.getPrefix() + verificationEnum.name()
-        + uuid;
+                + uuid;
     }
 
 }

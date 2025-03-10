@@ -4,12 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import asia.rxted.blog.common.ResultCode;
+import asia.rxted.blog.common.ResultMessage;
 import asia.rxted.blog.common.ResultUtil;
 import asia.rxted.blog.common.ServiceException;
 import asia.rxted.blog.config.base.Token;
@@ -31,18 +33,22 @@ public class UserServerImpl extends ServiceImpl<UserMapper, User> implements Use
     private ManageTokenGenerate manageTokenGenerate;
 
     @Override
-    public Token login(String username, String password) {
+    public ResultMessage<Token> login(String username, String password) {
         User user = this.findByUsername(username);
         if (user == null || !user.getStatus())
-            throw new ServiceException(ResultCode.USER_PASSWORD_ERROR);
-        if (!new BCryptPasswordEncoder().matches(password, user.getPassword()))
-            throw new ServiceException(ResultCode.USER_PASSWORD_ERROR);
+            return ResultUtil.error(ResultCode.USER_NOT_EXIST);
+        // if (!new BCryptPasswordEncoder().matches(password, user.getPassword()))
+        // throw new ServiceException(ResultCode.USER_PASSWORD_ERROR);
+        if (!password.equals(user.getPassword()))
+            return ResultUtil.error(ResultCode.USER_PASSWORD_ERROR);
         try {
-            return manageTokenGenerate.createToken(user, false);
+            return ResultUtil.data(manageTokenGenerate.createToken(user, false));
+
         } catch (Exception e) {
             log.error("登录错误：", e);
         }
-        return null;
+        return ResultUtil.error();
+
     }
 
     @Override
@@ -83,8 +89,7 @@ public class UserServerImpl extends ServiceImpl<UserMapper, User> implements Use
 
     @Override
     public User findByUsername(String username) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByUsername'");
+        return getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, username), false);
     }
 
     @Override
