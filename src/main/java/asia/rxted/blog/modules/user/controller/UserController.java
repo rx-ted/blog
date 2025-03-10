@@ -10,12 +10,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
+import asia.rxted.blog.common.ResultCode;
 import asia.rxted.blog.common.ResultMessage;
 import asia.rxted.blog.common.ResultUtil;
-import asia.rxted.blog.modules.cache.RedisUtil;
+import asia.rxted.blog.common.ServiceException;
+import asia.rxted.blog.modules.cache.RedisCache;
 import asia.rxted.blog.modules.user.config.UserRegister;
 import asia.rxted.blog.modules.user.dto.User;
 import asia.rxted.blog.modules.user.service.UserServer;
+import asia.rxted.blog.modules.verification.config.VerificationEnum;
+import asia.rxted.blog.modules.verification.service.VerificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -26,6 +30,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @Tag(name = "用户管理", description = "用户管理相关API")
 @RestController()
@@ -35,7 +40,7 @@ public class UserController {
     private UserServer userServer;
 
     @Autowired
-    private RedisUtil redis;
+    private VerificationService verificationService;
 
     @Operation(summary = "根据用户名获取用户信息")
     @GetMapping("{username}")
@@ -62,9 +67,13 @@ public class UserController {
     @PostMapping("/login")
     public ResultMessage<Object> loginUser(
             @NotNull(message = "用户名不能为空") @RequestParam String username,
-            @NotNull(message = "密码不能为空") @RequestParam String password) {
-
-        return null;
+            @NotNull(message = "密码不能为空") @RequestParam String password,
+            @RequestHeader String uuid) {
+        if (verificationService.check(uuid, VerificationEnum.LOGIN)) {
+            return ResultUtil.data(userServer.login(username, password));
+        } else {
+            throw new ServiceException(ResultCode.VERIFICATION_ERROR);
+        }
     }
 
     @Operation(summary = "用户忘记密码")
