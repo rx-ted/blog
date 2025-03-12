@@ -42,9 +42,9 @@ swagger:
     url: https://127.0.0.1:8080
     email: gjy.18sui@gmail.com
 
-logging:
-  file:
-    name: "logging.log"
+# logging:
+#   file:
+#     name: "logging.log"
 
 
 mybatis-plus:

@@ -15,12 +15,18 @@ public class User {
     @Schema(description = "User Id")
     private Integer id;
 
+    /*
+     * @ unique user name
+     */
     @Schema(description = "User Name")
     private String username;
 
     @Schema(description = "Nick Name")
     private String nick_name;
 
+    /*
+     * @ unique phone number
+     */
     @Schema(description = "User Phone Number")
     private String phone;
 
@@ -44,6 +50,12 @@ public class User {
 
     @Schema(description = "描述/详情/备注")
     private String description;
+
+    @Schema(description = "创建令牌")
+    private String access_token;
+
+    @Schema(description = "刷新令牌")
+    private String refresh_token;
 
     // !================
 

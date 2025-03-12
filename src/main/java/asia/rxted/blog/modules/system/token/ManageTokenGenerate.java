@@ -29,8 +29,7 @@ public class ManageTokenGenerate extends AbstractTokenGenerate<User> {
 
     @Override
     public Token refreshToken(String refreshToken) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'refreshToken'");
+        return token.refreshToken(refreshToken);
     }
 
 }

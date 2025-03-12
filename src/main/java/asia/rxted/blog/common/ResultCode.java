@@ -25,6 +25,7 @@ public enum ResultCode {
      * 用户
      */
     USER_EDIT_SUCCESS(20001, "用户修改成功"),
+    USER_OPERATION_ERROR(20001, "用户操作无反应"),
     USER_NOT_EXIST(20002, "用户不存在"),
     USER_NOT_LOGIN(20003, "用户未登录"),
     USER_AUTH_EXPIRED(20004, "用户已退出，请重新登录"),
@@ -39,6 +40,7 @@ public enum ResultCode {
     USER_RECEIPT_NOT_EXIST(20014, "会员发票信息不存在"),
     USER_EDIT_ERROR(20015, "用户修改失败"),
     USER_OLD_PASSWORD_ERROR(20016, "旧密码不正确"),
+    USER_SAME_PASSWORD_ERROR(20016, "新旧密码一样"),
     USER_COLLECTION_EXIST(20017, "无法重复收藏"),
     USER_GRADE_IS_DEFAULT(20018, "会员等级为默认会员等级"),
     USER_NOT_BINDING(20020, "未绑定用户"),
@@ -58,7 +60,9 @@ public enum ResultCode {
     CANT_EDIT_CLERK_SHOPKEEPER(20033, "无法在店员管理编辑店员信息"),
     USER_MOBILE_REPEATABLE_ERROR(20034, "该手机号已存在"),
     USER_LOGIN_SUCCESS(20001, "用户登录成功"),
-    USER_LOGOUT_SUCCESS(20002, "用户登出成功");
+    USER_LOGOUT_SUCCESS(20002, "用户注销成功"),
+    USER_EXIT_SUCCESS(20002, "用户登录退出成功"),
+    USER_LOGOUT_ERROR(20002, "用户注销错误");
 
     private final Integer code;
     private final String message;

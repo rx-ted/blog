@@ -14,17 +14,23 @@ public interface UserServer extends IService<User> {
     // Pls add your different function.
     ResultMessage<Token> login(String username, String password);
 
-    Token logout(String username);
+    ResultMessage<Object> logout(String username);
 
-    Token logout(int id);
+    ResultMessage<Object> logout(int id);
+
+    ResultMessage<Object> exit(String username);
 
     Token refreshToken(String refreshToken);
 
-    void saveUser(UserRegister register);
+    ResultMessage<Object> saveUser(UserRegister register);
 
-    void resetPassword(String password, String newPassword);
+    ResultMessage<Object> resetPassword(int id, String password, String newPassword);
 
-    void updateUser(UserRegister register);
+    ResultMessage<Object> resetPassword(String username, String password, String newPassword);
+
+    ResultMessage<Object> forgetPassword(String phone);
+
+    ResultMessage<Object> updateUser(User updater);
 
     User findByUsername(String username);
 
