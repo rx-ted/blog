@@ -1,0 +1,20 @@
+FROM ubuntu
+
+RUN cp  /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list.d/ubuntu.sources.bak
+RUN echo "Types: deb \nURIs: http://mirrors.aliyun.com/ubuntu/ \nSuites: noble noble-updates noble-backports \nComponents: main universe restricted multiverse \nSigned-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg" > /etc/apt/sources.list.d/ubuntu.sources
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone
+
+RUN apt update
+RUN apt install -y --no-install-recommends \
+    openjdk-17-jdk \
+    maven
+
+RUN apt-get purge --auto-remove
+RUN rm -rf /tmp/* /var/lib/apt/lists/*
+
+COPY . /app
+WORKDIR /app
+
+EXPOSE 8080
+
+CMD [ "sh","config/env-docker.sh" ]

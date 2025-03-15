@@ -25,11 +25,11 @@ services:
     # volumes:
     #   - ${PROJECT_HOME}/config/volumes/redis:/data
     command: redis-server --port 6379 --requirepass root --appendonly yes --protected-mode no
-  java:
-    image: openjdk:17-jdk
+
+  blog:
+    build:
+      context: .
+    container_name: blog
     ports:
       - "8080:8080"
-      # - "80:80"
-    volumes:
-      - "${PROJECT_HOME}:/app"
-    command: java -jar /app/target/${PROJECT_NAME}-${PROJECT_VERSION}.jar
+    restart: always
