@@ -20,13 +20,9 @@ import asia.rxted.blog.modules.user.config.UserRegister;
 import asia.rxted.blog.modules.user.dto.User;
 import asia.rxted.blog.modules.user.mapper.UserMapper;
 import asia.rxted.blog.modules.user.service.UserServer;
-import asia.rxted.blog.modules.verification.service.VerificationService;
 
 @Service
 public class UserServerImpl extends ServiceImpl<UserMapper, User> implements UserServer {
-
-    @Autowired
-    private VerificationService verificationService;
 
     @Autowired
     private ManageTokenGenerate manageTokenGenerate;

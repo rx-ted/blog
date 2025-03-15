@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  mysql:
+    image: mysql:9.2.0
+    restart: always
+    container_name: mysql
+    volumes:
+      # - config/data/mysqldata:/var/lib/mysql
+      - ${PROJECT_HOME}/config/my.cnf:/etc/mysql/conf.d/my.cnf
+      #      数据库还原目录 可将需要还原的sql文件放在这里
+      - ${PROJECT_HOME}/config/init/mysql:/docker-entrypoint-initdb.d
+    environment:
+      - "MYSQL_ROOT_PASSWORD=root"
+      - "MYSQL_DATABASE=blog"
+      - "TZ=Asia/Shanghai"
+    ports:
+      - 3306:3306
+  redis:
+    image: redis:7.4.2
+    restart: always
+    container_name: "redis"
+    ports:
+      - 6379:6379
+    # volumes:
+    #   - ${PROJECT_HOME}/config/volumes/redis:/data
+    command: redis-server --port 6379 --requirepass root --appendonly yes --protected-mode no
+  java:
+    image: openjdk:17-jdk
+    ports:
+      - "8080:8080"
+      # - "80:80"
+    volumes:
+      - "${PROJECT_HOME}:/app"
+    command: java -jar /app/target/${PROJECT_NAME}-${PROJECT_VERSION}.jar
