@@ -51,7 +51,7 @@ public class User {
     @Schema(description = "描述/详情/备注")
     private String description;
 
-    @Schema(description = "创建令牌")
+    @Schema(description = "访问令牌")
     private String access_token;
 
     @Schema(description = "刷新令牌")
