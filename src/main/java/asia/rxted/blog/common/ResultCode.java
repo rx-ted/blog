@@ -14,6 +14,12 @@ public enum ResultCode {
     PARAMS_ERROR(4002, "参数异常"),
 
     /**
+     * 邮箱代码状态
+     */
+    EMAIL_ERROR(44000,"邮箱操作失败"),
+
+
+    /**
      * 验证码
      */
     VERIFICATION_EMAIL_SEND_SUCCESS(80201, "邮箱验证码,发送成功"),

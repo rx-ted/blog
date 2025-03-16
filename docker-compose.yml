@@ -7,29 +7,65 @@ services:
     container_name: mysql
     volumes:
       # - config/data/mysqldata:/var/lib/mysql
-      - ${PROJECT_HOME}/config/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./config/my.cnf:/etc/mysql/conf.d/my.cnf
       #      数据库还原目录 可将需要还原的sql文件放在这里
-      - ${PROJECT_HOME}/config/init/mysql:/docker-entrypoint-initdb.d
+      - ./config/init/mysql:/docker-entrypoint-initdb.d
     environment:
       - "MYSQL_ROOT_PASSWORD=root"
       - "MYSQL_DATABASE=blog"
       - "TZ=Asia/Shanghai"
     ports:
       - 3306:3306
+    networks:
+      - blog_network
+
   redis:
-    image: redis:7.4.2
+    image: redis:7.0.4
     restart: always
     container_name: "redis"
+    networks:
+      - blog_network
     ports:
-      - 6379:6379
+      - "6379:6379"
     # volumes:
-    #   - ${PROJECT_HOME}/config/volumes/redis:/data
+    #   - ./config/init/redis/redis.conf:/etc/redis/redis.conf
     command: redis-server --port 6379 --requirepass root --appendonly yes --protected-mode no
 
-  blog:
-    build:
-      context: .
-    container_name: blog
-    ports:
-      - "8080:8080"
-    restart: always
+  # blog:
+  #   build:
+  #     context: .
+  #   container_name: blog
+  #   depends_on:
+  #     - redis
+  #     - mysql
+  #   environment:
+  #     - SPRING_REDIS_HOST=127.0.0.1
+  #     - SPRING_REDIS_PORT=6379
+  #   ports:
+  #     - "8080:8080"
+  #     - "25:25"
+  #   restart: always
+  #   networks:
+  #     - blog_network
+
+  # blog1:
+  #   image: openjdk:17-jdk
+  #   container_name: blog1
+  #   depends_on:
+  #     - redis
+  #     - mysql
+  #   working_dir: /app
+  #   volumes:
+  #     - "./target/app.jar:/app/app.jar"
+  #   # ports:
+  #   #   - "8080:8080"
+  #   #   - "25:25"
+  #   command: ["java", "-jar", "app.jar"]
+  #   networks:
+  #     - blog_network
+  #   restart: on-failure
+
+# docker network create --driver bridge blog_network
+networks:
+  blog_network:
+    driver: bridge

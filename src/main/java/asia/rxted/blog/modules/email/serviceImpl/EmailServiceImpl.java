@@ -12,21 +12,31 @@ import asia.rxted.blog.common.ResultMessage;
 import asia.rxted.blog.common.ResultUtil;
 import asia.rxted.blog.modules.cache.CachePrefix;
 import asia.rxted.blog.modules.cache.RedisCache;
+import asia.rxted.blog.modules.email.config.EmailConfig;
 import asia.rxted.blog.modules.email.service.EmailService;
 import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class EmailServiceImpl implements EmailService {
-    @Autowired
-    private JavaMailSender mailSender;
+    private final EmailConfig emailConfig;
+    private final JavaMailSender mailSender;
+
     @Autowired
     private RedisCache cache;
 
     public Long emailTimeTemp = 5 * 60 * 1000L; // 五分钟内有效
     public String emailFrom = "rx_ted@126.com"; // 发送者
 
+    public EmailServiceImpl(EmailConfig emailConfig, JavaMailSender mailSender) {
+        this.emailConfig = emailConfig;
+        this.mailSender = mailSender;
+    }
+
     @Override
     public void sendCode(String to, String subject, String text) {
+        if (!emailConfig.checkEmailConnection(to)) {
+            return;
+        }
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
 
@@ -50,10 +60,15 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public ResultMessage<Object> sendCode(String to) {
+        if (!emailConfig.checkEmailConnection(to)) {
+            return ResultUtil.success(ResultCode.EMAIL_ERROR);
+        }
+
         Object result = cache.get(CachePrefix.EMAIL_VALIDATE.getPrefix() + to);
         if (result != null) {
             return ResultUtil.success(ResultCode.VERIFICATION_REPEAT_ERROR);
         }
+
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
         try {

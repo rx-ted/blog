@@ -9,5 +9,4 @@ public interface EmailService {
     void sendCode(String to, String subject, String text);
 
     ResultMessage<Object> verifyCode(String to, String code);
-
 }
