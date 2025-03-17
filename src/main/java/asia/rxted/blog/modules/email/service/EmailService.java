@@ -30,7 +30,6 @@ public class EmailService {
     private RedisCache cache;
 
     public Long emailTimeTemp = 5 * 60 * 1000L; // 五分钟内有效
-    public String emailFrom = "rx_ted@126.com"; // 发送者
     private String code = "123456";
     private String tipSubject = "验证码通知";
     private String text = "<p>您的验证码是：<strong>%s</strong></p>" +
@@ -46,7 +45,7 @@ public class EmailService {
         try {
             // 添加邮件发送逻辑
             MimeMessage message = new MimeMessage(emailConfig.mailSession());
-            message.setFrom(emailFrom);
+            message.setFrom(emailConfig.getUsername());
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
             message.setSubject(tipSubject);
             message.setText(text, "UTF-8", "html");
