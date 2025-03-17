@@ -1,24 +1,13 @@
 spring:
   profiles:
     active: dev
-
   mail:
     host: smtp.126.com
     username: rx_ted@126.com
     password: WFbSTRf8QfcVQmYt
     port: 25
-    default-encoding: utf-8
-    test-connection: true
     protocol: smtp
-    properties:
-      mail:
-        smtp:
-          # ssl:
-          #   enable: true
-          auth: true
-          starttls:
-            enable: true
-            required: true
+    test-connection: true
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -70,6 +59,13 @@ swagger:
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # debug log
+
+
+# logging:
+#   level:
+#     org:
+#       springframework: INFO
+
 
 ---
 spring:

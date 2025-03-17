@@ -5,13 +5,13 @@ FROM maven:3.8.7 AS build
 WORKDIR /app
 
 # 将项目的源代码复制到容器中
-COPY . .
 COPY ./config/init/m2/settings.xml /root/.m2/settings.xml
+COPY . .
 
 # 使用 Maven 构建项目
 RUN mvn clean
-RUN install
-RUN package
+RUN mvn install
+RUN mvn package
 
 # 产物 target/app.jar 和 target/app.xml
 

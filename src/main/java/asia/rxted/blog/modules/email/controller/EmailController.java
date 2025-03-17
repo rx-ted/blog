@@ -1,6 +1,7 @@
 package asia.rxted.blog.modules.email.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,7 +26,7 @@ public class EmailController {
     @Parameter(name = "to", description = "接收者")
     @PostMapping()
     public ResultMessage<Object> sendEmail(@RequestParam String to) {
-        return email.sendCode(to);
+        return email.sendEmail(to);
     }
 
     @Operation(summary = "验证码验证")
