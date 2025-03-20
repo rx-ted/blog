@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 import com.google.gson.Gson;
 
 import asia.rxted.blog.config.enums.SecurityEnum;
+import asia.rxted.blog.config.enums.UserRoleEnum;
 import asia.rxted.blog.model.dto.UserDetailsDTO;
 import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.config.ResultUtil;
@@ -31,7 +32,6 @@ import asia.rxted.blog.modules.cache.service.RedisService;
 import asia.rxted.blog.modules.token.config.Token;
 import asia.rxted.blog.modules.token.service.TokenService;
 import asia.rxted.blog.modules.user.config.AuthUser;
-import asia.rxted.blog.modules.user.config.UserRoleEnum;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;

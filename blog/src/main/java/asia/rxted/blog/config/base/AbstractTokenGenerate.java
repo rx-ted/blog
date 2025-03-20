@@ -1,7 +1,7 @@
 package asia.rxted.blog.config.base;
 
+import asia.rxted.blog.config.enums.UserRoleEnum;
 import asia.rxted.blog.modules.token.config.Token;
-import asia.rxted.blog.modules.user.config.UserRoleEnum;
 
 public abstract class AbstractTokenGenerate<T> {
 

@@ -1,4 +1,4 @@
-package asia.rxted.blog.modules.user.config;
+package asia.rxted.blog.config.enums;
 
 public enum UserRoleEnum {
 

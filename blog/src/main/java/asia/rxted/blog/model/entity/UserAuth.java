@@ -1,4 +1,4 @@
-package asia.rxted.blog.modules.user.entity;
+package asia.rxted.blog.model.entity;
 
 import java.time.LocalDateTime;
 

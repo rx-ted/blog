@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import asia.rxted.blog.model.entity.Tag;
-import asia.rxted.blog.modules.user.entity.UserInfo;
+import asia.rxted.blog.model.entity.UserInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

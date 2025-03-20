@@ -1,4 +1,4 @@
-package asia.rxted.blog.modules.user.vo;
+package asia.rxted.blog.model.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

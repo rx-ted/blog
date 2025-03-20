@@ -2,9 +2,9 @@ package asia.rxted.blog.modules.user.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import asia.rxted.blog.model.entity.UserAuth;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.modules.user.dto.UserAdminDTO;
-import asia.rxted.blog.modules.user.entity.UserAuth;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
