@@ -63,4 +63,8 @@ public class ResultUtil<T> {
         return new ResultUtil<T>().setErrorMsg(ResultCode.ERROR);
     }
 
+    public static RuntimeException fail(ResultCode code) {
+        throw new RuntimeException(ResultUtil.error(code).toString());
+    }
+
 }

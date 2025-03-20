@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import asia.rxted.blog.common.ResultMessage;
 import asia.rxted.blog.common.ResultUtil;
-import asia.rxted.blog.config.base.Token;
+import asia.rxted.blog.modules.token.config.Token;
 import asia.rxted.blog.modules.user.config.UserRegister;
 import asia.rxted.blog.modules.user.dto.User;
 import asia.rxted.blog.modules.user.service.UserServer;

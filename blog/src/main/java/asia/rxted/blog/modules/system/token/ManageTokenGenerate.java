@@ -4,15 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import asia.rxted.blog.config.base.AbstractTokenGenerate;
-import asia.rxted.blog.config.base.Token;
-import asia.rxted.blog.config.base.TokenUtil;
+import asia.rxted.blog.modules.token.config.Token;
+import asia.rxted.blog.modules.token.serviceImpl.TokenServiceImpl;
 import asia.rxted.blog.modules.user.config.AuthUser;
 import asia.rxted.blog.modules.user.dto.User;
 
 @Service
 public class ManageTokenGenerate extends AbstractTokenGenerate<User> {
     @Autowired
-    TokenUtil token;
+    TokenServiceImpl token;
 
     @Override
     public Token createToken(User user, Boolean longTerm) {

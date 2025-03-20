@@ -1,0 +1,21 @@
+package asia.rxted.blog.modules.user.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import asia.rxted.blog.modules.article.vo.ConditionVO;
+import asia.rxted.blog.modules.user.dto.UserAdminDTO;
+import asia.rxted.blog.modules.user.entity.UserAuth;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+@Mapper
+public interface UserAuthMapper extends BaseMapper<UserAuth> {
+
+    List<UserAdminDTO> listUsers(@Param("current") Long current, @Param("size") Long size, @Param("conditionVO") ConditionVO conditionVO);
+
+    Integer countUser(@Param("conditionVO") ConditionVO conditionVO);
+
+}

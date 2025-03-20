@@ -12,6 +12,28 @@ import asia.rxted.blog.modules.user.config.UserRoleEnum;
  */
 public enum CachePrefix {
 
+    /*
+     * RabbitMQ
+     */
+    MAXWELL_QUEUE,
+    MAXWELL_EXCHANGE,
+    EMAIL_QUEUE,
+    EMAIL_EXCHANGE,
+    SUBSCRIBE_QUEUE,
+    SUBSCRIBE_EXCHANGE,
+    
+
+    USER_CODE_KEY,
+    BLOG_VIEWS_COUNT,
+    ARTICLE_VIEWS_COUNT,
+    WEBSITE_CONFIG,
+    USER_AREA,
+    VISITOR_AREA,
+    ABOUT,
+    UNIQUE_VISITOR,
+    LOGIN_USER,
+    ARTICLE_ACCESS,
+
     /**
      * nonce
      */
@@ -515,6 +537,39 @@ public enum CachePrefix {
 
     public static String removePrefix(String str) {
         return str.substring(str.lastIndexOf("}_") + 2);
+    }
+
+    /**
+     * <blockquote>For example,
+     * 
+     * <pre>{@code
+     *     String str = ORDER.getPrefix("-", "Java", "is", "cool","6");
+     *      return  "{ORDER}-{Java}-{is}-{cool}-6"
+     * }</pre>
+     * 
+     * </blockquote>
+     * 
+     * @param delimiter the delimiter that separates each element
+     * @param elements  the elements to join together.
+     * @return a new {@code String}
+     */
+    public String getPrefix(String delimiter, Object... elements) {
+        StringBuilder result = new StringBuilder();
+        result.append(String.format("{%s}", this.name()));
+        String.join("result", "null");
+        for (int i = 0; i < elements.length; i++) {
+            if (i > 0) {
+                result.append(delimiter);
+            }
+            if (i < elements.length - 1) {
+                // Format with braces for all parts except the last one
+                result.append(String.format("{%s}", elements[i]));
+            } else {
+                // Append the last part without braces
+                result.append(elements[i]);
+            }
+        }
+        return result.toString();
     }
 
     /**

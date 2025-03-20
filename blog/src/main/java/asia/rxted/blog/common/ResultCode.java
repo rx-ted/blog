@@ -1,5 +1,7 @@
 package asia.rxted.blog.common;
 
+import io.jsonwebtoken.security.Password;
+
 public enum ResultCode {
 
     // 成功状态码
@@ -13,11 +15,44 @@ public enum ResultCode {
     // 参数异常
     PARAMS_ERROR(4002, "参数异常"),
 
+    PASSWORD_ERROR(50000, "密码错误"),
+
+    NO_LOGIN(40001, "用户未登录"),
+
+    AUTHORIZED(40300, "没有操作权限"),
+
+    SYSTEM_ERROR(50000, "系统异常"),
+
+    FAIL(51000, "操作失败"),
+
+    VALID_ERROR(52000, "参数格式不正确"),
+
+    USERNAME_EXIST(52001, "用户名已存在"),
+
+    USERNAME_NOT_EXIST(52002, "用户名不存在"),
+
+    ARTICLE_ACCESS_FAIL(52003, "文章密码认证未通过"),
+
+    QQ_LOGIN_ERROR(53001, "qq登录错误"),
+
+    /**
+     * 文件操作状态码
+     */
+    FILE_UPLOAD_ERROR(100000, "文件上传失败"),
+
+    /*
+     * 文章代码状态
+     */
+    ARTICLE_NOT_EXIST(100000, "文章不存在"),
+    ARTICLE_TAG_IS_EXIST(100000, "标签名已存在"),
+    ARTICLE_TAG_EXISTS_DELETE_ERROR(100000, "删除失败，该标签下存在文章"),
+    ARTICLE_EXPORT_FAILED_ERROR(100004, "导出文章失败"),
+    ARTICLE_IMPORT_FAILED_ERROR(100004, "导入文章失败"),
+
     /**
      * 邮箱代码状态
      */
-    EMAIL_ERROR(44000,"邮箱操作失败"),
-
+    EMAIL_ERROR(44000, "邮箱操作失败"),
 
     /**
      * 验证码
@@ -37,6 +72,9 @@ public enum ResultCode {
     USER_EDIT_SUCCESS(20001, "用户修改成功"),
     USER_OPERATION_ERROR(20001, "用户操作无反应"),
     USER_NOT_EXIST(20002, "用户不存在"),
+    USER_NOT_EMPTY(20002, "用户名不能为空"),
+    USER_IS_LOCKED(20102, "用户帐号已被锁定"),
+
     USER_NOT_LOGIN(20003, "用户未登录"),
     USER_AUTH_EXPIRED(20004, "用户已退出，请重新登录"),
     USER_AUTHORITY_ERROR(20005, "权限不足"),

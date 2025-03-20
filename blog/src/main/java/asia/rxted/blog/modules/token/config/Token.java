@@ -1,4 +1,4 @@
-package asia.rxted.blog.config.base;
+package asia.rxted.blog.modules.token.config;
 
 import lombok.Data;
 
