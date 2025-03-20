@@ -10,8 +10,8 @@ import asia.rxted.blog.config.properties.QQConfigProperties;
 import asia.rxted.blog.model.dto.SocialTokenDTO;
 import asia.rxted.blog.model.dto.SocialUserInfoDTO;
 import asia.rxted.blog.model.vo.QQLoginVO;
-import asia.rxted.blog.modules.user.dto.QQTokenDTO;
-import asia.rxted.blog.modules.user.dto.QQUserInfoDTO;
+import asia.rxted.blog.model.dto.QQTokenDTO;
+import asia.rxted.blog.model.dto.QQUserInfoDTO;
 import asia.rxted.blog.utils.CommonUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;

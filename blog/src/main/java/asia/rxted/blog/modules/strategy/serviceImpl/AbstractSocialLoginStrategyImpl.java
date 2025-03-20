@@ -15,7 +15,7 @@ import asia.rxted.blog.config.ResultUtil;
 import asia.rxted.blog.config.constant.CommonConstant;
 import asia.rxted.blog.modules.strategy.SocialLoginStrategy;
 import asia.rxted.blog.modules.token.service.TokenService;
-import asia.rxted.blog.modules.user.dto.UserRole;
+import asia.rxted.blog.model.dto.UserRole;
 import asia.rxted.blog.modules.user.mapper.UserAuthMapper;
 import asia.rxted.blog.modules.user.mapper.UserInfoMapper;
 import asia.rxted.blog.modules.user.mapper.UserRoleMapper;

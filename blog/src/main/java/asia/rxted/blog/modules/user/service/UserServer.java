@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import asia.rxted.blog.config.ResultMessage;
 import asia.rxted.blog.modules.token.config.Token;
 import asia.rxted.blog.modules.user.config.UserRegister;
-import asia.rxted.blog.modules.user.dto.User;
+import asia.rxted.blog.model.dto.User;
 
 public interface UserServer extends IService<User> {
     // Pls add your different function.

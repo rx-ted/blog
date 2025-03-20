@@ -17,7 +17,7 @@ import asia.rxted.blog.config.ResultUtil;
 import asia.rxted.blog.modules.system.token.ManageTokenGenerate;
 import asia.rxted.blog.modules.token.config.Token;
 import asia.rxted.blog.modules.user.config.UserRegister;
-import asia.rxted.blog.modules.user.dto.User;
+import asia.rxted.blog.model.dto.User;
 import asia.rxted.blog.modules.user.mapper.UserMapper;
 import asia.rxted.blog.modules.user.service.UserServer;
 

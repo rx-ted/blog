@@ -9,7 +9,7 @@ import asia.rxted.blog.config.ResultMessage;
 import asia.rxted.blog.config.ResultUtil;
 import asia.rxted.blog.modules.token.config.Token;
 import asia.rxted.blog.modules.user.config.UserRegister;
-import asia.rxted.blog.modules.user.dto.User;
+import asia.rxted.blog.model.dto.User;
 import asia.rxted.blog.modules.user.service.UserServer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
