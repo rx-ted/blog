@@ -3,7 +3,7 @@ package asia.rxted.blog.modules.strategy;
 
 import java.util.List;
 
-import asia.rxted.blog.modules.article.dto.ArticleSearchDTO;
+import asia.rxted.blog.model.dto.ArticleSearchDTO;
 
 public interface SearchStrategy {
 

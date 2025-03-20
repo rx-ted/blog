@@ -2,10 +2,10 @@ package asia.rxted.blog.modules.article.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-import asia.rxted.blog.modules.article.dto.TagAdminDTO;
-import asia.rxted.blog.modules.article.dto.TagDTO;
-import asia.rxted.blog.modules.article.entity.Tag;
-import asia.rxted.blog.modules.article.vo.ConditionVO;
+import asia.rxted.blog.model.dto.TagAdminDTO;
+import asia.rxted.blog.model.dto.TagDTO;
+import asia.rxted.blog.model.entity.Tag;
+import asia.rxted.blog.model.vo.ConditionVO;
 
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;

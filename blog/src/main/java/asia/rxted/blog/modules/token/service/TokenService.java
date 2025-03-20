@@ -1,6 +1,6 @@
 package asia.rxted.blog.modules.token.service;
 
-import asia.rxted.blog.modules.article.dto.UserDetailsDTO;
+import asia.rxted.blog.model.dto.UserDetailsDTO;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 

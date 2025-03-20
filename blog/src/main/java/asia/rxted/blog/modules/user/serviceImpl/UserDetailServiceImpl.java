@@ -3,9 +3,9 @@ package asia.rxted.blog.modules.user.serviceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 
-import asia.rxted.blog.common.ResultCode;
-import asia.rxted.blog.common.ResultUtil;
-import asia.rxted.blog.modules.article.dto.UserDetailsDTO;
+import asia.rxted.blog.config.ResultCode;
+import asia.rxted.blog.config.ResultUtil;
+import asia.rxted.blog.model.dto.UserDetailsDTO;
 import asia.rxted.blog.modules.user.entity.UserAuth;
 import asia.rxted.blog.modules.user.entity.UserInfo;
 import asia.rxted.blog.modules.user.mapper.RoleMapper;

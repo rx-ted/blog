@@ -17,13 +17,14 @@ import org.springframework.util.StringUtils;
 
 import com.google.gson.Gson;
 
-import asia.rxted.blog.common.ResultCode;
-import asia.rxted.blog.common.ServiceException;
-import asia.rxted.blog.common.enums.SecurityEnum;
+import asia.rxted.blog.config.enums.SecurityEnum;
+import asia.rxted.blog.model.dto.UserDetailsDTO;
+import asia.rxted.blog.config.ResultCode;
+import asia.rxted.blog.config.ResultUtil;
+import asia.rxted.blog.config.ServiceException;
 import asia.rxted.blog.config.base.SecretKeyUtil;
 import asia.rxted.blog.config.constant.AuthConstant;
 import asia.rxted.blog.config.constant.RedisConstant;
-import asia.rxted.blog.modules.article.dto.UserDetailsDTO;
 import asia.rxted.blog.modules.cache.CachePrefix;
 import asia.rxted.blog.modules.cache.RedisCache;
 import asia.rxted.blog.modules.cache.service.RedisService;
@@ -69,14 +70,14 @@ public class TokenServiceImpl implements TokenService {
     }
 
     public Token refreshToken(String oldToken) {
-        Claims claims;
+        Claims claims = null;
         try {
             claims = Jwts.parser()
                     .setSigningKey(SecretKeyUtil.generalKeyByDecoders())
                     .build()
                     .parseClaimsJws(oldToken).getBody();
         } catch (Exception e) {
-            throw new ServiceException(ResultCode.USER_AUTH_EXPIRED);
+            ResultUtil.fail(ResultCode.USER_AUTH_EXPIRED);
         }
         String json = claims.get(SecurityEnum.USER_CONTEXT.getValue()).toString();
         AuthUser authUser = new Gson().fromJson(json, AuthUser.class);

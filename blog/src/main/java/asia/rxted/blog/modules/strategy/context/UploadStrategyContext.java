@@ -5,12 +5,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import asia.rxted.blog.config.enums.UploadModeEnum;
 import asia.rxted.blog.modules.strategy.UploadStrategy;
-import asia.rxted.blog.modules.strategy.config.UploadModeEnum;
 
 import java.io.InputStream;
 import java.util.Map;
-
 
 @Service
 public class UploadStrategyContext {

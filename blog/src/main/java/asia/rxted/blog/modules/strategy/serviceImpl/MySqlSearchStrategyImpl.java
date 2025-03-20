@@ -4,9 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 
 import asia.rxted.blog.config.constant.CommonConstant;
-import asia.rxted.blog.modules.article.config.ArticleStatusEnum;
-import asia.rxted.blog.modules.article.dto.ArticleSearchDTO;
-import asia.rxted.blog.modules.article.entity.Article;
+import asia.rxted.blog.config.enums.ArticleStatusEnum;
+import asia.rxted.blog.model.dto.ArticleSearchDTO;
+import asia.rxted.blog.model.entity.Article;
 import asia.rxted.blog.modules.article.mapper.ArticleMapper;
 import asia.rxted.blog.modules.strategy.SearchStrategy;
 

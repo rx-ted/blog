@@ -3,8 +3,8 @@ package asia.rxted.blog.modules.strategy.serviceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import asia.rxted.blog.common.ResultCode;
-import asia.rxted.blog.common.ResultUtil;
+import asia.rxted.blog.config.ResultCode;
+import asia.rxted.blog.config.ResultUtil;
 import asia.rxted.blog.modules.strategy.UploadStrategy;
 import asia.rxted.blog.utils.FileUtil;
 

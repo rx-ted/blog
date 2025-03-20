@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import asia.rxted.blog.config.enums.MarkdownTypeEnum;
 import asia.rxted.blog.modules.strategy.ArticleImportStrategy;
-import asia.rxted.blog.modules.strategy.config.MarkdownTypeEnum;
 
 import java.util.Map;
 

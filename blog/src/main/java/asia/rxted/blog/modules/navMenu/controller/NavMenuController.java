@@ -3,9 +3,9 @@ package asia.rxted.blog.modules.navMenu.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import asia.rxted.blog.common.ResultCode;
-import asia.rxted.blog.common.ResultMessage;
-import asia.rxted.blog.common.ResultUtil;
+import asia.rxted.blog.config.ResultCode;
+import asia.rxted.blog.config.ResultMessage;
+import asia.rxted.blog.config.ResultUtil;
 import asia.rxted.blog.modules.navMenu.service.NavMenuServer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

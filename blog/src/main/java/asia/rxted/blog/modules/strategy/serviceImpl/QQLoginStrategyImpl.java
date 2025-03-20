@@ -2,13 +2,13 @@ package asia.rxted.blog.modules.strategy.serviceImpl;
 
 import com.alibaba.fastjson.JSON;
 
-import asia.rxted.blog.common.ResultCode;
-import asia.rxted.blog.common.ResultUtil;
-import asia.rxted.blog.common.enums.LoginTypeEnum;
+import asia.rxted.blog.config.enums.LoginTypeEnum;
+import asia.rxted.blog.config.ResultCode;
+import asia.rxted.blog.config.ResultUtil;
 import asia.rxted.blog.config.constant.SocialLoginConstant;
 import asia.rxted.blog.config.properties.QQConfigProperties;
-import asia.rxted.blog.modules.strategy.dto.SocialTokenDTO;
-import asia.rxted.blog.modules.strategy.dto.SocialUserInfoDTO;
+import asia.rxted.blog.model.dto.SocialTokenDTO;
+import asia.rxted.blog.model.dto.SocialUserInfoDTO;
 import asia.rxted.blog.modules.user.dto.QQTokenDTO;
 import asia.rxted.blog.modules.user.dto.QQUserInfoDTO;
 import asia.rxted.blog.modules.user.vo.QQLoginVO;

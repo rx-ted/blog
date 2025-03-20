@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import asia.rxted.blog.common.ResultCode;
-import asia.rxted.blog.common.ResultMessage;
-import asia.rxted.blog.common.ResultUtil;
+import asia.rxted.blog.config.ResultCode;
+import asia.rxted.blog.config.ResultMessage;
+import asia.rxted.blog.config.ResultUtil;
 import asia.rxted.blog.modules.cache.CachePrefix;
 import asia.rxted.blog.modules.cache.RedisCache;
 import asia.rxted.blog.modules.email.config.EmailConfig;

@@ -17,11 +17,10 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
-            <version>1.9.23</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+            <version>3.4.3</version>
         </dependency>
-
 
         <dependency>
             <groupId>com.aliyun.oss</groupId>

@@ -3,10 +3,10 @@ package asia.rxted.blog.modules.article.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-import asia.rxted.blog.modules.article.dto.CategoryAdminDTO;
-import asia.rxted.blog.modules.article.dto.CategoryDTO;
-import asia.rxted.blog.modules.article.entity.Category;
-import asia.rxted.blog.modules.article.vo.ConditionVO;
+import asia.rxted.blog.model.dto.CategoryAdminDTO;
+import asia.rxted.blog.model.dto.CategoryDTO;
+import asia.rxted.blog.model.entity.Category;
+import asia.rxted.blog.model.vo.ConditionVO;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

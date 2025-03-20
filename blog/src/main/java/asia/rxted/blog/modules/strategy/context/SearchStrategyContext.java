@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import asia.rxted.blog.modules.article.dto.ArticleSearchDTO;
+import asia.rxted.blog.config.enums.SearchModeEnum;
+import asia.rxted.blog.model.dto.ArticleSearchDTO;
 import asia.rxted.blog.modules.strategy.SearchStrategy;
-import asia.rxted.blog.modules.strategy.config.SearchModeEnum;
 
 import java.util.List;
 import java.util.Map;

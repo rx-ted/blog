@@ -3,12 +3,12 @@ package asia.rxted.blog.modules.article.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
-import asia.rxted.blog.modules.article.dto.PageResultDTO;
-import asia.rxted.blog.modules.article.dto.TagAdminDTO;
-import asia.rxted.blog.modules.article.dto.TagDTO;
-import asia.rxted.blog.modules.article.entity.Tag;
-import asia.rxted.blog.modules.article.vo.ConditionVO;
-import asia.rxted.blog.modules.article.vo.TagVO;
+import asia.rxted.blog.model.dto.PageResultDTO;
+import asia.rxted.blog.model.dto.TagAdminDTO;
+import asia.rxted.blog.model.dto.TagDTO;
+import asia.rxted.blog.model.entity.Tag;
+import asia.rxted.blog.model.vo.ConditionVO;
+import asia.rxted.blog.model.vo.TagVO;
 
 import java.util.List;
 

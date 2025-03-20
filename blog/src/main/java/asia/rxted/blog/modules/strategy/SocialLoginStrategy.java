@@ -1,6 +1,6 @@
 package asia.rxted.blog.modules.strategy;
 
-import asia.rxted.blog.modules.strategy.dto.UserInfoDTO;
+import asia.rxted.blog.model.dto.UserInfoDTO;
 
 public interface SocialLoginStrategy {
 

@@ -4,9 +4,9 @@ package asia.rxted.blog.modules.strategy.context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import asia.rxted.blog.config.enums.LoginTypeEnum;
+import asia.rxted.blog.model.dto.UserInfoDTO;
 import asia.rxted.blog.modules.strategy.SocialLoginStrategy;
-import asia.rxted.blog.modules.strategy.config.LoginTypeEnum;
-import asia.rxted.blog.modules.strategy.dto.UserInfoDTO;
 
 import java.util.Map;
 

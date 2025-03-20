@@ -7,12 +7,12 @@ import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-import asia.rxted.blog.modules.article.dto.ArticleAdminDTO;
-import asia.rxted.blog.modules.article.dto.ArticleCardDTO;
-import asia.rxted.blog.modules.article.dto.ArticleDTO;
-import asia.rxted.blog.modules.article.dto.ArticleStatisticsDTO;
-import asia.rxted.blog.modules.article.entity.Article;
-import asia.rxted.blog.modules.article.vo.ConditionVO;
+import asia.rxted.blog.model.dto.ArticleAdminDTO;
+import asia.rxted.blog.model.dto.ArticleCardDTO;
+import asia.rxted.blog.model.dto.ArticleDTO;
+import asia.rxted.blog.model.dto.ArticleStatisticsDTO;
+import asia.rxted.blog.model.entity.Article;
+import asia.rxted.blog.model.vo.ConditionVO;
 
 @Mapper
 public interface ArticleMapper extends BaseMapper<Article> {
