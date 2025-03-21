@@ -1,6 +1,5 @@
 package asia.rxted.blog.utils;
 
-
 import eu.bitwalker.useragentutils.UserAgent;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +10,7 @@ import org.lionsoul.ip2region.DataBlock;
 import org.lionsoul.ip2region.DbConfig;
 import org.lionsoul.ip2region.DbSearcher;
 import org.lionsoul.ip2region.Util;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
@@ -26,6 +25,10 @@ import java.net.UnknownHostException;
 @Slf4j
 @Component
 public class IpUtil {
+
+    @Value("${ip.ip2region}")
+    private String ip2regionPath;
+
     private static DbSearcher searcher;
 
     private static Method method;
@@ -50,7 +53,7 @@ public class IpUtil {
         if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
             ipAddress = request.getRemoteAddr();
             if ("127.0.0.1".equals(ipAddress) || "0:0:0:0:0:0:0:1".equals(ipAddress)) {
-                //根据网卡取本机配置的IP
+                // 根据网卡取本机配置的IP
                 InetAddress inet = null;
                 try {
                     inet = InetAddress.getLocalHost();
@@ -66,7 +69,7 @@ public class IpUtil {
 
     @PostConstruct
     private void initIp2regionResource() throws Exception {
-        InputStream inputStream = new ClassPathResource("/ip/ip2region.db").getInputStream();
+        InputStream inputStream = new ClassPathResource(ip2regionPath).getInputStream();
         byte[] dbBinStr = FileCopyUtils.copyToByteArray(inputStream);
         DbConfig dbConfig = new DbConfig();
         searcher = new DbSearcher(dbConfig, dbBinStr);

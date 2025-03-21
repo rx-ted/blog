@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.config.ResultUtil;
+import asia.rxted.blog.mapper.ArticleTagMapper;
+import asia.rxted.blog.mapper.TagMapper;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.TagAdminDTO;
 import asia.rxted.blog.model.dto.TagDTO;
@@ -13,8 +15,6 @@ import asia.rxted.blog.model.entity.ArticleTag;
 import asia.rxted.blog.model.entity.Tag;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.TagVO;
-import asia.rxted.blog.modules.article.mapper.ArticleTagMapper;
-import asia.rxted.blog.modules.article.mapper.TagMapper;
 import asia.rxted.blog.modules.article.service.TagService;
 import asia.rxted.blog.utils.BeanCopyUtil;
 import asia.rxted.blog.utils.PageUtil;

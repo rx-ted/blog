@@ -19,6 +19,11 @@ spring:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
 
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
   data:
     redis:
       host: 127.0.0.1
@@ -32,6 +37,27 @@ spring:
           max-idle: 8 # 默认连接数最小空闲的连接数，默认为 8 。使用负数表示没有限制。
           min-idle: 0 # 默认连接池最小空闲的连接数，默认为 0 。允许设置 0 和 正数。
           max-wait: -1 # 连接池最大阻塞等待时间，单位：毫秒。默认为 -1 ，表示不限制。
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: root
+    password: root
+    listener:
+      simple:
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 3000
+
+  elasticsearch:
+    username: guest
+    password: guest
+    uris:
+      - localhost:9200
+    rest:
+      uris: localhost:9200
+
   cache:
     type: redis
     redis:
@@ -56,16 +82,42 @@ swagger:
 #   file:
 #     name: "logging.log"
 
+search:
+  mode: elasticsearch
+
+upload:
+  mode: oss
+  oss:
+    url: http://Bucket域名/
+    endpoint: OSS配置endpoint
+    accessKeyId: OSS配置accessKeyId
+    accessKeySecret: OSS配置accessKeySecret
+    bucketName: OSS配置bucketName
+  minio:
+    url: http://minio的ip:9000/
+    endpoint: http://minio的ip:9000
+    accesskey: 用户名
+    secretKey: 密码
+    bucketName: 桶的名称
+
+qq:
+  app-id: QQ APPID
+  check-token-url: https://graph.qq.com/oauth2.0/me?access_token={access_token}
+  user-info-url: https://graph.qq.com/user/get_user_info?openid={openid}&access_token={access_token}&oauth_consumer_key={oauth_consumer_key}
+
 mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # debug log
+    map-underscore-to-camel-case: true
 
+ip:
+  ip2region: "/ip/ip2region.db"
 
-logging:
-  level:
-    org:
-      springframework: DEBUG
-
+# logging:
+#   level:
+#     org:
+#       springframework: DEBUG
 
 ---
 spring:

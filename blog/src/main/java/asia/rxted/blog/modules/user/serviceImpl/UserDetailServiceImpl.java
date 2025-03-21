@@ -5,12 +5,12 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 
 import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.config.ResultUtil;
+import asia.rxted.blog.mapper.RoleMapper;
+import asia.rxted.blog.mapper.UserAuthMapper;
+import asia.rxted.blog.mapper.UserInfoMapper;
 import asia.rxted.blog.model.dto.UserDetailsDTO;
 import asia.rxted.blog.model.entity.UserAuth;
 import asia.rxted.blog.model.entity.UserInfo;
-import asia.rxted.blog.modules.user.mapper.RoleMapper;
-import asia.rxted.blog.modules.user.mapper.UserAuthMapper;
-import asia.rxted.blog.modules.user.mapper.UserInfoMapper;
 import asia.rxted.blog.utils.IpUtil;
 import eu.bitwalker.useragentutils.UserAgent;
 import jakarta.annotation.Resource;

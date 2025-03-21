@@ -1,6 +1,6 @@
 package asia.rxted.blog.model.vo;
 
-import java.time.LocalDateTime;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -42,11 +42,16 @@ public class ConditionVO {
     @Schema(name = "status", title = "状态", type = "Integer")
     private Integer status;
 
-    @Schema(name = "startTime", title = "开始时间", type = "LocalDateTime")
-    private LocalDateTime startTime;
+    @Schema(name = "startTime", title = "开始时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private String startTime;
+    // private LocalDateTime startTime; // TODO(Ben): it's not used to
+    // LocalDataTime, I did not found the root cause
 
-    @Schema(name = "endTime", title = "结束时间", type = "LocalDateTime")
-    private LocalDateTime endTime;
+    @Schema(name = "endTime", title = "结束时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private String endTime;
+    // private LocalDateTime endTime;
 
     @Schema(name = "isDelete", title = "是否删除", type = "Integer")
     private Integer isDelete;

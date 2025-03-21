@@ -5,9 +5,9 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 
 import asia.rxted.blog.config.constant.CommonConstant;
 import asia.rxted.blog.config.enums.ArticleStatusEnum;
+import asia.rxted.blog.mapper.ArticleMapper;
 import asia.rxted.blog.model.dto.ArticleSearchDTO;
 import asia.rxted.blog.model.entity.Article;
-import asia.rxted.blog.modules.article.mapper.ArticleMapper;
 import asia.rxted.blog.modules.strategy.SearchStrategy;
 
 import org.springframework.beans.factory.annotation.Autowired;

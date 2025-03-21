@@ -3,8 +3,8 @@ package asia.rxted.blog.config.aspect;
 import com.alibaba.fastjson.JSON;
 
 import asia.rxted.blog.config.event.OperationLogEvent;
+import asia.rxted.blog.config.log.OperationLog;
 import asia.rxted.blog.config.annotation.OptLog;
-import asia.rxted.blog.config.entity.OperationLog;
 import asia.rxted.blog.utils.IpUtil;
 import asia.rxted.blog.utils.UserUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +33,7 @@ public class OperationLogAspect {
     @Autowired
     private ApplicationContext applicationContext;
 
-    @Pointcut("@annotation(asia.rxted.blog.annotation.OptLog)")
+    @Pointcut("@annotation(asia.rxted.blog.config.annotation.OptLog)")
     public void operationLogPointCut() {
     }
 
