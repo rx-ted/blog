@@ -411,4 +411,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     }
 
+    @Override
+    public ArticleSearchDTO getFirstArticleBySearch() {
+        return searchStrategyContext.get("0");
+    }
+
 }

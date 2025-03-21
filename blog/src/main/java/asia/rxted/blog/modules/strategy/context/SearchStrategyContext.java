@@ -11,7 +11,6 @@ import asia.rxted.blog.modules.strategy.SearchStrategy;
 import java.util.List;
 import java.util.Map;
 
-
 @Service
 public class SearchStrategyContext {
 
@@ -23,6 +22,11 @@ public class SearchStrategyContext {
 
     public List<ArticleSearchDTO> executeSearchStrategy(String keywords) {
         return searchStrategyMap.get(SearchModeEnum.getStrategy(searchMode)).searchArticle(keywords);
+    }
+
+    public ArticleSearchDTO get(String id) {
+        return searchStrategyMap.get(SearchModeEnum.getStrategy(searchMode)).get(id);
+
     }
 
 }

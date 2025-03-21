@@ -173,8 +173,14 @@ public class ArticleController {
     @Operation(summary = "搜索文章")
     @GetMapping("/search")
     public ResultMessage<List<ArticleSearchDTO>> listArticlesBySearch(ConditionVO condition) {
-        System.out.println(condition.getStartTime());
         return ResultUtil.data(articleService.listArticlesBySearch(condition));
+    }
+
+
+    @Operation(summary = "搜索第一个文章")
+    @GetMapping("/search/first")
+    public ResultMessage<ArticleSearchDTO> getFirstArticleBySearch() {
+        return ResultUtil.data(articleService.getFirstArticleBySearch());
     }
 
 }

@@ -87,4 +87,15 @@ public class MySqlSearchStrategyImpl implements SearchStrategy {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public ArticleSearchDTO get(String id) {
+        List<Article> articles = articleMapper.selectList(null);
+
+        return ArticleSearchDTO.builder()
+                .id(Integer.parseInt(id))
+                .articleTitle(articles.get(0).getArticleTitle())
+                .articleContent(articles.get(0).getArticleContent())
+                .build();
+    }
+
 }

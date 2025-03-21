@@ -8,5 +8,6 @@ import asia.rxted.blog.model.dto.ArticleSearchDTO;
 public interface SearchStrategy {
 
     List<ArticleSearchDTO> searchArticle(String keywords);
+    ArticleSearchDTO get(String id);
 
 }

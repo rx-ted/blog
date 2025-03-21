@@ -104,4 +104,8 @@ public class EsSearchStrategyImpl implements SearchStrategy {
         return new ArrayList<>();
     }
 
+    public ArticleSearchDTO get(String id) {
+        return elasticsearchRestTemplate.get(id, ArticleSearchDTO.class);
+    }
+
 }

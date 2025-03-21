@@ -114,10 +114,10 @@ mybatis-plus:
 ip:
   ip2region: "/ip/ip2region.db"
 
-logging:
-  level:
-    org:
-      springframework: DEBUG
+# logging:
+#   level:
+#     org:
+#       springframework: DEBUG
 
 ---
 spring:
