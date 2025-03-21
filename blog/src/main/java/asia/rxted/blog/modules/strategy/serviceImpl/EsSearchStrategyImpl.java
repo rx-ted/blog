@@ -4,18 +4,23 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 
 import asia.rxted.blog.config.constant.CommonConstant;
-import asia.rxted.blog.config.enums.ArticleStatusEnum;
 import asia.rxted.blog.model.dto.ArticleSearchDTO;
 import asia.rxted.blog.modules.strategy.SearchStrategy;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import lombok.extern.log4j.Log4j2;
 
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.common.unit.Fuzziness;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.elasticsearch.client.erhlc.NativeSearchQueryBuilder;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.HighlightQuery;
+import org.springframework.data.elasticsearch.core.query.highlight.Highlight;
+import org.springframework.data.elasticsearch.core.query.highlight.HighlightField;
+import org.springframework.data.elasticsearch.core.query.highlight.HighlightFieldParameters;
+import org.springframework.data.elasticsearch.core.query.highlight.HighlightFieldParameters.HighlightFieldParametersBuilder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -34,31 +39,52 @@ public class EsSearchStrategyImpl implements SearchStrategy {
         if (StringUtils.isBlank(keywords)) {
             return new ArrayList<>();
         }
-        return search(buildQuery(keywords));
+        return search(keywords);
     }
 
-    private NativeSearchQueryBuilder buildQuery(String keywords) {
-        NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        boolQueryBuilder.must(QueryBuilders.boolQuery().should(QueryBuilders.matchQuery("articleTitle", keywords))
-                .should(QueryBuilders.matchQuery("articleContent", keywords)))
-                .must(QueryBuilders.termQuery("isDelete", CommonConstant.FALSE))
-                .must(QueryBuilders.termQuery("status", ArticleStatusEnum.PUBLIC.getStatus()));
-        nativeSearchQueryBuilder.withQuery(boolQueryBuilder);
-        return nativeSearchQueryBuilder;
+    private boolean isPhrase(String text) {
+        return text.contains(" ");
     }
 
-    private List<ArticleSearchDTO> search(NativeSearchQueryBuilder nativeSearchQueryBuilder) {
-        HighlightBuilder.Field titleField = new HighlightBuilder.Field("articleTitle");
-        titleField.preTags(CommonConstant.PRE_TAG);
-        titleField.postTags(CommonConstant.POST_TAG);
-        HighlightBuilder.Field contentField = new HighlightBuilder.Field("articleContent");
-        contentField.preTags(CommonConstant.PRE_TAG);
-        contentField.postTags(CommonConstant.POST_TAG);
-        contentField.fragmentSize(50);
-        nativeSearchQueryBuilder.withHighlightFields(titleField, contentField);
+    private Query buildSearchSimpleQuery(String field, String text) {
+        if (isPhrase(text)) {
+            return BoolQuery.of(
+                    q -> q.must(
+                            mb -> mb.bool(
+                                    b -> b.must(
+                                            sb -> sb.matchPhrase(
+                                                    m -> m.field(field).query(text))))))
+                    ._toQuery();
+        } else {
+            return BoolQuery.of(
+                    q -> q.must(
+                            mb -> mb.bool(
+                                    b -> b.must(
+                                            sb -> sb.match(
+                                                    m -> m.field(field).fuzziness(Fuzziness.ONE.asString())
+                                                            .query(text))))))
+                    ._toQuery();
+
+        }
+    }
+
+    private List<ArticleSearchDTO> search(String keywords) {
+
+        HighlightFieldParametersBuilder highlightFieldParametersBuilder = HighlightFieldParameters.builder()
+                .withPreTags(CommonConstant.PRE_TAG).withPostTags(CommonConstant.POST_TAG).withFragmentSize(50);
+        HighlightFieldParameters highlightFieldParameters = highlightFieldParametersBuilder.build();
+        List<HighlightField> highlightFields = new ArrayList<>();
+        highlightFields.add(new HighlightField("articleTitle", highlightFieldParameters));
+        highlightFields.add(new HighlightField("articleContent", highlightFieldParameters));
+
+        NativeQueryBuilder nativeQueryBuilder = new NativeQueryBuilder()
+                .withQuery(buildSearchSimpleQuery("articleTitle", keywords))
+                .withQuery(buildSearchSimpleQuery("articleContent", keywords))
+                .withHighlightQuery(new HighlightQuery(new Highlight(highlightFields), ArticleSearchDTO.class))
+                .withPageable(Pageable.ofSize(20));
+
         try {
-            SearchHits<ArticleSearchDTO> search = elasticsearchRestTemplate.search(nativeSearchQueryBuilder.build(),
+            SearchHits<ArticleSearchDTO> search = elasticsearchRestTemplate.search(nativeQueryBuilder.build(),
                     ArticleSearchDTO.class);
             return search.getSearchHits().stream().map(hit -> {
                 ArticleSearchDTO article = hit.getContent();
