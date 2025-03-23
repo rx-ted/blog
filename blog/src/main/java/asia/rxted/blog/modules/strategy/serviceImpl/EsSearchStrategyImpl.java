@@ -6,14 +6,12 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import asia.rxted.blog.config.constant.CommonConstant;
 import asia.rxted.blog.model.dto.ArticleSearchDTO;
 import asia.rxted.blog.modules.strategy.SearchStrategy;
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import lombok.extern.log4j.Log4j2;
 
-import org.elasticsearch.common.unit.Fuzziness;
+import org.opensearch.data.client.orhlc.NativeSearchQueryBuilder;
+import org.opensearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.HighlightQuery;
@@ -42,32 +40,6 @@ public class EsSearchStrategyImpl implements SearchStrategy {
         return search(keywords);
     }
 
-    private boolean isPhrase(String text) {
-        return text.contains(" ");
-    }
-
-    private Query buildSearchSimpleQuery(String field, String text) {
-        if (isPhrase(text)) {
-            return BoolQuery.of(
-                    q -> q.must(
-                            mb -> mb.bool(
-                                    b -> b.must(
-                                            sb -> sb.matchPhrase(
-                                                    m -> m.field(field).query(text))))))
-                    ._toQuery();
-        } else {
-            return BoolQuery.of(
-                    q -> q.must(
-                            mb -> mb.bool(
-                                    b -> b.must(
-                                            sb -> sb.match(
-                                                    m -> m.field(field).fuzziness(Fuzziness.ONE.asString())
-                                                            .query(text))))))
-                    ._toQuery();
-
-        }
-    }
-
     private List<ArticleSearchDTO> search(String keywords) {
 
         HighlightFieldParametersBuilder highlightFieldParametersBuilder = HighlightFieldParameters.builder()
@@ -77,10 +49,11 @@ public class EsSearchStrategyImpl implements SearchStrategy {
         highlightFields.add(new HighlightField("articleTitle", highlightFieldParameters));
         highlightFields.add(new HighlightField("articleContent", highlightFieldParameters));
 
-        NativeQueryBuilder nativeQueryBuilder = new NativeQueryBuilder()
-                .withQuery(buildSearchSimpleQuery("articleTitle", keywords))
-                .withQuery(buildSearchSimpleQuery("articleContent", keywords))
-                .withHighlightQuery(new HighlightQuery(new Highlight(highlightFields), ArticleSearchDTO.class))
+        NativeSearchQueryBuilder nativeQueryBuilder = new NativeSearchQueryBuilder()
+                .withQuery(
+                        QueryBuilders.multiMatchQuery(keywords, "articleTitle", "articleContent"))
+                .withHighlightQuery(new HighlightQuery(new Highlight(highlightFields),
+                        ArticleSearchDTO.class))
                 .withPageable(Pageable.ofSize(20));
 
         try {

@@ -82,8 +82,14 @@ swagger:
 #   file:
 #     name: "logging.log"
 
+opensearch:
+  uris: http://localhost:9200
+  username: admin
+  password: admin
+
 search:
   mode: elasticsearch
+  # mode: opensearch
 
 upload:
   mode: oss
