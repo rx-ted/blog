@@ -83,8 +83,8 @@ swagger:
 #     name: "logging.log"
 
 search:
-  mode: elasticsearch
-  # mode: opensearch
+  # mode: elasticsearch
+  mode: opensearch
 
 opensearch:
   uris: http://localhost:9200

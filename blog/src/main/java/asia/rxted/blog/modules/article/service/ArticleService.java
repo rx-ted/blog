@@ -18,6 +18,7 @@ import asia.rxted.blog.model.vo.ArticleTopFeaturedVO;
 import asia.rxted.blog.model.vo.ArticleVO;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.DeleteVO;
+import asia.rxted.blog.modules.search.dto.SearchDTO;
 
 public interface ArticleService extends IService<Article> {
 
@@ -49,7 +50,8 @@ public interface ArticleService extends IService<Article> {
 
     List<String> exportArticles(List<Integer> articleIdList);
 
-    // List<ArticleSearchDTO> listArticlesBySearch(ConditionVO condition);
+    List<SearchDTO> listArticlesBySearch(ConditionVO condition);
+
 
     // ArticleSearchDTO getFirstArticleBySearch();
 

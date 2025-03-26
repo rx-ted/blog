@@ -8,6 +8,7 @@ import asia.rxted.blog.config.enums.SearchModeEnum;
 import asia.rxted.blog.modules.search.dto.SearchDTO;
 import asia.rxted.blog.modules.strategy.SearchStrategy;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -15,12 +16,12 @@ import java.util.Map;
 public class SearchStrategyContext {
 
     @Value("${search.mode}")
-    private String searchMode;
+    private String searchMode= "opensearch";
 
     @Autowired
     private Map<String, SearchStrategy> searchStrategyMap;
 
-    public List<SearchDTO> executeSearchStrategy(String keywords) {
+    public List<SearchDTO> executeSearchStrategy(String keywords) throws IOException {
         return searchStrategyMap.get(SearchModeEnum.getStrategy(searchMode)).searchArticle(keywords);
     }
 

@@ -54,6 +54,7 @@ import asia.rxted.blog.modules.article.service.ArticleTagService;
 import asia.rxted.blog.modules.article.service.TagService;
 import asia.rxted.blog.modules.cache.CachePrefix;
 import asia.rxted.blog.modules.cache.service.RedisService;
+import asia.rxted.blog.modules.search.dto.SearchDTO;
 import asia.rxted.blog.modules.strategy.context.SearchStrategyContext;
 import asia.rxted.blog.modules.strategy.context.UploadStrategyContext;
 import asia.rxted.blog.utils.BeanCopyUtil;
@@ -91,8 +92,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Autowired
     UploadStrategyContext uploadStrategyContext;
 
-    // @Autowired
-    // SearchStrategyContext searchStrategyContext;
+    @Autowired
+    SearchStrategyContext searchStrategyContext;
 
     @Override
     @SneakyThrows
@@ -405,15 +406,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         return urls;
     }
 
-    // @Override
-    // public List<ArticleSearchDTO> listArticlesBySearch(ConditionVO condition) {
-    //     return searchStrategyContext.executeSearchStrategy(condition.getKeywords());
-
-    // }
-
-    // @Override
-    // public ArticleSearchDTO getFirstArticleBySearch() {
-    //     return searchStrategyContext.get("0");
-    // }
+    @Override
+    @SneakyThrows
+    public List<SearchDTO> listArticlesBySearch(ConditionVO condition) {
+        System.out.println("keywords: " + condition.getKeywords());
+        return searchStrategyContext.executeSearchStrategy(condition.getKeywords());
+    }
 
 }

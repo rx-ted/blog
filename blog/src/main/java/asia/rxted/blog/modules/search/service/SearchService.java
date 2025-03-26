@@ -1,35 +1,35 @@
 package asia.rxted.blog.modules.search.service;
 
-public interface SearchService<T> {
+import java.io.IOException;
+import java.util.List;
+
+import asia.rxted.blog.modules.search.dto.SearchDTO;
+
+public interface SearchService {
 
     /*
      * 首次插入文档
      */
-    Object create(T t);
+    void create(SearchDTO searchDTO) throws IOException;
 
     /*
      * 动态更新或追加数据
      */
-    Object index(T t);
+    void index(SearchDTO searchDTO) throws IOException;
 
     /*
      * 清理过期数据
      */
-    Object delete(T t);
+    void delete(String id) throws IOException;
 
     /*
      * 获取单条记录详情
      */
-    Object get(T t);
-
-    /*
-     * 修改用户资料字段
-     */
-    Object update(T t1, T t2);
+    SearchDTO get(String id) throws IOException;
 
     /*
      * 复杂检索与数据分析
      */
-    Object search(T t, String keywords);
+    List<SearchDTO> search(String keywords) throws IOException;
 
 }

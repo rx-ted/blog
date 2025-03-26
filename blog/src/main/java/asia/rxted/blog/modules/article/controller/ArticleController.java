@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,6 +33,8 @@ import asia.rxted.blog.config.ResultMessage;
 import asia.rxted.blog.config.ResultUtil;
 import asia.rxted.blog.config.annotation.OptLog;
 import asia.rxted.blog.modules.article.service.ArticleService;
+import asia.rxted.blog.modules.search.dto.SearchDTO;
+import asia.rxted.blog.modules.search.service.SearchService;
 import asia.rxted.blog.modules.strategy.context.ArticleImportStrategyContext;
 import asia.rxted.blog.modules.strategy.context.UploadStrategyContext;
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,6 +60,9 @@ public class ArticleController {
 
     @Autowired
     private ArticleImportStrategyContext articleImportStrategyContext;
+
+    @Autowired
+    private SearchService client;
 
     @Operation(summary = "获取置顶和推荐文章")
     @GetMapping("topAndFeatured")
@@ -171,16 +177,17 @@ public class ArticleController {
         return ResultUtil.data(articleService.exportArticles(articleIds));
     }
 
-    // @Operation(summary = "搜索文章")
-    // @GetMapping("/search")
-    // public ResultMessage<List<ArticleSearchDTO>> listArticlesBySearch(ConditionVO
-    // condition) {
-    // return ResultUtil.data(articleService.listArticlesBySearch(condition));
-    // }
+    @Operation(summary = "搜索文章")
+    @GetMapping("/search")
+    public ResultMessage<List<SearchDTO>> listArticlesBySearch(ConditionVO condition) {
+        return ResultUtil.data(articleService.listArticlesBySearch(condition));
+    }
 
-    @Operation(summary = "搜索第一个文章")
-    @GetMapping("/gg")
-    public void getFirstArticleBySearch() throws OpenSearchException, IOException {
+    @Operation(summary = "保存文章")
+    @PostMapping("/save")
+    public ResultMessage<Object> saveSearch(SearchDTO searchDTO) throws IOException {
+        client.index(searchDTO);
+        return ResultUtil.success();
 
     }
 
