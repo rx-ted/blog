@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import asia.rxted.blog.config.enums.SearchModeEnum;
-import asia.rxted.blog.model.dto.ArticleSearchDTO;
+import asia.rxted.blog.modules.search.dto.SearchDTO;
 import asia.rxted.blog.modules.strategy.SearchStrategy;
 
 import java.util.List;
@@ -20,13 +20,8 @@ public class SearchStrategyContext {
     @Autowired
     private Map<String, SearchStrategy> searchStrategyMap;
 
-    public List<ArticleSearchDTO> executeSearchStrategy(String keywords) {
+    public List<SearchDTO> executeSearchStrategy(String keywords) {
         return searchStrategyMap.get(SearchModeEnum.getStrategy(searchMode)).searchArticle(keywords);
-    }
-
-    public ArticleSearchDTO get(String id) {
-        return searchStrategyMap.get(SearchModeEnum.getStrategy(searchMode)).get(id);
-
     }
 
 }

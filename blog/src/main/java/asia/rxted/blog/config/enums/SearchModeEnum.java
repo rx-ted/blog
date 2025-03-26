@@ -9,8 +9,7 @@ public enum SearchModeEnum {
 
     MYSQL("mysql", "mySqlSearchStrategyImpl"),
 
-    ELASTICSEARCH("elasticsearch", "esSearchStrategyImpl");
-    // OPENSEARCH("opensearch", "esSearchStrategyImpl");
+    OPENSEARCH("opensearch", "esSearchStrategyImpl");
 
     private final String mode;
 

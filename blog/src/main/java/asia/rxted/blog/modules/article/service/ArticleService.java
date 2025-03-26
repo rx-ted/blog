@@ -9,7 +9,7 @@ import asia.rxted.blog.model.dto.ArticleAdminDTO;
 import asia.rxted.blog.model.dto.ArticleAdminViewDTO;
 import asia.rxted.blog.model.dto.ArticleCardDTO;
 import asia.rxted.blog.model.dto.ArticleDTO;
-import asia.rxted.blog.model.dto.ArticleSearchDTO;
+// import asia.rxted.blog.model.dto.ArticleSearchDTO;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.TopAndFeaturedArticlesDTO;
 import asia.rxted.blog.model.entity.Article;
@@ -49,8 +49,8 @@ public interface ArticleService extends IService<Article> {
 
     List<String> exportArticles(List<Integer> articleIdList);
 
-    List<ArticleSearchDTO> listArticlesBySearch(ConditionVO condition);
+    // List<ArticleSearchDTO> listArticlesBySearch(ConditionVO condition);
 
-    ArticleSearchDTO getFirstArticleBySearch();
+    // ArticleSearchDTO getFirstArticleBySearch();
 
 }

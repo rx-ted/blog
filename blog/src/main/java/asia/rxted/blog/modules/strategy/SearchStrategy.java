@@ -1,13 +1,11 @@
 package asia.rxted.blog.modules.strategy;
 
-
 import java.util.List;
 
-import asia.rxted.blog.model.dto.ArticleSearchDTO;
+import asia.rxted.blog.modules.search.dto.SearchDTO;
 
 public interface SearchStrategy {
 
-    List<ArticleSearchDTO> searchArticle(String keywords);
-    ArticleSearchDTO get(String id);
+    List<SearchDTO> searchArticle(String keywords);
 
 }

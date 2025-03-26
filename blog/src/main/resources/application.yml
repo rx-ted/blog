@@ -82,14 +82,20 @@ swagger:
 #   file:
 #     name: "logging.log"
 
+search:
+  mode: elasticsearch
+  # mode: opensearch
+
 opensearch:
   uris: http://localhost:9200
   username: admin
   password: admin
-
-search:
-  mode: elasticsearch
-  # mode: opensearch
+  host: localhost
+  port: 9200
+  protocol: http
+  keyStorePath: # cert path
+  keyStorePassword: # cert password
+  index_name: article
 
 upload:
   mode: oss

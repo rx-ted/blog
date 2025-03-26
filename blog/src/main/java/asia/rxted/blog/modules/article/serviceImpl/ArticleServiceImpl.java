@@ -35,7 +35,7 @@ import asia.rxted.blog.model.dto.ArticleAdminDTO;
 import asia.rxted.blog.model.dto.ArticleAdminViewDTO;
 import asia.rxted.blog.model.dto.ArticleCardDTO;
 import asia.rxted.blog.model.dto.ArticleDTO;
-import asia.rxted.blog.model.dto.ArticleSearchDTO;
+// import asia.rxted.blog.model.dto.ArticleSearchDTO;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.TopAndFeaturedArticlesDTO;
 import asia.rxted.blog.model.entity.Article;
@@ -91,8 +91,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Autowired
     UploadStrategyContext uploadStrategyContext;
 
-    @Autowired
-    SearchStrategyContext searchStrategyContext;
+    // @Autowired
+    // SearchStrategyContext searchStrategyContext;
 
     @Override
     @SneakyThrows
@@ -405,15 +405,15 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         return urls;
     }
 
-    @Override
-    public List<ArticleSearchDTO> listArticlesBySearch(ConditionVO condition) {
-        return searchStrategyContext.executeSearchStrategy(condition.getKeywords());
+    // @Override
+    // public List<ArticleSearchDTO> listArticlesBySearch(ConditionVO condition) {
+    //     return searchStrategyContext.executeSearchStrategy(condition.getKeywords());
 
-    }
+    // }
 
-    @Override
-    public ArticleSearchDTO getFirstArticleBySearch() {
-        return searchStrategyContext.get("0");
-    }
+    // @Override
+    // public ArticleSearchDTO getFirstArticleBySearch() {
+    //     return searchStrategyContext.get("0");
+    // }
 
 }

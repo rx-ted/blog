@@ -1,9 +1,11 @@
 package asia.rxted.blog.modules.article.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.validation.Valid;
 
+import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +21,6 @@ import asia.rxted.blog.model.dto.ArticleAdminDTO;
 import asia.rxted.blog.model.dto.ArticleAdminViewDTO;
 import asia.rxted.blog.model.dto.ArticleCardDTO;
 import asia.rxted.blog.model.dto.ArticleDTO;
-import asia.rxted.blog.model.dto.ArticleSearchDTO;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.TopAndFeaturedArticlesDTO;
 import asia.rxted.blog.model.vo.ArticlePasswordVO;
@@ -170,17 +171,17 @@ public class ArticleController {
         return ResultUtil.data(articleService.exportArticles(articleIds));
     }
 
-    @Operation(summary = "搜索文章")
-    @GetMapping("/search")
-    public ResultMessage<List<ArticleSearchDTO>> listArticlesBySearch(ConditionVO condition) {
-        return ResultUtil.data(articleService.listArticlesBySearch(condition));
-    }
-
+    // @Operation(summary = "搜索文章")
+    // @GetMapping("/search")
+    // public ResultMessage<List<ArticleSearchDTO>> listArticlesBySearch(ConditionVO
+    // condition) {
+    // return ResultUtil.data(articleService.listArticlesBySearch(condition));
+    // }
 
     @Operation(summary = "搜索第一个文章")
-    @GetMapping("/search/first")
-    public ResultMessage<ArticleSearchDTO> getFirstArticleBySearch() {
-        return ResultUtil.data(articleService.getFirstArticleBySearch());
+    @GetMapping("/gg")
+    public void getFirstArticleBySearch() throws OpenSearchException, IOException {
+
     }
 
 }

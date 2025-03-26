@@ -23,6 +23,8 @@ public enum ResultCode {
 
     SYSTEM_ERROR(50000, "系统异常"),
 
+    IO_OPEARTOR_ERROR(57000, "IO操作失败"),
+
     FAIL(51000, "操作失败"),
 
     VALID_ERROR(52000, "参数格式不正确"),
@@ -34,6 +36,16 @@ public enum ResultCode {
     ARTICLE_ACCESS_FAIL(52003, "文章密码认证未通过"),
 
     QQ_LOGIN_ERROR(53001, "qq登录错误"),
+
+    /**
+     * 搜索操作
+     */
+    SEARCH_ERROR(60000, "搜索失败"),
+    SEARCH_CREATE_ERROR(60000, "首次插入文档失败"),
+    SEARCH_INDEX_ERROR(60000, "更新或者追加数据失败"),
+    SEARCH_DELETE_ERROR(60000, "删除数据失败"),
+    SEARCH_GET_ERROR(60000, "获取记录失败"),
+    SEARCH_UPDATE_ERROR(60000, "修改数据失败"),
 
     /**
      * 文件操作状态码
