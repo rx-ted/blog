@@ -3,14 +3,16 @@ package asia.rxted.blog.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.BeanUtils;
+
 public class BeanCopyUtil {
 
     public static <T> T copyObject(Object source, Class<T> target) {
         T temp = null;
         try {
-            temp = target.newInstance();
+            temp = target.getDeclaredConstructor().newInstance();
             if (null != source) {
-                org.springframework.beans.BeanUtils.copyProperties(source, temp);
+                BeanUtils.copyProperties(source, temp);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,15 +1,14 @@
-version: "3"
-
 services:
   mysql:
     image: mysql:9.2.0
     restart: always
     container_name: mysql
     volumes:
-      # - config/data/mysqldata:/var/lib/mysql
-      - ./config/my.cnf:/etc/mysql/conf.d/my.cnf
-      #      数据库还原目录 可将需要还原的sql文件放在这里
-      - ./config/init/mysql:/docker-entrypoint-initdb.d
+      - ./config/init/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      #  数据库还原目录 可将需要还原的sql文件放在这里
+      - ./config/init/mysql/data:/docker-entrypoint-initdb.d
+      - ./config/init/mysql/log:/var/log/mysql
+      - ./config/init/mysql/lib:/var/lib/mysql
     environment:
       - "MYSQL_ROOT_PASSWORD=root"
       - "MYSQL_DATABASE=blog"
@@ -27,9 +26,64 @@ services:
       - blog_network
     ports:
       - "6379:6379"
-    # volumes:
-    #   - ./config/init/redis/redis.conf:/etc/redis/redis.conf
-    command: redis-server --port 6379 --requirepass root --appendonly yes --protected-mode no
+    volumes:
+      - ./config/init/redis/redis.conf:/etc/redis/redis.conf
+      - ./config/init/redis/data:/data
+
+  opensearch:
+    image: opensearchproject/opensearch:2.19.1
+    container_name: opensearch
+    hostname: opensearch
+    restart: always
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - ./config/init/opensearch/data:/usr/share/opensearch/data
+    environment:
+      - discovery.type=single-node
+      - "DISABLE_SECURITY_PLUGIN=true"
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=admin" # modify password
+    networks:
+      - blog_network
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.19.1
+    container_name: opensearch_dashboards
+    ports:
+      - "5601:5601"
+    environment:
+      OPENSEARCH_HOSTS: '["http://localhost:9200","http://opensearch:9200"]'
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+    networks:
+      - blog_network
+
+  maxwell:
+    image: zendesk/maxwell:v1.43.2
+    container_name: maxwell
+    restart: always
+    # 172.18.0.X neets to set host.
+    command: "bin/maxwell --user='root' --password='root'  --host='172.18.0.7'  --producer=rabbitmq --rabbitmq_user='guest' --rabbitmq_pass='guest' --rabbitmq_host='172.18.0.6' --rabbitmq_port='5672' --rabbitmq_exchange='maxwell_exchange'  --rabbitmq_exchange_type='fanout' --rabbitmq_exchange_durable='true' --filter='exclude: *.*, include: blog.t_article.article_title = *, include: blog.t_article.article_content = *, include: blog.t_article.is_delete = *, include: blog.t_article.status = *'"
+    networks:
+      - blog_network
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    restart: always
+    # hostname: rabbitmq
+    environment:
+      # - "RABBITMQ_DEFAULT_VHOST=/"
+      - "RABBITMQ_DEFAULT_USER=guest"
+      - "RABBITMQ_DEFAULT_PASS=guest"
+    volumes:
+      - ./config/init/rabbitmq/lib:/var/lib/rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      - blog_network
 
   # blog:
   #   build:

@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+config/init/mysql/lib/
+config/init/rabbitmq/lib/
+config/init/opensearch/data/
+config/init/mysql/log/
+config/init/redis/data/
