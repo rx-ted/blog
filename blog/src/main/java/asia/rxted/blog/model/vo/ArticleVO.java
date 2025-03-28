@@ -34,7 +34,7 @@ public class ArticleVO {
     @Schema(name = "articleCover", title = "文章缩略图", type = "String")
     private String articleCover;
 
-    @Schema(name = "category", title = "文章分类", type = "Integer")
+    @Schema(name = "categoryName", title = "文章分类", type = "Integer")
     private String categoryName;
 
     @Schema(name = "tagNameList", title = "文章标签", type = "List<Integer>")

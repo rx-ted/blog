@@ -16,14 +16,17 @@ services:
     ports:
       - 3306:3306
     networks:
-      - blog_network
+      blog_network:
+        ipv4_address: 172.28.0.2
 
   redis:
     image: redis:7.0.4
     restart: always
     container_name: "redis"
     networks:
-      - blog_network
+      blog_network:
+        ipv4_address: 172.28.0.3
+
     ports:
       - "6379:6379"
     volumes:
@@ -46,7 +49,8 @@ services:
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
       - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=admin" # modify password
     networks:
-      - blog_network
+      blog_network:
+        ipv4_address: 172.28.0.4
 
   opensearch-dashboards:
     image: opensearchproject/opensearch-dashboards:2.19.1
@@ -57,16 +61,21 @@ services:
       OPENSEARCH_HOSTS: '["http://localhost:9200","http://opensearch:9200"]'
       DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
     networks:
-      - blog_network
+      blog_network:
+        ipv4_address: 172.28.0.5
 
   maxwell:
     image: zendesk/maxwell:v1.43.2
     container_name: maxwell
     restart: always
+    command: "bin/maxwell --config /app/config.properties"
     # 172.18.0.X neets to set host.
-    command: "bin/maxwell --user='root' --password='root'  --host='172.18.0.7'  --producer=rabbitmq --rabbitmq_user='guest' --rabbitmq_pass='guest' --rabbitmq_host='172.18.0.6' --rabbitmq_port='5672' --rabbitmq_exchange='maxwell_exchange'  --rabbitmq_exchange_type='fanout' --rabbitmq_exchange_durable='true' --filter='exclude: *.*, include: blog.t_article.article_title = *, include: blog.t_article.article_content = *, include: blog.t_article.is_delete = *, include: blog.t_article.status = *'"
+    # command: "bin/maxwell --user='root' --password='root'  --host='172.18.0.4'  --producer=rabbitmq --rabbitmq_user='guest' --rabbitmq_pass='guest' --rabbitmq_host='172.18.0.5' --rabbitmq_port='5672' --rabbitmq_exchange='maxwell_exchange'  --rabbitmq_exchange_type='fanout' --rabbitmq_exchange_durable='true'" # --filter='exclude: *.*, include: blog.t_article.article_title = *, include: blog.t_article.article_content = *, include: blog.t_article.is_delete = *, include: blog.t_article.status = *'
+    volumes:
+      - "./config/init/maxwell/config.properties:/app/config.properties"
     networks:
-      - blog_network
+      blog_network:
+        ipv4_address: 172.28.0.6
 
   rabbitmq:
     image: rabbitmq:management
@@ -83,7 +92,8 @@ services:
       - "15672:15672"
       - "5672:5672"
     networks:
-      - blog_network
+      blog_network:
+        ipv4_address: 172.28.0.7
 
   # blog:
   #   build:
@@ -123,3 +133,8 @@ services:
 networks:
   blog_network:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+          gateway: 172.28.0.1

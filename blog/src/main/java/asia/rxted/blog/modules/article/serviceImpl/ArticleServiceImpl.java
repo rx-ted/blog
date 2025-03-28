@@ -49,6 +49,7 @@ import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.DeleteVO;
 import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.config.ResultUtil;
+import asia.rxted.blog.config.constant.RabbitMQConstant;
 import asia.rxted.blog.modules.article.service.ArticleService;
 import asia.rxted.blog.modules.article.service.ArticleTagService;
 import asia.rxted.blog.modules.article.service.TagService;
@@ -336,7 +337,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         this.saveOrUpdate(article);
         saveArticleTag(articleVO, article.getId());
         if (article.getStatus().equals(1)) {
-            rabbitTemplate.convertAndSend(CachePrefix.SUBSCRIBE_EXCHANGE.name(), "*",
+            rabbitTemplate.convertAndSend(RabbitMQConstant.MAXWELL_EXCHANGE, "*",
                     new Message(JSON.toJSONBytes(article.getId()), new MessageProperties()));
         }
     }

@@ -85,7 +85,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
             ResultUtil.fail(ResultCode.ARTICLE_TAG_EXISTS_DELETE_ERROR);
 
         }
-        tagMapper.deleteBatchIds(tagIds);
+        tagMapper.deleteByIds(tagIds, true);
     }
 
 }
