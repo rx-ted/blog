@@ -1,5 +1,7 @@
 package asia.rxted.blog.model.vo;
 
+import java.time.LocalDateTime;
+
 import org.springframework.format.annotation.DateTimeFormat;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -44,14 +46,11 @@ public class ConditionVO {
 
     @Schema(name = "startTime", title = "开始时间")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private String startTime;
-    // private LocalDateTime startTime; // TODO(Ben): it's not used to
-    // LocalDataTime, I did not found the root cause
+    private LocalDateTime startTime;
 
     @Schema(name = "endTime", title = "结束时间")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private String endTime;
-    // private LocalDateTime endTime;
+    private LocalDateTime endTime;
 
     @Schema(name = "isDelete", title = "是否删除", type = "Integer")
     private Integer isDelete;

@@ -24,10 +24,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import asia.rxted.blog.config.enums.ArticleStatusEnum;
 import asia.rxted.blog.config.enums.FileExtEnum;
 import asia.rxted.blog.config.enums.FilePathEnum;
 import asia.rxted.blog.mapper.ArticleMapper;
-import asia.rxted.blog.mapper.ArticleTagMapper;
 import asia.rxted.blog.mapper.CategoryMapper;
 import asia.rxted.blog.mapper.TagMapper;
 import asia.rxted.blog.model.dto.ArchiveDTO;
@@ -35,23 +35,21 @@ import asia.rxted.blog.model.dto.ArticleAdminDTO;
 import asia.rxted.blog.model.dto.ArticleAdminViewDTO;
 import asia.rxted.blog.model.dto.ArticleCardDTO;
 import asia.rxted.blog.model.dto.ArticleDTO;
-// import asia.rxted.blog.model.dto.ArticleSearchDTO;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.TopAndFeaturedArticlesDTO;
 import asia.rxted.blog.model.entity.Article;
-import asia.rxted.blog.model.entity.ArticleTag;
 import asia.rxted.blog.model.entity.Category;
 import asia.rxted.blog.model.entity.Tag;
 import asia.rxted.blog.model.vo.ArticlePasswordVO;
+import asia.rxted.blog.model.vo.ArticleSaveVO;
 import asia.rxted.blog.model.vo.ArticleTopFeaturedVO;
-import asia.rxted.blog.model.vo.ArticleVO;
+import asia.rxted.blog.model.vo.ArticleUpdateVO;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.DeleteVO;
 import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.config.ResultUtil;
 import asia.rxted.blog.config.constant.RabbitMQConstant;
 import asia.rxted.blog.modules.article.service.ArticleService;
-import asia.rxted.blog.modules.article.service.ArticleTagService;
 import asia.rxted.blog.modules.article.service.TagService;
 import asia.rxted.blog.modules.cache.CachePrefix;
 import asia.rxted.blog.modules.cache.service.RedisService;
@@ -73,16 +71,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     RedisService redisService;
 
     @Autowired
-    ArticleTagMapper articleTagMapper;
-
-    @Autowired
     CategoryMapper categoryMapper;
 
     @Autowired
     TagService tagService;
-
-    @Autowired
-    ArticleTagService articleTagService;
 
     @Autowired
     RabbitTemplate rabbitTemplate;
@@ -101,7 +93,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public PageResultDTO<ArticleCardDTO> listArticles() {
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<Article>()
                 .eq(Article::getIsDelete, 0)
-                .in(Article::getStatus, 1, 2);
+                .in(Article::getStatus, ArticleStatusEnum.PUBLIC.getStatus(), ArticleStatusEnum.SECRET.getStatus());
         CompletableFuture<Long> asyncCount = CompletableFuture.supplyAsync(() -> articleMapper.selectCount(wrapper));
         List<ArticleCardDTO> articles = articleMapper.listArticles(PageUtil.getLimitCurrent(), PageUtil.getSize());
         return new PageResultDTO<ArticleCardDTO>(articles, Math.toIntExact(asyncCount.get()));
@@ -209,10 +201,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     @SneakyThrows
     public PageResultDTO<ArticleCardDTO> listArticlesByTagId(Integer tagId) {
-        LambdaQueryWrapper<ArticleTag> queryWrapper = new LambdaQueryWrapper<ArticleTag>().eq(ArticleTag::getTagId,
+        LambdaQueryWrapper<Tag> queryWrapper = new LambdaQueryWrapper<Tag>().eq(Tag::getId,
                 tagId);
         CompletableFuture<Long> asyncCount = CompletableFuture
-                .supplyAsync(() -> articleTagMapper.selectCount(queryWrapper));
+                .supplyAsync(() -> tagMapper.selectCount(queryWrapper));
         List<ArticleCardDTO> articles = articleMapper.listArticlesByTagId(PageUtil.getLimitCurrent(),
                 PageUtil.getSize(), tagId);
         return new PageResultDTO<>(articles, Math.toIntExact(asyncCount.get()));
@@ -221,8 +213,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     @SneakyThrows
     public PageResultDTO<ArchiveDTO> listArchives() {
-        LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<Article>().eq(Article::getIsDelete, 0)
-                .eq(Article::getStatus, 1);
+        LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<Article>()
+                .eq(Article::getIsDelete, 0)
+                .in(Article::getStatus, ArticleStatusEnum.PUBLIC.getStatus(), ArticleStatusEnum.SECRET.getStatus());
         CompletableFuture<Long> asyncCount = CompletableFuture
                 .supplyAsync(() -> articleMapper.selectCount(queryWrapper));
         List<ArticleCardDTO> articles = articleMapper.listArchives(PageUtil.getLimitCurrent(), PageUtil.getSize());
@@ -276,12 +269,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         return new PageResultDTO<>(articleAdminDTOs, asyncCount.get());
     }
 
-    private Category saveArticleCategory(ArticleVO articleVO) {
+    private Category saveArticleCategory(String categoryName, Integer articleStatus) {
         Category category = categoryMapper.selectOne(new LambdaQueryWrapper<Category>()
-                .eq(Category::getCategoryName, articleVO.getCategoryName()));
-        if (Objects.isNull(category) && !articleVO.getStatus().equals(DRAFT.getStatus())) {
+                .eq(Category::getCategoryName, categoryName));
+        if (Objects.isNull(category) && !articleStatus.equals(ArticleStatusEnum.DRAFT.getStatus())) {
             category = Category.builder()
-                    .categoryName(articleVO.getCategoryName())
+                    .categoryName(categoryName)
                     .build();
             categoryMapper.insert(category);
         }
@@ -289,20 +282,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void saveArticleTag(ArticleVO articleVO, Integer articleId) {
-        if (Objects.nonNull(articleVO.getId())) {
-            articleTagMapper.delete(new LambdaQueryWrapper<ArticleTag>()
-                    .eq(ArticleTag::getArticleId, articleVO.getId()));
-        }
-        List<String> tagNames = articleVO.getTagNames();
-        if (CollectionUtils.isNotEmpty(tagNames)) {
+    public void saveArticleTag(List<String> tagNames, Integer articleStatus) {
+        if (CollectionUtils.isNotEmpty(tagNames) && !articleStatus.equals(ArticleStatusEnum.DRAFT.getStatus())) {
             List<Tag> existTags = tagService.list(new LambdaQueryWrapper<Tag>()
                     .in(Tag::getTagName, tagNames));
             List<String> existTagNames = existTags.stream()
                     .map(Tag::getTagName)
-                    .collect(Collectors.toList());
-            List<Integer> existTagIds = existTags.stream()
-                    .map(Tag::getId)
                     .collect(Collectors.toList());
             tagNames.removeAll(existTagNames);
             if (CollectionUtils.isNotEmpty(tagNames)) {
@@ -311,35 +296,43 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                         .build())
                         .collect(Collectors.toList());
                 tagService.saveBatch(tags);
-                List<Integer> tagIds = tags.stream()
-                        .map(Tag::getId)
-                        .collect(Collectors.toList());
-                existTagIds.addAll(tagIds);
             }
-            List<ArticleTag> articleTags = existTagIds.stream().map(item -> ArticleTag.builder()
-                    .articleId(articleId)
-                    .tagId(item)
-                    .build())
-                    .collect(Collectors.toList());
-            articleTagService.saveBatch(articleTags);
         }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveOrUpdateArticle(ArticleVO articleVO) {
-        Category category = saveArticleCategory(articleVO);
+    public void saveArticle(ArticleSaveVO articleVO) {
+        Category category = saveArticleCategory(articleVO.getCategoryName(), articleVO.getStatus());
         Article article = BeanCopyUtil.copyObject(articleVO, Article.class);
         if (Objects.nonNull(category)) {
             article.setCategoryId(category.getId());
         }
         article.setUserId(UserUtil.getUserDetailsDTO().getUserInfoId());
         this.saveOrUpdate(article);
-        saveArticleTag(articleVO, article.getId());
+        saveArticleTag(articleVO.getTagNames(), articleVO.getStatus());
         if (article.getStatus().equals(1)) {
             rabbitTemplate.convertAndSend(RabbitMQConstant.MAXWELL_EXCHANGE, "*",
                     new Message(JSON.toJSONBytes(article.getId()), new MessageProperties()));
         }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateArticle(ArticleUpdateVO articleVO) {
+        Category category = saveArticleCategory(articleVO.getCategoryName(), articleVO.getStatus());
+        Article article = BeanCopyUtil.copyObject(articleVO, Article.class);
+        if (Objects.nonNull(category)) {
+            article.setCategoryId(category.getId());
+        }
+        article.setUserId(UserUtil.getUserDetailsDTO().getUserInfoId());
+        this.update(article, null);
+        saveArticleTag(articleVO.getTagNames(), articleVO.getStatus());
+        if (article.getStatus().equals(1)) {
+            rabbitTemplate.convertAndSend(RabbitMQConstant.MAXWELL_EXCHANGE, "*",
+                    new Message(JSON.toJSONBytes(article.getId()), new MessageProperties()));
+        }
+
     }
 
     @Override
@@ -366,9 +359,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteArticles(List<Integer> articleIds) {
-        articleTagMapper.delete(new LambdaQueryWrapper<ArticleTag>()
-                .in(ArticleTag::getArticleId, articleIds));
-        articleMapper.deleteBatchIds(articleIds);
+        articleMapper.deleteByIds(articleIds);
     }
 
     @Override

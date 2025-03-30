@@ -6,12 +6,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.config.ResultUtil;
-import asia.rxted.blog.mapper.ArticleTagMapper;
 import asia.rxted.blog.mapper.TagMapper;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.TagAdminDTO;
 import asia.rxted.blog.model.dto.TagDTO;
-import asia.rxted.blog.model.entity.ArticleTag;
 import asia.rxted.blog.model.entity.Tag;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.TagVO;
@@ -22,6 +20,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,8 +30,43 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     @Autowired
     private TagMapper tagMapper;
 
-    @Autowired
-    private ArticleTagMapper articleTagMapper;
+    @Override
+    public Boolean saveTag(String tagName) {
+        Tag existTag = tagMapper.selectOne(new LambdaQueryWrapper<Tag>()
+                .select(Tag::getId)
+                .eq(Tag::getTagName, tagName));
+
+        if (Objects.nonNull(existTag)) {
+            ResultUtil.fail(ResultCode.ARTICLE_TAG_IS_EXIST);
+        }
+        Tag tag = Tag.builder().tagName(tagName).build();
+        return this.save(tag);
+    }
+
+    @Override
+    public Boolean updateTag(TagVO tagVO) {
+        Tag tag = Tag.builder().id(tagVO.getId()).tagName(tagVO.getTagName()).build();
+        return this.updateById(tag);
+    }
+
+    @Override
+    public List<Boolean> saveTags(List<String> tagNames) {
+        List<Boolean> status = new ArrayList<>();
+        tagNames.forEach(tagName -> {
+            status.add(this.saveTag(tagName));
+        });
+        return status;
+    }
+
+    @Override
+    public List<Boolean> updateTags(List<TagVO> tagList) {
+        List<Boolean> status = new ArrayList<>();
+        tagList.forEach(tagVO -> {
+            status.add(
+                    this.updateTag(tagVO));
+        });
+        return status;
+    }
 
     @Override
     public List<TagDTO> listTags() {
@@ -42,6 +76,16 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
     @Override
     public List<TagDTO> listTopTenTags() {
         return tagMapper.listTopTenTags();
+    }
+
+    @Override
+    public Boolean deleteTag(Integer tagId) {
+        return tagMapper.deleteById(tagId) > 0;
+    }
+
+    @Override
+    public Boolean deleteTags(List<Integer> tagIds) {
+        return tagMapper.deleteByIds(tagIds, true) == tagIds.size();
     }
 
     @SneakyThrows
@@ -63,29 +107,6 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
                 .like(StringUtils.isNotBlank(conditionVO.getKeywords()), Tag::getTagName, conditionVO.getKeywords())
                 .orderByDesc(Tag::getId));
         return BeanCopyUtil.copyList(tags, TagAdminDTO.class);
-    }
-
-    @Override
-    public void saveOrUpdateTag(TagVO tagVO) {
-        Tag existTag = tagMapper.selectOne(new LambdaQueryWrapper<Tag>()
-                .select(Tag::getId)
-                .eq(Tag::getTagName, tagVO.getTagName()));
-        if (Objects.nonNull(existTag) && !existTag.getId().equals(tagVO.getId())) {
-            ResultUtil.fail(ResultCode.ARTICLE_TAG_IS_EXIST);
-        }
-        Tag tag = BeanCopyUtil.copyObject(tagVO, Tag.class);
-        this.saveOrUpdate(tag);
-    }
-
-    @Override
-    public void deleteTag(List<Integer> tagIds) {
-        Long count = articleTagMapper.selectCount(new LambdaQueryWrapper<ArticleTag>()
-                .in(ArticleTag::getTagId, tagIds));
-        if (count > 0) {
-            ResultUtil.fail(ResultCode.ARTICLE_TAG_EXISTS_DELETE_ERROR);
-
-        }
-        tagMapper.deleteByIds(tagIds, true);
     }
 
 }

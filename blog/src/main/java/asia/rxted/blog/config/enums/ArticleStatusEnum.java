@@ -8,10 +8,9 @@ import lombok.Getter;
 public enum ArticleStatusEnum {
 
     PUBLIC(1, "公开"),
-
     SECRET(2, "密码"),
-
-    DRAFT(3, "草稿");
+    PRIVATE(3, "私密"),
+    DRAFT(4, "草稿");
 
     private final Integer status;
 

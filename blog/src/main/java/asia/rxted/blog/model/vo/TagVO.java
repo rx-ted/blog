@@ -20,7 +20,7 @@ public class TagVO {
     private Integer id;
 
     @NotBlank(message = "标签名不能为空")
-    @Schema(name = "categoryName", title = "标签名", required = true, type = "String")
+    @Schema(name = "tagName", title = "标签名", required = true, type = "String")
     private String tagName;
 
 }

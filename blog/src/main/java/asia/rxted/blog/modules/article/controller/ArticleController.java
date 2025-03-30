@@ -1,6 +1,5 @@
 package asia.rxted.blog.modules.article.controller;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -23,8 +22,9 @@ import asia.rxted.blog.model.dto.ArticleDTO;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.TopAndFeaturedArticlesDTO;
 import asia.rxted.blog.model.vo.ArticlePasswordVO;
+import asia.rxted.blog.model.vo.ArticleSaveVO;
 import asia.rxted.blog.model.vo.ArticleTopFeaturedVO;
-import asia.rxted.blog.model.vo.ArticleVO;
+import asia.rxted.blog.model.vo.ArticleUpdateVO;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.DeleteVO;
 import asia.rxted.blog.config.ResultMessage;
@@ -32,7 +32,6 @@ import asia.rxted.blog.config.ResultUtil;
 import asia.rxted.blog.config.annotation.OptLog;
 import asia.rxted.blog.modules.article.service.ArticleService;
 import asia.rxted.blog.modules.search.dto.SearchDTO;
-import asia.rxted.blog.modules.search.service.SearchService;
 import asia.rxted.blog.modules.strategy.context.ArticleImportStrategyContext;
 import asia.rxted.blog.modules.strategy.context.UploadStrategyContext;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,8 +58,46 @@ public class ArticleController {
     @Autowired
     private ArticleImportStrategyContext articleImportStrategyContext;
 
-    @Autowired
-    private SearchService client;
+    // 获取所有文章归档
+    @Operation(summary = "获取所有文章归档")
+    @GetMapping("archives/all")
+    public ResultMessage<PageResultDTO<ArchiveDTO>> listArchives() {
+        return ResultUtil.data(articleService.listArchives());
+    }
+
+    // 获取所有文章
+    @Operation(summary = "获取所有文章")
+    @PostMapping("admin/query")
+    public ResultMessage<PageResultDTO<ArticleAdminDTO>> listArticlesAdmin(ConditionVO conditionVO) {
+        return ResultUtil.data(articleService.listArticlesAdmin(conditionVO));
+    }
+
+    // 保存文章
+    @OptLog(optType = SAVE)
+    @Operation(summary = "保存文章")
+    @PostMapping("admin")
+    public ResultMessage<?> saveArticle(@Valid @RequestBody ArticleSaveVO articleVO) {
+        articleService.saveArticle(articleVO);
+        return ResultUtil.success();
+    }
+
+    // 修改文章
+    @OptLog(optType = UPDATE)
+    @Operation(summary = "修改文章")
+    @PutMapping("admin")
+    public ResultMessage<?> updateArticle(@Valid @RequestBody ArticleUpdateVO articleVO) {
+        articleService.updateArticle(articleVO);
+        return ResultUtil.success();
+    }
+
+    // 根据id获取文章
+    @Operation(summary = "根据id获取文章")
+    @GetMapping("{articleId}")
+    public ResultMessage<ArticleDTO> getArticleById(@PathVariable("articleId") Integer articleId) {
+        return ResultUtil.data(articleService.getArticleById(articleId));
+    }
+
+    // 删除文章
 
     @Operation(summary = "获取置顶和推荐文章")
     @GetMapping("topAndFeatured")
@@ -81,12 +118,6 @@ public class ArticleController {
         return ResultUtil.data(articleService.listArticlesByCategoryId(categoryId));
     }
 
-    @Operation(summary = "根据id获取文章")
-    @GetMapping("{articleId}")
-    public ResultMessage<ArticleDTO> getArticleById(@PathVariable("articleId") Integer articleId) {
-        return ResultUtil.data(articleService.getArticleById(articleId));
-    }
-
     @Operation(summary = "校验文章访问密码")
     @PostMapping("access")
     public ResultMessage<?> accessArticle(@Valid @RequestBody ArticlePasswordVO articlePasswordVO) {
@@ -100,26 +131,6 @@ public class ArticleController {
         return ResultUtil.data(articleService.listArticlesByTagId(tagId));
     }
 
-    @Operation(summary = "获取所有文章归档")
-    @GetMapping("archives/all")
-    public ResultMessage<PageResultDTO<ArchiveDTO>> listArchives() {
-        return ResultUtil.data(articleService.listArchives());
-    }
-
-    @Operation(summary = "获取后台文章")
-    @GetMapping("admin")
-    public ResultMessage<PageResultDTO<ArticleAdminDTO>> listArticlesAdmin(ConditionVO conditionVO) {
-        return ResultUtil.data(articleService.listArticlesAdmin(conditionVO));
-    }
-
-    @OptLog(optType = SAVE_OR_UPDATE)
-    @Operation(summary = "保存和修改文章")
-    @PostMapping("admin")
-    public ResultMessage<?> saveOrUpdateArticle(@Valid @RequestBody ArticleVO articleVO) {
-        articleService.saveOrUpdateArticle(articleVO);
-        return ResultUtil.success();
-    }
-
     @OptLog(optType = UPDATE)
     @Operation(summary = "修改文章是否置顶和推荐")
     @PutMapping("admin/topAndFeatured")
@@ -129,7 +140,7 @@ public class ArticleController {
     }
 
     @Operation(summary = "删除或者恢复文章")
-    @PutMapping("admin")
+    @PutMapping("admin/delete")
     public ResultMessage<?> updateArticleDelete(@Valid @RequestBody DeleteVO deleteVO) {
         articleService.updateArticleDelete(deleteVO);
         return ResultUtil.success();
@@ -179,14 +190,6 @@ public class ArticleController {
     @GetMapping("/search")
     public ResultMessage<List<SearchDTO>> listArticlesBySearch(ConditionVO condition) {
         return ResultUtil.data(articleService.listArticlesBySearch(condition));
-    }
-
-    @Operation(summary = "保存文章")
-    @PostMapping("/save")
-    public ResultMessage<Object> saveSearch(SearchDTO searchDTO) throws IOException {
-        client.index(searchDTO);
-        return ResultUtil.success();
-
     }
 
 }

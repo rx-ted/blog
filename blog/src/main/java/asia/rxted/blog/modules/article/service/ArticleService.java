@@ -13,8 +13,9 @@ import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.TopAndFeaturedArticlesDTO;
 import asia.rxted.blog.model.entity.Article;
 import asia.rxted.blog.model.vo.ArticlePasswordVO;
+import asia.rxted.blog.model.vo.ArticleSaveVO;
 import asia.rxted.blog.model.vo.ArticleTopFeaturedVO;
-import asia.rxted.blog.model.vo.ArticleVO;
+import asia.rxted.blog.model.vo.ArticleUpdateVO;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.DeleteVO;
 import asia.rxted.blog.modules.search.dto.SearchDTO;
@@ -37,7 +38,9 @@ public interface ArticleService extends IService<Article> {
 
     PageResultDTO<ArticleAdminDTO> listArticlesAdmin(ConditionVO conditionVO);
 
-    void saveOrUpdateArticle(ArticleVO articleVO);
+    void saveArticle(ArticleSaveVO articleSaveVO);
+
+    void updateArticle(ArticleUpdateVO articleVO);
 
     void updateArticleTopAndFeatured(ArticleTopFeaturedVO articleTopFeaturedVO);
 
@@ -50,8 +53,5 @@ public interface ArticleService extends IService<Article> {
     List<String> exportArticles(List<Integer> articleIdList);
 
     List<SearchDTO> listArticlesBySearch(ConditionVO condition);
-
-
-    // ArticleSearchDTO getFirstArticleBySearch();
 
 }

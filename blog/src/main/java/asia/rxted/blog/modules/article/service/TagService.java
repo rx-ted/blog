@@ -1,6 +1,5 @@
 package asia.rxted.blog.modules.article.service;
 
-
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import asia.rxted.blog.model.dto.PageResultDTO;
@@ -22,8 +21,16 @@ public interface TagService extends IService<Tag> {
 
     List<TagAdminDTO> listTagsAdminBySearch(ConditionVO conditionVO);
 
-    void saveOrUpdateTag(TagVO tagVO);
+    Boolean saveTag(String tagName);
 
-    void deleteTag(List<Integer> tagIds);
+    List<Boolean> saveTags(List<String> tagNames);
+
+    Boolean updateTag(TagVO tagVO);
+
+    List<Boolean> updateTags(List<TagVO> tagList);
+
+    Boolean deleteTag(Integer tagId);
+
+    Boolean deleteTags(List<Integer> tagIds);
 
 }
