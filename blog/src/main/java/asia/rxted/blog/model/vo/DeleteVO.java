@@ -9,8 +9,6 @@ import javax.validation.constraints.NotNull;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -18,8 +16,8 @@ import java.util.List;
 public class DeleteVO {
 
     @NotNull(message = "id不能为空")
-    @Schema(name = "ids", title = "要删除的id", required = true, type = "List<Integer>")
-    private List<Integer> ids;
+    @Schema(name = "id", title = "要删除的id", required = true, type = "Integer")
+    private Integer id;
 
     @NotNull(message = "状态值不能为空")
     @Schema(name = "isDelete", title = "删除状态", required = true, type = "Integer")

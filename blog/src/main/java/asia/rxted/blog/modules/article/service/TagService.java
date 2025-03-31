@@ -33,4 +33,6 @@ public interface TagService extends IService<Tag> {
 
     Boolean deleteTags(List<Integer> tagIds);
 
+    List<Tag> checkOrSaveTagsByName(List<String> tagList);
+
 }

@@ -97,7 +97,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
             return new PageResultDTO<>();
         }
         List<TagAdminDTO> tags = tagMapper.listTagsAdmin(PageUtil.getLimitCurrent(), PageUtil.getSize(), conditionVO);
-        return new PageResultDTO<>(tags, Math.toIntExact(count));
+        return new PageResultDTO<>(tags, count);
     }
 
     @SneakyThrows
@@ -107,6 +107,28 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
                 .like(StringUtils.isNotBlank(conditionVO.getKeywords()), Tag::getTagName, conditionVO.getKeywords())
                 .orderByDesc(Tag::getId));
         return BeanCopyUtil.copyList(tags, TagAdminDTO.class);
+    }
+
+    @Override
+    public List<Tag> checkOrSaveTagsByName(List<String> tagList) {
+        if (Objects.isNull(tagList)) {
+            return null;
+        }
+        List<Tag> tags = new ArrayList<>();
+        tagList.forEach(name -> {
+            LambdaQueryWrapper<Tag> wrapper = new LambdaQueryWrapper<Tag>().eq(Tag::getTagName, name);
+            Tag tag = this.getOne(wrapper);
+            if (Objects.nonNull(tag))
+                tags.add(tag);
+            else {
+                if (this.save(Tag.builder().tagName(name).build())) {
+                    tags.add(this.getOne(wrapper));
+                } else {
+                    tags.add(null);
+                }
+            }
+        });
+        return tags;
     }
 
 }

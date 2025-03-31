@@ -15,6 +15,6 @@ import lombok.NoArgsConstructor;
 public class PageResultDTO<T> {
 
     private List<T> records;
-    private Integer count;
+    private Long count;
 
 }

@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "文章")
-public class ArticleUpdateVO {
+public class ArticleVO {
 
     @Schema(name = "id", title = "文章id", type = "Integer")
     private Integer id;

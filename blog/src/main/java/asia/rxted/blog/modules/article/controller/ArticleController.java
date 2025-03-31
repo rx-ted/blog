@@ -22,9 +22,8 @@ import asia.rxted.blog.model.dto.ArticleDTO;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.TopAndFeaturedArticlesDTO;
 import asia.rxted.blog.model.vo.ArticlePasswordVO;
-import asia.rxted.blog.model.vo.ArticleSaveVO;
 import asia.rxted.blog.model.vo.ArticleTopFeaturedVO;
-import asia.rxted.blog.model.vo.ArticleUpdateVO;
+import asia.rxted.blog.model.vo.ArticleVO;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.DeleteVO;
 import asia.rxted.blog.config.ResultMessage;
@@ -34,6 +33,7 @@ import asia.rxted.blog.modules.article.service.ArticleService;
 import asia.rxted.blog.modules.search.dto.SearchDTO;
 import asia.rxted.blog.modules.strategy.context.ArticleImportStrategyContext;
 import asia.rxted.blog.modules.strategy.context.UploadStrategyContext;
+import asia.rxted.blog.utils.UserUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -59,35 +59,18 @@ public class ArticleController {
     private ArticleImportStrategyContext articleImportStrategyContext;
 
     // 获取所有文章归档
-    @Operation(summary = "获取所有文章归档")
-    @GetMapping("archives/all")
-    public ResultMessage<PageResultDTO<ArchiveDTO>> listArchives() {
-        return ResultUtil.data(articleService.listArchives());
-    }
-
-    // 获取所有文章
-    @Operation(summary = "获取所有文章")
-    @PostMapping("admin/query")
-    public ResultMessage<PageResultDTO<ArticleAdminDTO>> listArticlesAdmin(ConditionVO conditionVO) {
-        return ResultUtil.data(articleService.listArticlesAdmin(conditionVO));
-    }
+    // @Operation(summary = "获取所有文章归档")
+    // @GetMapping("archives/all")
+    // public ResultMessage<PageResultDTO<ArchiveDTO>> listArchives() {
+    // return ResultUtil.data(articleService.listArchives());
+    // }
 
     // 保存文章
-    @OptLog(optType = SAVE)
-    @Operation(summary = "保存文章")
+    @OptLog(optType = SAVE_OR_UPDATE)
+    @Operation(summary = "保存修改文章")
     @PostMapping("admin")
-    public ResultMessage<?> saveArticle(@Valid @RequestBody ArticleSaveVO articleVO) {
-        articleService.saveArticle(articleVO);
-        return ResultUtil.success();
-    }
-
-    // 修改文章
-    @OptLog(optType = UPDATE)
-    @Operation(summary = "修改文章")
-    @PutMapping("admin")
-    public ResultMessage<?> updateArticle(@Valid @RequestBody ArticleUpdateVO articleVO) {
-        articleService.updateArticle(articleVO);
-        return ResultUtil.success();
+    public ResultMessage<?> saveArticle(@Valid @RequestBody ArticleVO articleVO) {
+        return ResultUtil.data(articleService.saveOrUpdateArticle(articleVO));
     }
 
     // 根据id获取文章
@@ -112,45 +95,49 @@ public class ArticleController {
         return ResultUtil.data(articleService.listArticles());
     }
 
-    @Operation(summary = "根据分类id获取文章")
-    @GetMapping("categoryId")
-    public ResultMessage<PageResultDTO<ArticleCardDTO>> getArticlesByCategoryId(@RequestParam Integer categoryId) {
-        return ResultUtil.data(articleService.listArticlesByCategoryId(categoryId));
-    }
+    // @Operation(summary = "根据分类id获取文章")
+    // @GetMapping("categoryId")
+    // public ResultMessage<PageResultDTO<ArticleCardDTO>>
+    // getArticlesByCategoryId(@RequestParam Integer categoryId) {
+    // return ResultUtil.data(articleService.listArticlesByCategoryId(categoryId));
+    // }
 
-    @Operation(summary = "校验文章访问密码")
-    @PostMapping("access")
-    public ResultMessage<?> accessArticle(@Valid @RequestBody ArticlePasswordVO articlePasswordVO) {
-        articleService.accessArticle(articlePasswordVO);
-        return ResultUtil.success();
-    }
+    // @Operation(summary = "校验文章访问密码")
+    // @PostMapping("access")
+    // public ResultMessage<?> accessArticle(@Valid @RequestBody ArticlePasswordVO
+    // articlePasswordVO) {
+    // articleService.accessArticle(articlePasswordVO);
+    // return ResultUtil.success();
+    // }
 
-    @Operation(summary = "根据标签id获取文章")
-    @GetMapping("tagId")
-    public ResultMessage<PageResultDTO<ArticleCardDTO>> listArticlesByTagId(@RequestParam Integer tagId) {
-        return ResultUtil.data(articleService.listArticlesByTagId(tagId));
-    }
+    // @Operation(summary = "根据标签id获取文章")
+    // @GetMapping("tagId")
+    // public ResultMessage<PageResultDTO<ArticleCardDTO>>
+    // listArticlesByTagId(@RequestParam Integer tagId) {
+    // return ResultUtil.data(articleService.listArticlesByTagId(tagId));
+    // }
 
-    @OptLog(optType = UPDATE)
-    @Operation(summary = "修改文章是否置顶和推荐")
-    @PutMapping("admin/topAndFeatured")
-    public ResultMessage<?> updateArticleTopAndFeatured(@Valid @RequestBody ArticleTopFeaturedVO articleTopFeaturedVO) {
-        articleService.updateArticleTopAndFeatured(articleTopFeaturedVO);
-        return ResultUtil.success();
-    }
+    // @OptLog(optType = UPDATE)
+    // @Operation(summary = "修改文章是否置顶和推荐")
+    // @PutMapping("admin/topAndFeatured")
+    // public ResultMessage<?> updateArticleTopAndFeatured(@Valid @RequestBody
+    // ArticleTopFeaturedVO articleTopFeaturedVO) {
+    // articleService.updateArticleTopAndFeatured(articleTopFeaturedVO);
+    // return ResultUtil.success();
+    // }
 
     @Operation(summary = "删除或者恢复文章")
-    @PutMapping("admin/delete")
+    @PutMapping("delete")
     public ResultMessage<?> updateArticleDelete(@Valid @RequestBody DeleteVO deleteVO) {
-        articleService.updateArticleDelete(deleteVO);
+        articleService.softDeleteById(deleteVO);
         return ResultUtil.success();
     }
 
     @OptLog(optType = DELETE)
     @Operation(summary = "物理删除文章")
-    @DeleteMapping("/admin/delete")
-    public ResultMessage<?> deleteArticles(@RequestBody List<Integer> articleIds) {
-        articleService.deleteArticles(articleIds);
+    @DeleteMapping("delete")
+    public ResultMessage<?> deleteArticles(@RequestBody Integer articleId) {
+        articleService.hardDeleteById(articleId);
         return ResultUtil.success();
     }
 
@@ -163,12 +150,14 @@ public class ArticleController {
         return ResultUtil.data(uploadStrategyContext.executeUploadStrategy(file, FilePathEnum.ARTICLE.getPath()));
     }
 
-    @Operation(summary = "根据id查看后台文章")
-    @Parameter(name = "articleId", description = "文章id", required = true /* ,type = "Integer" */)
-    @GetMapping("/admin/{articleId}")
-    public ResultMessage<ArticleAdminViewDTO> getArticleBackById(@PathVariable("articleId") Integer articleId) {
-        return ResultUtil.data(articleService.getArticleByIdAdmin(articleId));
-    }
+    // @Operation(summary = "根据id查看后台文章")
+    // @Parameter(name = "articleId", description = "文章id", required = true /* ,type
+    // = "Integer" */)
+    // @GetMapping("/admin/{articleId}")
+    // public ResultMessage<ArticleAdminViewDTO>
+    // getArticleBackById(@PathVariable("articleId") Integer articleId) {
+    // return ResultUtil.data(articleService.getArticleByIdAdmin(articleId));
+    // }
 
     @OptLog(optType = UPLOAD)
     @Operation(summary = "导入文章")
@@ -178,18 +167,20 @@ public class ArticleController {
         return ResultUtil.success();
     }
 
-    @OptLog(optType = EXPORT)
-    @Operation(summary = "导出文章")
-    @Parameter(name = "articleIdList", description = "文章id", required = true/* , type = "List<Integer>" */)
-    @PostMapping("/admin/export")
-    public ResultMessage<List<String>> exportArticles(@RequestBody List<Integer> articleIds) {
-        return ResultUtil.data(articleService.exportArticles(articleIds));
-    }
+    // @OptLog(optType = EXPORT)
+    // @Operation(summary = "导出文章")
+    // @Parameter(name = "articleIdList", description = "文章id", required = true/* ,
+    // type = "List<Integer>" */)
+    // @PostMapping("/admin/export")
+    // public ResultMessage<List<String>> exportArticles(@RequestBody List<Integer>
+    // articleIds) {
+    // return ResultUtil.data(articleService.exportArticles(articleIds));
+    // }
 
     @Operation(summary = "搜索文章")
     @GetMapping("/search")
     public ResultMessage<List<SearchDTO>> listArticlesBySearch(ConditionVO condition) {
-        return ResultUtil.data(articleService.listArticlesBySearch(condition));
+        return ResultUtil.data(articleService.search(condition));
     }
 
 }

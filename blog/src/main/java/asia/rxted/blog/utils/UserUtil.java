@@ -6,16 +6,23 @@ import org.springframework.stereotype.Component;
 
 import asia.rxted.blog.model.dto.UserDetailsDTO;
 
-
 @Component
 public class UserUtil {
 
     public static UserDetailsDTO getUserDetailsDTO() {
-        return (UserDetailsDTO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        return (UserDetailsDTO) authentication.getPrincipal();
     }
 
     public static Authentication getAuthentication() {
-        return SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        return authentication;
     }
 
 }

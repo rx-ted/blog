@@ -1,9 +1,7 @@
 package asia.rxted.blog.config.enums;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@Getter
 @AllArgsConstructor
 public enum ArticleStatusEnum {
 
@@ -12,8 +10,16 @@ public enum ArticleStatusEnum {
     PRIVATE(3, "私密"),
     DRAFT(4, "草稿");
 
-    private final Integer status;
+    private final Integer code;
 
     private final String desc;
+
+    public Integer code() {
+        return this.code;
+    }
+
+    public String desc() {
+        return this.desc;
+    }
 
 }

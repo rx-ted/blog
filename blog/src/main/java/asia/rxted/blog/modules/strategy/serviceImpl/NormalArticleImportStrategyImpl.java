@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.config.ResultUtil;
 import asia.rxted.blog.config.enums.ArticleStatusEnum;
-import asia.rxted.blog.model.vo.ArticleUpdateVO;
+import asia.rxted.blog.model.vo.ArticleVO;
 import asia.rxted.blog.modules.article.service.ArticleService;
 import asia.rxted.blog.modules.strategy.ArticleImportStrategy;
 import cn.hutool.core.exceptions.ExceptionUtil;
@@ -37,11 +37,11 @@ public class NormalArticleImportStrategyImpl implements ArticleImportStrategy {
             log.error(StrUtil.format("导入文章失败, 堆栈:{}", ExceptionUtil.stacktraceToString(e)));
             ResultUtil.fail(ResultCode.ARTICLE_IMPORT_FAILED_ERROR);
         }
-        ArticleUpdateVO articleVO = ArticleUpdateVO.builder()
+        ArticleVO articleVO = ArticleVO.builder()
                 .articleTitle(articleTitle)
                 .articleContent(articleContent.toString())
-                .status(ArticleStatusEnum.DRAFT.getStatus())
+                .status(ArticleStatusEnum.DRAFT.code())
                 .build();
-        articleService.updateArticle(articleVO);
+        articleService.saveOrUpdateArticle(articleVO);
     }
 }

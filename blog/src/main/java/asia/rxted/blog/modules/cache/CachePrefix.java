@@ -21,7 +21,6 @@ public enum CachePrefix {
     EMAIL_EXCHANGE,
     SUBSCRIBE_QUEUE,
     SUBSCRIBE_EXCHANGE,
-    
 
     USER_CODE_KEY,
     BLOG_VIEWS_COUNT,

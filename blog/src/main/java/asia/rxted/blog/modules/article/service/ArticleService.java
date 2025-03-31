@@ -4,54 +4,38 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
-import asia.rxted.blog.model.dto.ArchiveDTO;
-import asia.rxted.blog.model.dto.ArticleAdminDTO;
-import asia.rxted.blog.model.dto.ArticleAdminViewDTO;
 import asia.rxted.blog.model.dto.ArticleCardDTO;
 import asia.rxted.blog.model.dto.ArticleDTO;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.TopAndFeaturedArticlesDTO;
 import asia.rxted.blog.model.entity.Article;
-import asia.rxted.blog.model.vo.ArticlePasswordVO;
-import asia.rxted.blog.model.vo.ArticleSaveVO;
-import asia.rxted.blog.model.vo.ArticleTopFeaturedVO;
-import asia.rxted.blog.model.vo.ArticleUpdateVO;
+import asia.rxted.blog.model.vo.ArticleVO;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.DeleteVO;
 import asia.rxted.blog.modules.search.dto.SearchDTO;
 
 public interface ArticleService extends IService<Article> {
 
-    TopAndFeaturedArticlesDTO listTopAndFeaturedArticles();
-
+    // get all
     PageResultDTO<ArticleCardDTO> listArticles();
 
-    PageResultDTO<ArticleCardDTO> listArticlesByCategoryId(Integer categoryId);
+    // get by id
+    ArticleDTO getArticleById(Integer id);
 
-    ArticleDTO getArticleById(Integer articleId);
+    // list Top And Featured Articles
+    TopAndFeaturedArticlesDTO listTopAndFeaturedArticles();
 
-    void accessArticle(ArticlePasswordVO articlePasswordVO);
+    // save
+    Boolean saveOrUpdateArticle(ArticleVO article);
 
-    PageResultDTO<ArticleCardDTO> listArticlesByTagId(Integer tagId);
+    Boolean softDeleteById(DeleteVO deleteVO);
+    // soft delete
 
-    PageResultDTO<ArchiveDTO> listArchives();
+    // hard delete
+    Boolean hardDeleteById(Integer id);
 
-    PageResultDTO<ArticleAdminDTO> listArticlesAdmin(ConditionVO conditionVO);
+    // query keywords, i.e. user, article, etc.
 
-    void saveArticle(ArticleSaveVO articleSaveVO);
-
-    void updateArticle(ArticleUpdateVO articleVO);
-
-    void updateArticleTopAndFeatured(ArticleTopFeaturedVO articleTopFeaturedVO);
-
-    void updateArticleDelete(DeleteVO deleteVO);
-
-    void deleteArticles(List<Integer> articleIds);
-
-    ArticleAdminViewDTO getArticleByIdAdmin(Integer articleId);
-
-    List<String> exportArticles(List<Integer> articleIdList);
-
-    List<SearchDTO> listArticlesBySearch(ConditionVO condition);
+    List<SearchDTO> search(ConditionVO condition);
 
 }
