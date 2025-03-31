@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 
 import asia.rxted.blog.config.ResultCode;
@@ -43,18 +44,25 @@ import asia.rxted.blog.model.vo.QQLoginVO;
 import asia.rxted.blog.model.vo.UserVO;
 import asia.rxted.blog.modules.cache.CachePrefix;
 import asia.rxted.blog.modules.cache.service.RedisService;
+import asia.rxted.blog.modules.strategy.context.SocialLoginStrategyContext;
+import asia.rxted.blog.modules.token.service.TokenService;
 import asia.rxted.blog.modules.user.service.SiteUserInfoService;
 import asia.rxted.blog.modules.user.service.UserAuthService;
 import asia.rxted.blog.utils.CommonUtil;
+import asia.rxted.blog.utils.PageUtil;
+import asia.rxted.blog.utils.UserUtil;
 
 public class UserAuthServiceImpl implements UserAuthService {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
     @Autowired
     private RedisService redisService;
+
     @Autowired
     private UserAuthMapper userAuthMapper;
+
     @Autowired
     private UserInfoMapper userInfoMapper;
 
@@ -63,6 +71,12 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Autowired
     private UserRoleMapper userRoleMapper;
+
+    @Autowired
+    private TokenService tokenService;
+
+    @Autowired
+    private SocialLoginStrategyContext socialLoginStrategyContext;
 
     @Override
     public void sendCode(String username) {
@@ -144,32 +158,51 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     public void updatePassword(UserVO userVO) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updatePassword'");
+        if (!checkUser(userVO)) {
+            ResultUtil.fail(ResultCode.EMAIL_NOT_EXISTING);
+        }
+        userAuthMapper.update(new UserAuth(), new LambdaUpdateWrapper<UserAuth>()
+                .set(UserAuth::getPassword, BCrypt.hashpw(userVO.getPassword(), BCrypt.gensalt()))
+                .eq(UserAuth::getUsername, userVO.getUsername()));
+
     }
 
     @Override
     public void updateAdminPassword(PasswordVO passwordVO) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateAdminPassword'");
+        UserAuth user = userAuthMapper.selectOne(new LambdaQueryWrapper<UserAuth>()
+                .eq(UserAuth::getId, UserUtil.getUserDetailsDTO().getId()));
+        if (Objects.nonNull(user) && BCrypt.checkpw(passwordVO.getOldPassword(), user.getPassword())) {
+            UserAuth userAuth = UserAuth.builder()
+                    .id(UserUtil.getUserDetailsDTO().getId())
+                    .password(BCrypt.hashpw(passwordVO.getNewPassword(), BCrypt.gensalt()))
+                    .build();
+            userAuthMapper.updateById(userAuth);
+        } else {
+            ResultUtil.fail(ResultCode.USER_OLD_PASSWORD_ERROR);
+        }
     }
 
     @Override
     public PageResultDTO<UserAdminDTO> listUsers(ConditionVO condition) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'listUsers'");
+        Integer count = userAuthMapper.countUser(condition);
+        if (count == 0) {
+            return new PageResultDTO<>();
+        }
+        List<UserAdminDTO> UserAdminDTOs = userAuthMapper.listUsers(PageUtil.getLimitCurrent(), PageUtil.getSize(),
+                condition);
+        return new PageResultDTO<>(UserAdminDTOs, Long.valueOf(count));
     }
 
     @Override
     public String logout() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'logout'");
+        tokenService.delLoginUser(UserUtil.getUserDetailsDTO().getId());
+        return "注销成功";
     }
 
     @Override
     public UserInfoDTO qqLogin(QQLoginVO qqLoginVO) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'qqLogin'");
+        return socialLoginStrategyContext.executeLoginStrategy(JSON.toJSONString(qqLoginVO), LoginTypeEnum.QQ);
+
     }
 
     private Boolean checkUser(UserVO user) {
