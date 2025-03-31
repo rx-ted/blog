@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Data
 @TableName(value = "Users")
-public class User {
+public class UserAuthDTO {
     @Schema(description = "User Id")
     private Integer id;
 

@@ -7,15 +7,15 @@ import asia.rxted.blog.config.base.AbstractTokenGenerate;
 import asia.rxted.blog.modules.token.config.Token;
 import asia.rxted.blog.modules.token.serviceImpl.TokenServiceImpl;
 import asia.rxted.blog.modules.user.config.AuthUser;
-import asia.rxted.blog.model.dto.User;
+import asia.rxted.blog.model.dto.UserAuthDTO;
 
 @Service
-public class ManageTokenGenerate extends AbstractTokenGenerate<User> {
+public class ManageTokenGenerate extends AbstractTokenGenerate<UserAuthDTO> {
     @Autowired
     TokenServiceImpl token;
 
     @Override
-    public Token createToken(User user, Boolean longTerm) {
+    public Token createToken(UserAuthDTO user, Boolean longTerm) {
         AuthUser authUser = AuthUser.builder()
                 .username(user.getUsername())
                 .id(user.getId().toString())

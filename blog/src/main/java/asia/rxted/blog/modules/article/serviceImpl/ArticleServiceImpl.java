@@ -192,7 +192,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         // 注册状态提取当前用户
         // TODO(Ben): register user
         newArticle.setUserId(1);
-        if (!this.save(newArticle)) {
+        if (!this.saveOrUpdate(newArticle)) {
             return false;
         }
         if (Objects.nonNull(tags)) {

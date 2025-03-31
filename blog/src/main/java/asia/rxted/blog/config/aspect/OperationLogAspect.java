@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 
 import asia.rxted.blog.config.event.OperationLogEvent;
 import asia.rxted.blog.config.log.OperationLog;
+import asia.rxted.blog.model.dto.UserDetailsDTO;
 import asia.rxted.blog.config.annotation.OptLog;
 import asia.rxted.blog.utils.IpUtil;
 import asia.rxted.blog.utils.UserUtil;
@@ -38,7 +39,6 @@ public class OperationLogAspect {
     }
 
     @AfterReturning(value = "operationLogPointCut()", returning = "keys")
-    @SuppressWarnings("unchecked")
     public void saveOperationLog(JoinPoint joinPoint, Object keys) {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = (HttpServletRequest) Objects.requireNonNull(requestAttributes)
@@ -65,8 +65,10 @@ public class OperationLogAspect {
             }
         }
         operationLog.setResponseData(JSON.toJSONString(keys));
-        operationLog.setUserId(UserUtil.getUserDetailsDTO().getId());
-        operationLog.setNickname(UserUtil.getUserDetailsDTO().getNickname());
+        // UserDetailsDTO auth = UserUtil.getUserDetailsDTO();
+        operationLog.setUserId(1);
+        // operationLog.setNickname(UserUtil.getUserDetailsDTO().getNickname());
+        operationLog.setNickname("演示账号");
         String ipAddress = IpUtil.getIpAddress(request);
         operationLog.setIpAddress(ipAddress);
         operationLog.setIpSource(IpUtil.getIpSource(ipAddress));

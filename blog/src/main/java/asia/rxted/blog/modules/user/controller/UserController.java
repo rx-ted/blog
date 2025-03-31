@@ -9,7 +9,7 @@ import asia.rxted.blog.config.ResultMessage;
 import asia.rxted.blog.config.ResultUtil;
 import asia.rxted.blog.modules.token.config.Token;
 import asia.rxted.blog.modules.user.config.UserRegister;
-import asia.rxted.blog.model.dto.User;
+import asia.rxted.blog.model.dto.UserAuthDTO;
 import asia.rxted.blog.modules.user.service.UserServer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,7 +36,7 @@ public class UserController {
     @Parameters({
             @Parameter(description = "用户名", required = true, name = "username")
     })
-    public ResultMessage<User> getUser(@PathVariable String username) {
+    public ResultMessage<UserAuthDTO> getUser(@PathVariable String username) {
         return ResultUtil.data(userServer.findByUsername(username));
     }
 
@@ -76,7 +76,7 @@ public class UserController {
 
     @Operation(summary = "用户注销")
     @PutMapping("/update")
-    public ResultMessage<Object> updateUser(@RequestBody User user) {
+    public ResultMessage<Object> updateUser(@RequestBody UserAuthDTO user) {
         return userServer.updateUser(user);
     }
 

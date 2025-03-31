@@ -65,6 +65,8 @@ public enum ResultCode {
      * 邮箱代码状态
      */
     EMAIL_ERROR(44000, "邮箱操作失败"),
+    EMAIL_FORMAT_ERROR(44001, "邮箱格式不对"),
+    EMAIL_EXISTING(44002, "邮箱已被注册"),
 
     /**
      * 验证码

@@ -18,18 +18,18 @@ import asia.rxted.blog.mapper.UserMapper;
 import asia.rxted.blog.modules.system.token.ManageTokenGenerate;
 import asia.rxted.blog.modules.token.config.Token;
 import asia.rxted.blog.modules.user.config.UserRegister;
-import asia.rxted.blog.model.dto.User;
+import asia.rxted.blog.model.dto.UserAuthDTO;
 import asia.rxted.blog.modules.user.service.UserServer;
 
 @Service
-public class UserServerImpl extends ServiceImpl<UserMapper, User> implements UserServer {
+public class UserServerImpl extends ServiceImpl<UserMapper, UserAuthDTO> implements UserServer {
 
     @Autowired
     private ManageTokenGenerate manageTokenGenerate;
 
     @Override
     public ResultMessage<Token> login(String username, String password) {
-        User user = this.findByUsername(username);
+        UserAuthDTO user = this.findByUsername(username);
         if (user == null || !user.getStatus())
             return ResultUtil.error(ResultCode.USER_NOT_EXIST);
         if (!password.equals(user.getPassword()))
@@ -48,7 +48,7 @@ public class UserServerImpl extends ServiceImpl<UserMapper, User> implements Use
 
     @Override
     public ResultMessage<Object> logout(String username) {
-        User user = this.findByUsername(username);
+        UserAuthDTO user = this.findByUsername(username);
         if (user == null) {
             return ResultUtil.error(ResultCode.USER_LOGOUT_ERROR);
         }
@@ -60,7 +60,7 @@ public class UserServerImpl extends ServiceImpl<UserMapper, User> implements Use
 
     @Override
     public ResultMessage<Object> logout(int id) {
-        User user = this.getById(id);
+        UserAuthDTO user = this.getById(id);
         if (user == null) {
             return ResultUtil.error(ResultCode.USER_LOGOUT_ERROR);
         }
@@ -82,7 +82,7 @@ public class UserServerImpl extends ServiceImpl<UserMapper, User> implements Use
         if (this.findByUsername(username) != null) {
             return ResultUtil.error(ResultCode.USER_EXIST);
         }
-        User user = new User();
+        UserAuthDTO user = new UserAuthDTO();
         BeanUtils.copyProperties(register, user);
         this.save(user);
         return ResultUtil.success();
@@ -94,7 +94,7 @@ public class UserServerImpl extends ServiceImpl<UserMapper, User> implements Use
         if (password == newPassword) {
             return ResultUtil.error(ResultCode.USER_SAME_PASSWORD_ERROR);
         }
-        User user = this.getById(id);
+        UserAuthDTO user = this.getById(id);
         if (user == null) {
             return ResultUtil.error(ResultCode.USER_NOT_EXIST);
         }
@@ -108,7 +108,7 @@ public class UserServerImpl extends ServiceImpl<UserMapper, User> implements Use
         if (password == newPassword) {
             return ResultUtil.error(ResultCode.USER_SAME_PASSWORD_ERROR);
         }
-        User user = findByUsername(username);
+        UserAuthDTO user = findByUsername(username);
         if (user == null) {
             return ResultUtil.error(ResultCode.USER_NOT_EXIST);
         }
@@ -117,11 +117,11 @@ public class UserServerImpl extends ServiceImpl<UserMapper, User> implements Use
     }
 
     @Override
-    public ResultMessage<Object> updateUser(User updater) {
+    public ResultMessage<Object> updateUser(UserAuthDTO updater) {
         if (this.getById(updater.getId()) == null) {
             return ResultUtil.error(ResultCode.USER_EXIST);
         }
-        User user = new User();
+        UserAuthDTO user = new UserAuthDTO();
         BeanUtils.copyProperties(updater, user);
         try {
             this.updateById(user);
@@ -133,20 +133,20 @@ public class UserServerImpl extends ServiceImpl<UserMapper, User> implements Use
     }
 
     @Override
-    public User findByUsername(String username) {
-        return getOne(new LambdaQueryWrapper<User>().eq(User::getUsername, username), false);
+    public UserAuthDTO findByUsername(String username) {
+        return getOne(new LambdaQueryWrapper<UserAuthDTO>().eq(UserAuthDTO::getUsername, username), false);
     }
 
     @Override
-    public IPage<User> getUserPage(Page page, QueryWrapper<User> wrapper) {
-        Page<User> user = page(page, wrapper);
+    public IPage<UserAuthDTO> getUserPage(Page page, QueryWrapper<UserAuthDTO> wrapper) {
+        Page<UserAuthDTO> user = page(page, wrapper);
         System.out.println(user);
         return user;
     }
 
     @Override
     public ResultMessage<Object> exit(String username) {
-        User user = this.findByUsername(username);
+        UserAuthDTO user = this.findByUsername(username);
         if (user == null) {
             return ResultUtil.error(ResultCode.USER_NOT_EXIST);
         }
@@ -160,9 +160,9 @@ public class UserServerImpl extends ServiceImpl<UserMapper, User> implements Use
      */
     @Override
     public ResultMessage<Object> forgetPassword(String phone) {
-        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(User::getPhone, phone);
-        User user = this.getOne(wrapper);
+        LambdaQueryWrapper<UserAuthDTO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserAuthDTO::getPhone, phone);
+        UserAuthDTO user = this.getOne(wrapper);
         if (user == null) {
             return ResultUtil.error(ResultCode.USER_PHONE_NOT_EXIST);
         }
