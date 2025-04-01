@@ -46,8 +46,6 @@ public class EmailConfig {
             } // 无需额外配置
             default -> System.out.println("Warning: Unsupported mail port " + port);
         }
-
-        System.out.println("'props:'" + props);
         return Session.getInstance(props);
     }
 

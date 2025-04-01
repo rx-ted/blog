@@ -11,6 +11,9 @@ import asia.rxted.blog.config.constant.RabbitMQConstant;
 
 @Configuration
 public class RabbitMQConfig {
+    /**
+     * MAXWELL config
+     */
     @Bean
     public Queue articleQueue() {
         return new Queue(RabbitMQConstant.MAXWELL_QUEUE, true);
@@ -24,6 +27,24 @@ public class RabbitMQConfig {
     @Bean
     public Binding bindingArticleDirect() {
         return BindingBuilder.bind(articleQueue()).to(maxWellExchange());
+    }
+
+    /*
+     * Email config
+     */
+    @Bean
+    public Queue emailQueue() {
+        return new Queue(RabbitMQConstant.EMAIL_QUEUE, true);
+    }
+
+    @Bean
+    public FanoutExchange emaillExchange() {
+        return new FanoutExchange(RabbitMQConstant.EMAIL_EXCHANGE, true, false);
+    }
+
+    @Bean
+    public Binding bindingEmailDirect() {
+        return BindingBuilder.bind(emailQueue()).to(emaillExchange());
     }
 
 }

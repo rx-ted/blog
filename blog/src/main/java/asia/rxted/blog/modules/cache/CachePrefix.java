@@ -587,4 +587,8 @@ public enum CachePrefix {
     public String getPrefix(UserRoleEnum role, String str) {
         return "{" + this.name() + "_" + role.name() + "}_" + str + "_";
     }
+
+    public String join(String str) {
+        return "{" + this.name() + "}_" + str;
+    }
 }

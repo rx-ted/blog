@@ -28,6 +28,13 @@
     <dependencies>
 
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <version>3.4.4</version>
+        </dependency>
+
+
+        <dependency>
             <groupId>org.apache.httpcomponents.core5</groupId>
             <artifactId>httpcore5</artifactId>
             <version>${org.apache.httpcomponents.core5}</version>

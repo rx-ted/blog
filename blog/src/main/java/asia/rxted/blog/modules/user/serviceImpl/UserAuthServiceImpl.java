@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 
 import asia.rxted.blog.config.ResultCode;
-import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.config.constant.CommonConstant;
 import asia.rxted.blog.config.constant.RabbitMQConstant;
 import asia.rxted.blog.config.constant.RedisConstant;
@@ -94,7 +93,7 @@ public class UserAuthServiceImpl implements UserAuthService {
                 .build();
         rabbitTemplate.convertAndSend(RabbitMQConstant.EMAIL_EXCHANGE, "*",
                 new Message(JSON.toJSONBytes(emailDTO), new MessageProperties()));
-        redisService.set(CachePrefix.EMAIL_CODE.getPrefix(username), code, RedisConstant.CODE_EXPIRE_TIME);
+        redisService.set(CachePrefix.EMAIL_CODE.join(username), code, RedisConstant.CODE_EXPIRE_TIME);
         return ResultCode.SUCCESS;
     }
 
@@ -131,9 +130,9 @@ public class UserAuthServiceImpl implements UserAuthService {
         if (!CommonUtil.checkEmail(userVO.getUsername())) {
             return ResultCode.EMAIL_FORMAT_ERROR;
         }
-        if (checkUser(userVO)) {
-            ResultVO.fail(ResultCode.EMAIL_EXISTING);
-
+        var code = checkUser(userVO);
+        if (code != ResultCode.SUCCESS) {
+            return code;
         }
         UserInfo userInfo = UserInfo.builder()
                 .email(userVO.getUsername())
@@ -158,8 +157,9 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     public ResultCode updatePassword(UserVO userVO) {
-        if (!checkUser(userVO)) {
-            return ResultCode.EMAIL_NOT_EXISTING;
+        var code = checkUser(userVO);
+        if (code != ResultCode.SUCCESS) {
+            return code;
         }
         userAuthMapper.update(new UserAuth(), new LambdaUpdateWrapper<UserAuth>()
                 .set(UserAuth::getPassword, BCrypt.hashpw(userVO.getPassword(), BCrypt.gensalt()))
@@ -206,14 +206,14 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     }
 
-    private Boolean checkUser(UserVO user) {
-        if (!user.getCode().equals(redisService.get(CachePrefix.EMAIL_CODE.getPrefix(user.getUsername())))) {
-            ResultVO.fail(ResultCode.VERIFICATION_ERROR);
+    private ResultCode checkUser(UserVO user) {
+        if (!user.getCode().equals(redisService.get(CachePrefix.EMAIL_CODE.join(user.getUsername())))) {
+            return ResultCode.VERIFICATION_ERROR;
         }
         UserAuth userAuth = userAuthMapper.selectOne(new LambdaQueryWrapper<UserAuth>()
                 .select(UserAuth::getUsername)
                 .eq(UserAuth::getUsername, user.getUsername()));
-        return Objects.nonNull(userAuth);
+        return Objects.nonNull(userAuth) ? ResultCode.SUCCESS : ResultCode.USER_NOT_EXIST;
     }
 
 }
