@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 
 import asia.rxted.blog.config.ResultCode;
-import asia.rxted.blog.config.ResultUtil;
+import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.mapper.RoleMapper;
 import asia.rxted.blog.mapper.UserAuthMapper;
 import asia.rxted.blog.mapper.UserInfoMapper;
@@ -45,14 +45,14 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (StringUtils.isBlank(username)) {
-            ResultUtil.fail(ResultCode.USER_NOT_EMPTY);
+            ResultVO.fail(ResultCode.USER_NOT_EMPTY);
         }
         UserAuth userAuth = userAuthMapper.selectOne(new LambdaQueryWrapper<UserAuth>()
                 .select(UserAuth::getId, UserAuth::getUserInfoId, UserAuth::getUsername, UserAuth::getPassword,
                         UserAuth::getLoginType)
                 .eq(UserAuth::getUsername, username));
         if (Objects.isNull(userAuth)) {
-            ResultUtil.fail(ResultCode.USER_NOT_EXIST);
+            ResultVO.fail(ResultCode.USER_NOT_EXIST);
         }
         return convertUserDetail(userAuth, request);
     }

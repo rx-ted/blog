@@ -27,7 +27,7 @@ import asia.rxted.blog.model.vo.ArticleVO;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.DeleteVO;
 import asia.rxted.blog.config.ResultMessage;
-import asia.rxted.blog.config.ResultUtil;
+import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.config.annotation.OptLog;
 import asia.rxted.blog.modules.article.service.ArticleService;
 import asia.rxted.blog.modules.search.dto.SearchDTO;
@@ -70,14 +70,14 @@ public class ArticleController {
     @Operation(summary = "保存修改文章")
     @PostMapping("admin")
     public ResultMessage<?> saveArticle(@Valid @RequestBody ArticleVO articleVO) {
-        return ResultUtil.data(articleService.saveOrUpdateArticle(articleVO));
+        return ResultVO.data(articleService.saveOrUpdateArticle(articleVO));
     }
 
     // 根据id获取文章
     @Operation(summary = "根据id获取文章")
     @GetMapping("{articleId}")
     public ResultMessage<ArticleDTO> getArticleById(@PathVariable("articleId") Integer articleId) {
-        return ResultUtil.data(articleService.getArticleById(articleId));
+        return ResultVO.data(articleService.getArticleById(articleId));
     }
 
     // 删除文章
@@ -85,14 +85,14 @@ public class ArticleController {
     @Operation(summary = "获取置顶和推荐文章")
     @GetMapping("topAndFeatured")
     public ResultMessage<TopAndFeaturedArticlesDTO> listTopAndFeaturedArticles() {
-        return ResultUtil.data(articleService.listTopAndFeaturedArticles());
+        return ResultVO.data(articleService.listTopAndFeaturedArticles());
     }
 
     @Operation(summary = "获取所有文章")
     @GetMapping("all")
     public ResultMessage<PageResultDTO<ArticleCardDTO>> listArticles() {
 
-        return ResultUtil.data(articleService.listArticles());
+        return ResultVO.data(articleService.listArticles());
     }
 
     // @Operation(summary = "根据分类id获取文章")
@@ -130,7 +130,7 @@ public class ArticleController {
     @PutMapping("delete")
     public ResultMessage<?> updateArticleDelete(@Valid @RequestBody DeleteVO deleteVO) {
         articleService.softDeleteById(deleteVO);
-        return ResultUtil.success();
+        return ResultVO.success();
     }
 
     @OptLog(optType = DELETE)
@@ -138,7 +138,7 @@ public class ArticleController {
     @DeleteMapping("delete")
     public ResultMessage<?> deleteArticles(@RequestBody Integer articleId) {
         articleService.hardDeleteById(articleId);
-        return ResultUtil.success();
+        return ResultVO.success();
     }
 
     @OptLog(optType = UPLOAD)
@@ -147,7 +147,7 @@ public class ArticleController {
     )
     @PostMapping("/admin/images")
     public ResultMessage<String> saveArticleImages(MultipartFile file) {
-        return ResultUtil.data(uploadStrategyContext.executeUploadStrategy(file, FilePathEnum.ARTICLE.getPath()));
+        return ResultVO.data(uploadStrategyContext.executeUploadStrategy(file, FilePathEnum.ARTICLE.getPath()));
     }
 
     // @Operation(summary = "根据id查看后台文章")
@@ -164,7 +164,7 @@ public class ArticleController {
     @PostMapping("/admin/import")
     public ResultMessage<?> importArticles(MultipartFile file, @RequestParam(required = false) String type) {
         articleImportStrategyContext.importArticles(file, type);
-        return ResultUtil.success();
+        return ResultVO.success();
     }
 
     // @OptLog(optType = EXPORT)
@@ -180,7 +180,7 @@ public class ArticleController {
     @Operation(summary = "搜索文章")
     @GetMapping("/search")
     public ResultMessage<List<SearchDTO>> listArticlesBySearch(ConditionVO condition) {
-        return ResultUtil.data(articleService.search(condition));
+        return ResultVO.data(articleService.search(condition));
     }
 
 }

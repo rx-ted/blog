@@ -14,7 +14,7 @@ import asia.rxted.blog.model.dto.UserInfoDTO;
 import asia.rxted.blog.model.entity.UserAuth;
 import asia.rxted.blog.model.entity.UserInfo;
 import asia.rxted.blog.config.ResultCode;
-import asia.rxted.blog.config.ResultUtil;
+import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.config.constant.CommonConstant;
 import asia.rxted.blog.modules.strategy.SocialLoginStrategy;
 import asia.rxted.blog.modules.token.service.TokenService;
@@ -67,7 +67,7 @@ public abstract class AbstractSocialLoginStrategyImpl implements SocialLoginStra
             userDetailsDTO = saveUserDetail(socialToken, ipAddress, ipSource);
         }
         if (userDetailsDTO.getIsDisable().equals(CommonConstant.TRUE)) {
-            ResultUtil.fail(ResultCode.USER_IS_LOCKED);
+            ResultVO.fail(ResultCode.USER_IS_LOCKED);
         }
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetailsDTO, null,
                 userDetailsDTO.getAuthorities());

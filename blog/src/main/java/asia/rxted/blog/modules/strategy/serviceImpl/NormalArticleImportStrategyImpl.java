@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import asia.rxted.blog.config.ResultCode;
-import asia.rxted.blog.config.ResultUtil;
+import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.config.enums.ArticleStatusEnum;
 import asia.rxted.blog.model.vo.ArticleVO;
 import asia.rxted.blog.modules.article.service.ArticleService;
@@ -35,7 +35,7 @@ public class NormalArticleImportStrategyImpl implements ArticleImportStrategy {
             }
         } catch (IOException e) {
             log.error(StrUtil.format("导入文章失败, 堆栈:{}", ExceptionUtil.stacktraceToString(e)));
-            ResultUtil.fail(ResultCode.ARTICLE_IMPORT_FAILED_ERROR);
+            ResultVO.fail(ResultCode.ARTICLE_IMPORT_FAILED_ERROR);
         }
         ArticleVO articleVO = ArticleVO.builder()
                 .articleTitle(articleTitle)

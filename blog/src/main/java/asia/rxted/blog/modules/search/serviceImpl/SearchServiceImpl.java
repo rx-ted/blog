@@ -20,7 +20,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import asia.rxted.blog.config.ResultCode;
-import asia.rxted.blog.config.ResultUtil;
+import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.modules.search.dto.SearchDTO;
 import asia.rxted.blog.modules.search.service.SearchService;
 
@@ -48,7 +48,7 @@ public class SearchServiceImpl implements SearchService {
             CreateResponse response = client.create(request);
             response.forcedRefresh();
         } catch (OpenSearchException e) {
-            ResultUtil.fail(ResultCode.SEARCH_CREATE_ERROR);
+            ResultVO.fail(ResultCode.SEARCH_CREATE_ERROR);
         }
     }
 
@@ -62,7 +62,7 @@ public class SearchServiceImpl implements SearchService {
                     .build();
             client.index(request);
         } catch (OpenSearchException e) {
-            ResultUtil.fail(ResultCode.SEARCH_INDEX_ERROR);
+            ResultVO.fail(ResultCode.SEARCH_INDEX_ERROR);
         }
     }
 
@@ -75,7 +75,7 @@ public class SearchServiceImpl implements SearchService {
                     .build();
             client.delete(request);
         } catch (OpenSearchException e) {
-            ResultUtil.fail(ResultCode.SEARCH_DELETE_ERROR);
+            ResultVO.fail(ResultCode.SEARCH_DELETE_ERROR);
         }
     }
 
@@ -90,7 +90,7 @@ public class SearchServiceImpl implements SearchService {
             GetResponse<SearchDTO> response = client.get(request, SearchDTO.class);
             return response.source();
         } catch (OpenSearchException e) {
-            ResultUtil.fail(ResultCode.SEARCH_GET_ERROR);
+            ResultVO.fail(ResultCode.SEARCH_GET_ERROR);
         }
         return null;
     }
@@ -112,7 +112,7 @@ public class SearchServiceImpl implements SearchService {
             }
             return searchDTOs;
         } catch (OpenSearchException e) {
-            ResultUtil.fail(ResultCode.SEARCH_ERROR);
+            ResultVO.fail(ResultCode.SEARCH_ERROR);
         }
         return null;
     }

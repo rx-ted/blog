@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.config.ResultMessage;
-import asia.rxted.blog.config.ResultUtil;
+import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.modules.navMenu.service.NavMenuServer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,11 +24,11 @@ public class NavMenuController {
     @GetMapping("/menu")
     public ResultMessage<Object> getNavMenu() {
         try {
-            return ResultUtil.data(navMenuServer.list());
+            return ResultVO.data(navMenuServer.list());
 
         } catch (Exception e) {
             e.printStackTrace();
-            return ResultUtil.error(ResultCode.ERROR);
+            return ResultVO.error(ResultCode.ERROR);
         }
     }
 

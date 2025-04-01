@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import asia.rxted.blog.config.ResultCode;
-import asia.rxted.blog.config.ResultUtil;
+import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.mapper.TagMapper;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.TagAdminDTO;
@@ -37,7 +37,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
                 .eq(Tag::getTagName, tagName));
 
         if (Objects.nonNull(existTag)) {
-            ResultUtil.fail(ResultCode.ARTICLE_TAG_IS_EXIST);
+            ResultVO.fail(ResultCode.ARTICLE_TAG_IS_EXIST);
         }
         Tag tag = Tag.builder().tagName(tagName).build();
         return this.save(tag);

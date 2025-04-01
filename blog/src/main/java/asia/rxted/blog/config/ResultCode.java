@@ -85,6 +85,8 @@ public enum ResultCode {
      * 用户
      */
     USER_EDIT_SUCCESS(20001, "用户修改成功"),
+    ADMIN_EDIT_SUCCESS(40000, "admin修改成功"),
+
     USER_OPERATION_ERROR(20001, "用户操作无反应"),
     USER_NOT_EXIST(20002, "用户不存在"),
     USER_NOT_EMPTY(20002, "用户名不能为空"),

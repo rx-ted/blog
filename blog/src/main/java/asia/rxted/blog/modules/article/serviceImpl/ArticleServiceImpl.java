@@ -48,7 +48,7 @@ import asia.rxted.blog.model.vo.ArticleVO;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.DeleteVO;
 import asia.rxted.blog.config.ResultCode;
-import asia.rxted.blog.config.ResultUtil;
+import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.config.constant.RabbitMQConstant;
 import asia.rxted.blog.modules.article.service.ArticleService;
 import asia.rxted.blog.modules.article.service.ArticleTagService;
@@ -128,7 +128,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             // 从注册登录信息获取
             Boolean isAccess = redisService.sIsMember(CachePrefix.ARTICLE_ACCESS.getPrefix("userid"), id);
             if (isAccess.equals(false)) {
-                ResultUtil.fail(ResultCode.ARTICLE_ACCESS_FAIL);
+                ResultVO.fail(ResultCode.ARTICLE_ACCESS_FAIL);
                 return null;
             }
         }

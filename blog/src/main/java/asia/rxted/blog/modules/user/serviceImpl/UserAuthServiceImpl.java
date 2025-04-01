@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 
 import asia.rxted.blog.config.ResultCode;
-import asia.rxted.blog.config.ResultUtil;
+import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.config.constant.CommonConstant;
 import asia.rxted.blog.config.constant.RabbitMQConstant;
 import asia.rxted.blog.config.constant.RedisConstant;
@@ -79,9 +79,9 @@ public class UserAuthServiceImpl implements UserAuthService {
     private SocialLoginStrategyContext socialLoginStrategyContext;
 
     @Override
-    public void sendCode(String username) {
+    public ResultCode sendCode(String username) {
         if (!CommonUtil.checkEmail(username)) {
-            ResultUtil.fail(ResultCode.EMAIL_FORMAT_ERROR);
+            return ResultCode.EMAIL_FORMAT_ERROR;
         }
         String code = CommonUtil.getRandomCode();
         Map<String, Object> map = new HashMap<>();
@@ -95,7 +95,7 @@ public class UserAuthServiceImpl implements UserAuthService {
         rabbitTemplate.convertAndSend(RabbitMQConstant.EMAIL_EXCHANGE, "*",
                 new Message(JSON.toJSONBytes(emailDTO), new MessageProperties()));
         redisService.set(CachePrefix.EMAIL_CODE.getPrefix(username), code, RedisConstant.CODE_EXPIRE_TIME);
-
+        return ResultCode.SUCCESS;
     }
 
     @Override
@@ -127,12 +127,12 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void register(UserVO userVO) {
+    public ResultCode register(UserVO userVO) {
         if (!CommonUtil.checkEmail(userVO.getUsername())) {
-            ResultUtil.fail(ResultCode.EMAIL_FORMAT_ERROR);
+            return ResultCode.EMAIL_FORMAT_ERROR;
         }
         if (checkUser(userVO)) {
-            ResultUtil.fail(ResultCode.EMAIL_EXISTING);
+            ResultVO.fail(ResultCode.EMAIL_EXISTING);
 
         }
         UserInfo userInfo = UserInfo.builder()
@@ -153,22 +153,22 @@ public class UserAuthServiceImpl implements UserAuthService {
                 .loginType(LoginTypeEnum.EMAIL.getType())
                 .build();
         userAuthMapper.insert(userAuth);
-
+        return ResultCode.SUCCESS;
     }
 
     @Override
-    public void updatePassword(UserVO userVO) {
+    public ResultCode updatePassword(UserVO userVO) {
         if (!checkUser(userVO)) {
-            ResultUtil.fail(ResultCode.EMAIL_NOT_EXISTING);
+            return ResultCode.EMAIL_NOT_EXISTING;
         }
         userAuthMapper.update(new UserAuth(), new LambdaUpdateWrapper<UserAuth>()
                 .set(UserAuth::getPassword, BCrypt.hashpw(userVO.getPassword(), BCrypt.gensalt()))
                 .eq(UserAuth::getUsername, userVO.getUsername()));
-
+        return ResultCode.SUCCESS;
     }
 
     @Override
-    public void updateAdminPassword(PasswordVO passwordVO) {
+    public ResultCode updateAdminPassword(PasswordVO passwordVO) {
         UserAuth user = userAuthMapper.selectOne(new LambdaQueryWrapper<UserAuth>()
                 .eq(UserAuth::getId, UserUtil.getUserDetailsDTO().getId()));
         if (Objects.nonNull(user) && BCrypt.checkpw(passwordVO.getOldPassword(), user.getPassword())) {
@@ -177,8 +177,9 @@ public class UserAuthServiceImpl implements UserAuthService {
                     .password(BCrypt.hashpw(passwordVO.getNewPassword(), BCrypt.gensalt()))
                     .build();
             userAuthMapper.updateById(userAuth);
+            return ResultCode.SUCCESS;
         } else {
-            ResultUtil.fail(ResultCode.USER_OLD_PASSWORD_ERROR);
+            return ResultCode.USER_OLD_PASSWORD_ERROR;
         }
     }
 
@@ -194,9 +195,9 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
-    public String logout() {
+    public ResultCode logout() {
         tokenService.delLoginUser(UserUtil.getUserDetailsDTO().getId());
-        return "注销成功";
+        return ResultCode.SUCCESS;
     }
 
     @Override
@@ -207,7 +208,7 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     private Boolean checkUser(UserVO user) {
         if (!user.getCode().equals(redisService.get(CachePrefix.EMAIL_CODE.getPrefix(user.getUsername())))) {
-            ResultUtil.fail(ResultCode.VERIFICATION_ERROR);
+            ResultVO.fail(ResultCode.VERIFICATION_ERROR);
         }
         UserAuth userAuth = userAuthMapper.selectOne(new LambdaQueryWrapper<UserAuth>()
                 .select(UserAuth::getUsername)

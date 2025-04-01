@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 
 import asia.rxted.blog.config.enums.LoginTypeEnum;
 import asia.rxted.blog.config.ResultCode;
-import asia.rxted.blog.config.ResultUtil;
+import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.config.constant.SocialLoginConstant;
 import asia.rxted.blog.config.properties.QQConfigProperties;
 import asia.rxted.blog.model.dto.SocialTokenDTO;
@@ -65,11 +65,11 @@ public class QQLoginStrategyImpl extends AbstractSocialLoginStrategyImpl {
             QQTokenDTO qqTokenDTO = JSON.parseObject(CommonUtil.getBracketsContent(Objects.requireNonNull(result)),
                     QQTokenDTO.class);
             if (!qqLoginVO.getOpenId().equals(qqTokenDTO.getOpenid())) {
-                ResultUtil.fail(ResultCode.QQ_LOGIN_ERROR);
+                ResultVO.fail(ResultCode.QQ_LOGIN_ERROR);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            ResultUtil.fail(ResultCode.QQ_LOGIN_ERROR);
+            ResultVO.fail(ResultCode.QQ_LOGIN_ERROR);
         }
     }
 

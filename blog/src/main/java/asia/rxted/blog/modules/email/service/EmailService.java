@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.config.ResultMessage;
-import asia.rxted.blog.config.ResultUtil;
+import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.modules.cache.CachePrefix;
 import asia.rxted.blog.modules.cache.RedisCache;
 import asia.rxted.blog.modules.email.config.EmailConfig;
@@ -39,7 +39,7 @@ public class EmailService {
     public ResultMessage<Object> sendEmail(String to) {
         Object result = cache.get(CachePrefix.EMAIL_VALIDATE.getPrefix() + to);
         if (result != null) {
-            return ResultUtil.success(ResultCode.VERIFICATION_REPEAT_ERROR);
+            return ResultVO.success(ResultCode.VERIFICATION_REPEAT_ERROR);
         }
 
         try {
@@ -51,11 +51,11 @@ public class EmailService {
             message.setText(text, "UTF-8", "html");
             javaMailSender.send(message);
             cache.put(CachePrefix.EMAIL_VALIDATE.getPrefix() + to, code, emailTimeTemp, TimeUnit.MILLISECONDS);
-            return ResultUtil.success(ResultCode.VERIFICATION_EMAIL_SEND_SUCCESS);
+            return ResultVO.success(ResultCode.VERIFICATION_EMAIL_SEND_SUCCESS);
 
         } catch (MessagingException e) {
             // e.printStackTrace();
-            return ResultUtil.error(ResultCode.VERIFICATION_EMAIL_SEND_ERROR);
+            return ResultVO.error(ResultCode.VERIFICATION_EMAIL_SEND_ERROR);
         }
     }
 
@@ -63,13 +63,13 @@ public class EmailService {
 
         Object result = cache.get(CachePrefix.EMAIL_VALIDATE.getPrefix() + to);
         if (result == null) {
-            return ResultUtil.error(ResultCode.VERIFICATION_CODE_INVALID);
+            return ResultVO.error(ResultCode.VERIFICATION_CODE_INVALID);
         }
         if (!result.toString().equals(code)) {
-            return ResultUtil.error(ResultCode.VERIFICATION_ERROR);
+            return ResultVO.error(ResultCode.VERIFICATION_ERROR);
         }
         cache.remove(CachePrefix.EMAIL_VALIDATE.getPrefix() + to);
-        return ResultUtil.success(ResultCode.VERIFICATION_SUCCESS);
+        return ResultVO.success(ResultCode.VERIFICATION_SUCCESS);
 
     }
 }

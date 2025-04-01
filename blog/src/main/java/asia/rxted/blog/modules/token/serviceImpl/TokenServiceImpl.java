@@ -21,7 +21,7 @@ import asia.rxted.blog.config.enums.SecurityEnum;
 import asia.rxted.blog.config.enums.UserRoleEnum;
 import asia.rxted.blog.model.dto.UserDetailsDTO;
 import asia.rxted.blog.config.ResultCode;
-import asia.rxted.blog.config.ResultUtil;
+import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.config.ServiceException;
 import asia.rxted.blog.config.base.SecretKeyUtil;
 import asia.rxted.blog.config.constant.AuthConstant;
@@ -77,7 +77,7 @@ public class TokenServiceImpl implements TokenService {
                     .build()
                     .parseClaimsJws(oldToken).getBody();
         } catch (Exception e) {
-            ResultUtil.fail(ResultCode.USER_AUTH_EXPIRED);
+            ResultVO.fail(ResultCode.USER_AUTH_EXPIRED);
         }
         String json = claims.get(SecurityEnum.USER_CONTEXT.getValue()).toString();
         AuthUser authUser = new Gson().fromJson(json, AuthUser.class);
