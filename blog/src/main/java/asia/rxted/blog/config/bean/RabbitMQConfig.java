@@ -8,9 +8,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import asia.rxted.blog.config.constant.RabbitMQConstant;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
+@Slf4j
 public class RabbitMQConfig {
+
     /**
      * MAXWELL config
      */

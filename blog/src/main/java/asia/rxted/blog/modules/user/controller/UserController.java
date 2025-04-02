@@ -43,8 +43,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @RestController()
 @RequestMapping("users")
 public class UserController {
-    @Autowired
-    private UserServer userServer;
+    // @Autowired
+    // private UserServer userServer;
 
     @Autowired
     private UserAuthService userAuthService;

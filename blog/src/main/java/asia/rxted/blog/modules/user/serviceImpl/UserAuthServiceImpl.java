@@ -12,6 +12,7 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
@@ -51,6 +52,7 @@ import asia.rxted.blog.utils.CommonUtil;
 import asia.rxted.blog.utils.PageUtil;
 import asia.rxted.blog.utils.UserUtil;
 
+@Service
 public class UserAuthServiceImpl implements UserAuthService {
 
     @Autowired

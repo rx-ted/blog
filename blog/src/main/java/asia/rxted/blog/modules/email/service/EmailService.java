@@ -73,7 +73,7 @@ public class EmailService {
         try {
             // 添加邮件发送逻辑
             MimeMessage mimeMessage = new MimeMessage(emailConfig.mailSession());
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
             Context context = new Context();
             context.setVariables(emailMsgDTO.getCommentMap());
             String process = templateEngine.process(emailMsgDTO.getTemplate(), context);
@@ -82,7 +82,7 @@ public class EmailService {
             helper.setSubject(emailMsgDTO.getSubject());
             helper.setText(process, true);
             javaMailSender.send(mimeMessage);
-            return ResultCode.VERIFICATION_EMAIL_SEND_SUCCESS;
+            return ResultCode.SUCCESS;
         } catch (MessagingException e) {
             // e.printStackTrace();
             return ResultCode.VERIFICATION_EMAIL_SEND_ERROR;
