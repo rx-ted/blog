@@ -4,6 +4,11 @@ import java.time.LocalDateTime;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,12 +49,10 @@ public class ConditionVO {
     @Schema(name = "status", title = "状态", type = "Integer")
     private Integer status;
 
-    @Schema(name = "startTime", title = "开始时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Schema(name = "startTime", title = "开始时间", example = "2014-12-01 12:00:00", format = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime startTime;
 
-    @Schema(name = "endTime", title = "结束时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Schema(name = "endTime", title = "结束时间", example = "2014-12-01 12:00:00", format = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endTime;
 
     @Schema(name = "isDelete", title = "是否删除", type = "Integer")

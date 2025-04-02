@@ -1,5 +1,6 @@
 package asia.rxted.blog.config.bean;
 
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -14,26 +15,26 @@ import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 
-@ConfigurationProperties(prefix = "swagger")
+@ConfigurationProperties(prefix = "openapi")
 @Configuration
-public class SwaggerConfig {
+public class OpenAPIConfig {
 
     @Autowired
     private Environment environment;
 
-    @Value("${swagger.title}")
+    @Value("${openapi.title}")
     private String title;
-    @Value("${swagger.version}")
+    @Value("${openapi.version}")
     private String version;
-    @Value("${swagger.description}")
+    @Value("${openapi.description}")
     private String description;
-    @Value("${swagger.termsOfServiceUrl}")
+    @Value("${openapi.termsOfServiceUrl}")
     private String termsOfServiceUrl;
-    @Value("${swagger.contact.name}")
+    @Value("${openapi.contact.name}")
     private String name;
-    @Value("${swagger.contact.url}")
+    @Value("${openapi.contact.url}")
     private String url;
-    @Value("${swagger.contact.email}")
+    @Value("${openapi.contact.email}")
     private String email;
 
     private boolean checkDevOrTest() {
@@ -75,9 +76,18 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public OpenAPI springShopOpenAPI() {
+    public OpenAPI openAPI() {
         return new OpenAPI()
                 .info(info())
                 .externalDocs(externalDocumentation());
+    }
+
+    public GroupedOpenApi createRestAPI(String groupName, String basePackage) {
+        return GroupedOpenApi.builder()
+                .group(groupName)
+                .packagesToScan(basePackage)
+                .pathsToMatch("/**")
+                .addOpenApiCustomizer(openapi -> openapi.info(info()))
+                .build();
     }
 }

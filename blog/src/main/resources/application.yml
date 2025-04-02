@@ -1,6 +1,14 @@
 spring:
+  application:
+    name: Blog
   profiles:
     active: dev
+  jackson:
+    time-zone: Asia/Shanghai
+    #  返回时间戳
+    serialization:
+      write-dates-as-timestamps: true
+
   mail:
     host: smtp.126.com
     username: rx_ted@126.com
@@ -63,19 +71,24 @@ spring:
     redis:
       time-to-live: 6000
 
-swagger:
-  production: false
-  basic:
-    enable: true
-    username: rx
-    password: rx
+knife4j:
+  enable: true
+  openapi:
+    title: blog API接口文档
+    description: Blog Api Documentation
+    email: gjy.18sui@gmail.com
+    concat: rx-ted
+    url: https://rx-ted.asia
+    version: v1.0.0
+
+openapi:
   title: blog API接口文档
   description: Blog Api Documentation
   version: 1.0.0
-  termsOfServiceUrl: https://127.0.0.1:8080
+  termsOfServiceUrl: https://rx-ted.asia
   contact:
     name: rx-ted
-    url: https://127.0.0.1:8080
+    url: https://rx-ted.asia
     email: gjy.18sui@gmail.com
 
 # logging:
