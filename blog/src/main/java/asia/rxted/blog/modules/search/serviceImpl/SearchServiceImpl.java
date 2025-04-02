@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.config.ResultVO;
-import asia.rxted.blog.modules.search.dto.SearchDTO;
+import asia.rxted.blog.model.dto.SearchDTO;
 import asia.rxted.blog.modules.search.service.SearchService;
 
 @ConfigurationProperties(prefix = "opensearch")

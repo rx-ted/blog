@@ -34,17 +34,14 @@ import asia.rxted.blog.model.dto.EmailMsgDTO;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.UserAdminDTO;
 import asia.rxted.blog.model.dto.UserAreaDTO;
-import asia.rxted.blog.model.dto.UserInfoDTO;
 import asia.rxted.blog.model.dto.UserRole;
 import asia.rxted.blog.model.entity.UserAuth;
 import asia.rxted.blog.model.entity.UserInfo;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.PasswordVO;
-import asia.rxted.blog.model.vo.QQLoginVO;
 import asia.rxted.blog.model.vo.UserVO;
 import asia.rxted.blog.modules.cache.CachePrefix;
 import asia.rxted.blog.modules.cache.service.RedisService;
-import asia.rxted.blog.modules.strategy.context.SocialLoginStrategyContext;
 import asia.rxted.blog.modules.token.service.TokenService;
 import asia.rxted.blog.modules.user.service.SiteUserInfoService;
 import asia.rxted.blog.modules.user.service.UserAuthService;
@@ -75,9 +72,6 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Autowired
     private TokenService tokenService;
-
-    @Autowired
-    private SocialLoginStrategyContext socialLoginStrategyContext;
 
     @Override
     public ResultCode sendCode(String username) {
@@ -200,12 +194,6 @@ public class UserAuthServiceImpl implements UserAuthService {
     public ResultCode logout() {
         tokenService.delLoginUser(UserUtil.getUserDetailsDTO().getId());
         return ResultCode.SUCCESS;
-    }
-
-    @Override
-    public UserInfoDTO qqLogin(QQLoginVO qqLoginVO) {
-        return socialLoginStrategyContext.executeLoginStrategy(JSON.toJSONString(qqLoginVO), LoginTypeEnum.QQ);
-
     }
 
     private ResultCode checkUser(UserVO user) {

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.google.common.base.Strings;
 
-import asia.rxted.blog.modules.search.dto.SearchDTO;
+import asia.rxted.blog.model.dto.SearchDTO;
 import asia.rxted.blog.modules.search.service.SearchService;
 import asia.rxted.blog.modules.strategy.SearchStrategy;
 

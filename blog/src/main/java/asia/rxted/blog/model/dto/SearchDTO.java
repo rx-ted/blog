@@ -1,4 +1,4 @@
-package asia.rxted.blog.modules.search.dto;
+package asia.rxted.blog.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

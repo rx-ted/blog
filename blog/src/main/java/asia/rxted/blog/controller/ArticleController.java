@@ -1,4 +1,4 @@
-package asia.rxted.blog.modules.article.controller;
+package asia.rxted.blog.controller;
 
 import java.util.List;
 
@@ -20,6 +20,7 @@ import asia.rxted.blog.model.dto.ArticleAdminViewDTO;
 import asia.rxted.blog.model.dto.ArticleCardDTO;
 import asia.rxted.blog.model.dto.ArticleDTO;
 import asia.rxted.blog.model.dto.PageResultDTO;
+import asia.rxted.blog.model.dto.SearchDTO;
 import asia.rxted.blog.model.dto.TopAndFeaturedArticlesDTO;
 import asia.rxted.blog.model.vo.ArticlePasswordVO;
 import asia.rxted.blog.model.vo.ArticleTopFeaturedVO;
@@ -30,7 +31,6 @@ import asia.rxted.blog.config.ResultMessage;
 import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.config.annotation.OptLog;
 import asia.rxted.blog.modules.article.service.ArticleService;
-import asia.rxted.blog.modules.search.dto.SearchDTO;
 import asia.rxted.blog.modules.strategy.context.ArticleImportStrategyContext;
 import asia.rxted.blog.modules.strategy.context.UploadStrategyContext;
 import asia.rxted.blog.utils.UserUtil;
@@ -68,7 +68,6 @@ public class ArticleController {
     // 保存文章
     @OptLog(optType = SAVE_OR_UPDATE)
     @Operation(summary = "保存修改文章")
-    @PostMapping("admin")
     public ResultMessage<?> saveArticle(@Valid @RequestBody ArticleVO articleVO) {
         return ResultVO.data(articleService.saveOrUpdateArticle(articleVO));
     }

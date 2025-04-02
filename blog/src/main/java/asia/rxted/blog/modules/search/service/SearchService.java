@@ -3,7 +3,7 @@ package asia.rxted.blog.modules.search.service;
 import java.io.IOException;
 import java.util.List;
 
-import asia.rxted.blog.modules.search.dto.SearchDTO;
+import asia.rxted.blog.model.dto.SearchDTO;
 
 public interface SearchService {
 

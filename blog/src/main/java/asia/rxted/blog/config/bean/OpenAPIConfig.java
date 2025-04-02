@@ -90,4 +90,9 @@ public class OpenAPIConfig {
                 .addOpenApiCustomizer(openapi -> openapi.info(info()))
                 .build();
     }
+
+    @Bean
+    public GroupedOpenApi adminAPI() {
+        return createRestAPI("blog-api", "asia.rxted.blog.controller");
+    }
 }

@@ -10,9 +10,9 @@ import com.alibaba.fastjson.JSON;
 
 import asia.rxted.blog.config.constant.RabbitMQConstant;
 import asia.rxted.blog.model.dto.MaxWellDataDTO;
+import asia.rxted.blog.model.dto.SearchDTO;
+import asia.rxted.blog.model.dto.SearchDTO.SearchDTOBuilder;
 import asia.rxted.blog.model.entity.Article;
-import asia.rxted.blog.modules.search.dto.SearchDTO;
-import asia.rxted.blog.modules.search.dto.SearchDTO.SearchDTOBuilder;
 import asia.rxted.blog.modules.search.service.SearchService;
 
 @RabbitListener(queues = RabbitMQConstant.MAXWELL_QUEUE)

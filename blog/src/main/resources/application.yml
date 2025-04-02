@@ -73,13 +73,6 @@ spring:
 
 knife4j:
   enable: true
-  openapi:
-    title: blog API接口文档
-    description: Blog Api Documentation
-    email: gjy.18sui@gmail.com
-    concat: rx-ted
-    url: https://rx-ted.asia
-    version: v1.0.0
 
 openapi:
   title: blog API接口文档

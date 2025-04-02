@@ -1,4 +1,4 @@
-package asia.rxted.blog.modules.user.controller;
+package asia.rxted.blog.controller;
 
 import static asia.rxted.blog.config.constant.OptTypeConstant.UPDATE;
 
@@ -108,12 +108,6 @@ public class UserController {
     @GetMapping("/logout")
     public ResultMessage<Object> logout() {
         return ResultVO.data(userAuthService.logout());
-    }
-
-    @Operation(summary = "QQ login")
-    @PostMapping("oauth/qq")
-    public ResultMessage<UserInfoDTO> qqLogin(@Valid QQLoginVO qqLoginVO) {
-        return ResultVO.data(userAuthService.qqLogin(qqLoginVO));
     }
 
 }
