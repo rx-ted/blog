@@ -6,38 +6,28 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import asia.rxted.blog.config.ResultMessage;
 import asia.rxted.blog.config.ResultVO;
+import asia.rxted.blog.config.annotation.AccessLimit;
 import asia.rxted.blog.config.annotation.OptLog;
-import asia.rxted.blog.modules.token.config.Token;
-import asia.rxted.blog.modules.user.config.UserRegister;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.UserAdminDTO;
 import asia.rxted.blog.model.dto.UserAreaDTO;
-import asia.rxted.blog.model.dto.UserAuthDTO;
-import asia.rxted.blog.model.dto.UserInfoDTO;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.PasswordVO;
-import asia.rxted.blog.model.vo.QQLoginVO;
 import asia.rxted.blog.model.vo.UserVO;
 import asia.rxted.blog.modules.user.service.UserAuthService;
-import asia.rxted.blog.modules.user.service.UserServer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 @Tag(name = "用户管理", description = "用户管理相关API")
 @RestController()
@@ -49,7 +39,7 @@ public class UserController {
     @Autowired
     private UserAuthService userAuthService;
 
-    // @AccessLimit(seconds = 60, maxCount = 1)
+    @AccessLimit(seconds = 60, maxCount = 1)
     @Operation(summary = "发送邮箱验证码")
     @Parameter(name = "username", description = "用户名", required = true)
     @GetMapping("code")

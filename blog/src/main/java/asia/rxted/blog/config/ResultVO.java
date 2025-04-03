@@ -65,4 +65,12 @@ public class ResultVO<T> {
         throw new ServiceException(code);
     }
 
+    public static <T> ResultMessage<T> status(ResultCode code) {
+        if (code == ResultCode.SUCCESS) {
+            return new ResultVO<T>().setSuccessMsg(code);
+        } else {
+            return new ResultVO<T>().setErrorMsg(code);
+        }
+    }
+
 }

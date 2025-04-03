@@ -23,6 +23,7 @@ public class MaxWellConsumer {
 
     @RabbitHandler
     public void process(byte[] data) throws IOException {
+        System.out.println("this is mysql operation.");
         MaxWellDataDTO maxWellDataDTO = JSON.parseObject(new String(data), MaxWellDataDTO.class);
         Article article = JSON.parseObject(JSON.toJSONString(maxWellDataDTO.getData()), Article.class);
         switch (maxWellDataDTO.getType()) {

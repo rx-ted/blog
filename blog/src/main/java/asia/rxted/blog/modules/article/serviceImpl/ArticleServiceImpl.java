@@ -1,18 +1,9 @@
 package asia.rxted.blog.modules.article.serviceImpl;
 
-import static asia.rxted.blog.config.enums.ArticleStatusEnum.*;
-
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
@@ -23,18 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import asia.rxted.blog.config.enums.ArticleStatusEnum;
-import asia.rxted.blog.config.enums.FileExtEnum;
-import asia.rxted.blog.config.enums.FilePathEnum;
 import asia.rxted.blog.mapper.ArticleMapper;
 import asia.rxted.blog.mapper.CategoryMapper;
 import asia.rxted.blog.mapper.TagMapper;
-import asia.rxted.blog.model.dto.ArchiveDTO;
-import asia.rxted.blog.model.dto.ArticleAdminDTO;
-import asia.rxted.blog.model.dto.ArticleAdminViewDTO;
 import asia.rxted.blog.model.dto.ArticleCardDTO;
 import asia.rxted.blog.model.dto.ArticleDTO;
 import asia.rxted.blog.model.dto.PageResultDTO;
@@ -43,8 +28,6 @@ import asia.rxted.blog.model.dto.TopAndFeaturedArticlesDTO;
 import asia.rxted.blog.model.entity.Article;
 import asia.rxted.blog.model.entity.Category;
 import asia.rxted.blog.model.entity.Tag;
-import asia.rxted.blog.model.vo.ArticlePasswordVO;
-import asia.rxted.blog.model.vo.ArticleTopFeaturedVO;
 import asia.rxted.blog.model.vo.ArticleVO;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.DeleteVO;
@@ -61,7 +44,6 @@ import asia.rxted.blog.modules.strategy.context.SearchStrategyContext;
 import asia.rxted.blog.modules.strategy.context.UploadStrategyContext;
 import asia.rxted.blog.utils.BeanCopyUtil;
 import asia.rxted.blog.utils.PageUtil;
-import asia.rxted.blog.utils.UserUtil;
 import lombok.SneakyThrows;
 
 @Service
@@ -180,7 +162,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean saveOrUpdateArticle(ArticleVO article) {
+    public ResultCode saveOrUpdateArticle(ArticleVO article) {
         String categroyName = article.getCategoryName();
         List<String> tagNames = article.getTagNames();
 
@@ -193,7 +175,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         // TODO(Ben): register user
         newArticle.setUserId(1);
         if (!this.saveOrUpdate(newArticle)) {
-            return false;
+            return ResultCode.ARTICLE_SAVE_OR_UPDATE_ERROR;
         }
         if (Objects.nonNull(tags)) {
             tags.forEach(tag -> {
@@ -204,21 +186,21 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
         // 传播rabbitmq 告诉操作状态
         if (newArticle.getStatus().equals(ArticleStatusEnum.PUBLIC.code())) {
-            rabbitTemplate.convertAndSend(RabbitMQConstant.SUBSCRIBE_EXCHANGE, "*",
+            rabbitTemplate.convertAndSend(RabbitMQConstant.MAXWELL_EXCHANGE, "*",
                     new Message(JSON.toJSONBytes(newArticle.getId()), new MessageProperties()));
         }
-        return true;
+        return ResultCode.SUCCESS;
     }
 
     @Override
-    public Boolean softDeleteById(DeleteVO deleteVO) {
+    public ResultCode softDeleteById(DeleteVO deleteVO) {
         Article article = Article.builder().id(deleteVO.getId()).isDelete(deleteVO.getIsDelete()).build();
-        return this.updateById(article);
+        return this.updateById(article) ? ResultCode.SUCCESS : ResultCode.ARTICLE_DELETE_ERROR;
     }
 
     @Override
-    public Boolean hardDeleteById(Integer id) {
-        return this.removeById(id);
+    public ResultCode hardDeleteById(Integer id) {
+        return this.removeById(id) ? ResultCode.SUCCESS : ResultCode.ARTICLE_DELETE_ERROR;
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.model.dto.ArticleCardDTO;
 import asia.rxted.blog.model.dto.ArticleDTO;
 import asia.rxted.blog.model.dto.PageResultDTO;
@@ -26,13 +27,13 @@ public interface ArticleService extends IService<Article> {
     TopAndFeaturedArticlesDTO listTopAndFeaturedArticles();
 
     // save
-    Boolean saveOrUpdateArticle(ArticleVO article);
+    ResultCode saveOrUpdateArticle(ArticleVO article);
 
-    Boolean softDeleteById(DeleteVO deleteVO);
     // soft delete
+    ResultCode softDeleteById(DeleteVO deleteVO);
 
     // hard delete
-    Boolean hardDeleteById(Integer id);
+    ResultCode hardDeleteById(Integer id);
 
     // query keywords, i.e. user, article, etc.
 

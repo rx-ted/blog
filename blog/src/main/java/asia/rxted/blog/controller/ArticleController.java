@@ -14,16 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import asia.rxted.blog.config.enums.FilePathEnum;
-import asia.rxted.blog.model.dto.ArchiveDTO;
-import asia.rxted.blog.model.dto.ArticleAdminDTO;
-import asia.rxted.blog.model.dto.ArticleAdminViewDTO;
 import asia.rxted.blog.model.dto.ArticleCardDTO;
 import asia.rxted.blog.model.dto.ArticleDTO;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.SearchDTO;
 import asia.rxted.blog.model.dto.TopAndFeaturedArticlesDTO;
-import asia.rxted.blog.model.vo.ArticlePasswordVO;
-import asia.rxted.blog.model.vo.ArticleTopFeaturedVO;
 import asia.rxted.blog.model.vo.ArticleVO;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.DeleteVO;
@@ -33,7 +28,6 @@ import asia.rxted.blog.config.annotation.OptLog;
 import asia.rxted.blog.modules.article.service.ArticleService;
 import asia.rxted.blog.modules.strategy.context.ArticleImportStrategyContext;
 import asia.rxted.blog.modules.strategy.context.UploadStrategyContext;
-import asia.rxted.blog.utils.UserUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -68,6 +62,7 @@ public class ArticleController {
     // 保存文章
     @OptLog(optType = SAVE_OR_UPDATE)
     @Operation(summary = "保存修改文章")
+    @PostMapping()
     public ResultMessage<?> saveArticle(@Valid @RequestBody ArticleVO articleVO) {
         return ResultVO.data(articleService.saveOrUpdateArticle(articleVO));
     }
@@ -80,7 +75,6 @@ public class ArticleController {
     }
 
     // 删除文章
-
     @Operation(summary = "获取置顶和推荐文章")
     @GetMapping("topAndFeatured")
     public ResultMessage<TopAndFeaturedArticlesDTO> listTopAndFeaturedArticles() {
@@ -128,16 +122,14 @@ public class ArticleController {
     @Operation(summary = "删除或者恢复文章")
     @PutMapping("delete")
     public ResultMessage<?> updateArticleDelete(@Valid @RequestBody DeleteVO deleteVO) {
-        articleService.softDeleteById(deleteVO);
-        return ResultVO.success();
+        return ResultVO.status(articleService.softDeleteById(deleteVO));
     }
 
     @OptLog(optType = DELETE)
     @Operation(summary = "物理删除文章")
     @DeleteMapping("delete")
     public ResultMessage<?> deleteArticles(@RequestBody Integer articleId) {
-        articleService.hardDeleteById(articleId);
-        return ResultVO.success();
+        return ResultVO.status(articleService.hardDeleteById(articleId));
     }
 
     @OptLog(optType = UPLOAD)

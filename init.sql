@@ -1,11 +1,4 @@
--- ----------------------------
--- Table structure for t_article
--- ----------------------------
-INSERT INTO
-    `t_article` (
-        `user_id`,
-        `article_title`,
-        `article_content`,
-        `create_time`
-    )
-VALUES (1, "title", "content","2022-08-19 21:42:04")
+SELECT count(1)
+FROM
+    t_user_auth ua
+    LEFT JOIN t_user_info ui ON ua.user_info_id = ui.id

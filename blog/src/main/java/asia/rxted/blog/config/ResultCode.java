@@ -81,6 +81,9 @@ public enum ResultCode {
     ARTICLE_TAG_EXISTS_DELETE_ERROR(100000, "删除失败，该标签下存在文章"),
     ARTICLE_EXPORT_FAILED_ERROR(100004, "导出文章失败"),
     ARTICLE_IMPORT_FAILED_ERROR(100004, "导入文章失败"),
+    ARTICLE_SAVE_OR_UPDATE_ERROR(100004, "插入或者更新文章失败"),
+    ARTICLE_DELETE_ERROR(100004, "删除文章失败"),
+
 
     /**
      * 邮箱代码状态
