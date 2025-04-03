@@ -1,4 +1,4 @@
-package asia.rxted.blog.modules.cache;
+package asia.rxted.blog.config.bean;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,7 +45,8 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         try {
-            RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
+            RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host,
+                    port);
             config.setDatabase(0);
             config.setDatabase(database);
             config.setPassword(password);

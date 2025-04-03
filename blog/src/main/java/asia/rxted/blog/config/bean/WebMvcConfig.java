@@ -22,8 +22,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .allowedOriginPatterns("*")
                 .allowCredentials(true)
-                .allowedMethods("*")
-                .maxAge(3600);
+                .allowedMethods("*");
     }
 
     @Override
@@ -31,11 +30,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
         // 静态资源映射
         // registry.addResourceHandler(null);
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
+        registry.addResourceHandler("/templates/**").addResourceLocations("classpath:/templates/");
         // 配置 knife4j 的静态资源请求映射地址
         registry.addResourceHandler("/doc.html")
                 .addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+        // registry.addResourceHandler("/webjars/**")
+        // .addResourceLocations("classpath:/META-INF/resources/webjars/");
 
     }
 
