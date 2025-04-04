@@ -3519,7 +3519,7 @@ VALUES (
         'https://static.linhaojun.top/avatar/2af2e2db20740e712f0a011a6f8c9af5.jpg',
         '演示账号的用户简介',
         'https://www.linhaojun.top',
-        0,
+        1,
         0,
         '2022-08-19 21:42:04',
         '2022-08-24 17:11:35'

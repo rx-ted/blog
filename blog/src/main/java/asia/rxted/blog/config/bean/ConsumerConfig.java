@@ -69,6 +69,7 @@ public class ConsumerConfig {
         List<UserInfo> users = userInfoService
                 .list(new LambdaQueryWrapper<UserInfo>().eq(UserInfo::getIsSubscribe, CommonConstant.TRUE));
         List<String> emails = users.stream().map(UserInfo::getEmail).collect(Collectors.toList());
+        log.info("subscriber name: "+emails.toString());
         for (String email : emails) {
             EmailMsgDTO emailDTO = new EmailMsgDTO();
             Map<String, Object> map = new HashMap<>();

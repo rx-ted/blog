@@ -187,7 +187,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         // 传播rabbitmq 告诉操作状态
         if (newArticle.getStatus().equals(ArticleStatusEnum.PUBLIC.code())) {
             System.out.println("will send rabbitmq");
-            rabbitTemplate.convertAndSend(RabbitMQConstant.SUBSCRIBE_EXCHANGE, "*",
+            rabbitTemplate.convertAndSend(RabbitMQConstant.SUBSCRIBE_EXCHANGE, RabbitMQConstant.SUBSCRIBE_ROUTING_KEY_NAME,
                     new Message(JSON.toJSONBytes(newArticle.getId()), new MessageProperties()));
         }
         return ResultCode.SUCCESS;
