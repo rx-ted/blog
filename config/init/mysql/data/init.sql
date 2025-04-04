@@ -2,25 +2,25 @@ SET NAMES utf8mb4;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
--- CREATE USER 'maxwell' @'%' IDENTIFIED BY 'root';
+CREATE USER 'maxwell' @'%' IDENTIFIED BY 'maxwell';
 
--- CREATE USER 'maxwell' @'localhost' IDENTIFIED BY 'root';
+CREATE USER 'maxwell' @'localhost' IDENTIFIED BY 'maxwell';
 
--- GRANT ALL ON maxwell.* TO 'maxwell' @'%';
+GRANT ALL ON maxwell.* TO 'maxwell' @'%';
 
--- GRANT ALL ON maxwell.* TO 'maxwell' @'localhost';
+GRANT ALL ON maxwell.* TO 'maxwell' @'localhost';
 
--- GRANT
--- SELECT
--- ,
---     REPLICATION CLIENT,
---     REPLICATION SLAVE ON *.* TO 'maxwell' @'%';
+GRANT
+SELECT
+,
+    REPLICATION CLIENT,
+    REPLICATION SLAVE ON *.* TO 'maxwell' @'%';
 
--- GRANT
--- SELECT
--- ,
---     REPLICATION CLIENT,
---     REPLICATION SLAVE ON *.* TO 'maxwell' @'localhost';
+GRANT
+SELECT
+,
+    REPLICATION CLIENT,
+    REPLICATION SLAVE ON *.* TO 'maxwell' @'localhost';
 
 USE blog;
 

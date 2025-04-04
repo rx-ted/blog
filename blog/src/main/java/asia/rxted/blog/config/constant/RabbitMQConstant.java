@@ -11,6 +11,7 @@ public interface RabbitMQConstant {
     String EMAIL_QUEUE = "email_queue";
 
     String EMAIL_EXCHANGE = "email_exchange";
+
     String EMAIL_ROUTING_KEY_NAME = "email.routing.key";
 
     String SUBSCRIBE_QUEUE = "subscribe_queue";
