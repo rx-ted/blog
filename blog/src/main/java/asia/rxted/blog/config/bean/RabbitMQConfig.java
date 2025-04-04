@@ -50,4 +50,22 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(emailQueue()).to(emaillExchange());
     }
 
+    /*
+     * Subscribe config
+     */
+    @Bean
+    public Queue subscribeQueue() {
+        return new Queue(RabbitMQConstant.SUBSCRIBE_QUEUE, true);
+    }
+
+    @Bean
+    public FanoutExchange subscribelExchange() {
+        return new FanoutExchange(RabbitMQConstant.SUBSCRIBE_EXCHANGE, true, false);
+    }
+
+    @Bean
+    public Binding bindingSubscribeDirect() {
+        return BindingBuilder.bind(subscribeQueue()).to(subscribelExchange());
+    }
+
 }
