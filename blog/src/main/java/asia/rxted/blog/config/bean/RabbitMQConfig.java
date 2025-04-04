@@ -18,7 +18,7 @@ public class RabbitMQConfig {
      * MAXWELL config
      */
     @Bean
-    public Queue articleQueue() {
+    public Queue maxWellQueue() {
         return new Queue(RabbitMQConstant.MAXWELL_QUEUE, true);
     }
 
@@ -29,7 +29,9 @@ public class RabbitMQConfig {
 
     @Bean
     public Binding bindingArticleDirect() {
-        return BindingBuilder.bind(articleQueue()).to(maxWellExchange());
+        return BindingBuilder
+                .bind(maxWellQueue())
+                .to(maxWellExchange());
     }
 
     /*

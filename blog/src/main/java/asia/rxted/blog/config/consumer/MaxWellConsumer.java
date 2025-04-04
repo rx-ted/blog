@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 
@@ -15,6 +16,7 @@ import asia.rxted.blog.model.dto.SearchDTO.SearchDTOBuilder;
 import asia.rxted.blog.model.entity.Article;
 import asia.rxted.blog.modules.search.service.SearchService;
 
+@Component
 @RabbitListener(queues = RabbitMQConstant.MAXWELL_QUEUE)
 public class MaxWellConsumer {
 
