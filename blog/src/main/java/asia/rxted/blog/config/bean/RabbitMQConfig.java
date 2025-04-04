@@ -4,6 +4,7 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -61,13 +62,14 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public FanoutExchange subscribelExchange() {
-        return new FanoutExchange(RabbitMQConstant.SUBSCRIBE_EXCHANGE, true, false);
+    public TopicExchange subscribelExchange() {
+        return new TopicExchange(RabbitMQConstant.SUBSCRIBE_EXCHANGE, true, false);
     }
 
     @Bean
     public Binding bindingSubscribeDirect() {
-        return BindingBuilder.bind(subscribeQueue()).to(subscribelExchange());
+        return BindingBuilder.bind(subscribeQueue()).to(subscribelExchange())
+                .with(RabbitMQConstant.SUBSCRIBE_ROUTING_KEY_NAME);
     }
 
 }

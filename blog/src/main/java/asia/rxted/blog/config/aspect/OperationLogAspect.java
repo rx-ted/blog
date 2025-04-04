@@ -4,10 +4,8 @@ import com.alibaba.fastjson.JSON;
 
 import asia.rxted.blog.config.event.OperationLogEvent;
 import asia.rxted.blog.config.log.OperationLog;
-import asia.rxted.blog.model.dto.UserDetailsDTO;
 import asia.rxted.blog.config.annotation.OptLog;
 import asia.rxted.blog.utils.IpUtil;
-import asia.rxted.blog.utils.UserUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;

@@ -3478,7 +3478,7 @@ INSERT INTO
 VALUES (
         1,
         1,
-        'admin@163.com',
+        'gjy.18sui@gmail.com',
         '$2a$10$/Z90STxVyGOIfNhTfvzbEuJ9t1yHjrkN6pBMRAqd5g5SdNIrdt5Da',
         1,
         '182.118.236.146',
@@ -3514,7 +3514,7 @@ INSERT INTO
     `t_user_info`
 VALUES (
         1,
-        'admin@163.com',
+        'gjy.18sui@gmail.com',
         '演示账号',
         'https://static.linhaojun.top/avatar/2af2e2db20740e712f0a011a6f8c9af5.jpg',
         '演示账号的用户简介',

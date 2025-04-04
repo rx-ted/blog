@@ -8,13 +8,6 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -37,18 +30,8 @@ public class UserAdminDTO {
 
     private String ipSource;
 
-    // @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    // @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    // @JsonSerialize(using = LocalDateTimeSerializer.class)
-    // @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDateTime createTime;
 
-    // @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    // @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    // @JsonSerialize(using = LocalDateTimeSerializer.class)
-    // @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDateTime lastLoginTime;
 
     private Integer isDisable;

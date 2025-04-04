@@ -1,11 +1,10 @@
-package asia.rxted.blog.config.consumer;
+package asia.rxted.blog.config.bean;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,20 +16,28 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
 import asia.rxted.blog.config.constant.CommonConstant;
 import asia.rxted.blog.config.constant.RabbitMQConstant;
+import asia.rxted.blog.config.enums.EmailSendTypeEnum;
 import asia.rxted.blog.model.dto.EmailMsgDTO;
+import asia.rxted.blog.model.dto.MaxWellDataDTO;
+import asia.rxted.blog.model.dto.SearchDTO;
+import asia.rxted.blog.model.dto.SearchDTO.SearchDTOBuilder;
 import asia.rxted.blog.model.entity.Article;
 import asia.rxted.blog.model.entity.UserInfo;
 import asia.rxted.blog.modules.article.service.ArticleService;
 import asia.rxted.blog.modules.email.service.EmailService;
+import asia.rxted.blog.modules.search.service.SearchService;
 import asia.rxted.blog.modules.user.service.SiteUserInfoService;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 @ConfigurationProperties(prefix = "website")
-@RabbitListener(queues = RabbitMQConstant.SUBSCRIBE_QUEUE)
-public class SubscribeConsumer {
-
+public class ConsumerConfig {
     @Value("${website.url}")
     private String websiteUrl;
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private ArticleService articleService;
@@ -39,10 +46,24 @@ public class SubscribeConsumer {
     private SiteUserInfoService userInfoService;
 
     @Autowired
-    private EmailService emailService;
+    private SearchService searchService;
 
-    @RabbitHandler
-    public void process(byte[] data) {
+    @RabbitListener(queues = RabbitMQConstant.EMAIL_QUEUE)
+    public void emailProcess(byte[] data) {
+        try {
+            EmailMsgDTO emailMsgDTO = JSON.parseObject(new String(data), EmailMsgDTO.class);
+            if (emailMsgDTO.getEmail() == null || emailMsgDTO.getTemplate() == null) {
+                return;
+            }
+            emailService.send(EmailSendTypeEnum.CODE, emailMsgDTO);
+        } catch (Exception e) {
+            log.error("Fail to send mail, msg: " + e);
+        }
+
+    }
+
+    @RabbitListener(queues = RabbitMQConstant.SUBSCRIBE_QUEUE)
+    public void subscribeProcess(byte[] data) {
         Integer articleId = JSON.parseObject(new String(data), Integer.class);
         Article article = articleService.getOne(new LambdaQueryWrapper<Article>().eq(Article::getId, articleId));
         List<UserInfo> users = userInfoService
@@ -63,7 +84,41 @@ public class SubscribeConsumer {
                         + "<a style=\"text-decoration:none;color:#12addb\" href=\"" + url + "\">点击查看</a>");
             }
             emailDTO.setCommentMap(map);
-            emailService.sendHtmlMail(emailDTO);
+            emailService.send(EmailSendTypeEnum.SUBSCRIBE, emailDTO);
         }
+
     }
+
+    @RabbitListener(queues = RabbitMQConstant.MAXWELL_QUEUE)
+    public void maxWellProcess(byte[] data) {
+        try {
+
+            MaxWellDataDTO maxWellDataDTO = JSON.parseObject(new String(data), MaxWellDataDTO.class);
+            Article article = JSON.parseObject(JSON.toJSONString(maxWellDataDTO.getData()), Article.class);
+            switch (maxWellDataDTO.getType()) {
+                case "insert":
+                case "update":
+                    // append or update
+                    SearchDTOBuilder search = SearchDTO.builder()
+                            .id(Integer.toString(article.getId()))
+                            .content(article.getArticleContent())
+                            .title(article.getArticleTitle())
+                            .isDelete(article.getIsDelete())
+                            .status(article.getStatus());
+                    searchService.index(search.build());
+                    break;
+                case "delete":
+                    searchService.delete(Integer.toString(article.getId()));
+                    break;
+
+                default:
+                    break;
+            }
+
+        } catch (Exception e) {
+            log.error("Fail to opearate maxwell, msg: " + e);
+        }
+
+    }
+
 }

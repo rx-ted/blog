@@ -1,7 +1,6 @@
 package asia.rxted.blog.model.entity;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
