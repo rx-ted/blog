@@ -92,6 +92,11 @@ search:
   # mode: elasticsearch
   mode: opensearch
 
+jwt:
+  secret: ThisIsASecretThisIsASecretThisIsASecretThisIsASecret #rx-ted
+  expire: 3600
+  header: Authorization
+
 opensearch:
   uris: http://localhost:9200
   username: admin

@@ -15,9 +15,11 @@ import asia.rxted.blog.config.annotation.OptLog;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.UserAdminDTO;
 import asia.rxted.blog.model.dto.UserAreaDTO;
+import asia.rxted.blog.model.dto.UserDetailsDTO;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.PasswordVO;
 import asia.rxted.blog.model.vo.UserVO;
+import asia.rxted.blog.modules.token.service.TokenService;
 import asia.rxted.blog.modules.user.service.UserAuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,6 +38,9 @@ public class UserController {
 
     @Autowired
     private UserAuthService userAuthService;
+
+    @Autowired
+    private TokenService tokenService;
 
     @AccessLimit(seconds = 60, maxCount = 1)
     @Operation(summary = "发送邮箱验证码")
@@ -81,6 +86,12 @@ public class UserController {
     @GetMapping("/logout")
     public ResultMessage<Object> logout() {
         return ResultVO.data(userAuthService.logout());
+    }
+
+    @Operation(summary = "用户创建令牌")
+    @PostMapping("/createToken")
+    public ResultMessage<String> createToken(@Valid @RequestBody UserDetailsDTO dto) {
+        return ResultVO.data(tokenService.createToken(dto));
     }
 
 }
