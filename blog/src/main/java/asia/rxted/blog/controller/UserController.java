@@ -33,8 +33,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController()
 @RequestMapping("users")
 public class UserController {
-    // @Autowired
-    // private UserServer userServer;
 
     @Autowired
     private UserAuthService userAuthService;
@@ -59,26 +57,11 @@ public class UserController {
         return ResultVO.data(userAuthService.listUsers(conditionVO));
     }
 
-    // @Operation(summary = "用户注销")
-    // @PutMapping("/update")
-    // public ResultMessage<Object> updateUser(@RequestBody UserAuthDTO user) {
-    // return userServer.updateUser(user);
-    // }
-
     @Operation(summary = "用户注册")
     @PostMapping("/register")
     public ResultMessage<Object> registerUser(@RequestBody UserVO userVO) {
         return ResultVO.success(userAuthService.register(userVO));
     }
-
-    // @Operation(summary = "用户登录")
-    // @PostMapping("/login")
-    // public ResultMessage<Token> loginUser(
-    // @NotNull(message = "用户名不能为空") @RequestParam String username,
-    // @NotNull(message = "密码不能为空") @RequestParam String password,
-    // @RequestHeader String uuid) {
-    // return userServer.login(username, password);
-    // }
 
     @Operation(summary = "修改密码")
     @PostMapping("/password")

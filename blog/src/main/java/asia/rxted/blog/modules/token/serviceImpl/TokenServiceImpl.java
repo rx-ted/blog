@@ -27,7 +27,6 @@ import asia.rxted.blog.config.base.SecretKeyUtil;
 import asia.rxted.blog.config.constant.AuthConstant;
 import asia.rxted.blog.config.constant.RedisConstant;
 import asia.rxted.blog.modules.cache.CachePrefix;
-import asia.rxted.blog.modules.cache.RedisCache;
 import asia.rxted.blog.modules.cache.service.RedisService;
 import asia.rxted.blog.modules.token.config.Token;
 import asia.rxted.blog.modules.token.service.TokenService;
@@ -45,8 +44,6 @@ public class TokenServiceImpl implements TokenService {
 
     // * token默认过期时间
     private Long expirationTime = 60L;
-    @Autowired
-    private RedisCache cache;
 
     @Autowired
     private RedisService redisService;
