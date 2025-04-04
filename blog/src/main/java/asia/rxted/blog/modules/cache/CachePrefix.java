@@ -12,16 +12,6 @@ import asia.rxted.blog.config.enums.UserRoleEnum;
  */
 public enum CachePrefix {
 
-    /*
-     * RabbitMQ
-     */
-    MAXWELL_QUEUE,
-    MAXWELL_EXCHANGE,
-    EMAIL_QUEUE,
-    EMAIL_EXCHANGE,
-    SUBSCRIBE_QUEUE,
-    SUBSCRIBE_EXCHANGE,
-
     USER_CODE_KEY,
     BLOG_VIEWS_COUNT,
     ARTICLE_VIEWS_COUNT,

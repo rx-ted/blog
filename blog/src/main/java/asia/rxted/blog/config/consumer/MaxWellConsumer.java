@@ -1,4 +1,4 @@
-package asia.rxted.blog.consumer;
+package asia.rxted.blog.config.consumer;
 
 import java.io.IOException;
 

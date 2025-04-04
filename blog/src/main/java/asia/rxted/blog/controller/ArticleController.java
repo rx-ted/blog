@@ -127,8 +127,8 @@ public class ArticleController {
 
     @OptLog(optType = DELETE)
     @Operation(summary = "物理删除文章")
-    @DeleteMapping("delete")
-    public ResultMessage<?> deleteArticles(@RequestBody Integer articleId) {
+    @DeleteMapping("delete/{articleId}")
+    public ResultMessage<?> deleteArticles(@PathVariable Integer articleId) {
         return ResultVO.status(articleService.hardDeleteById(articleId));
     }
 

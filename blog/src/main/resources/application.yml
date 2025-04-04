@@ -132,6 +132,9 @@ mybatis-plus:
 ip:
   ip2region: "/ip/ip2region.db"
 
+website:
+  url: https://rx-ted.asia
+
 # logging:
 #   level:
 #     org:

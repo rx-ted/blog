@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import asia.rxted.blog.config.constant.CommonConstant;
 import asia.rxted.blog.mapper.AboutMapper;
@@ -26,6 +27,7 @@ import asia.rxted.blog.model.dto.WebsiteConfigDTO;
 import asia.rxted.blog.model.entity.About;
 import asia.rxted.blog.model.entity.Article;
 import asia.rxted.blog.model.entity.Comment;
+import asia.rxted.blog.model.entity.UserInfo;
 import asia.rxted.blog.model.entity.WebsiteConfig;
 import asia.rxted.blog.model.vo.AboutVO;
 import asia.rxted.blog.model.vo.WebsiteConfigVO;
@@ -50,7 +52,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
-public class SiteInfoServiceImpl implements SiteUserInfoService {
+public class SiteInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
+        implements SiteUserInfoService {
 
     @Autowired
     private WebsiteConfigMapper websiteConfigMapper;
