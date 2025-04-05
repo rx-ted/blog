@@ -25,6 +25,8 @@ public class JwtConfig {
     private String secret;
     private Long expire;
     private String header;
+    private String prefix;
+    private Integer wait;
 
     public String createToken(String subject) {
         Date nowDate = new Date();

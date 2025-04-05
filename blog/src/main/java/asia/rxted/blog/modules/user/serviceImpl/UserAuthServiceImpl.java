@@ -23,7 +23,6 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.config.constant.CommonConstant;
 import asia.rxted.blog.config.constant.RabbitMQConstant;
-import asia.rxted.blog.config.constant.RedisConstant;
 import asia.rxted.blog.config.enums.LoginTypeEnum;
 import asia.rxted.blog.config.enums.RoleEnum;
 import asia.rxted.blog.config.enums.UserAreaTypeEnum;
@@ -89,7 +88,7 @@ public class UserAuthServiceImpl implements UserAuthService {
                 .build();
         rabbitTemplate.convertAndSend(RabbitMQConstant.EMAIL_EXCHANGE, "*",
                 new Message(JSON.toJSONBytes(emailDTO), new MessageProperties()));
-        redisService.set(CachePrefix.EMAIL_CODE.join(username), code, RedisConstant.CODE_EXPIRE_TIME);
+        redisService.set(CachePrefix.EMAIL_CODE.join(username), code, CommonConstant.EMAIL_EXPIRE_TIME);
         return ResultCode.SUCCESS;
     }
 

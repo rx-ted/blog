@@ -9,8 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import asia.rxted.blog.model.dto.UserDetailsDTO;
-import asia.rxted.blog.config.constant.AuthConstant;
-import asia.rxted.blog.config.constant.RedisConstant;
+import asia.rxted.blog.modules.cache.CachePrefix;
 import asia.rxted.blog.modules.cache.service.RedisService;
 import asia.rxted.blog.modules.token.config.JwtConfig;
 import asia.rxted.blog.modules.token.service.TokenService;
@@ -28,43 +27,49 @@ public class TokenServiceImpl implements TokenService {
     private RedisService redisService;
 
     @Override
+    public String createToken(String subject) {
+        return jwtConfig.createToken(subject);
+    }
+
+    @Override
     public String createToken(UserDetailsDTO userDetailsDTO) {
         refreshToken(userDetailsDTO);
         String userId = userDetailsDTO.getId().toString();
-        return jwtConfig.createToken(userId);
+        return createToken(userId);
     }
 
     @Override
     public void refreshToken(UserDetailsDTO userDetailsDTO) {
         LocalDateTime currentTime = LocalDateTime.now();
-        userDetailsDTO.setExpireTime(currentTime.plusSeconds(AuthConstant.EXPIRE_TIME));
+        userDetailsDTO.setExpireTime(currentTime.plusSeconds(jwtConfig.getExpire()));
         String userId = userDetailsDTO.getId().toString();
-        redisService.hSet(RedisConstant.LOGIN_USER, userId, userDetailsDTO, AuthConstant.EXPIRE_TIME);
+        redisService.hSet(CachePrefix.LOGIN_USER.getPrefix(), userId, userDetailsDTO, jwtConfig.getExpire());
     }
 
     @Override
     public void renewToken(UserDetailsDTO userDetailsDTO) {
         LocalDateTime expireTime = userDetailsDTO.getExpireTime();
         LocalDateTime currentTime = LocalDateTime.now();
-        if (Duration.between(currentTime, expireTime).toMinutes() <= AuthConstant.TWENTY_MINUTES) {
+        if (Duration.between(currentTime, expireTime).toMinutes() <= jwtConfig.getWait()) {
             refreshToken(userDetailsDTO);
         }
     }
 
     @Override
     public UserDetailsDTO getUserDetailDTO(HttpServletRequest request) {
-        String token = Optional.ofNullable(request.getHeader(AuthConstant.TOKEN_HEADER)).orElse("")
-                .replaceFirst(AuthConstant.TOKEN_PREFIX, "");
+        String token = Optional.ofNullable(request.getHeader(jwtConfig.getHeader())).orElse("")
+                .replaceFirst(jwtConfig.getPrefix(), "");
         if (StringUtils.hasText(token) && !token.equals("null")) {
             String userId = jwtConfig.getUserIdFromToken(token);
-            return (UserDetailsDTO) redisService.hGet(RedisConstant.LOGIN_USER, userId);
+            return (UserDetailsDTO) redisService.hGet(
+                    CachePrefix.LOGIN_USER.name(), userId);
         }
         return null;
     }
 
     @Override
     public void delLoginUser(Integer userId) {
-        redisService.hDel(RedisConstant.LOGIN_USER, String.valueOf(userId));
+        redisService.hDel(CachePrefix.LOGIN_USER.getPrefix(), String.valueOf(userId));
 
     }
 

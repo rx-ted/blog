@@ -96,6 +96,8 @@ jwt:
   secret: ThisIsASecretThisIsASecretThisIsASecretThisIsASecret #rx-ted
   expire: 3600
   header: Authorization
+  prefix: Bearer
+  wait: 20
 
 opensearch:
   uris: http://localhost:9200

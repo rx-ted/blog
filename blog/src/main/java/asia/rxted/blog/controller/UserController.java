@@ -5,6 +5,10 @@ import static asia.rxted.blog.config.constant.OptTypeConstant.UPDATE;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,12 +28,8 @@ import asia.rxted.blog.modules.user.service.UserAuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "用户管理", description = "用户管理相关API")
 @RestController()
@@ -41,6 +41,9 @@ public class UserController {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    HttpServletRequest request;
 
     @AccessLimit(seconds = 60, maxCount = 1)
     @Operation(summary = "发送邮箱验证码")
@@ -92,6 +95,12 @@ public class UserController {
     @PostMapping("/createToken")
     public ResultMessage<String> createToken(@Valid @RequestBody UserDetailsDTO dto) {
         return ResultVO.data(tokenService.createToken(dto));
+    }
+
+    @Operation(summary = "用户令牌信息")
+    @GetMapping("/getUserDetail")
+    public ResultMessage<UserDetailsDTO> getUserDetailDTO() {
+        return ResultVO.data(tokenService.getUserDetailDTO(request));
     }
 
 }

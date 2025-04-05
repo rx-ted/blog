@@ -42,4 +42,6 @@ public interface CommonConstant {
 
     String MENTION_REMIND = "@提醒";
 
+    Long EMAIL_EXPIRE_TIME = 900L; // 15 minutes
+
 }
