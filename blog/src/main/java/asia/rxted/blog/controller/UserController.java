@@ -107,7 +107,7 @@ public class UserController {
     @Operation(summary = "用户登录")
     @PostMapping("/login")
     public ResultMessage<?> login(@RequestBody UserLoginVO dto) {
-        return ResultVO.data(userAuthService.login(dto));
+        return userAuthService.login(dto);
     }
 
 }

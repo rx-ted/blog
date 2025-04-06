@@ -63,7 +63,7 @@ public class JwtConfig {
         return getTokenClaim(token).getExpiration();
     }
 
-    public String getUserIdFromToken(String token) {
+    public String getUserNameFromToken(String token) {
         return getTokenClaim(token).getSubject();
     }
 

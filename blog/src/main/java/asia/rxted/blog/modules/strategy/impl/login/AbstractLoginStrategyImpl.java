@@ -31,11 +31,11 @@ public abstract class AbstractLoginStrategyImpl implements LoginStrategy {
     public ResultMessage<UserInfoDTO> login(String data) {
         ResultMessage<UserDetailsDTO> result = getUserDetailsDTO(data, request);
         if (!result.getCode().equals(200)) {
-            ResultVO.error(result.getCode(), result.getMsg());
+            return ResultVO.error(result.getCode(), result.getMsg());
         }
         UserDetailsDTO userDetailsDTO = result.getData();
         if (userDetailsDTO.getIsDisable().equals(CommonConstant.TRUE)) {
-            ResultVO.error(ResultCode.USER_IS_LOCKED);
+            return ResultVO.error(ResultCode.USER_IS_LOCKED);
         }
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetailsDTO, null,
                 userDetailsDTO.getAuthorities());

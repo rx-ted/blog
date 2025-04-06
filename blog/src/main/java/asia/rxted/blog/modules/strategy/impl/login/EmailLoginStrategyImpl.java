@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
@@ -36,23 +38,26 @@ public class EmailLoginStrategyImpl extends AbstractLoginStrategyImpl {
     @Autowired
     private UserDetailServiceImpl userDetailsService;
 
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @Override
     public ResultMessage<UserDetailsDTO> getUserDetailsDTO(String data, HttpServletRequest request) {
         EmailLoginVO emailLoginVO = JSON.parseObject(data, EmailLoginVO.class);
         UserInfo userInfo = userInfoMapper.selectOne(new LambdaQueryWrapper<UserInfo>()
                 .eq(UserInfo::getEmail, emailLoginVO.getUsername()));
         if (Objects.isNull(userInfo)) {
-            return ResultVO.status(ResultCode.USER_NOT_EXIST);
+            return ResultVO.error(ResultCode.USER_NOT_EXIST);
         }
-
-        LambdaQueryWrapper<UserAuth> wrapper = new LambdaQueryWrapper<UserAuth>()
-                .eq(UserAuth::getUserInfoId, userInfo.getId())
-                .eq(UserAuth::getPassword, emailLoginVO.getPassword());
-        UserAuth result = userAuthMapper.selectOne(wrapper);
+        UserAuth result = userAuthMapper.selectOne(
+                new LambdaQueryWrapper<UserAuth>()
+                        .eq(UserAuth::getUserInfoId, userInfo.getId()));
         if (result == null) {
-            return ResultVO.status(ResultCode.PASSWORD_ERROR);
+            return ResultVO.error(ResultCode.USER_CONNECT_LOGIN_ERROR);
         }
 
+        if (!passwordEncoder.matches(emailLoginVO.getPassword(), result.getPassword())) {
+            return ResultVO.error(ResultCode.USER_PASSWORD_ERROR);
+        }
         String ipAddress = IpUtil.getIpAddress(request);
         String ipSource = IpUtil.getIpSource(ipAddress);
 

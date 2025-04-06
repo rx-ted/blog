@@ -178,7 +178,7 @@ public class SiteInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
     @Override
     public WebsiteConfigDTO getWebsiteConfig() {
         WebsiteConfigDTO websiteConfigDTO;
-        Object websiteConfig = redisService.get(CachePrefix.WEBSITE_CONFIG.getPrefix());
+        Object websiteConfig = redisService.get(CachePrefix.WEBSITE_CONFIG.name());
         if (Objects.nonNull(websiteConfig)) {
             websiteConfigDTO = JSON.parseObject(websiteConfig.toString(), WebsiteConfigDTO.class);
         } else {

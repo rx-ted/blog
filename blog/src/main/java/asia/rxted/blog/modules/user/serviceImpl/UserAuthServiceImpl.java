@@ -14,6 +14,7 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +22,6 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import com.google.common.base.Strings;
 
 import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.config.ResultMessage;
@@ -38,7 +38,6 @@ import asia.rxted.blog.model.dto.EmailMsgDTO;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.UserAdminDTO;
 import asia.rxted.blog.model.dto.UserAreaDTO;
-import asia.rxted.blog.model.dto.UserDetailsDTO;
 import asia.rxted.blog.model.dto.UserInfoDTO;
 import asia.rxted.blog.model.dto.UserRole;
 import asia.rxted.blog.model.entity.UserAuth;
@@ -85,6 +84,8 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Autowired
     private LoginStrategyContext loginStrategyContext;
+
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public ResultCode sendCode(String username) {
@@ -140,30 +141,32 @@ public class UserAuthServiceImpl implements UserAuthService {
             return ResultCode.EMAIL_FORMAT_ERROR;
         }
         var code = canRegisterUsername(emailVO);
+        System.out.println(code.message());
         if (code != ResultCode.SUCCESS) {
             return code;
         }
-        UserInfo userInfo = UserInfo.builder()
-                .username("UK" + UUID.randomUUID().toString().replaceAll("-", ""))
-                .email(emailVO.getUsername())
-                .nickname(CommonConstant.DEFAULT_NICKNAME + IdWorker.getId())
-                .avatar(siteUserInfoService.getWebsiteConfig().getUserAvatar())
-                .build();
-        UserRole userRole = UserRole.builder()
-                .userId(userInfo.getId())
-                .roleId(RoleEnum.USER.getRoleId())
-                .build();
-        UserAuth userAuth = UserAuth.builder()
-                .userInfoId(userInfo.getId())
-                .password(BCrypt.hashpw(emailVO.getPassword(), BCrypt.gensalt()))
-                .loginType(LoginTypeEnum.EMAIL.getType())
-                .build();
         try {
+            UserInfo userInfo = UserInfo.builder()
+                    .username("UK_" + UUID.randomUUID().toString().replaceAll("-", ""))
+                    .email(emailVO.getUsername())
+                    .nickname(CommonConstant.DEFAULT_NICKNAME + IdWorker.getId())
+                    .avatar(siteUserInfoService.getWebsiteConfig().getUserAvatar())
+                    .build();
             userInfoMapper.insert(userInfo);
+            UserRole userRole = UserRole.builder()
+                    .userId(userInfo.getId())
+                    .roleId(RoleEnum.USER.getRoleId())
+                    .build();
             userRoleMapper.insert(userRole);
+            UserAuth userAuth = UserAuth.builder()
+                    .userInfoId(userInfo.getId())
+                    .password(passwordEncoder.encode(emailVO.getPassword()))
+                    .loginType(LoginTypeEnum.EMAIL.getType())
+                    .build();
             userAuthMapper.insert(userAuth);
             return ResultCode.SUCCESS;
         } catch (Exception e) {
+            System.out.println(e);
             return ResultCode.USER_REGISTER_ERROR;
         }
 
@@ -186,7 +189,7 @@ public class UserAuthServiceImpl implements UserAuthService {
             UserInfo userInfo = result.getData();
             userAuthMapper.update(new UserAuth(), new LambdaUpdateWrapper<UserAuth>()
                     .set(UserAuth::getUpdateTime, LocalDateTime.now())
-                    .set(UserAuth::getPassword, BCrypt.hashpw(emailVO.getPassword(), BCrypt.gensalt()))
+                    .set(UserAuth::getPassword, passwordEncoder.encode(emailVO.getPassword()))
                     .eq(UserAuth::getUserInfoId, userInfo.getId()));
             return ResultCode.SUCCESS;
         } else {
@@ -224,7 +227,8 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     public ResultCode logout() {
-        tokenService.delLoginUser(UserUtil.getUserDetailsDTO().getId());
+        String username = UserUtil.getUserDetailsDTO().getUsername();
+        tokenService.delLoginUser(username);
         return ResultCode.SUCCESS;
     }
 
@@ -232,10 +236,10 @@ public class UserAuthServiceImpl implements UserAuthService {
         UserInfo userInfo = userInfoMapper.selectOne(
                 new LambdaQueryWrapper<UserInfo>()
                         .eq(UserInfo::getEmail, emailVO.getUsername()));
-        if (userInfo != null) {
-            return ResultCode.USER_EXIST;
+        if (Objects.isNull(userInfo)) {
+            return ResultCode.SUCCESS;
         }
-        return ResultCode.SUCCESS;
+        return ResultCode.USER_EXIST;
     }
 
     private ResultMessage<UserInfo> checkUser(EmailVO user) {

@@ -34,16 +34,16 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public String createToken(UserDetailsDTO userDetailsDTO) {
         refreshToken(userDetailsDTO);
-        String userId = userDetailsDTO.getId().toString();
-        return createToken(userId);
+        String username = userDetailsDTO.getUsername();
+        return createToken(username);
     }
 
     @Override
     public void refreshToken(UserDetailsDTO userDetailsDTO) {
         LocalDateTime currentTime = LocalDateTime.now();
         userDetailsDTO.setExpireTime(currentTime.plusSeconds(jwtConfig.getExpire()));
-        String userId = userDetailsDTO.getId().toString();
-        redisService.hSet(CachePrefix.LOGIN_USER.getPrefix(), userId, userDetailsDTO, jwtConfig.getExpire());
+        String username = userDetailsDTO.getUsername();
+        redisService.hSet(CachePrefix.LOGIN_USER.name(), username, userDetailsDTO, jwtConfig.getExpire());
     }
 
     @Override
@@ -60,16 +60,16 @@ public class TokenServiceImpl implements TokenService {
         String token = Optional.ofNullable(request.getHeader(jwtConfig.getHeader())).orElse("")
                 .replaceFirst(jwtConfig.getPrefix(), "");
         if (StringUtils.hasText(token) && !token.equals("null")) {
-            String userId = jwtConfig.getUserIdFromToken(token);
+            String useraname = jwtConfig.getUserNameFromToken(token);
             return (UserDetailsDTO) redisService.hGet(
-                    CachePrefix.LOGIN_USER.name(), userId);
+                    CachePrefix.LOGIN_USER.name(), useraname);
         }
         return null;
     }
 
     @Override
-    public void delLoginUser(Integer userId) {
-        redisService.hDel(CachePrefix.LOGIN_USER.getPrefix(), String.valueOf(userId));
+    public void delLoginUser(String username) {
+        redisService.hDel(CachePrefix.LOGIN_USER.name(), username);
 
     }
 

@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public interface TokenService {
 
-
     String createToken(String subject);
 
     String createToken(UserDetailsDTO userDetailsDTO);
@@ -18,6 +17,6 @@ public interface TokenService {
 
     UserDetailsDTO getUserDetailDTO(HttpServletRequest request);
 
-    void delLoginUser(Integer userId);
+    void delLoginUser(String username);
 
 }
