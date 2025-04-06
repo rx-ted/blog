@@ -16,7 +16,7 @@ import java.util.Map;
 public class SearchStrategyContext {
 
     @Value("${search.mode}")
-    private String searchMode= "opensearch";
+    private String searchMode;
 
     @Autowired
     private Map<String, SearchStrategy> searchStrategyMap;

@@ -62,7 +62,7 @@ public class ResultVO<T> {
     }
 
     public static RuntimeException fail(ResultCode code) {
-        throw new ServiceException(code);
+        throw new IllegalArgumentException(code.message());
     }
 
     public static <T> ResultMessage<T> status(ResultCode code) {

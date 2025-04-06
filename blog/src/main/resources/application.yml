@@ -89,7 +89,8 @@ openapi:
 #     name: "logging.log"
 
 search:
-  # mode: elasticsearch
+  # only select one
+  # mode: mysql
   mode: opensearch
 
 jwt:

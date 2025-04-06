@@ -22,7 +22,8 @@ import asia.rxted.blog.model.dto.UserAreaDTO;
 import asia.rxted.blog.model.dto.UserDetailsDTO;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.PasswordVO;
-import asia.rxted.blog.model.vo.UserVO;
+import asia.rxted.blog.model.vo.UserLoginVO;
+import asia.rxted.blog.model.vo.EmailVO;
 import asia.rxted.blog.modules.token.service.TokenService;
 import asia.rxted.blog.modules.user.service.UserAuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -67,13 +68,13 @@ public class UserController {
 
     @Operation(summary = "用户注册")
     @PostMapping("/register")
-    public ResultMessage<Object> registerUser(@RequestBody UserVO userVO) {
+    public ResultMessage<Object> registerUser(@RequestBody EmailVO userVO) {
         return ResultVO.success(userAuthService.register(userVO));
     }
 
     @Operation(summary = "修改密码")
     @PostMapping("/password")
-    public ResultMessage<Object> ForgetPassword(@Valid @RequestBody UserVO userVO) {
+    public ResultMessage<Object> ForgetPassword(@Valid @RequestBody EmailVO userVO) {
         return ResultVO.data(userAuthService.updatePassword(userVO));
     }
 
@@ -101,6 +102,12 @@ public class UserController {
     @GetMapping("/getUserDetail")
     public ResultMessage<UserDetailsDTO> getUserDetailDTO() {
         return ResultVO.data(tokenService.getUserDetailDTO(request));
+    }
+
+    @Operation(summary = "用户登录")
+    @PostMapping("/login")
+    public ResultMessage<?> login(@RequestBody UserLoginVO dto) {
+        return ResultVO.data(userAuthService.login(dto));
     }
 
 }

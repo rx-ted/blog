@@ -13,7 +13,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -23,9 +22,13 @@ public class UserInfo {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    private String email;
+    private String username;
 
     private String nickname;
+
+    private String email;
+
+    private String phone;
 
     private String avatar;
 
@@ -42,4 +45,6 @@ public class UserInfo {
 
     @TableField(fill = FieldFill.UPDATE)
     private LocalDateTime updateTime;
+
+    
 }

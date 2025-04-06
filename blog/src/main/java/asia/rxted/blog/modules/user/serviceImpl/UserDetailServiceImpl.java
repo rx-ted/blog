@@ -46,13 +46,22 @@ public class UserDetailServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (StringUtils.isBlank(username)) {
             ResultVO.fail(ResultCode.USER_NOT_EMPTY);
+            return null;
+        }
+        UserInfo userInfo = userInfoMapper.selectOne(
+                new LambdaQueryWrapper<UserInfo>()
+                        .eq(UserInfo::getUsername, username));
+        if (userInfo == null) {
+            ResultVO.fail(ResultCode.USER_NOT_EXIST);
+            return null;
         }
         UserAuth userAuth = userAuthMapper.selectOne(new LambdaQueryWrapper<UserAuth>()
-                .select(UserAuth::getId, UserAuth::getUserInfoId, UserAuth::getUsername, UserAuth::getPassword,
+                .select(UserAuth::getId, UserAuth::getUserInfoId, UserAuth::getPassword,
                         UserAuth::getLoginType)
-                .eq(UserAuth::getUsername, username));
+                .eq(UserAuth::getUserInfoId, userInfo.getId()));
         if (Objects.isNull(userAuth)) {
-            ResultVO.fail(ResultCode.USER_NOT_EXIST);
+            ResultVO.fail(ResultCode.USER_CONNECT_LOGIN_ERROR);
+            return null;
         }
         return convertUserDetail(userAuth, request);
     }
@@ -67,8 +76,9 @@ public class UserDetailServiceImpl implements UserDetailsService {
                 .id(user.getId())
                 .loginType(user.getLoginType())
                 .userInfoId(userInfo.getId())
-                .username(user.getUsername())
+                .username(userInfo.getUsername())
                 .password(user.getPassword())
+                .phone(userInfo.getPhone())
                 .email(userInfo.getEmail())
                 .roles(roles)
                 .nickname(userInfo.getNickname())

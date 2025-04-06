@@ -24,235 +24,6 @@ SELECT
 
 USE blog;
 
-drop TABLE if EXISTS `Articles`;
-
-CREATE TABLE `Articles` (
-    id INT AUTO_INCREMENT NOT null PRIMARY KEY,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    is_origin BOOLEAN DEFAULT TRUE,
-    title VARCHAR(255) NOT NULL,
-    author VARCHAR(100),
-    tags VARCHAR(255),
-    content TEXT NOT NULL,
-    description TEXT
-);
-
-drop TABLE if EXISTS `NavMenus`;
-
-CREATE TABLE `NavMenus` (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    parent_id INT DEFAULT 0,
-    name VARCHAR(32) NOT NULL,
-    url VARCHAR(255),
-    grade INT,
-    sort INT
-);
-
-drop TABLE if EXISTS `Users`;
-
-CREATE TABLE `Users` (
-    `id` bigint AUTO_INCREMENT NOT NULL COMMENT 'ID',
-    `username` varchar(32) NOT NULL COMMENT '用户名',
-    `nick_name` varchar(20) NULL DEFAULT NULL COMMENT '昵称',
-    `phone` varchar(100) NULL DEFAULT NULL UNIQUE COMMENT '手机号码',
-    `avatar` varchar(1000) NULL DEFAULT NULL COMMENT '用户头像',
-    `email` varchar(100) NULL DEFAULT NULL UNIQUE COMMENT '邮件',
-    `password` varchar(255) NULL DEFAULT NULL COMMENT '密码',
-    `is_super` BOOLEAN NOT NULL DEFAULT FALSE COMMENT '是否是超级管理员 超级管理员/普通管理员',
-    `status` BOOLEAN NOT NULL DEFAULT TRUE COMMENT '状态 默认true正常 false禁用',
-    `role` VARCHAR(10) NOT NULL DEFAULT "ADMIN" COMMENT '角色ID',
-    `description` varchar(255) NULL DEFAULT NULL COMMENT '备注',
-    `sex` varchar(10) NULL DEFAULT NULL COMMENT '性别',
-    `access_token` VARCHAR(255) NULL DEFAULT NULL COMMENT '访问令牌',
-    `refresh_token` VARCHAR(255) NULL DEFAULT NULL COMMENT '刷新令牌',
-    `create_by` varchar(255) NULL DEFAULT 'admin' COMMENT '创建者',
-    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `delete_flag` BOOLEAN NULL DEFAULT NULL COMMENT '删除标志 true/false 删除/未删除',
-    `update_by` varchar(255) NULL DEFAULT 'admin' COMMENT '更新者',
-    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`) USING BTREE,
-    UNIQUE INDEX `UK_sh2dyl78jk1vxtlyohwr5wht9` (`username` ASC) USING BTREE
-);
-
-INSERT INTO
-    Articles (
-        title,
-        author,
-        tags,
-        content,
-        description
-    )
-VALUES (
-        "title1",
-        "Ben",
-        "tag1,tag2,tag3",
-        "content11111",
-        "content_description"
-    );
-
-INSERT INTO
-    Articles (
-        title,
-        author,
-        tags,
-        content,
-        description
-    )
-VALUES (
-        "title111",
-        "Ben111",
-        "tag1,tag2111,tag3",
-        "content1222",
-        "content_des123"
-    );
-
-INSERT INTO
-    NavMenus (
-        parent_id,
-        name,
-        url,
-        grade,
-        sort
-    )
-VALUES (0, 'Index', '/index', 1, 1);
-
-INSERT INTO
-    NavMenus (
-        parent_id,
-        name,
-        url,
-        grade,
-        sort
-    )
-VALUES (0, 'Tags', '/tags', 1, 2);
-
-INSERT INTO
-    NavMenus (
-        parent_id,
-        name,
-        url,
-        grade,
-        sort
-    )
-VALUES (0, 'Editor', '/editor', 1, 3);
-
-INSERT INTO
-    NavMenus (parent_id, name, grade, sort)
-VALUES (0, 'Work', 1, 4);
-
-INSERT INTO
-    NavMenus (
-        parent_id,
-        name,
-        url,
-        grade,
-        sort
-    )
-VALUES (
-        4,
-        'PictureBed',
-        'https://example.com',
-        2,
-        1
-    );
-
-INSERT INTO
-    NavMenus (
-        parent_id,
-        name,
-        url,
-        grade,
-        sort
-    )
-VALUES (
-        4,
-        'ChatGPT',
-        'https://example.com',
-        2,
-        2
-    );
-
-INSERT INTO
-    NavMenus (
-        parent_id,
-        name,
-        url,
-        grade,
-        sort
-    )
-VALUES (0, 'About', '/about', 1, 5);
-
-INSERT INTO
-    `Users` (
-        username,
-        email,
-        password,
-        phone
-    )
-VALUES (
-        "rx",
-        "1552488649@qq.com",
-        "123456",
-        "18812345611"
-    );
-
-INSERT INTO
-    `Users` (
-        username,
-        email,
-        password,
-        phone
-    )
-VALUES (
-        "rx1",
-        "155123456@qq.com",
-        "123456",
-        "188888888"
-    );
-
-INSERT INTO
-    `Users` (
-        username,
-        email,
-        password,
-        phone
-    )
-VALUES (
-        "rx2",
-        "15512345@qq.com",
-        "123456",
-        "188888888123"
-    );
-
-INSERT INTO
-    `Users` (
-        username,
-        email,
-        password,
-        phone
-    )
-VALUES (
-        "rx3",
-        "155445566@qq.com",
-        "123456",
-        "188881234"
-    );
-
-INSERT INTO
-    `Users` (
-        username,
-        email,
-        password,
-        phone
-    )
-VALUES (
-        "rx4",
-        "15577777777@qq.com",
-        "123456",
-        "1877777777"
-    );
-
 SET NAMES utf8mb4;
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -3457,8 +3228,7 @@ DROP TABLE IF EXISTS `t_user_auth`;
 
 CREATE TABLE `t_user_auth` (
     `id` int NOT NULL AUTO_INCREMENT,
-    `user_info_id` int NOT NULL COMMENT '用户信息id',
-    `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户名',
+    `user_info_id` INT NOT NULL COMMENT '用户信息id',
     `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '密码',
     `login_type` tinyint(1) NOT NULL COMMENT '登录类型',
     `ip_address` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户登录ip',
@@ -3466,8 +3236,7 @@ CREATE TABLE `t_user_auth` (
     `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `last_login_time` datetime NULL DEFAULT NULL COMMENT '上次登录时间',
-    PRIMARY KEY (`id`) USING BTREE,
-    UNIQUE INDEX `username` (`username` ASC) USING BTREE
+    PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1014 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -3478,8 +3247,7 @@ INSERT INTO
 VALUES (
         1,
         1,
-        'gjy.18sui@gmail.com',
-        '$2a$10$/Z90STxVyGOIfNhTfvzbEuJ9t1yHjrkN6pBMRAqd5g5SdNIrdt5Da',
+        '123456',
         1,
         '182.118.236.146',
         '中国|河南省|洛阳市|联通',
@@ -3495,15 +3263,18 @@ DROP TABLE IF EXISTS `t_user_info`;
 
 CREATE TABLE `t_user_info` (
     `id` int NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-    `email` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '邮箱号',
+    `username` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户名',
     `nickname` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户昵称',
-    `avatar` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '用户头像',
+    `email` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '邮箱号',
+    `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '手机号码',
+    `avatar` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'url://avatar.jpg' COMMENT '用户头像',
     `intro` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户简介',
     `website` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '个人网站',
     `is_subscribe` tinyint(1) NULL DEFAULT NULL COMMENT '是否订阅',
     `is_disable` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否禁用',
     `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    UNIQUE INDEX `UK_sh2dyl78jk1vxtlyohwr5wht9` (`username` ASC) USING BTREE,
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1024 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
@@ -3514,11 +3285,13 @@ INSERT INTO
     `t_user_info`
 VALUES (
         1,
-        'gjy.18sui@gmail.com',
+        'UK_admin',
         '演示账号',
+        'gjy.18sui@gmail.com',
+        '18888888888',
         'https://static.linhaojun.top/avatar/2af2e2db20740e712f0a011a6f8c9af5.jpg',
         '演示账号的用户简介',
-        'https://www.linhaojun.top',
+        'https://www.rx-ted.asia',
         1,
         0,
         '2022-08-19 21:42:04',

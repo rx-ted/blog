@@ -1,4 +1,4 @@
-package asia.rxted.blog.modules.strategy.serviceImpl;
+package asia.rxted.blog.modules.strategy.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

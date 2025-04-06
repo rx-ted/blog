@@ -1,10 +1,12 @@
 package asia.rxted.blog.modules.user.serviceImpl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.amqp.core.Message;
@@ -19,8 +21,11 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.google.common.base.Strings;
 
 import asia.rxted.blog.config.ResultCode;
+import asia.rxted.blog.config.ResultMessage;
+import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.config.constant.CommonConstant;
 import asia.rxted.blog.config.constant.RabbitMQConstant;
 import asia.rxted.blog.config.enums.LoginTypeEnum;
@@ -33,22 +38,28 @@ import asia.rxted.blog.model.dto.EmailMsgDTO;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.UserAdminDTO;
 import asia.rxted.blog.model.dto.UserAreaDTO;
+import asia.rxted.blog.model.dto.UserDetailsDTO;
+import asia.rxted.blog.model.dto.UserInfoDTO;
 import asia.rxted.blog.model.dto.UserRole;
 import asia.rxted.blog.model.entity.UserAuth;
 import asia.rxted.blog.model.entity.UserInfo;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.PasswordVO;
-import asia.rxted.blog.model.vo.UserVO;
+import asia.rxted.blog.model.vo.UserLoginVO;
+import asia.rxted.blog.model.vo.EmailVO;
 import asia.rxted.blog.modules.cache.CachePrefix;
 import asia.rxted.blog.modules.cache.service.RedisService;
+import asia.rxted.blog.modules.strategy.context.LoginStrategyContext;
 import asia.rxted.blog.modules.token.service.TokenService;
 import asia.rxted.blog.modules.user.service.SiteUserInfoService;
 import asia.rxted.blog.modules.user.service.UserAuthService;
 import asia.rxted.blog.utils.CommonUtil;
 import asia.rxted.blog.utils.PageUtil;
 import asia.rxted.blog.utils.UserUtil;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class UserAuthServiceImpl implements UserAuthService {
 
     @Autowired
@@ -71,6 +82,9 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private LoginStrategyContext loginStrategyContext;
 
     @Override
     public ResultCode sendCode(String username) {
@@ -121,45 +135,64 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResultCode register(UserVO userVO) {
-        if (!CommonUtil.checkEmail(userVO.getUsername())) {
+    public ResultCode register(EmailVO emailVO) {
+        if (!CommonUtil.checkEmail(emailVO.getUsername())) {
             return ResultCode.EMAIL_FORMAT_ERROR;
         }
-        var code = checkUser(userVO);
+        var code = canRegisterUsername(emailVO);
         if (code != ResultCode.SUCCESS) {
             return code;
         }
         UserInfo userInfo = UserInfo.builder()
-                .email(userVO.getUsername())
+                .username("UK" + UUID.randomUUID().toString().replaceAll("-", ""))
+                .email(emailVO.getUsername())
                 .nickname(CommonConstant.DEFAULT_NICKNAME + IdWorker.getId())
                 .avatar(siteUserInfoService.getWebsiteConfig().getUserAvatar())
                 .build();
-        userInfoMapper.insert(userInfo);
         UserRole userRole = UserRole.builder()
                 .userId(userInfo.getId())
                 .roleId(RoleEnum.USER.getRoleId())
                 .build();
-        userRoleMapper.insert(userRole);
         UserAuth userAuth = UserAuth.builder()
                 .userInfoId(userInfo.getId())
-                .username(userVO.getUsername())
-                .password(BCrypt.hashpw(userVO.getPassword(), BCrypt.gensalt()))
+                .password(BCrypt.hashpw(emailVO.getPassword(), BCrypt.gensalt()))
                 .loginType(LoginTypeEnum.EMAIL.getType())
                 .build();
-        userAuthMapper.insert(userAuth);
-        return ResultCode.SUCCESS;
+        try {
+            userInfoMapper.insert(userInfo);
+            userRoleMapper.insert(userRole);
+            userAuthMapper.insert(userAuth);
+            return ResultCode.SUCCESS;
+        } catch (Exception e) {
+            return ResultCode.USER_REGISTER_ERROR;
+        }
+
     }
 
     @Override
-    public ResultCode updatePassword(UserVO userVO) {
-        var code = checkUser(userVO);
-        if (code != ResultCode.SUCCESS) {
-            return code;
+    public ResultCode updatePassword(EmailVO emailVO) {
+        var code = redisService.get(
+                CachePrefix.EMAIL_CODE.join(
+                        emailVO.getUsername()));
+
+        if (Objects.isNull(code)) {
+            return ResultCode.VERIFICATION_CODE_INVALID;
+
+        } else if (code.toString().equals(emailVO.getCode())) {
+            var result = checkUser(emailVO);
+            if (!result.getCode().equals(200)) {
+                return ResultCode.USER_EDIT_ERROR;
+            }
+            UserInfo userInfo = result.getData();
+            userAuthMapper.update(new UserAuth(), new LambdaUpdateWrapper<UserAuth>()
+                    .set(UserAuth::getUpdateTime, LocalDateTime.now())
+                    .set(UserAuth::getPassword, BCrypt.hashpw(emailVO.getPassword(), BCrypt.gensalt()))
+                    .eq(UserAuth::getUserInfoId, userInfo.getId()));
+            return ResultCode.SUCCESS;
+        } else {
+            return ResultCode.VERIFICATION_ERROR;
         }
-        userAuthMapper.update(new UserAuth(), new LambdaUpdateWrapper<UserAuth>()
-                .set(UserAuth::getPassword, BCrypt.hashpw(userVO.getPassword(), BCrypt.gensalt()))
-                .eq(UserAuth::getUsername, userVO.getUsername()));
-        return ResultCode.SUCCESS;
+
     }
 
     @Override
@@ -195,14 +228,36 @@ public class UserAuthServiceImpl implements UserAuthService {
         return ResultCode.SUCCESS;
     }
 
-    private ResultCode checkUser(UserVO user) {
-        if (!user.getCode().equals(redisService.get(CachePrefix.EMAIL_CODE.join(user.getUsername())))) {
-            return ResultCode.VERIFICATION_ERROR;
+    private ResultCode canRegisterUsername(EmailVO emailVO) {
+        UserInfo userInfo = userInfoMapper.selectOne(
+                new LambdaQueryWrapper<UserInfo>()
+                        .eq(UserInfo::getEmail, emailVO.getUsername()));
+        if (userInfo != null) {
+            return ResultCode.USER_EXIST;
         }
-        UserAuth userAuth = userAuthMapper.selectOne(new LambdaQueryWrapper<UserAuth>()
-                .select(UserAuth::getUsername)
-                .eq(UserAuth::getUsername, user.getUsername()));
-        return Objects.nonNull(userAuth) ? ResultCode.SUCCESS : ResultCode.USER_NOT_EXIST;
+        return ResultCode.SUCCESS;
+    }
+
+    private ResultMessage<UserInfo> checkUser(EmailVO user) {
+        UserInfo userInfo = userInfoMapper.selectOne(
+                new LambdaQueryWrapper<UserInfo>()
+                        .eq(UserInfo::getEmail, user.getUsername()));
+        if (userInfo == null) {
+            return ResultVO.error(ResultCode.USER_NOT_EXIST);
+        }
+        return ResultVO.data(userInfo);
+    }
+
+    @Override
+    public ResultMessage<UserInfoDTO> login(UserLoginVO userLoginVO) {
+        Integer type = userLoginVO.getType();
+        if (Objects.isNull(type)) {
+            log.error(ResultCode.LOGIN_NOT_FOUND.message());
+            return null;
+        }
+        return loginStrategyContext.executeLoginStrategy(
+                JSON.toJSONString(userLoginVO.getLoginDetails()),
+                LoginTypeEnum.findObjectByType(type));
     }
 
 }

@@ -36,13 +36,13 @@ public enum ResultCode {
 
     VALID_ERROR(52000, "参数格式不正确"),
 
-    USERNAME_EXIST(52001, "用户名已存在"),
 
     USERNAME_NOT_EXIST(52002, "用户名不存在"),
 
     ARTICLE_ACCESS_FAIL(52003, "文章密码认证未通过"),
 
     QQ_LOGIN_ERROR(53001, "qq登录错误"),
+    LOGIN_NOT_FOUND(53001, "登录类型未找到"),
 
     /**
      * 系统异常
@@ -84,7 +84,6 @@ public enum ResultCode {
     ARTICLE_IMPORT_FAILED_ERROR(100004, "导入文章失败"),
     ARTICLE_SAVE_OR_UPDATE_ERROR(100004, "插入或者更新文章失败"),
     ARTICLE_DELETE_ERROR(100004, "删除文章失败"),
-
 
     /**
      * 邮箱代码状态
@@ -171,10 +170,10 @@ public enum ResultCode {
     /**
      * 用户
      */
-    USER_EDIT_SUCCESS(20001, "用户修改成功"),
     ADMIN_EDIT_SUCCESS(40000, "admin修改成功"),
 
     USER_OPERATION_ERROR(20001, "用户操作无反应"),
+
     USER_NOT_EXIST(20002, "用户不存在"),
     USER_NOT_EMPTY(20002, "用户名不能为空"),
     USER_IS_LOCKED(20102, "用户帐号已被锁定"),
@@ -183,7 +182,7 @@ public enum ResultCode {
     USER_AUTH_EXPIRED(20004, "用户已退出，请重新登录"),
     USER_AUTHORITY_ERROR(20005, "权限不足"),
     USER_CONNECT_LOGIN_ERROR(20006, "未找到登录信息"),
-    USER_EXIST(20008, "该用户名或手机号已被注册"),
+    USER_EXIST(20008, "用户已被注册"),
     USER_PHONE_NOT_EXIST(20009, "手机号不存在"),
     USER_PASSWORD_ERROR(20010, "密码不正确"),
     USER_NOT_PHONE(20011, "非当前用户的手机号"),
@@ -196,7 +195,7 @@ public enum ResultCode {
     USER_COLLECTION_EXIST(20017, "无法重复收藏"),
     USER_GRADE_IS_DEFAULT(20018, "会员等级为默认会员等级"),
     USER_NOT_BINDING(20020, "未绑定用户"),
-    USER_AUTO_REGISTER_ERROR(20021, "自动注册失败,请稍后重试"),
+    USER_REGISTER_ERROR(20021, "注册失败,请稍后重试"),
     USER_OVERDUE_CONNECT_ERROR(20022, "授权信息已过期，请重新授权/登录"),
     USER_CONNECT_BANDING_ERROR(20023, "当前联合登陆方式，已绑定其他账号，需进行解绑操作"),
     USER_CONNECT_NOT_EXIST_ERROR(20024, "暂无联合登陆信息，无法实现一键注册功能，请点击第三方登录进行授权"),
@@ -540,11 +539,9 @@ public enum ResultCode {
     /**
      * 验证码
      */
-    VERIFICATION_EMAIL_SEND_SUCCESS(80201, "邮箱验证码,发送成功"),
     VERIFICATION_EMAIL_SEND_ERROR(80201, "邮箱验证码,发送失败"),
     VERIFICATION_SEND_SUCCESS(80201, "短信验证码,发送成功"),
     VERIFICATION_ERROR(80202, "验证失败"),
-    VERIFICATION_SUCCESS(80202, "验证成功"),
     VERIFICATION_CODE_INVALID(80204, "验证码已失效，请重新校验"),
     VERIFICATION_SMS_CHECKED_ERROR(80210, "短信验证码错误，请重新校验"),
     VERIFICATION_REPEAT_ERROR(80210, "已发送，请稍等"),
@@ -586,7 +583,7 @@ public enum ResultCode {
     private final Integer code;
     private final String message;
 
-    ResultCode(Integer code, String message) {
+     ResultCode(Integer code, String message) {
         this.code = code;
         this.message = message;
     }
@@ -597,6 +594,16 @@ public enum ResultCode {
 
     public String message() {
         return this.message;
+    }
+
+    public static ResultCode getResultCode(ResultCode rc) {
+
+        for (ResultCode resultCode : ResultCode.values()) {
+            if (resultCode.code.equals(rc.code) && resultCode.message.equals(rc.message)) {
+                return resultCode;
+            }
+        }
+        return null; // or throw an exception if preferred
     }
 
 }

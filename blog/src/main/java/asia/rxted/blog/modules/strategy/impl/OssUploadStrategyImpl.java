@@ -1,4 +1,4 @@
-package asia.rxted.blog.modules.strategy.serviceImpl;
+package asia.rxted.blog.modules.strategy.impl;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;

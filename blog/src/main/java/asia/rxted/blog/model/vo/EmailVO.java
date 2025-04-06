@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "用户账号")
-public class UserVO {
+public class EmailVO {
 
     @NotBlank(message = "邮箱不能为空")
     @Email(message = "邮箱格式不正确")
