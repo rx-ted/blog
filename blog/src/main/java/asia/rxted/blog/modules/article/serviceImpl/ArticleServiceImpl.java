@@ -16,7 +16,8 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
-import asia.rxted.blog.config.enums.ArticleStatusEnum;
+import asia.rxted.blog.constant.RabbitMQConstant;
+import asia.rxted.blog.enums.ArticleStatusEnum;
 import asia.rxted.blog.mapper.ArticleMapper;
 import asia.rxted.blog.mapper.CategoryMapper;
 import asia.rxted.blog.mapper.TagMapper;
@@ -33,7 +34,6 @@ import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.DeleteVO;
 import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.config.ResultVO;
-import asia.rxted.blog.config.constant.RabbitMQConstant;
 import asia.rxted.blog.modules.article.service.ArticleService;
 import asia.rxted.blog.modules.article.service.ArticleTagService;
 import asia.rxted.blog.modules.article.service.CategoryService;
@@ -41,7 +41,6 @@ import asia.rxted.blog.modules.article.service.TagService;
 import asia.rxted.blog.modules.cache.CachePrefix;
 import asia.rxted.blog.modules.cache.service.RedisService;
 import asia.rxted.blog.modules.strategy.context.SearchStrategyContext;
-import asia.rxted.blog.modules.strategy.context.UploadStrategyContext;
 import asia.rxted.blog.utils.BeanCopyUtil;
 import asia.rxted.blog.utils.PageUtil;
 import lombok.SneakyThrows;
@@ -72,9 +71,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Autowired
     TagMapper tagMapper;
-
-    @Autowired
-    UploadStrategyContext uploadStrategyContext;
 
     @Autowired
     SearchStrategyContext searchStrategyContext;
@@ -187,7 +183,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         // 传播rabbitmq 告诉操作状态
         if (newArticle.getStatus().equals(ArticleStatusEnum.PUBLIC.code())) {
             System.out.println("will send rabbitmq");
-            rabbitTemplate.convertAndSend(RabbitMQConstant.SUBSCRIBE_EXCHANGE, RabbitMQConstant.SUBSCRIBE_ROUTING_KEY_NAME,
+            rabbitTemplate.convertAndSend(RabbitMQConstant.SUBSCRIBE_EXCHANGE,
+                    RabbitMQConstant.SUBSCRIBE_ROUTING_KEY_NAME,
                     new Message(JSON.toJSONBytes(newArticle.getId()), new MessageProperties()));
         }
         return ResultCode.SUCCESS;

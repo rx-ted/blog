@@ -1,6 +1,6 @@
 package asia.rxted.blog.modules.cache;
 
-import asia.rxted.blog.config.enums.UserRoleEnum;
+import asia.rxted.blog.enums.UserRoleEnum;
 
 /**
  * 缓存前缀

@@ -8,7 +8,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import asia.rxted.blog.config.ResultCode;
-import asia.rxted.blog.config.enums.EmailSendTypeEnum;
+import asia.rxted.blog.enums.EmailSendTypeEnum;
 import asia.rxted.blog.model.dto.EmailMsgDTO;
 import asia.rxted.blog.modules.email.config.EmailConfig;
 import jakarta.mail.MessagingException;

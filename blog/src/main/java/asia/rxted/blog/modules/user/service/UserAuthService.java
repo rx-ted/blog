@@ -7,10 +7,8 @@ import asia.rxted.blog.config.ResultMessage;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.UserAdminDTO;
 import asia.rxted.blog.model.dto.UserAreaDTO;
-import asia.rxted.blog.model.dto.UserDetailsDTO;
 import asia.rxted.blog.model.dto.UserInfoDTO;
 import asia.rxted.blog.model.vo.ConditionVO;
-import asia.rxted.blog.model.vo.PasswordVO;
 import asia.rxted.blog.model.vo.UserLoginVO;
 import asia.rxted.blog.model.vo.EmailVO;
 
@@ -22,8 +20,6 @@ public interface UserAuthService {
     ResultCode register(EmailVO userVO);
 
     ResultCode updatePassword(EmailVO userVO);
-
-    ResultCode updateAdminPassword(PasswordVO passwordVO);
 
     PageResultDTO<UserAdminDTO> listUsers(ConditionVO condition);
 

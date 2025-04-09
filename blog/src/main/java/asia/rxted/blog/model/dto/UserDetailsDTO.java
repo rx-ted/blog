@@ -1,6 +1,5 @@
 package asia.rxted.blog.model.dto;
 
-import asia.rxted.blog.config.constant.CommonConstant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import asia.rxted.blog.constant.CommonConstant;
 
 import java.beans.Transient;
 import java.time.LocalDateTime;

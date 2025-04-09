@@ -15,7 +15,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
 
-import asia.rxted.blog.config.constant.CommonConstant;
+import asia.rxted.blog.constant.CommonConstant;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;

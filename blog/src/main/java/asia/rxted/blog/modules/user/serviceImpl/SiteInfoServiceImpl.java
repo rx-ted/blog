@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
-import asia.rxted.blog.config.constant.CommonConstant;
+import asia.rxted.blog.constant.CommonConstant;
 import asia.rxted.blog.mapper.AboutMapper;
 import asia.rxted.blog.mapper.ArticleMapper;
 import asia.rxted.blog.mapper.CategoryMapper;

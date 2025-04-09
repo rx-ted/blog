@@ -13,7 +13,6 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,11 +25,11 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.config.ResultMessage;
 import asia.rxted.blog.config.ResultVO;
-import asia.rxted.blog.config.constant.CommonConstant;
-import asia.rxted.blog.config.constant.RabbitMQConstant;
-import asia.rxted.blog.config.enums.LoginTypeEnum;
-import asia.rxted.blog.config.enums.RoleEnum;
-import asia.rxted.blog.config.enums.UserAreaTypeEnum;
+import asia.rxted.blog.constant.CommonConstant;
+import asia.rxted.blog.constant.RabbitMQConstant;
+import asia.rxted.blog.enums.LoginTypeEnum;
+import asia.rxted.blog.enums.RoleEnum;
+import asia.rxted.blog.enums.UserAreaTypeEnum;
 import asia.rxted.blog.mapper.UserAuthMapper;
 import asia.rxted.blog.mapper.UserInfoMapper;
 import asia.rxted.blog.mapper.UserRoleMapper;
@@ -43,7 +42,6 @@ import asia.rxted.blog.model.dto.UserRole;
 import asia.rxted.blog.model.entity.UserAuth;
 import asia.rxted.blog.model.entity.UserInfo;
 import asia.rxted.blog.model.vo.ConditionVO;
-import asia.rxted.blog.model.vo.PasswordVO;
 import asia.rxted.blog.model.vo.UserLoginVO;
 import asia.rxted.blog.model.vo.EmailVO;
 import asia.rxted.blog.modules.cache.CachePrefix;
@@ -140,10 +138,16 @@ public class UserAuthServiceImpl implements UserAuthService {
         if (!CommonUtil.checkEmail(emailVO.getUsername())) {
             return ResultCode.EMAIL_FORMAT_ERROR;
         }
-        var code = canRegisterUsername(emailVO);
-        System.out.println(code.message());
-        if (code != ResultCode.SUCCESS) {
-            return code;
+
+        var code = redisService.get(CachePrefix.EMAIL_CODE.join(emailVO.getUsername()));
+        if (Objects.isNull(code)) {
+            return ResultCode.VERIFICATION_CODE_INVALID;
+        } else if (!code.toString().equals(emailVO.getCode())) {
+            return ResultCode.VERIFICATION_ERROR;
+        }
+        var rc = canRegisterUsername(emailVO);
+        if (rc != ResultCode.SUCCESS) {
+            return rc;
         }
         try {
             UserInfo userInfo = UserInfo.builder()
@@ -164,6 +168,7 @@ public class UserAuthServiceImpl implements UserAuthService {
                     .loginType(LoginTypeEnum.EMAIL.getType())
                     .build();
             userAuthMapper.insert(userAuth);
+            redisService.del(CachePrefix.EMAIL_CODE.join(emailVO.getUsername()));
             return ResultCode.SUCCESS;
         } catch (Exception e) {
             System.out.println(e);
@@ -199,22 +204,6 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
-    public ResultCode updateAdminPassword(PasswordVO passwordVO) {
-        UserAuth user = userAuthMapper.selectOne(new LambdaQueryWrapper<UserAuth>()
-                .eq(UserAuth::getId, UserUtil.getUserDetailsDTO().getId()));
-        if (Objects.nonNull(user) && BCrypt.checkpw(passwordVO.getOldPassword(), user.getPassword())) {
-            UserAuth userAuth = UserAuth.builder()
-                    .id(UserUtil.getUserDetailsDTO().getId())
-                    .password(BCrypt.hashpw(passwordVO.getNewPassword(), BCrypt.gensalt()))
-                    .build();
-            userAuthMapper.updateById(userAuth);
-            return ResultCode.SUCCESS;
-        } else {
-            return ResultCode.USER_OLD_PASSWORD_ERROR;
-        }
-    }
-
-    @Override
     public PageResultDTO<UserAdminDTO> listUsers(ConditionVO condition) {
         Integer count = userAuthMapper.countUser(condition);
         if (count == 0) {
@@ -227,8 +216,12 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     public ResultCode logout() {
-        String username = UserUtil.getUserDetailsDTO().getUsername();
-        tokenService.delLoginUser(username);
+
+        System.out.println(UserUtil.getAuthentication());
+
+
+        // String username = UserUtil.getUserDetailsDTO().getUsername();
+        // tokenService.delLoginUser(username);
         return ResultCode.SUCCESS;
     }
 
@@ -254,14 +247,9 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     public ResultMessage<UserInfoDTO> login(UserLoginVO userLoginVO) {
-        Integer type = userLoginVO.getType();
-        if (Objects.isNull(type)) {
-            log.error(ResultCode.LOGIN_NOT_FOUND.message());
-            return null;
-        }
         return loginStrategyContext.executeLoginStrategy(
-                JSON.toJSONString(userLoginVO.getLoginDetails()),
-                LoginTypeEnum.findObjectByType(type));
+                JSON.toJSONString(userLoginVO.getLoginVO()),
+                LoginTypeEnum.findObjectByType(userLoginVO.getType()));
     }
 
 }

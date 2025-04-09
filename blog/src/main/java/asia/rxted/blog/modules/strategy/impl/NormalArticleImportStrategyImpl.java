@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.config.ResultVO;
-import asia.rxted.blog.config.enums.ArticleStatusEnum;
+import asia.rxted.blog.enums.ArticleStatusEnum;
 import asia.rxted.blog.model.vo.ArticleVO;
 import asia.rxted.blog.modules.article.service.ArticleService;
 import asia.rxted.blog.modules.strategy.ArticleImportStrategy;
