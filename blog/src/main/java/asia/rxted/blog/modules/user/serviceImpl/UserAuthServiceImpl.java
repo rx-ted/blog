@@ -253,7 +253,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
-    public ResultMessage<UserInfoDTO> login(UserLoginVO userLoginVO) {
+    public UserInfoDTO login(UserLoginVO userLoginVO) {
         return loginStrategyContext.executeLoginStrategy(
                 JSON.toJSONString(userLoginVO.getLoginVO()),
                 LoginTypeEnum.findObjectByType(userLoginVO.getType()));

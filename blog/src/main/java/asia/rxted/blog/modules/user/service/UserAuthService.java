@@ -25,5 +25,5 @@ public interface UserAuthService {
 
     ResultCode logout();
 
-    ResultMessage<UserInfoDTO> login(UserLoginVO userLoginVO);
+    UserInfoDTO login(UserLoginVO userLoginVO);
 }
