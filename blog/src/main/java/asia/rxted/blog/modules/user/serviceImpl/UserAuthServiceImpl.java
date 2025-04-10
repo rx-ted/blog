@@ -13,6 +13,8 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +39,7 @@ import asia.rxted.blog.model.dto.EmailMsgDTO;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.UserAdminDTO;
 import asia.rxted.blog.model.dto.UserAreaDTO;
+import asia.rxted.blog.model.dto.UserDetailsDTO;
 import asia.rxted.blog.model.dto.UserInfoDTO;
 import asia.rxted.blog.model.dto.UserRole;
 import asia.rxted.blog.model.entity.UserAuth;
@@ -53,6 +56,7 @@ import asia.rxted.blog.modules.user.service.UserAuthService;
 import asia.rxted.blog.utils.CommonUtil;
 import asia.rxted.blog.utils.PageUtil;
 import asia.rxted.blog.utils.UserUtil;
+import io.minio.Result;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -216,13 +220,16 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     public ResultCode logout() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        System.out.println(UserUtil.getAuthentication());
+        if ((authentication.getPrincipal() instanceof UserDetailsDTO)) {
+            var principal = (UserDetailsDTO) authentication.getPrincipal();
 
-
-        // String username = UserUtil.getUserDetailsDTO().getUsername();
-        // tokenService.delLoginUser(username);
-        return ResultCode.SUCCESS;
+            tokenService.delLoginUser(principal.getUsername());
+            return ResultCode.SUCCESS;
+        } else {
+            return ResultCode.USER_LOGOUT_ERROR;
+        }
     }
 
     private ResultCode canRegisterUsername(EmailVO emailVO) {

@@ -24,8 +24,6 @@ public enum ResultCode {
 
     PASSWORD_ERROR(50000, "密码错误"),
 
-    NO_LOGIN(40001, "用户未登录"),
-
     AUTHORIZED(40300, "没有操作权限"),
 
     SYSTEM_ERROR(50000, "系统异常"),
@@ -211,7 +209,6 @@ public enum ResultCode {
     CANT_EDIT_CLERK_SHOPKEEPER(20033, "无法在店员管理编辑店员信息"),
     USER_MOBILE_REPEATABLE_ERROR(20034, "该手机号已存在"),
     USER_LOGIN_SUCCESS(20001, "用户登录成功"),
-    USER_LOGOUT_SUCCESS(20002, "用户注销成功"),
     USER_EXIT_SUCCESS(20002, "用户登录退出成功"),
     USER_LOGOUT_ERROR(20002, "用户注销错误"),
 

@@ -24,7 +24,9 @@ import asia.rxted.blog.utils.UserUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHandler {
 
@@ -52,11 +54,20 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
 
     @Async
     public void updateUserInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (!(authentication.getPrincipal() instanceof UserDetailsDTO)) {
+            log.error("Principal is not of type UserDetailsDTO. Found: {}",
+                    authentication.getPrincipal().getClass().getName());
+            return;
+        }
+        UserDetailsDTO principal = (UserDetailsDTO) authentication.getPrincipal();
+
         UserAuth userAuth = UserAuth.builder()
-                .id(UserUtil.getUserDetailsDTO().getId())
-                .ipAddress(UserUtil.getUserDetailsDTO().getIpAddress())
-                .ipSource(UserUtil.getUserDetailsDTO().getIpSource())
-                .lastLoginTime(UserUtil.getUserDetailsDTO().getLastLoginTime())
+                .id(principal.getId())
+                .ipAddress(principal.getIpAddress())
+                .ipSource(principal.getIpSource())
+                .lastLoginTime(principal.getLastLoginTime())
                 .build();
         userAuthMapper.updateById(userAuth);
     }

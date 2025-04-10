@@ -1,28 +1,24 @@
 package asia.rxted.blog.utils;
 
+import java.util.Objects;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import asia.rxted.blog.model.dto.UserDetailsDTO;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class UserUtil {
-
-    public static UserDetailsDTO getUserDetailsDTO() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return null;
-        }
-        return (UserDetailsDTO) authentication.getPrincipal();
-    }
 
     public static Authentication getAuthentication() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return null;
+        if (Objects.nonNull(authentication) && authentication.isAuthenticated()) {
+            return authentication;
         }
-        return authentication;
+        log.error("Authentication is null or not authenticated");
+        return null;
     }
 
 }

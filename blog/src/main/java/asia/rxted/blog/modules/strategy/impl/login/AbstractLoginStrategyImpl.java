@@ -40,7 +40,6 @@ public abstract class AbstractLoginStrategyImpl implements LoginStrategy {
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetailsDTO, null,
                 userDetailsDTO.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
-        System.out.println(UserUtil.getAuthentication());
 
         UserInfoDTO userInfoDTO = BeanCopyUtil.copyObject(userDetailsDTO, UserInfoDTO.class);
         String token = tokenService.createToken(userDetailsDTO);
