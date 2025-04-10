@@ -3,8 +3,8 @@ package asia.rxted.blog.modules.user.serviceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 
+import asia.rxted.blog.config.BizException;
 import asia.rxted.blog.config.ResultCode;
-import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.mapper.RoleMapper;
 import asia.rxted.blog.mapper.UserAuthMapper;
 import asia.rxted.blog.mapper.UserInfoMapper;
@@ -45,23 +45,20 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (StringUtils.isBlank(username)) {
-            ResultVO.fail(ResultCode.USER_NOT_EMPTY);
-            return null;
+            throw new BizException(ResultCode.USER_NOT_EMPTY);
         }
         UserInfo userInfo = userInfoMapper.selectOne(
                 new LambdaQueryWrapper<UserInfo>()
                         .eq(UserInfo::getUsername, username));
         if (userInfo == null) {
-            ResultVO.fail(ResultCode.USER_NOT_EXIST);
-            return null;
+            throw new BizException(ResultCode.USER_NOT_EXIST);
         }
         UserAuth userAuth = userAuthMapper.selectOne(new LambdaQueryWrapper<UserAuth>()
                 .select(UserAuth::getId, UserAuth::getUserInfoId, UserAuth::getPassword,
                         UserAuth::getLoginType)
                 .eq(UserAuth::getUserInfoId, userInfo.getId()));
         if (Objects.isNull(userAuth)) {
-            ResultVO.fail(ResultCode.USER_CONNECT_LOGIN_ERROR);
-            return null;
+            throw new BizException(ResultCode.USER_CONNECT_LOGIN_ERROR);
         }
         return convertUserDetail(userAuth, request);
     }

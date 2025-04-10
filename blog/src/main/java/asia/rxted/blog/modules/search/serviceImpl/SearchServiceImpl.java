@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
+import asia.rxted.blog.config.BizException;
 import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.model.dto.SearchDTO;
@@ -48,7 +49,7 @@ public class SearchServiceImpl implements SearchService {
             CreateResponse response = client.create(request);
             response.forcedRefresh();
         } catch (OpenSearchException e) {
-            ResultVO.fail(ResultCode.SEARCH_CREATE_ERROR);
+            throw new BizException(ResultCode.SEARCH_CREATE_ERROR);
         }
     }
 
@@ -62,7 +63,7 @@ public class SearchServiceImpl implements SearchService {
                     .build();
             client.index(request);
         } catch (OpenSearchException e) {
-            ResultVO.fail(ResultCode.SEARCH_INDEX_ERROR);
+            throw new BizException(ResultCode.SEARCH_INDEX_ERROR);
         }
     }
 
@@ -75,7 +76,7 @@ public class SearchServiceImpl implements SearchService {
                     .build();
             client.delete(request);
         } catch (OpenSearchException e) {
-            ResultVO.fail(ResultCode.SEARCH_DELETE_ERROR);
+            throw new BizException(ResultCode.SEARCH_DELETE_ERROR);
         }
     }
 
@@ -90,9 +91,8 @@ public class SearchServiceImpl implements SearchService {
             GetResponse<SearchDTO> response = client.get(request, SearchDTO.class);
             return response.source();
         } catch (OpenSearchException e) {
-            ResultVO.fail(ResultCode.SEARCH_GET_ERROR);
+            throw new BizException(ResultCode.SEARCH_GET_ERROR);
         }
-        return null;
     }
 
     @Override
@@ -112,9 +112,8 @@ public class SearchServiceImpl implements SearchService {
             }
             return searchDTOs;
         } catch (OpenSearchException e) {
-            ResultVO.fail(ResultCode.SEARCH_ERROR);
+            throw new BizException(ResultCode.SEARCH_ERROR);
         }
-        return null;
     }
 
 }

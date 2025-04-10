@@ -3,8 +3,8 @@ package asia.rxted.blog.modules.strategy.impl;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import asia.rxted.blog.config.BizException;
 import asia.rxted.blog.config.ResultCode;
-import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.modules.strategy.UploadStrategy;
 import asia.rxted.blog.utils.FileUtil;
 
@@ -25,9 +25,8 @@ public abstract class AbstractUploadStrategyImpl implements UploadStrategy {
             return getFileAccessUrl(path + fileName);
         } catch (Exception e) {
             e.printStackTrace();
-            ResultVO.fail(ResultCode.FILE_UPLOAD_ERROR);
+            throw new BizException(ResultCode.FILE_UPLOAD_ERROR);
         }
-        return null;
     }
 
     @Override
@@ -37,9 +36,8 @@ public abstract class AbstractUploadStrategyImpl implements UploadStrategy {
             return getFileAccessUrl(path + fileName);
         } catch (Exception e) {
             e.printStackTrace();
-            ResultVO.fail(ResultCode.FILE_UPLOAD_ERROR);
+            throw new BizException(ResultCode.FILE_UPLOAD_ERROR);
         }
-        return null;
     }
 
     public abstract Boolean exists(String filePath);
