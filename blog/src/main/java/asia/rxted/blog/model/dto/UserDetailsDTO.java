@@ -14,6 +14,7 @@ import java.beans.Transient;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
@@ -102,5 +103,11 @@ public class UserDetailsDTO implements UserDetails {
     @Transient
     public boolean isEnabled() {
         return true;
+    }
+
+    public void setAuthorities(Set<GrantedAuthority> authorities) {
+        this.roles = authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
     }
 }

@@ -99,6 +99,7 @@ jwt:
   header: Authorization
   prefix: Bearer
   wait: 20
+  antMatchers: /login/**,/register/**,/static/**
 
 opensearch:
   uris: http://localhost:9200

@@ -44,6 +44,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @SneakyThrows
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        System.out.println("username: " + username);
         if (StringUtils.isBlank(username)) {
             throw new BizException(ResultCode.USER_NOT_EMPTY);
         }

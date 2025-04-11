@@ -20,7 +20,6 @@ import asia.rxted.blog.model.dto.UserInfoDTO;
 import asia.rxted.blog.model.entity.UserAuth;
 import asia.rxted.blog.modules.token.service.TokenService;
 import asia.rxted.blog.utils.BeanCopyUtil;
-import asia.rxted.blog.utils.UserUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,13 +37,11 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
             Authentication authentication) throws IOException, ServletException {
-        Authentication localAuthentication = SecurityContextHolder.getContext().getAuthentication();
-        if (Objects.isNull(localAuthentication.getPrincipal())) {
-            return;
-        }
-        UserInfoDTO userInfoDTO = BeanCopyUtil.copyObject(localAuthentication.getPrincipal(), UserInfoDTO.class);
+        UserDetailsDTO userDetailsDTO = (UserDetailsDTO) authentication.getPrincipal();
+
+        UserInfoDTO userInfoDTO = BeanCopyUtil.copyObject(userDetailsDTO, UserInfoDTO.class);
+
         if (Objects.nonNull(userInfoDTO)) {
-            UserDetailsDTO userDetailsDTO = (UserDetailsDTO) authentication.getPrincipal();
             userInfoDTO.setToken(tokenService.createToken(userDetailsDTO));
         }
         response.setContentType(CommonConstant.APPLICATION_JSON);

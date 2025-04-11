@@ -13,7 +13,6 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -55,8 +54,6 @@ import asia.rxted.blog.modules.user.service.SiteUserInfoService;
 import asia.rxted.blog.modules.user.service.UserAuthService;
 import asia.rxted.blog.utils.CommonUtil;
 import asia.rxted.blog.utils.PageUtil;
-import asia.rxted.blog.utils.UserUtil;
-import io.minio.Result;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -253,6 +250,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public UserInfoDTO login(UserLoginVO userLoginVO) {
         return loginStrategyContext.executeLoginStrategy(
                 JSON.toJSONString(userLoginVO.getLoginVO()),

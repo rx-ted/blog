@@ -15,8 +15,6 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
 import asia.rxted.blog.config.BizException;
 import asia.rxted.blog.config.ResultCode;
-import asia.rxted.blog.config.ResultMessage;
-import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.mapper.UserAuthMapper;
 import asia.rxted.blog.mapper.UserInfoMapper;
 import asia.rxted.blog.model.dto.UserDetailsDTO;
@@ -39,7 +37,7 @@ public class LoginStrategyImpl extends AbstractLoginStrategyImpl {
     private UserInfoMapper userInfoMapper;
 
     @Autowired
-    private UserDetailServiceImpl userDetailsService;
+    private UserDetailServiceImpl userDetailService;
 
     @Autowired
     private RedisService redisService;
@@ -76,7 +74,7 @@ public class LoginStrategyImpl extends AbstractLoginStrategyImpl {
                         .set(UserAuth::getIpAddress, ipAddress)
                         .set(UserAuth::getIpSource, ipSource)
                         .eq(UserAuth::getId, userAuth.getId()));
-        return userDetailsService.convertUserDetail(userAuth, request);
+        return userDetailService.convertUserDetail(userAuth, request);
     }
 
     private UserInfo loginHandler(LoginVO loginVO, Integer loginType) {
