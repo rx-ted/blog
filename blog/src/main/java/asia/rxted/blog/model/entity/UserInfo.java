@@ -46,5 +46,4 @@ public class UserInfo {
     @TableField(fill = FieldFill.UPDATE)
     private LocalDateTime updateTime;
 
-    
 }

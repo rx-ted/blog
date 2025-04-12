@@ -18,8 +18,10 @@ public class Role {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
+    // 角色名称
     private String roleName;
 
+    // 是否禁用 0否 1是
     private Integer isDisable;
 
     @TableField(fill = FieldFill.INSERT)

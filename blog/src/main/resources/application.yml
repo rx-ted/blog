@@ -95,11 +95,11 @@ search:
 
 jwt:
   secret: ThisIsASecretThisIsASecretThisIsASecretThisIsASecret #rx-ted
-  expire: 3600
-  header: Authorization
-  prefix: Bearer
-  wait: 20
-  antMatchers: /login/**,/register/**,/static/**
+  expiration: 3600
+  refresh-token:
+    expiration: 604800000 # 7 天
+  header: "Authorization"
+  prefix: "Bearer "
 
 opensearch:
   uris: http://localhost:9200

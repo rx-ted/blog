@@ -10,7 +10,6 @@ import jakarta.mail.Session;
 import lombok.Data;
 
 @Configuration
-// @ConfigurationProperties(prefix = "spring.mail")
 @Data
 public class EmailConfig {
 

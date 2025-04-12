@@ -1,22 +1,17 @@
 package asia.rxted.blog.modules.token.service;
 
+import org.springframework.security.core.userdetails.UserDetails;
+
 import asia.rxted.blog.model.dto.UserDetailsDTO;
-import jakarta.servlet.http.HttpServletRequest;
 
 public interface TokenService {
 
-    String createToken(String subject);
+    String createToken(UserDetailsDTO userDetails);
 
-    String createToken(UserDetailsDTO userDetailsDTO);
-
-    Boolean validateToken(String token);
-
-    void refreshToken(UserDetailsDTO userDetailsDTO);
-
-    void renewToken(UserDetailsDTO userDetailsDTO);
-
-    UserDetailsDTO getUserDetailDTO(HttpServletRequest request);
+    boolean isTokenValid(String token, UserDetails userDetails);
 
     void delLoginUser(String username);
+
+    String extractUserName(String token);
 
 }

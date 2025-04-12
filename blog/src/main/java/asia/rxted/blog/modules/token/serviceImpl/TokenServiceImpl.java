@@ -1,81 +1,100 @@
 package asia.rxted.blog.modules.token.serviceImpl;
 
-import java.time.Duration;
+import java.security.Key;
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
 import asia.rxted.blog.model.dto.UserDetailsDTO;
 import asia.rxted.blog.modules.cache.CachePrefix;
 import asia.rxted.blog.modules.cache.service.RedisService;
-import asia.rxted.blog.modules.token.config.JwtConfig;
+import asia.rxted.blog.modules.token.JwtConfig;
 import asia.rxted.blog.modules.token.service.TokenService;
-import jakarta.servlet.http.HttpServletRequest;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class TokenServiceImpl implements TokenService {
     /*
      * find resource data, i.e. https://www.cnblogs.com/java-note/p/18787761
      */
-    @Autowired
-    private JwtConfig jwtConfig;
 
     @Autowired
     private RedisService redisService;
 
+    @Autowired
+    private JwtConfig jwtConfig;
+
     @Override
-    public String createToken(String subject) {
-        return jwtConfig.createToken(subject);
+    public String createToken(UserDetailsDTO userDetails) {
+        return createToken(new HashMap<>(), userDetails);
+    }
+
+    private String createToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        String username = userDetails.getUsername();
+
+        String token = Jwts.builder().setClaims(extraClaims).setSubject(username)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtConfig.getExpiration() * 1000))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
+        redisService.hSet(CachePrefix.ACCESS_TOKEN.name(), username, token);
+        return token;
     }
 
     @Override
-    public String createToken(UserDetailsDTO userDetailsDTO) {
-        refreshToken(userDetailsDTO);
-        String username = userDetailsDTO.getUsername();
-        return createToken(username);
-    }
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String userName = extractUserName(token);
+        return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
 
-    @Override
-    public void refreshToken(UserDetailsDTO userDetailsDTO) {
-        LocalDateTime currentTime = LocalDateTime.now();
-        userDetailsDTO.setExpireTime(currentTime.plusSeconds(jwtConfig.getExpire()));
-        String username = userDetailsDTO.getUsername();
-        redisService.hSet(CachePrefix.LOGIN_USER.name(), username, userDetailsDTO, jwtConfig.getExpire());
-    }
-
-    @Override
-    public void renewToken(UserDetailsDTO userDetailsDTO) {
-        LocalDateTime expireTime = userDetailsDTO.getExpireTime();
-        LocalDateTime currentTime = LocalDateTime.now();
-        if (Duration.between(currentTime, expireTime).toMinutes() <= jwtConfig.getWait()) {
-            refreshToken(userDetailsDTO);
-        }
-    }
-
-    @Override
-    public UserDetailsDTO getUserDetailDTO(HttpServletRequest request) {
-        String token = Optional.ofNullable(request.getHeader(jwtConfig.getHeader())).orElse("")
-                .replaceFirst(jwtConfig.getPrefix(), "");
-        if (StringUtils.hasText(token) && !token.equals("null")) {
-            String useraname = jwtConfig.getUserNameFromToken(token);
-            return (UserDetailsDTO) redisService.hGet(
-                    CachePrefix.LOGIN_USER.name(), useraname);
-        }
-        return null;
     }
 
     @Override
     public void delLoginUser(String username) {
-        redisService.hDel(CachePrefix.LOGIN_USER.name(), username);
+        var token = redisService.hGet(CachePrefix.ACCESS_TOKEN.name(), username);
+        if (Objects.nonNull(token)) {
+            redisService.hDel(CachePrefix.ACCESS_TOKEN.name(), username);
+            redisService.hSet(CachePrefix.BLACK_LIST.name(), token.toString(), LocalDateTime.now());
+        }
+    }
 
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
     }
 
     @Override
-    public Boolean validateToken(String token) {
-        return jwtConfig.getTokenClaim(token) != null;
+    public String extractUserName(String token) {
+        return extractClaim(token, Claims::getSubject);
+
+    }
+
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolvers.apply(claims);
+    }
+
+    private Key getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(jwtConfig.getSecret());
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token)
+                .getBody();
     }
 
 }

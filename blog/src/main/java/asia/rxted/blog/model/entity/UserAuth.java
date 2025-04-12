@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class UserAuth {
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Integer id; // will use uuid
+    private Integer id;
 
     private Integer userInfoId;
 

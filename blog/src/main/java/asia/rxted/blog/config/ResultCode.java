@@ -12,6 +12,8 @@ public enum ResultCode {
      */
     ERROR(400, "服务器繁忙，请稍后重试"),
 
+    NO_ACCESS(403, "拒绝访问"),
+
     UNKNOWN(-1, "未知状态"),
     /**
      * 失败返回码
@@ -33,7 +35,6 @@ public enum ResultCode {
     FAIL(51000, "操作失败"),
 
     VALID_ERROR(52000, "参数格式不正确"),
-
 
     USERNAME_NOT_EXIST(52002, "用户名不存在"),
 
@@ -579,7 +580,7 @@ public enum ResultCode {
     private final Integer code;
     private final String message;
 
-     ResultCode(Integer code, String message) {
+    ResultCode(Integer code, String message) {
         this.code = code;
         this.message = message;
     }

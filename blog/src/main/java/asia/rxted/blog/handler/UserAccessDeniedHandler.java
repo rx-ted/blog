@@ -15,11 +15,11 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
+public class UserAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
             AccessDeniedException accessDeniedException) throws IOException {
         response.setContentType(CommonConstant.APPLICATION_JSON);
-        response.getWriter().write(JSON.toJSONString(ResultVO.error(ResultCode.AUTHORIZED)));
+        response.getWriter().write(JSON.toJSONString(ResultVO.error(ResultCode.NO_ACCESS)));
     }
 }

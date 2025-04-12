@@ -17,7 +17,7 @@ import java.io.IOException;
  * 登录失败处理
  */
 @Component
-public class AuthenticationFailureHandlerImpl implements AuthenticationFailureHandler {
+public class UserLoginFailureHandler implements AuthenticationFailureHandler {
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,

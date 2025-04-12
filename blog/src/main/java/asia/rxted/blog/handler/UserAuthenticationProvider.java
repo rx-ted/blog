@@ -9,40 +9,46 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
 
 import asia.rxted.blog.model.dto.UserDetailsDTO;
 import asia.rxted.blog.modules.user.serviceImpl.UserDetailServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 
-public class AuthenticationProviderImpl implements AuthenticationProvider {
+@Slf4j
+@Component
+public class UserAuthenticationProvider implements AuthenticationProvider {
 
     @Autowired
     private UserDetailServiceImpl userDetailService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        log.info("UserAuthenticationProvider authenticate: " + authentication.toString());
+
         String username = (String) authentication.getPrincipal(); // 获取用户名
         String password = (String) authentication.getCredentials(); // 获取密码
 
-        UserDetailsDTO sysUserDetails = (UserDetailsDTO) userDetailService.loadUserByUsername(username);
-        if (sysUserDetails == null) {
+        UserDetailsDTO userDetailsDTO = (UserDetailsDTO) userDetailService.loadUserByUsername(username);
+        if (userDetailsDTO == null) {
             throw new UsernameNotFoundException("用户名不存在");
         }
 
-        if (!new BCryptPasswordEncoder().matches(password, sysUserDetails.getPassword())) {
+        if (!new BCryptPasswordEncoder().matches(password, userDetailsDTO.getPassword())) {
             throw new BadCredentialsException("用户名或密码错误");
         }
 
-        if (sysUserDetails.getIsDisable().equals(1)) {
+        if (userDetailsDTO.getIsDisable().equals(1)) {
             throw new LockedException("用户已禁用");
         }
 
-        return new UsernamePasswordAuthenticationToken(sysUserDetails, password, sysUserDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetailsDTO, password, userDetailsDTO.getAuthorities());
 
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-		return true;
+        return true;
     }
 
 }

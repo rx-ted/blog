@@ -23,6 +23,11 @@ public enum CachePrefix {
     LOGIN_USER,
     ARTICLE_ACCESS,
 
+    /*
+     * Token黑名单
+     */
+    BLACK_LIST,
+
     /**
      * nonce
      */

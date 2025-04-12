@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHandler {
+public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     @Autowired
     private UserAuthMapper userAuthMapper;
