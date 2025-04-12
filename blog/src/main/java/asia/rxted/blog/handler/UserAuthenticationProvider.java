@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import asia.rxted.blog.config.BizException;
+import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.model.dto.UserDetailsDTO;
 import asia.rxted.blog.modules.user.serviceImpl.UserDetailServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -31,15 +33,15 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
 
         UserDetailsDTO userDetailsDTO = (UserDetailsDTO) userDetailService.loadUserByUsername(username);
         if (userDetailsDTO == null) {
-            throw new UsernameNotFoundException("用户名不存在");
+            throw new BizException(ResultCode.USER_NOT_EXIST);
         }
 
         if (!new BCryptPasswordEncoder().matches(password, userDetailsDTO.getPassword())) {
-            throw new BadCredentialsException("用户名或密码错误");
+            throw new BizException(ResultCode.USER_PASSWORD_ERROR);
         }
 
         if (userDetailsDTO.getIsDisable().equals(1)) {
-            throw new LockedException("用户已禁用");
+            throw new BizException(ResultCode.USER_IS_LOCKED);
         }
 
         return new UsernamePasswordAuthenticationToken(userDetailsDTO, password, userDetailsDTO.getAuthorities());

@@ -47,9 +47,18 @@ public class UserDetailServiceImpl implements UserDetailsService {
         if (StringUtils.isBlank(username)) {
             throw new BizException(ResultCode.USER_NOT_EMPTY);
         }
+
+        // get email user info.
         UserInfo userInfo = userInfoMapper.selectOne(
                 new LambdaQueryWrapper<UserInfo>()
-                        .eq(UserInfo::getUsername, username));
+                        .eq(UserInfo::getEmail, username));
+        // if userInfo is null, try to use phone
+        if (Objects.isNull(userInfo)) {
+            userInfo = userInfoMapper.selectOne(
+                    new LambdaQueryWrapper<UserInfo>()
+                            .eq(UserInfo::getPhone, username));
+        }
+
         if (userInfo == null) {
             throw new BizException(ResultCode.USER_NOT_EXIST);
         }

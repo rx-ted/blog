@@ -1,10 +1,7 @@
 package asia.rxted.blog.bean;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,7 +13,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import asia.rxted.blog.handler.JwtAuthenticationTokenFilter;
-import asia.rxted.blog.modules.user.serviceImpl.UserDetailServiceImpl;
+import asia.rxted.blog.handler.UserAccessDeniedHandler;
+import asia.rxted.blog.handler.UserAuthenticationEntryPoint;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -27,10 +25,13 @@ import org.springframework.context.annotation.Bean;
 public class WebSecurityConfig {
 
         @Autowired
-        private UserDetailServiceImpl userDetailService;
+        private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
         @Autowired
-        private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+        private UserAuthenticationEntryPoint userAuthenticationEntryPoint;
+
+        @Autowired
+        private UserAccessDeniedHandler userAccessDeniedHandler;
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,16 +39,39 @@ public class WebSecurityConfig {
                 /*
                  * NOTICE: Enable this section when the tester accesses the URL.
                  */
-                http.csrf(AbstractHttpConfigurer::disable);
+                http.csrf(AbstractHttpConfigurer::disable); // 禁用跨站请求伪造防护
                 http.authorizeHttpRequests(requests -> requests
-                                .requestMatchers("/**").permitAll()
+                                /* 获取白名单（不进行权限验证 */
+                                .requestMatchers("/", "/index.html").permitAll()
                                 .requestMatchers("/user/**").permitAll()
-                                .requestMatchers("/article/**").permitAll()
+                                /* 其他的需要登陆后才能访问 */
                                 .anyRequest().authenticated());
-                http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-                http.authenticationProvider(authenticationProvider());
-                http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+                http.sessionManagement(session -> session
+                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 禁用session（使用Token认证）
+                http.exceptionHandling(e -> e
+                                /* 用户未登录 */
+                                .authenticationEntryPoint(userAuthenticationEntryPoint)
+                                /* 权限问题 */
+                                .accessDeniedHandler(userAccessDeniedHandler));
+                // http.authenticationProvider(userAuthenticationProvider);
+                /* 测试用的 */
+                /*
+                 *
+                 * http.formLogin(fromLogin -> fromLogin
+                 * // .loginPage("/login") // 指定登录路径
+                 * .loginProcessingUrl("/login/submit") // 登录路径提交表单
+                 * .successHandler(userLoginSuccessHandler)// 配置登录成功处理类
+                 * .failureHandler(userLoginFailureHandler)); // 配置登录失败处理类
+                 */
 
+                /* 测试用的 */
+                /*
+                 * http.logout(logout -> logout
+                 * .logoutUrl("/logout/submit") // 配置登出地址
+                 * .logoutSuccessHandler(userLogoutSuccessHandler) // 配置用户登出处理类
+                 * );
+                 */
+                http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class); // 添加JWT过滤器
                 return http.build();
         }
 
@@ -56,19 +80,22 @@ public class WebSecurityConfig {
                 return new BCryptPasswordEncoder();
         }
 
-        @Bean
-        public AuthenticationProvider authenticationProvider() {
-
-                DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-                authProvider.setUserDetailsService(userDetailService);
-                authProvider.setPasswordEncoder(passwordEncoder());
-                return authProvider;
-        }
-
-        @Bean
-        public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-                        throws Exception {
-                return config.getAuthenticationManager();
-        }
+        /*
+         * 
+         * @Bean
+         * public AuthenticationProvider authenticationProvider() {
+         * 
+         * DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+         * authProvider.setUserDetailsService(userDetailService);
+         * authProvider.setPasswordEncoder(passwordEncoder());
+         * return authProvider;
+         * }
+         */
+        // @Bean
+        // public AuthenticationManager
+        // authenticationManager(AuthenticationConfiguration config)
+        // throws Exception {
+        // return config.getAuthenticationManager();
+        // }
 
 }
