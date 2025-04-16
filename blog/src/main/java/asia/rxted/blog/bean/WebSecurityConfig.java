@@ -1,7 +1,6 @@
 package asia.rxted.blog.bean;
 
 import org.springframework.context.annotation.Configuration;
-
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,6 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import asia.rxted.blog.handler.JwtAuthenticationTokenFilter;
 import asia.rxted.blog.handler.UserAccessDeniedHandler;
 import asia.rxted.blog.handler.UserAuthenticationEntryPoint;
+import asia.rxted.blog.handler.UserAuthorizationManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +33,9 @@ public class WebSecurityConfig {
         @Autowired
         private UserAccessDeniedHandler userAccessDeniedHandler;
 
+        @Autowired
+        private UserAuthorizationManager userAuthorizationManager;
+
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -41,11 +44,16 @@ public class WebSecurityConfig {
                  */
                 http.csrf(AbstractHttpConfigurer::disable); // 禁用跨站请求伪造防护
                 http.authorizeHttpRequests(requests -> requests
+                                .anyRequest().access(userAuthorizationManager)
                                 /* 获取白名单（不进行权限验证 */
-                                .requestMatchers("/", "/index.html").permitAll()
-                                .requestMatchers("/user/**").permitAll()
+                                // .requestMatchers("/",
+                                // "/css/**", "/js/**", "/img/**", "/fonts/**", "/favicon.ico",
+                                // "/index.html")
+                                // .permitAll()
+                                // .requestMatchers("/user/**").permitAll()
                                 /* 其他的需要登陆后才能访问 */
-                                .anyRequest().authenticated());
+                                // .anyRequest().authenticated()
+                                );
                 http.sessionManagement(session -> session
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 禁用session（使用Token认证）
                 http.exceptionHandling(e -> e

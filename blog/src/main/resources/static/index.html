@@ -1,6 +1,38 @@
-<html>
-    <body>
-        <h1>hello word!!!</h1>
-        <p>this is a html page</p>
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+  </head>
+  <body>
+    <h1>Login</h1>
+    <form action="http://127.0.0.1:8080/user/login" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required />
+        <br />
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required />
+        <br />
+        <label for="code">Code:</label>
+        <input type="text" id="code" name="code" required />
+        <br />
+        <a href="#" id="sendCodeButton">Send Code</a>
+        <br />
+        <button type="submit">Login</button>
+    </form>
+
+    <script>
+        document.getElementById('sendCodeButton').addEventListener('click', function (event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            if (!username) {
+                alert('Please enter your username first.');
+                return;
+            }
+            const url = `http://127.0.0.1:8080/user/code?username=${encodeURIComponent(username)}`;
+            window.location.href = url;
+        });
+    </script>
+  </body>
 </html>
