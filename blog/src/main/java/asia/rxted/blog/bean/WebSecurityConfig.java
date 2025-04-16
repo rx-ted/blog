@@ -44,16 +44,17 @@ public class WebSecurityConfig {
                  */
                 http.csrf(AbstractHttpConfigurer::disable); // 禁用跨站请求伪造防护
                 http.authorizeHttpRequests(requests -> requests
+                                /* 路径访问检测 */
                                 .anyRequest().access(userAuthorizationManager)
-                                /* 获取白名单（不进行权限验证 */
-                                // .requestMatchers("/",
-                                // "/css/**", "/js/**", "/img/**", "/fonts/**", "/favicon.ico",
-                                // "/index.html")
-                                // .permitAll()
-                                // .requestMatchers("/user/**").permitAll()
-                                /* 其他的需要登陆后才能访问 */
-                                // .anyRequest().authenticated()
-                                );
+                /* 获取白名单（不进行权限验证 */
+                // .requestMatchers("/",
+                // "/css/**", "/js/**", "/img/**", "/fonts/**", "/favicon.ico",
+                // "/index.html")
+                // .permitAll()
+                // .requestMatchers("/user/**").permitAll()
+                /* 其他的需要登陆后才能访问 */
+                // .anyRequest().authenticated()
+                );
                 http.sessionManagement(session -> session
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 禁用session（使用Token认证）
                 http.exceptionHandling(e -> e

@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema(description = "标签对象")
+@Schema(name = "标签对象")
 public class TagVO {
 
     @Schema(name = "id", title = "标签id", type = "Integer")

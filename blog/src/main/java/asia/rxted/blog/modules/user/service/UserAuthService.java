@@ -3,7 +3,6 @@ package asia.rxted.blog.modules.user.service;
 import java.util.List;
 
 import asia.rxted.blog.config.ResultCode;
-import asia.rxted.blog.config.ResultMessage;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.UserAdminDTO;
 import asia.rxted.blog.model.dto.UserAreaDTO;
@@ -11,6 +10,7 @@ import asia.rxted.blog.model.dto.UserInfoDTO;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.UserLoginVO;
 import asia.rxted.blog.model.vo.EmailVO;
+import asia.rxted.blog.model.vo.PasswordVO;
 
 public interface UserAuthService {
     ResultCode sendCode(String username);
@@ -26,4 +26,7 @@ public interface UserAuthService {
     ResultCode logout();
 
     UserInfoDTO login(UserLoginVO userLoginVO);
+
+    ResultCode updateAdminPassword(PasswordVO passwordVO);
+
 }

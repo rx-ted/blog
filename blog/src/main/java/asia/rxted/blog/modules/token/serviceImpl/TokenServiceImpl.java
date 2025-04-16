@@ -60,10 +60,10 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public void delLoginUser(String username) {
-        var token = redisService.hGet(CachePrefix.ACCESS_TOKEN.name(), username);
+    public void delLoginUser(Integer id) {
+        var token = redisService.hGet(CachePrefix.ACCESS_TOKEN.name(), id.toString());
         if (Objects.nonNull(token)) {
-            redisService.hDel(CachePrefix.ACCESS_TOKEN.name(), username);
+            redisService.hDel(CachePrefix.ACCESS_TOKEN.name(), id.toString());
             redisService.hSet(CachePrefix.BLACK_LIST.name(), token.toString(), LocalDateTime.now());
         }
     }

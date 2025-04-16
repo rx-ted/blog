@@ -10,7 +10,7 @@ public interface TokenService {
 
     boolean isTokenValid(String token, UserDetails userDetails);
 
-    void delLoginUser(String username);
+    void delLoginUser(Integer id);
 
     String extractUserName(String token);
 
