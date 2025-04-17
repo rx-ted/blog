@@ -29,7 +29,7 @@ public class UserUtil {
                 return (UserDetailsDTO) authentication.getPrincipal();
             }
         }
-        return null;
+        throw new IllegalArgumentException("Authentication is null or not authenticated");
     }
 
 }

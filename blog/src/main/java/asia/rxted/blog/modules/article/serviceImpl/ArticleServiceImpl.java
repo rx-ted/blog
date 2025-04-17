@@ -1,7 +1,11 @@
 package asia.rxted.blog.modules.article.serviceImpl;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -19,22 +23,28 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import asia.rxted.blog.constant.RabbitMQConstant;
 import asia.rxted.blog.enums.ArticleStatusEnum;
 import asia.rxted.blog.mapper.ArticleMapper;
+import asia.rxted.blog.mapper.ArticleTagMapper;
 import asia.rxted.blog.mapper.CategoryMapper;
 import asia.rxted.blog.mapper.TagMapper;
+import asia.rxted.blog.model.dto.ArchiveDTO;
+import asia.rxted.blog.model.dto.ArticleAdminDTO;
+import asia.rxted.blog.model.dto.ArticleAdminViewDTO;
 import asia.rxted.blog.model.dto.ArticleCardDTO;
 import asia.rxted.blog.model.dto.ArticleDTO;
 import asia.rxted.blog.model.dto.PageResultDTO;
 import asia.rxted.blog.model.dto.SearchDTO;
 import asia.rxted.blog.model.dto.TopAndFeaturedArticlesDTO;
 import asia.rxted.blog.model.entity.Article;
+import asia.rxted.blog.model.entity.ArticleTag;
 import asia.rxted.blog.model.entity.Category;
 import asia.rxted.blog.model.entity.Tag;
+import asia.rxted.blog.model.vo.ArticlePasswordVO;
+import asia.rxted.blog.model.vo.ArticleTopFeaturedVO;
 import asia.rxted.blog.model.vo.ArticleVO;
 import asia.rxted.blog.model.vo.ConditionVO;
 import asia.rxted.blog.model.vo.DeleteVO;
 import asia.rxted.blog.config.BizException;
 import asia.rxted.blog.config.ResultCode;
-import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.modules.article.service.ArticleService;
 import asia.rxted.blog.modules.article.service.ArticleTagService;
 import asia.rxted.blog.modules.article.service.CategoryService;
@@ -44,37 +54,41 @@ import asia.rxted.blog.modules.cache.service.RedisService;
 import asia.rxted.blog.modules.strategy.context.SearchStrategyContext;
 import asia.rxted.blog.utils.BeanCopyUtil;
 import asia.rxted.blog.utils.PageUtil;
+import asia.rxted.blog.utils.UserUtil;
 import lombok.SneakyThrows;
 
 @Service
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
 
     @Autowired
-    ArticleMapper articleMapper;
+    private ArticleMapper articleMapper;
 
     @Autowired
-    RedisService redisService;
+    private ArticleTagMapper articleTagMapper;
 
     @Autowired
-    CategoryMapper categoryMapper;
+    private RedisService redisService;
 
     @Autowired
-    TagService tagService;
+    private CategoryMapper categoryMapper;
 
     @Autowired
-    CategoryService categoryService;
+    private TagService tagService;
 
     @Autowired
-    ArticleTagService articleTagService;
+    private CategoryService categoryService;
 
     @Autowired
-    RabbitTemplate rabbitTemplate;
+    private ArticleTagService articleTagService;
 
     @Autowired
-    TagMapper tagMapper;
+    private RabbitTemplate rabbitTemplate;
 
     @Autowired
-    SearchStrategyContext searchStrategyContext;
+    private TagMapper tagMapper;
+
+    @Autowired
+    private SearchStrategyContext searchStrategyContext;
 
     private LambdaQueryWrapper<Article> wrapper(Integer isDelete, Integer... codes) {
         return new LambdaQueryWrapper<Article>()
@@ -168,8 +182,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (Objects.nonNull(category))
             newArticle.setCategoryId(category.getId());
         // 注册状态提取当前用户
-        // TODO(Ben): register user
-        newArticle.setUserId(1);
+        newArticle.setUserId(UserUtil.getUserDetailsDTO().getUserInfoId());
         if (!this.saveOrUpdate(newArticle)) {
             return ResultCode.ARTICLE_SAVE_OR_UPDATE_ERROR;
         }
@@ -182,7 +195,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
         // 传播rabbitmq 告诉操作状态
         if (newArticle.getStatus().equals(ArticleStatusEnum.PUBLIC.code())) {
-            System.out.println("will send rabbitmq");
             rabbitTemplate.convertAndSend(RabbitMQConstant.SUBSCRIBE_EXCHANGE,
                     RabbitMQConstant.SUBSCRIBE_ROUTING_KEY_NAME,
                     new Message(JSON.toJSONBytes(newArticle.getId()), new MessageProperties()));
@@ -205,6 +217,177 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @SneakyThrows(IOException.class)
     public List<SearchDTO> search(ConditionVO condition) {
         return searchStrategyContext.executeSearchStrategy(condition.getKeywords());
+    }
+
+    @Override
+    @SneakyThrows
+    public PageResultDTO<ArticleCardDTO> listArticlesByCategoryId(Integer categoryId) {
+        LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<Article>().eq(Article::getCategoryId,
+                categoryId);
+        CompletableFuture<Long> asyncCount = CompletableFuture
+                .supplyAsync(() -> articleMapper.selectCount(queryWrapper));
+        List<ArticleCardDTO> articles = articleMapper.getArticlesByCategoryId(PageUtil.getLimitCurrent(),
+                PageUtil.getSize(), categoryId);
+        return new PageResultDTO<>(articles, asyncCount.get());
+    }
+
+    @Override
+    @SneakyThrows
+    public ResultCode accessArticle(ArticlePasswordVO articlePasswordVO) {
+
+        Article article = articleMapper
+                .selectOne(new LambdaQueryWrapper<Article>().eq(Article::getId, articlePasswordVO.getArticleId()));
+        if (Objects.isNull(article)) {
+            return ResultCode.ARTICLE_NOT_EXIST;
+        }
+        if (article.getPassword().equals(articlePasswordVO.getArticlePassword())) {
+            redisService.sAdd(CachePrefix.ARTICLE_ACCESS.join(UserUtil.getUserDetailsDTO().getId().toString()),
+                    articlePasswordVO.getArticleId());
+            return ResultCode.SUCCESS;
+        } else {
+            return ResultCode.PASSWORD_ERROR;
+        }
+    }
+
+    @Override
+    @SneakyThrows
+    public PageResultDTO<ArticleCardDTO> listArticlesByTagId(Integer tagId) {
+        LambdaQueryWrapper<ArticleTag> queryWrapper = new LambdaQueryWrapper<ArticleTag>().eq(ArticleTag::getTagId,
+                tagId);
+        CompletableFuture<Long> asyncCount = CompletableFuture
+                .supplyAsync(() -> articleTagMapper.selectCount(queryWrapper));
+        List<ArticleCardDTO> articles = articleMapper.listArticlesByTagId(PageUtil.getLimitCurrent(),
+                PageUtil.getSize(), tagId);
+        return new PageResultDTO<>(articles, asyncCount.get());
+    }
+
+    @SneakyThrows
+    @Override
+    public PageResultDTO<ArchiveDTO> listArchives() {
+        LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<Article>().eq(Article::getIsDelete, 0)
+                .eq(Article::getStatus, 1);
+        CompletableFuture<Long> asyncCount = CompletableFuture
+                .supplyAsync(() -> articleMapper.selectCount(queryWrapper));
+        List<ArticleCardDTO> articles = articleMapper.listArchives(PageUtil.getLimitCurrent(), PageUtil.getSize());
+        HashMap<String, List<ArticleCardDTO>> map = new HashMap<>();
+        for (ArticleCardDTO article : articles) {
+            LocalDateTime createTime = article.getCreateTime();
+            int month = createTime.getMonth().getValue();
+            int year = createTime.getYear();
+            String key = year + "-" + month;
+            if (Objects.isNull(map.get(key))) {
+                List<ArticleCardDTO> articleCardDTOS = new ArrayList<>();
+                articleCardDTOS.add(article);
+                map.put(key, articleCardDTOS);
+            } else {
+                map.get(key).add(article);
+            }
+        }
+        List<ArchiveDTO> archiveDTOs = new ArrayList<>();
+        map.forEach((key, value) -> archiveDTOs.add(ArchiveDTO.builder().Time(key).articles(value).build()));
+        archiveDTOs.sort((o1, o2) -> {
+            String[] o1s = o1.getTime().split("-");
+            String[] o2s = o2.getTime().split("-");
+            int o1Year = Integer.parseInt(o1s[0]);
+            int o1Month = Integer.parseInt(o1s[1]);
+            int o2Year = Integer.parseInt(o2s[0]);
+            int o2Month = Integer.parseInt(o2s[1]);
+            if (o1Year > o2Year) {
+                return -1;
+            } else if (o1Year < o2Year) {
+                return 1;
+            } else
+                return Integer.compare(o2Month, o1Month);
+        });
+        return new PageResultDTO<>(archiveDTOs, asyncCount.get());
+
+    }
+
+    @SneakyThrows
+    @Override
+    public PageResultDTO<ArticleAdminDTO> listArticlesAdmin(ConditionVO conditionVO) {
+        CompletableFuture<Integer> asyncCount = CompletableFuture
+                .supplyAsync(() -> articleMapper.countArticleAdmins(conditionVO));
+        List<ArticleAdminDTO> articleAdminDTOs = articleMapper.listArticlesAdmin(PageUtil.getLimitCurrent(),
+                PageUtil.getSize(), conditionVO);
+        Map<Object, Double> viewsCountMap = redisService.zAllScore(CachePrefix.ARTICLE_VIEWS_COUNT.name());
+        articleAdminDTOs.forEach(item -> {
+            Double viewsCount = viewsCountMap.get(item.getId());
+            if (Objects.nonNull(viewsCount)) {
+                item.setViewsCount(viewsCount.intValue());
+            }
+        });
+        return new PageResultDTO<>(articleAdminDTOs, Long.valueOf(asyncCount.get()));
+    }
+
+    @Override
+    public ResultCode updateArticleTopAndFeatured(ArticleTopFeaturedVO articleTopFeaturedVO) {
+        Article article = Article.builder()
+                .id(articleTopFeaturedVO.getId())
+                .isTop(articleTopFeaturedVO.getIsTop())
+                .isFeatured(articleTopFeaturedVO.getIsFeatured())
+                .build();
+        return articleMapper.updateById(article) > 0 ? ResultCode.SUCCESS : ResultCode.ARTICLE_SAVE_OR_UPDATE_ERROR;
+
+    }
+
+    @Override
+    public ResultCode updateArticleDelete(DeleteVO deleteVO) {
+        Article article = Article.builder().id(deleteVO.getId())
+                .isDelete(deleteVO.getIsDelete())
+                .build();
+        return this.updateById(article) ? ResultCode.SUCCESS : ResultCode.ARTICLE_SAVE_OR_UPDATE_ERROR;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ResultCode deleteArticles(List<Integer> articleIds) {
+        articleTagMapper.delete(new LambdaQueryWrapper<ArticleTag>()
+                .in(ArticleTag::getArticleId, articleIds));
+        return articleMapper.deleteByIds(articleIds) > 0 ? ResultCode.SUCCESS
+                : ResultCode.ARTICLE_DELETE_ERROR;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ArticleAdminViewDTO getArticleByIdAdmin(Integer articleId) {
+        Article article = articleMapper.selectById(articleId);
+        Category category = categoryMapper.selectById(article.getCategoryId());
+        String categoryName = null;
+        if (Objects.nonNull(category)) {
+            categoryName = category.getCategoryName();
+        }
+        List<String> tagNames = tagMapper.listTagNamesByArticleId(articleId);
+        ArticleAdminViewDTO articleAdminViewDTO = BeanCopyUtil.copyObject(article, ArticleAdminViewDTO.class);
+        articleAdminViewDTO.setCategoryName(categoryName);
+        articleAdminViewDTO.setTagNames(tagNames);
+        return articleAdminViewDTO;
+
+    }
+
+    @Override
+    public List<String> exportArticles(List<Integer> articleIds) {
+        /*
+         * List<Article> articles = articleMapper.selectList(new
+         * LambdaQueryWrapper<Article>()
+         * .select(Article::getArticleTitle, Article::getArticleContent)
+         * .in(Article::getId, articleIds));
+         * List<String> urls = new ArrayList<>();
+         * for (Article article : articles) {
+         * try (ByteArrayInputStream inputStream = new
+         * ByteArrayInputStream(article.getArticleContent().getBytes())) {
+         * String url = uploadStrategyContext.executeUploadStrategy(
+         * article.getArticleTitle() + FileExtEnum.MD.getExtName(), inputStream,
+         * FilePathEnum.MD.getPath());
+         * urls.add(url);
+         * } catch (Exception e) {
+         * e.printStackTrace();
+         * throw new BizException("导出文章失败");
+         * }
+         * }
+         * return urls;
+         */
+        return new ArrayList<>();
     }
 
 }
