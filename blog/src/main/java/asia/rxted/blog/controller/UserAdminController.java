@@ -17,7 +17,7 @@ import asia.rxted.blog.model.vo.UserRoleVO;
 import asia.rxted.blog.modules.user.service.UserAuthService;
 import asia.rxted.blog.modules.user.service.UserInfoService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import static asia.rxted.blog.constant.OptTypeConstant.*;
 
-@Schema(name = "用户admin管理模块")
+@Tag(name = "用户admin管理", description = "用户admin管理相关API")
 @RestController
 @RequestMapping("admin")
 public class UserAdminController {

@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,6 +43,7 @@ import asia.rxted.blog.utils.BeanCopyUtil;
 import asia.rxted.blog.utils.PageUtil;
 import asia.rxted.blog.utils.UserUtil;
 
+@Service
 public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> implements UserInfoService {
     @Autowired
     private UserInfoMapper userInfoMapper;
