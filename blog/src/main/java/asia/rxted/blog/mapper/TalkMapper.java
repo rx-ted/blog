@@ -7,12 +7,12 @@ import asia.rxted.blog.model.dto.TalkDTO;
 import asia.rxted.blog.model.entity.Talk;
 import asia.rxted.blog.model.vo.ConditionVO;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
+@Mapper
 public interface TalkMapper extends BaseMapper<Talk> {
 
     List<TalkDTO> listTalks(@Param("current") Long current, @Param("size") Long size);

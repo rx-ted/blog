@@ -144,6 +144,13 @@ ip:
 website:
   url: https://rx-ted.asia
 
+file:
+  max-len: 100 # Maximum allowed length for file names is 100 characters.
+  max-size: 1 #单次上传文件最大不超过1MB
+  mode: mysql # mysql,local
+  # Use the default upload path if the mode is set to local.
+  default-upload-path: /home/rx-ted/projects/java/rx/uploads # 默认上传路径
+
 # logging:
 #   level:
 #     org:

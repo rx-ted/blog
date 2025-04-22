@@ -52,6 +52,8 @@ public enum ResultCode {
     ILLEGAL_REQUEST_ERROR(1004, "非法请求，请重新刷新页面操作"),
     IMAGE_FILE_EXT_ERROR(1005, "不支持图片格式"),
     FILE_NOT_EXIST_ERROR(1011, "上传文件不能为空"),
+    FILE_SIZE_ERROR(1011, "上传文件大小过大"),
+    FILE_NAME_LENGTH_ERROR(1011, "上传文件名过长"),
     FILE_TYPE_NOT_SUPPORT(1010, "不支持上传的文件类型！"),
     PLATFORM_NOT_SUPPORTED_IM(1006, "平台未开启IM"),
     STORE_NOT_SUPPORTED_IM(1007, "店铺未开启IM"),
@@ -72,6 +74,7 @@ public enum ResultCode {
      * 文件操作状态码
      */
     FILE_UPLOAD_ERROR(100000, "文件上传失败"),
+    FILE_UPLOAD_STRATEGY_ERROR(100000, "文件上传策略不支持"),
 
     /*
      * 文章代码状态

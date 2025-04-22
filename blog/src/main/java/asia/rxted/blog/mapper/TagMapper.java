@@ -7,12 +7,12 @@ import asia.rxted.blog.model.dto.TagDTO;
 import asia.rxted.blog.model.entity.Tag;
 import asia.rxted.blog.model.vo.ConditionVO;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
+@Mapper
 public interface TagMapper extends BaseMapper<Tag> {
 
     List<TagDTO> listTags();

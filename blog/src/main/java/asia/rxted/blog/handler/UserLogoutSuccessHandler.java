@@ -3,13 +3,12 @@ package asia.rxted.blog.handler;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Component;
-
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 
 import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.modules.cache.CachePrefix;

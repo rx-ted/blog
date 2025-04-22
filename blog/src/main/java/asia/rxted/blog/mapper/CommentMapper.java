@@ -11,11 +11,11 @@ import asia.rxted.blog.model.vo.CommentVO;
 import asia.rxted.blog.model.vo.ConditionVO;
 
 import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
-@Repository
+@Mapper
 public interface CommentMapper extends BaseMapper<Comment> {
 
     List<CommentDTO> listComments(@Param("current") Long current, @Param("size") Long size,

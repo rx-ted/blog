@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import asia.rxted.blog.config.BizException;
 import asia.rxted.blog.config.ResultCode;
 import asia.rxted.blog.modules.strategy.UploadStrategy;
-import asia.rxted.blog.utils.FileUtil;
+import asia.rxted.blog.utils.FileUtils;
 
 import java.io.*;
 
@@ -16,8 +16,8 @@ public abstract class AbstractUploadStrategyImpl implements UploadStrategy {
     @Override
     public String uploadFile(MultipartFile file, String path) {
         try {
-            String md5 = FileUtil.getMd5(file.getInputStream());
-            String extName = FileUtil.getExtName(file.getOriginalFilename());
+            String md5 = FileUtils.getMd5(file.getInputStream());
+            String extName = FileUtils.getExtName(file.getOriginalFilename());
             String fileName = md5 + extName;
             if (!exists(path + fileName)) {
                 upload(path, fileName, file.getInputStream());

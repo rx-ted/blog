@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @Configuration
-@ConfigurationProperties(prefix = "opensearch")
 public class OpensearchConfig {
 
         @Value("${opensearch.protocol}")
