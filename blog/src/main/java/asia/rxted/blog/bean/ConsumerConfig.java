@@ -26,7 +26,7 @@ import asia.rxted.blog.model.entity.UserInfo;
 import asia.rxted.blog.modules.article.service.ArticleService;
 import asia.rxted.blog.modules.email.service.EmailService;
 import asia.rxted.blog.modules.search.service.SearchService;
-import asia.rxted.blog.modules.user.service.SiteUserInfoService;
+import asia.rxted.blog.modules.user.service.UserInfoService;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
@@ -43,7 +43,7 @@ public class ConsumerConfig {
     private ArticleService articleService;
 
     @Autowired
-    private SiteUserInfoService userInfoService;
+    private UserInfoService userInfoService;
 
     @Autowired
     private SearchService searchService;
@@ -69,7 +69,7 @@ public class ConsumerConfig {
         List<UserInfo> users = userInfoService
                 .list(new LambdaQueryWrapper<UserInfo>().eq(UserInfo::getIsSubscribe, CommonConstant.TRUE));
         List<String> emails = users.stream().map(UserInfo::getEmail).collect(Collectors.toList());
-        log.info("subscriber name: "+emails.toString());
+        log.info("subscriber name: " + emails.toString());
         for (String email : emails) {
             EmailMsgDTO emailDTO = new EmailMsgDTO();
             Map<String, Object> map = new HashMap<>();

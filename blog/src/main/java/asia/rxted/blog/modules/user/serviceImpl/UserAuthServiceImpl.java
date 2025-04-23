@@ -52,8 +52,8 @@ import asia.rxted.blog.modules.cache.CachePrefix;
 import asia.rxted.blog.modules.cache.service.RedisService;
 import asia.rxted.blog.modules.strategy.context.LoginStrategyContext;
 import asia.rxted.blog.modules.token.service.TokenService;
-import asia.rxted.blog.modules.user.service.SiteUserInfoService;
 import asia.rxted.blog.modules.user.service.UserAuthService;
+import asia.rxted.blog.modules.website.WebsiteInfoService;
 import asia.rxted.blog.utils.CommonUtil;
 import asia.rxted.blog.utils.PageUtil;
 import asia.rxted.blog.utils.UserUtil;
@@ -76,7 +76,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     private UserInfoMapper userInfoMapper;
 
     @Autowired
-    private SiteUserInfoService siteUserInfoService;
+    private WebsiteInfoService websiteInfoService;
 
     @Autowired
     private UserRoleMapper userRoleMapper;
@@ -158,7 +158,7 @@ public class UserAuthServiceImpl implements UserAuthService {
                     .username("UK_" + UUID.randomUUID().toString().replaceAll("-", ""))
                     .email(emailVO.getUsername())
                     .nickname(CommonConstant.DEFAULT_NICKNAME + IdWorker.getId())
-                    .avatar(siteUserInfoService.getWebsiteConfig().getUserAvatar())
+                    .avatar(websiteInfoService.getWebsiteConfig().getUserAvatar())
                     .build();
             userInfoMapper.insert(userInfo);
             UserRole userRole = UserRole.builder()

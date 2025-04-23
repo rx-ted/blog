@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SiteAdminInfoDTO {
+public class WebsiteAdminInfoDTO {
 
     private Integer viewsCount;
 

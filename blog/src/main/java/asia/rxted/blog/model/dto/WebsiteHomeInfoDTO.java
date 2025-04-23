@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SiteHomeInfoDTO {
+public class WebsiteHomeInfoDTO {
 
     private Long articleCount;
 

@@ -1,4 +1,4 @@
-package asia.rxted.blog.modules.user.serviceImpl;
+package asia.rxted.blog.modules.website.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -17,12 +17,12 @@ import asia.rxted.blog.mapper.WebsiteConfigMapper;
 import asia.rxted.blog.model.dto.ArticleRankDTO;
 import asia.rxted.blog.model.dto.ArticleStatisticsDTO;
 import asia.rxted.blog.model.dto.CategoryDTO;
-import asia.rxted.blog.model.dto.SiteAboutDTO;
-import asia.rxted.blog.model.dto.SiteAdminInfoDTO;
-import asia.rxted.blog.model.dto.SiteHomeInfoDTO;
 import asia.rxted.blog.model.dto.TagDTO;
 import asia.rxted.blog.model.dto.UniqueViewDTO;
+import asia.rxted.blog.model.dto.WebsiteAboutDTO;
+import asia.rxted.blog.model.dto.WebsiteAdminInfoDTO;
 import asia.rxted.blog.model.dto.WebsiteConfigDTO;
+import asia.rxted.blog.model.dto.WebsiteHomeInfoDTO;
 import asia.rxted.blog.model.entity.About;
 import asia.rxted.blog.model.entity.Article;
 import asia.rxted.blog.model.entity.Comment;
@@ -32,8 +32,8 @@ import asia.rxted.blog.model.vo.AboutVO;
 import asia.rxted.blog.model.vo.WebsiteConfigVO;
 import asia.rxted.blog.modules.cache.CachePrefix;
 import asia.rxted.blog.modules.cache.service.RedisService;
-import asia.rxted.blog.modules.user.service.SiteUserInfoService;
-import asia.rxted.blog.modules.user.service.UniqueViewService;
+import asia.rxted.blog.modules.website.UniqueViewService;
+import asia.rxted.blog.modules.website.WebsiteInfoService;
 import asia.rxted.blog.utils.BeanCopyUtil;
 import asia.rxted.blog.utils.IpUtil;
 import eu.bitwalker.useragentutils.Browser;
@@ -53,8 +53,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
-public class SiteInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
-        implements SiteUserInfoService {
+public class WebsiteInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
+        implements WebsiteInfoService {
 
     @Autowired
     private WebsiteConfigMapper websiteConfigMapper;
@@ -112,7 +112,7 @@ public class SiteInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
 
     @SneakyThrows
     @Override
-    public SiteHomeInfoDTO getAuroraHomeInfo() {
+    public WebsiteHomeInfoDTO getAuroraHomeInfo() {
         CompletableFuture<Long> asyncArticleCount = CompletableFuture.supplyAsync(
                 () -> articleMapper.selectCount(new LambdaQueryWrapper<Article>().eq(Article::getIsDelete, 0)));
         CompletableFuture<Long> asyncCategoryCount = CompletableFuture
@@ -124,7 +124,7 @@ public class SiteInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
             Object count = redisService.get(CachePrefix.BLOG_VIEWS_COUNT.getPrefix());
             return Integer.parseInt(Optional.ofNullable(count).orElse(0).toString());
         });
-        return SiteHomeInfoDTO.builder()
+        return WebsiteHomeInfoDTO.builder()
                 .articleCount(asyncArticleCount.get())
                 .categoryCount(asyncCategoryCount.get())
                 .tagCount(asyncTagCount.get())
@@ -134,7 +134,7 @@ public class SiteInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
     }
 
     @Override
-    public SiteAdminInfoDTO getAuroraAdminInfo() {
+    public WebsiteAdminInfoDTO getAuroraAdminInfo() {
         Object count = redisService.get(CachePrefix.BLOG_VIEWS_COUNT.getPrefix());
         Integer viewsCount = Integer.parseInt(Optional.ofNullable(count).orElse(0).toString());
         Long messageCount = commentMapper.selectCount(new LambdaQueryWrapper<Comment>().eq(Comment::getType, 2));
@@ -148,7 +148,7 @@ public class SiteInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
         Map<Object, Double> articleMap = redisService.zReverseRangeWithScore(
                 CachePrefix.ARTICLE_VIEWS_COUNT.getPrefix(),
                 0, 4);
-        SiteAdminInfoDTO auroraAdminInfoDTO = SiteAdminInfoDTO.builder()
+        WebsiteAdminInfoDTO auroraAdminInfoDTO = WebsiteAdminInfoDTO.builder()
                 .articleStatisticsDTOs(articleStatisticsDTOs)
                 .tagDTOs(tagDTOs)
                 .viewsCount(viewsCount)
@@ -202,14 +202,14 @@ public class SiteInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo>
     }
 
     @Override
-    public SiteAboutDTO getAbout() {
-        SiteAboutDTO aboutDTO;
+    public WebsiteAboutDTO getAbout() {
+        WebsiteAboutDTO aboutDTO;
         Object about = redisService.get(CachePrefix.ABOUT.getPrefix());
         if (Objects.nonNull(about)) {
-            aboutDTO = JSON.parseObject(about.toString(), SiteAboutDTO.class);
+            aboutDTO = JSON.parseObject(about.toString(), WebsiteAboutDTO.class);
         } else {
             String content = aboutMapper.selectById(CommonConstant.DEFAULT_ABOUT_ID).getContent();
-            aboutDTO = JSON.parseObject(content, SiteAboutDTO.class);
+            aboutDTO = JSON.parseObject(content, WebsiteAboutDTO.class);
             redisService.set(CachePrefix.ABOUT.getPrefix(), content);
         }
         return aboutDTO;
