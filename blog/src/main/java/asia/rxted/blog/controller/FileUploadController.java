@@ -9,7 +9,9 @@ import asia.rxted.blog.config.ResultMessage;
 import asia.rxted.blog.config.ResultVO;
 import asia.rxted.blog.modules.file.FileService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "文件上传模块")
 @RestController
 @RequestMapping("file")
 public class FileUploadController {
