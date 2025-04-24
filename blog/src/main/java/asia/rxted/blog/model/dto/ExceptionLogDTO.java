@@ -1,6 +1,5 @@
-package asia.rxted.blog.log;
+package asia.rxted.blog.model.dto;
 
-import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,10 +11,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("t_exception_log")
-public class ExceptionLog {
+public class ExceptionLogDTO {
 
-    @TableId(type = IdType.AUTO)
     private Integer id;
 
     private String optUri;
@@ -34,7 +31,6 @@ public class ExceptionLog {
 
     private String ipSource;
 
-    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
 }

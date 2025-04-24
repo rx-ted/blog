@@ -3,7 +3,7 @@ package asia.rxted.blog.aspect;
 import com.alibaba.fastjson.JSON;
 
 import asia.rxted.blog.event.ExceptionLogEvent;
-import asia.rxted.blog.log.ExceptionLog;
+import asia.rxted.blog.model.entity.ExceptionLog;
 import asia.rxted.blog.utils.ExceptionUtil;
 import asia.rxted.blog.utils.IpUtil;
 import io.swagger.v3.oas.annotations.Operation;

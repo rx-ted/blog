@@ -2,7 +2,7 @@ package asia.rxted.blog.event;
 
 import org.springframework.context.ApplicationEvent;
 
-import asia.rxted.blog.log.OperationLog;
+import asia.rxted.blog.model.entity.OperationLog;
 
 public class OperationLogEvent extends ApplicationEvent {
 
