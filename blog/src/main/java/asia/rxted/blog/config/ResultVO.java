@@ -73,4 +73,12 @@ public class ResultVO<T> {
         }
     }
 
+    public static <T> ResultMessage<T> status(boolean b) {
+        if (b == true) {
+            return ResultVO.success();
+        } else {
+            return ResultVO.error();
+        }
+    }
+
 }
