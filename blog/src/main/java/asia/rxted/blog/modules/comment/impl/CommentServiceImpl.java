@@ -93,7 +93,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         Integer isCommentReview = websiteConfig.getIsCommentReview();
         commentVO.setCommentContent(HTMLUtil.filter(commentVO.getCommentContent()));
         Comment comment = Comment.builder()
-                .userId(UserUtil.getUserDetailsDTO().getUserInfoId())
+                // .userId(UserUtil.getUserDetailsDTO().getUserInfoId())
+                .userId(1)
                 .replyUserId(commentVO.getReplyUserId())
                 .topicId(commentVO.getTopicId())
                 .commentContent(commentVO.getCommentContent())
@@ -102,7 +103,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                 .isReview(isCommentReview == CommonConstant.TRUE ? CommonConstant.FALSE : CommonConstant.TRUE)
                 .build();
         commentMapper.insert(comment);
-        String fromNickname = UserUtil.getUserDetailsDTO().getNickname();
+        // String fromNickname = UserUtil.getUserDetailsDTO().getNickname();
+        String fromNickname = "测试";
+
         if (websiteConfig.getIsEmailNotice().equals(CommonConstant.TRUE)) {
             CompletableFuture.runAsync(() -> notice(comment, fromNickname));
         }
