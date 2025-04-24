@@ -28,6 +28,12 @@
     <dependencies>
 
         <dependency>
+            <groupId>com.github.houbb</groupId>
+            <artifactId>sensitive-word</artifactId>
+            <version>0.9.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>
             knife4j-openapi3-jakarta-spring-boot-starter
