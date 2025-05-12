@@ -10,9 +10,5 @@ class BlogApplicationTests {
     void contextLoads() {
     }
 
-    @Test
-    void example1(){
-        System.out.println("Hello ssss");
-    }
 
 }

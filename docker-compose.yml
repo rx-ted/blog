@@ -6,9 +6,10 @@ services:
     volumes:
       - ./config/init/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
       #  数据库还原目录 可将需要还原的sql文件放在这里
-      - ./config/init/mysql/data:/docker-entrypoint-initdb.d
-      - ./config/init/mysql/log:/var/log/mysql
-      - ./config/init/mysql/lib:/var/lib/mysql
+      - ./.cache/mysql/data:/docker-entrypoint-initdb.d
+      - ./config/init/mysql/data/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./.cache/mysql/log:/var/log/mysql
+      - ./.cache/mysql/lib:/var/lib/mysql
     environment:
       - "MYSQL_ROOT_PASSWORD=root"
       - "MYSQL_DATABASE=blog"
@@ -31,7 +32,7 @@ services:
       - "6379:6379"
     volumes:
       - ./config/init/redis/redis.conf:/etc/redis/redis.conf
-      - ./config/init/redis/data:/data
+      - ./.cache/redis/data:/data
 
   opensearch:
     image: opensearchproject/opensearch:2.19.1
@@ -42,7 +43,7 @@ services:
       - "9200:9200"
       - "9600:9600"
     volumes:
-      - ./config/init/opensearch/data:/usr/share/opensearch/data
+      - ./.cache/opensearch/data:/usr/share/opensearch/data
     environment:
       - discovery.type=single-node
       - "DISABLE_SECURITY_PLUGIN=true"
@@ -67,6 +68,11 @@ services:
   maxwell:
     image: zendesk/maxwell:v1.43.2
     container_name: maxwell
+    depends_on:
+      - redis
+      - mysql
+      - opensearch
+      - rabbitmq
     restart: always
     command: "bin/maxwell --config /app/config.properties"
     # 172.18.0.X neets to set host.
@@ -87,47 +93,46 @@ services:
       - "RABBITMQ_DEFAULT_USER=guest"
       - "RABBITMQ_DEFAULT_PASS=guest"
     volumes:
-      - ./config/init/rabbitmq/lib:/var/lib/rabbitmq
+      - ./.cache/rabbitmq/lib:/var/lib/rabbitmq
     ports:
       - "15672:15672"
       - "5672:5672"
     networks:
       blog_network:
         ipv4_address: 172.28.0.7
+  
+  maven:
+    image:  maven:3.8.7
+    container_name: maven
+    depends_on:
+      - maxwell
+    working_dir: /app
+    volumes:
+      - ./config/init/m2/settings.xml:/root/.m2/settings.xml
+      - ~/.m2/repository:/root/.m2/repository
+      - ./blog:/app
+      - ./.cache/output:/app/target
+    networks:
+      - blog_network
+    command: ["mvn", "install","package"]
+    restart:  "no"
 
-  # blog:
-  #   build:
-  #     context: .
-  #   container_name: blog
-  #   depends_on:
-  #     - redis
-  #     - mysql
-  #   environment:
-  #     - SPRING_REDIS_HOST=127.0.0.1
-  #     - SPRING_REDIS_PORT=6379
-  #   ports:
-  #     - "8080:8080"
-  #     - "25:25"
-  #   restart: always
-  #   networks:
-  #     - blog_network
 
-  # blog1:
-  #   image: openjdk:17-jdk
-  #   container_name: blog1
-  #   depends_on:
-  #     - redis
-  #     - mysql
-  #   working_dir: /app
-  #   volumes:
-  #     - "./target/app.jar:/app/app.jar"
-  #   # ports:
-  #   #   - "8080:8080"
-  #   #   - "25:25"
-  #   command: ["java", "-jar", "app.jar"]
-  #   networks:
-  #     - blog_network
-  #   restart: on-failure
+
+  java:
+    image: openjdk:17-jdk
+    container_name: java
+    depends_on:
+      - maven
+    volumes:
+      - "./.cache/output/app.jar:/app/app.jar"
+    ports:
+      - "8080:8080"
+    #   - "25:25"
+    command: ["java", "-jar", "/app/app.jar"]
+    networks:
+      - blog_network
+    restart: on-failure
 
 # docker network create --driver bridge blog_network
 networks:

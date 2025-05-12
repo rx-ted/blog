@@ -19,9 +19,16 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/blog?serverTimezone=UTC
+    url: jdbc:mysql://172.28.0.2:3306/blog?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
     username: root
     password: root
+    hikari:
+      pool-name: blog
+      maximum-pool-size: 10 # 连接池最大连接数，默认为 10 。
+      minimum-idle: 5 # 默认连接池最小空闲的连接数，默认为 5 。
+      idle-timeout: 600000 # 连接池空闲超时时间，单位：毫秒。默认为 600000 ，表示 10 分钟。
+      connection-timeout: 30000 # 连接池获取连接超时时间，单位：毫秒。默认为 30000 ，表示 30 秒。
+      max-lifetime: 1800000 # 连接池最大生命周期，单位：毫秒。默认为 1800000 ，表示 30 分钟。
 
   mvc:
     pathmatch:
@@ -34,7 +41,7 @@ spring:
 
   data:
     redis:
-      host: 127.0.0.1
+      host: 172.28.0.3
       port: 6379
       password: root # Redis 服务器密码。
       database: 0 # Redis 数据库号，默认为 0。
@@ -47,7 +54,7 @@ spring:
           max-wait: -1 # 连接池最大阻塞等待时间，单位：毫秒。默认为 -1 ，表示不限制。
 
   rabbitmq:
-    host: localhost
+    host: 172.28.0.7
     port: 5672
     username: guest
     password: guest
@@ -58,13 +65,13 @@ spring:
           max-attempts: 3
           initial-interval: 3000
 
-  elasticsearch:
-    username: guest
-    password: guest
-    uris:
-      - localhost:9200
-    rest:
-      uris: localhost:9200
+  # elasticsearch:
+  #   username: guest
+  #   password: guest
+  #   uris:
+  #     - localhost:9200
+  #   rest:
+  #     uris: localhost:9200
 
   cache:
     type: redis
@@ -89,8 +96,7 @@ openapi:
 #     name: "logging.log"
 
 search:
-  # only select one
-  # mode: mysql
+  # only select one, such as mysql or opensearch
   mode: opensearch
 
 jwt:
@@ -102,7 +108,7 @@ jwt:
   prefix: "Bearer "
 
 opensearch:
-  uris: http://localhost:9200
+  uris: http://172.28.0.4:9200
   username: admin
   password: admin
   host: localhost
@@ -151,10 +157,11 @@ file:
   # Use the default upload path if the mode is set to local.
   default-upload-path: /home/rx-ted/projects/java/rx/uploads # 默认上传路径
 
-# logging:
-#   level:
-#     org:
-#       springframework: DEBUG
+logging:
+  level:
+    org:
+      springframework:
+        jdbc: DEBUG
 
 ---
 spring:
