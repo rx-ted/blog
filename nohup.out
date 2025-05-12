@@ -1,0 +1,415 @@
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.0)
+
+2025-05-12T17:49:25.743+08:00  INFO 76716 --- [Blog] [           main] asia.rxted.blog.BlogApplication          : Starting BlogApplication v0.0.1 using Java 17.0.15 with PID 76716 (/Users/rx/projects/java/rx/blog/target/app.jar started by rx in /Users/rx/projects/java/rx)
+2025-05-12T17:49:25.744+08:00  INFO 76716 --- [Blog] [           main] asia.rxted.blog.BlogApplication          : The following 1 profile is active: "dev"
+2025-05-12T17:49:26.505+08:00  INFO 76716 --- [Blog] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2025-05-12T17:49:26.506+08:00  INFO 76716 --- [Blog] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2025-05-12T17:49:26.529+08:00  INFO 76716 --- [Blog] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 16 ms. Found 0 Redis repository interfaces.
+2025-05-12T17:49:27.073+08:00  INFO 76716 --- [Blog] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-05-12T17:49:27.079+08:00  INFO 76716 --- [Blog] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-05-12T17:49:27.079+08:00  INFO 76716 --- [Blog] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.24]
+2025-05-12T17:49:27.098+08:00  INFO 76716 --- [Blog] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-05-12T17:49:27.098+08:00  INFO 76716 --- [Blog] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1289 ms
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+Logging initialized using 'class org.apache.ibatis.logging.stdout.StdOutImpl' adapter.
+Get /192.168.2.177 network interface 
+Get network interface info: name:en1 (en1)
+Initialization Sequence datacenterId:6 workerId:7
+ _ _   |_  _ _|_. ___ _ |    _ 
+| | |\/|_)(_| | |_\  |_)||_|_\ 
+     /               |         
+                        3.5.10.1 
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4e9695cf] was not registered for synchronization because synchronization is not active
+2025-05-12T17:49:27.769+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+2025-05-12T17:49:27.769+08:00  INFO 76716 --- [Blog] [           main] com.zaxxer.hikari.HikariDataSource       : blog - Starting...
+2025-05-12T17:49:27.864+08:00  INFO 76716 --- [Blog] [           main] com.zaxxer.hikari.pool.HikariPool        : blog - Added connection com.mysql.cj.jdbc.ConnectionImpl@6b529d42
+2025-05-12T17:49:27.865+08:00  INFO 76716 --- [Blog] [           main] com.zaxxer.hikari.HikariDataSource       : blog - Start completed.
+JDBC Connection [HikariProxyConnection@1468832172 wrapping com.mysql.cj.jdbc.ConnectionImpl@6b529d42] will not be managed by Spring
+==>  Preparing: select re.id as id, url, request_method, role_name from t_resource re left join t_role_resource rr on re.id = rr.resource_id left join t_role ro on rr.role_id = ro.id where re.parent_id is not null;
+==> Parameters: 
+<==    Columns: id, url, request_method, role_name
+<==        Row: 1068, /, GET, null
+<==        Row: 1069, /about, GET, null
+<==        Row: 1070, /admin, GET, test
+<==        Row: 1070, /admin, GET, admin
+<==        Row: 1071, /admin/about, PUT, admin
+<==        Row: 1072, /admin/articles, GET, test
+<==        Row: 1072, /admin/articles, GET, admin
+<==        Row: 1073, /admin/articles, POST, admin
+<==        Row: 1074, /admin/articles, PUT, admin
+<==        Row: 1075, /admin/articles/delete, DELETE, admin
+<==        Row: 1076, /admin/articles/export, POST, admin
+<==        Row: 1077, /admin/articles/images, POST, admin
+<==        Row: 1078, /admin/articles/import, POST, admin
+<==        Row: 1079, /admin/articles/topAndFeatured, PUT, admin
+<==        Row: 1080, /admin/articles/*, GET, test
+<==        Row: 1080, /admin/articles/*, GET, admin
+<==        Row: 1081, /admin/categories, GET, test
+<==        Row: 1081, /admin/categories, GET, admin
+<==        Row: 1082, /admin/categories, POST, admin
+<==        Row: 1083, /admin/categories, DELETE, admin
+<==        Row: 1084, /admin/categories/search, GET, test
+<==        Row: 1084, /admin/categories/search, GET, admin
+<==        Row: 1085, /admin/comments, GET, test
+<==        Row: 1085, /admin/comments, GET, admin
+<==        Row: 1086, /admin/comments, DELETE, admin
+<==        Row: 1087, /admin/comments/review, PUT, admin
+<==        Row: 1088, /admin/config/images, POST, admin
+<==        Row: 1089, /admin/jobLogs, GET, test
+<==        Row: 1089, /admin/jobLogs, GET, admin
+<==        Row: 1090, /admin/jobLogs, DELETE, admin
+<==        Row: 1091, /admin/jobLogs/clean, DELETE, admin
+<==        Row: 1092, /admin/jobLogs/jobGroups, GET, test
+<==        Row: 1092, /admin/jobLogs/jobGroups, GET, admin
+<==        Row: 1093, /admin/jobs, GET, test
+<==        Row: 1093, /admin/jobs, GET, admin
+<==        Row: 1094, /admin/jobs, POST, admin
+<==        Row: 1095, /admin/jobs, PUT, admin
+<==        Row: 1096, /admin/jobs, DELETE, admin
+<==        Row: 1097, /admin/jobs/jobGroups, GET, test
+<==        Row: 1097, /admin/jobs/jobGroups, GET, admin
+<==        Row: 1098, /admin/jobs/run, PUT, admin
+<==        Row: 1099, /admin/jobs/status, PUT, admin
+<==        Row: 1100, /admin/jobs/*, GET, test
+<==        Row: 1100, /admin/jobs/*, GET, admin
+<==        Row: 1101, /admin/links, GET, test
+<==        Row: 1101, /admin/links, GET, admin
+<==        Row: 1102, /admin/links, POST, admin
+<==        Row: 1103, /admin/links, DELETE, admin
+<==        Row: 1104, /admin/menus, GET, test
+<==        Row: 1104, /admin/menus, GET, admin
+<==        Row: 1105, /admin/menus, POST, admin
+<==        Row: 1106, /admin/menus/isHidden, PUT, admin
+<==        Row: 1107, /admin/menus/*, DELETE, admin
+<==        Row: 1108, /admin/operation/logs, GET, test
+<==        Row: 1108, /admin/operation/logs, GET, admin
+<==        Row: 1109, /admin/operation/logs, DELETE, admin
+<==        Row: 1110, /admin/photos, GET, test
+<==        Row: 1110, /admin/photos, GET, admin
+<==        Row: 1111, /admin/photos, POST, admin
+<==        Row: 1112, /admin/photos, PUT, admin
+<==        Row: 1113, /admin/photos, DELETE, admin
+<==        Row: 1114, /admin/photos/album, PUT, admin
+<==        Row: 1115, /admin/photos/albums, GET, test
+<==        Row: 1115, /admin/photos/albums, GET, admin
+<==        Row: 1116, /admin/photos/albums, POST, admin
+<==        Row: 1117, /admin/photos/albums/cover, POST, admin
+<==        Row: 1118, /admin/photos/albums/info, GET, test
+<==        Row: 1118, /admin/photos/albums/info, GET, admin
+<==        Row: 1119, /admin/photos/albums/*, DELETE, admin
+<==        Row: 1120, /admin/photos/albums/*/info, GET, admin
+<==        Row: 1121, /admin/photos/delete, PUT, admin
+<==        Row: 1122, /admin/resources, GET, test
+<==        Row: 1122, /admin/resources, GET, admin
+<==        Row: 1123, /admin/resources, POST, admin
+<==        Row: 1124, /admin/resources/*, DELETE, admin
+<==        Row: 1125, /admin/role, POST, admin
+<==        Row: 1126, /admin/role/menus, GET, test
+<==        Row: 1126, /admin/role/menus, GET, admin
+<==        Row: 1127, /admin/role/resources, GET, test
+<==        Row: 1127, /admin/role/resources, GET, admin
+<==        Row: 1128, /admin/roles, GET, test
+<==        Row: 1128, /admin/roles, GET, admin
+<==        Row: 1129, /admin/roles, DELETE, admin
+<==        Row: 1130, /admin/tags, GET, test
+<==        Row: 1130, /admin/tags, GET, admin
+<==        Row: 1131, /admin/tags, POST, admin
+<==        Row: 1132, /admin/tags, DELETE, admin
+<==        Row: 1133, /admin/tags/search, GET, test
+<==        Row: 1133, /admin/tags/search, GET, admin
+<==        Row: 1134, /admin/talks, GET, test
+<==        Row: 1134, /admin/talks, GET, admin
+<==        Row: 1135, /admin/talks, POST, admin
+<==        Row: 1136, /admin/talks, DELETE, admin
+<==        Row: 1137, /admin/talks/images, POST, admin
+<==        Row: 1138, /admin/talks/*, GET, null
+<==        Row: 1139, /admin/user/menus, GET, test
+<==        Row: 1139, /admin/user/menus, GET, admin
+<==        Row: 1140, /admin/users, GET, test
+<==        Row: 1140, /admin/users, GET, admin
+<==        Row: 1141, /admin/users/area, GET, test
+<==        Row: 1141, /admin/users/area, GET, admin
+<==        Row: 1142, /admin/users/disable, PUT, admin
+<==        Row: 1143, /admin/users/online, GET, test
+<==        Row: 1143, /admin/users/online, GET, admin
+<==        Row: 1144, /admin/users/password, PUT, admin
+<==        Row: 1145, /admin/users/role, GET, test
+<==        Row: 1145, /admin/users/role, GET, admin
+<==        Row: 1146, /admin/users/role, PUT, admin
+<==        Row: 1146, /admin/users/role, PUT, user
+<==        Row: 1147, /admin/users/*/online, DELETE, admin
+<==        Row: 1148, /admin/website/config, GET, test
+<==        Row: 1148, /admin/website/config, GET, admin
+<==        Row: 1149, /admin/website/config, PUT, admin
+<==        Row: 1150, /albums/*/photos, GET, null
+<==        Row: 1151, /archives/all, GET, null
+<==        Row: 1152, /articles/all, GET, null
+<==        Row: 1153, /articles/categoryId, GET, null
+<==        Row: 1154, /articles/search, GET, null
+<==        Row: 1155, /articles/tagId, GET, null
+<==        Row: 1156, /articles/topAndFeatured, GET, null
+<==        Row: 1157, /articles/*, GET, null
+<==        Row: 1158, /bizException, GET, admin
+<==        Row: 1159, /bizException, HEAD, admin
+<==        Row: 1160, /bizException, POST, admin
+<==        Row: 1161, /bizException, PUT, admin
+<==        Row: 1162, /bizException, DELETE, admin
+<==        Row: 1163, /bizException, OPTIONS, admin
+<==        Row: 1164, /bizException, PATCH, admin
+<==        Row: 1165, /categories/all, GET, null
+<==        Row: 1166, /comments, GET, null
+<==        Row: 1167, /comments/save, POST, admin
+<==        Row: 1167, /comments/save, POST, user
+<==        Row: 1168, /comments/topSeven, GET, null
+<==        Row: 1169, /links, GET, null
+<==        Row: 1170, /photos/albums, GET, null
+<==        Row: 1171, /report, POST, null
+<==        Row: 1172, /tags/all, GET, null
+<==        Row: 1173, /tags/topTen, GET, null
+<==        Row: 1174, /talks, GET, null
+<==        Row: 1175, /talks/*, GET, null
+<==        Row: 1176, /users/avatar, POST, null
+<==        Row: 1177, /users/code, GET, null
+<==        Row: 1178, /users/email, PUT, null
+<==        Row: 1179, /users/info, PUT, null
+<==        Row: 1180, /users/info/*, GET, null
+<==        Row: 1181, /users/logout, POST, null
+<==        Row: 1182, /users/oauth/qq, POST, null
+<==        Row: 1183, /users/password, PUT, null
+<==        Row: 1184, /users/register, POST, null
+<==        Row: 1185, /users/subscribe, PUT, null
+<==        Row: 1187, /admin/exception/logs, GET, test
+<==        Row: 1187, /admin/exception/logs, GET, admin
+<==        Row: 1188, /admin/exception/logs, DELETE, admin
+<==      Total: 153
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4e9695cf]
+2025-05-12T17:49:28.727+08:00  INFO 76716 --- [Blog] [           main] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name userAuthenticationProvider
+2025-05-12T17:49:28.728+08:00  WARN 76716 --- [Blog] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used for username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider.
+2025-05-12T17:49:28.773+08:00  INFO 76716 --- [Blog] [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2025-05-12T17:49:28.958+08:00  INFO 76716 --- [Blog] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-05-12T17:49:28.991+08:00  INFO 76716 --- [Blog] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@1007954a, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@10770c1, org.springframework.security.web.context.SecurityContextHolderFilter@4c541b00, org.springframework.security.web.header.HeaderWriterFilter@189f2184, org.springframework.web.filter.CorsFilter@35ab0bf3, org.springframework.security.web.authentication.logout.LogoutFilter@2c5e2a44, asia.rxted.blog.handler.JwtAuthenticationTokenFilter@67d8613, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@39240aa3, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@32180efb, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@dd26290, org.springframework.security.web.session.SessionManagementFilter@2c2dfde3, org.springframework.security.web.access.ExceptionTranslationFilter@68d1f4e2, org.springframework.security.web.access.intercept.AuthorizationFilter@60abe420]
+2025-05-12T17:49:29.935+08:00  INFO 76716 --- [Blog] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-05-12T17:49:29.937+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:29.938+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+2025-05-12T17:49:29.946+08:00  INFO 76716 --- [Blog] [           main] o.s.a.r.c.CachingConnectionFactory       : Attempting to connect to: [localhost:5672]
+2025-05-12T17:49:29.978+08:00  INFO 76716 --- [Blog] [           main] o.s.a.r.c.CachingConnectionFactory       : Created new connection: rabbitConnectionFactory#795949fb:0/SimpleConnection@55aadbf2 [delegate=amqp://guest@127.0.0.1:5672/, localPort=52044]
+2025-05-12T17:49:30.003+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:30.003+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+2025-05-12T17:49:30.009+08:00 DEBUG 76716 --- [Blog] [pool-3-thread-3] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:30.009+08:00 DEBUG 76716 --- [Blog] [pool-3-thread-3] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+2025-05-12T17:49:30.009+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:30.009+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+Successfully connected to MySQL database!
+2025-05-12T17:49:30.012+08:00 DEBUG 76716 --- [Blog] [pool-3-thread-4] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:30.012+08:00 DEBUG 76716 --- [Blog] [pool-3-thread-4] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+2025-05-12T17:49:30.012+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:30.012+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+Successfully connected to MySQL database!
+2025-05-12T17:49:30.015+08:00 DEBUG 76716 --- [Blog] [pool-3-thread-5] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:30.015+08:00 DEBUG 76716 --- [Blog] [pool-3-thread-5] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+2025-05-12T17:49:30.026+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:30.026+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+2025-05-12T17:49:30.028+08:00  INFO 76716 --- [Blog] [           main] asia.rxted.blog.BlogApplication          : Started BlogApplication in 4.536 seconds (process running for 4.764)
+2025-05-12T17:49:30.028+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:30.028+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+2025-05-12T17:49:30.043+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:30.043+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+2025-05-12T17:49:30.045+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:30.045+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+2025-05-12T17:49:30.046+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:30.046+08:00 DEBUG 76716 --- [Blog] [           main] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+2025-05-12T17:49:30.046+08:00  INFO 76716 --- [Blog] [           main] asia.rxted.blog.BlogApplication          : 
+----------------------------------------------------------
+	Application: 'Blog' is running Success! 
+	Local URL: 	http://localhost:8080
+	Document:	http://localhost:8080/doc.html
+----------------------------------------------------------
+2025-05-12T17:49:38.295+08:00  INFO 76716 --- [Blog] [nio-8080-exec-3] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-05-12T17:49:38.295+08:00  INFO 76716 --- [Blog] [nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-05-12T17:49:38.295+08:00  INFO 76716 --- [Blog] [nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+Creating a new SqlSession
+Creating a new SqlSession
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2253fbda] was not registered for synchronization because synchronization is not active
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6e486783] was not registered for synchronization because synchronization is not active
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6e82b4] was not registered for synchronization because synchronization is not active
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@29e46fb2] was not registered for synchronization because synchronization is not active
+2025-05-12T17:49:38.341+08:00 DEBUG 76716 --- [Blog] [onPool-worker-3] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+2025-05-12T17:49:38.342+08:00 DEBUG 76716 --- [Blog] [onPool-worker-4] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+2025-05-12T17:49:38.342+08:00 DEBUG 76716 --- [Blog] [onPool-worker-2] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+JDBC Connection [HikariProxyConnection@99375537 wrapping com.mysql.cj.jdbc.ConnectionImpl@525a89df] will not be managed by Spring
+==>  Preparing: SELECT COUNT( * ) AS total FROM t_talk
+JDBC Connection [HikariProxyConnection@1887083423 wrapping com.mysql.cj.jdbc.ConnectionImpl@58b8082b] will not be managed by Spring
+==> Parameters: 
+==>  Preparing: SELECT COUNT( * ) AS total FROM t_category
+JDBC Connection [HikariProxyConnection@63287852 wrapping com.mysql.cj.jdbc.ConnectionImpl@6b529d42] will not be managed by Spring
+==>  Preparing: SELECT COUNT( * ) AS total FROM t_tag
+==> Parameters: 
+==> Parameters: 
+<==    Columns: total
+<==        Row: 0
+<==    Columns: total
+<==        Row: 0
+<==      Total: 1
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6e486783]
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2253fbda]
+<==    Columns: total
+<==        Row: 0
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6e82b4]
+2025-05-12T17:49:38.354+08:00 DEBUG 76716 --- [Blog] [onPool-worker-1] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+JDBC Connection [HikariProxyConnection@1631934174 wrapping com.mysql.cj.jdbc.ConnectionImpl@6b529d42] will not be managed by Spring
+==>  Preparing: SELECT COUNT( * ) AS total FROM t_article WHERE (is_delete = ?)
+==> Parameters: 0(Integer)
+<==    Columns: total
+<==        Row: 0
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@29e46fb2]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@9c10f03] was not registered for synchronization because synchronization is not active
+2025-05-12T17:49:38.466+08:00 DEBUG 76716 --- [Blog] [onPool-worker-5] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+JDBC Connection [HikariProxyConnection@1851510971 wrapping com.mysql.cj.jdbc.ConnectionImpl@6b529d42] will not be managed by Spring
+==>  Preparing: SELECT id,config,create_time,update_time FROM t_website_config WHERE id=?
+==> Parameters: 1(Integer)
+<==    Columns: id, config, create_time, update_time
+<==        Row: 1, {"alipayQRCode":"https://static.linhaojun.top/config/da4c6d8c13f66a8dd6716ddb48d73299.jpg","author":"花未眠","authorAvatar":"https://static.linhaojun.top/config/6e4f47f4bb66d2d30722d20e789b220e.jpg","authorIntro":"一个疯狂的coder","beianNumber":"苏ICP备2022012376号","csdn":"","englishName":"huaweimian","gitee":"https://gitee.com/linhaojun","github":"https://github.com/linhaojun857","isCommentReview":0,"isEmailNotice":1,"isReward":1,"juejin":"","logo":"https://static.linhaojun.top/config/cc36e9fa5aeb214e41495c1e2268f2db.png","multiLanguage":1,"name":"花未眠","notice":"代码已经开源，如果你感觉还行就给一个star吧。。。","qq":"","qqLogin":1,"stackoverflow":"","touristAvatar":"https://static.linhaojun.top/config/2af2e2db20740e712f0a011a6f8c9af5.jpg","twitter":"","userAvatar":"https://static.linhaojun.top/config/0af1901da1e64dfb99bb61db21e716c4.jpeg","weChat":"","websiteCreateTime":"2022-08-19","weiXinQRCode":"https://static.linhaojun.top/config/ed47edae605f74306f751c6fba9f14bd.png","weibo":"","zhihu":""}, 2022-07-24 12:05:33, 2022-08-20 12:48:28
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@9c10f03]
+2025-05-12T17:49:38.579+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-3] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:38.579+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-3] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+2025-05-12T17:49:38.909+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-5] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:38.909+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-6] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:38.909+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-4] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:38.909+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-5] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+2025-05-12T17:49:38.909+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-6] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+2025-05-12T17:49:38.909+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-4] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+Successfully connected to MySQL database!
+Successfully connected to MySQL database!
+2025-05-12T17:49:38.936+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-5] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:38.936+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-6] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:38.936+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-4] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:38.936+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-5] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+2025-05-12T17:49:38.936+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-4] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+2025-05-12T17:49:38.936+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-6] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+Successfully connected to MySQL database!
+Successfully connected to MySQL database!
+Creating a new SqlSession
+Creating a new SqlSession
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1c721783] was not registered for synchronization because synchronization is not active
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ed064a0] was not registered for synchronization because synchronization is not active
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5155cbba] was not registered for synchronization because synchronization is not active
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2aeae67a] was not registered for synchronization because synchronization is not active
+2025-05-12T17:49:40.690+08:00 DEBUG 76716 --- [Blog] [onPool-worker-9] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+2025-05-12T17:49:40.691+08:00 DEBUG 76716 --- [Blog] [onPool-worker-6] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+2025-05-12T17:49:40.690+08:00 DEBUG 76716 --- [Blog] [onPool-worker-8] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+2025-05-12T17:49:40.691+08:00 DEBUG 76716 --- [Blog] [onPool-worker-5] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+JDBC Connection [HikariProxyConnection@76171721 wrapping com.mysql.cj.jdbc.ConnectionImpl@11911cd3] will not be managed by Spring
+JDBC Connection [HikariProxyConnection@1612154634 wrapping com.mysql.cj.jdbc.ConnectionImpl@58b8082b] will not be managed by Spring
+JDBC Connection [HikariProxyConnection@1582874140 wrapping com.mysql.cj.jdbc.ConnectionImpl@525a89df] will not be managed by Spring
+JDBC Connection [HikariProxyConnection@313916029 wrapping com.mysql.cj.jdbc.ConnectionImpl@6b529d42] will not be managed by Spring
+Creating a new SqlSession
+==>  Preparing: SELECT COUNT( * ) AS total FROM t_talk
+==>  Preparing: SELECT COUNT( * ) AS total FROM t_category
+==>  Preparing: SELECT COUNT( * ) AS total FROM t_tag
+==>  Preparing: SELECT COUNT( * ) AS total FROM t_article WHERE (is_delete = ?)
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38206681] was not registered for synchronization because synchronization is not active
+==> Parameters: 
+==> Parameters: 
+==> Parameters: 
+2025-05-12T17:49:40.693+08:00 DEBUG 76716 --- [Blog] [onPool-worker-7] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+==> Parameters: 0(Integer)
+JDBC Connection [HikariProxyConnection@921145333 wrapping com.mysql.cj.jdbc.ConnectionImpl@32d80df1] will not be managed by Spring
+==>  Preparing: SELECT id,config,create_time,update_time FROM t_website_config WHERE id=?
+==> Parameters: 1(Integer)
+<==    Columns: total
+<==    Columns: total
+<==        Row: 0
+<==    Columns: total
+<==        Row: 0
+<==      Total: 1
+<==      Total: 1
+<==    Columns: total
+<==        Row: 0
+<==        Row: 0
+<==      Total: 1
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1c721783]
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2aeae67a]
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5155cbba]
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ed064a0]
+<==    Columns: id, config, create_time, update_time
+<==        Row: 1, {"alipayQRCode":"https://static.linhaojun.top/config/da4c6d8c13f66a8dd6716ddb48d73299.jpg","author":"花未眠","authorAvatar":"https://static.linhaojun.top/config/6e4f47f4bb66d2d30722d20e789b220e.jpg","authorIntro":"一个疯狂的coder","beianNumber":"苏ICP备2022012376号","csdn":"","englishName":"huaweimian","gitee":"https://gitee.com/linhaojun","github":"https://github.com/linhaojun857","isCommentReview":0,"isEmailNotice":1,"isReward":1,"juejin":"","logo":"https://static.linhaojun.top/config/cc36e9fa5aeb214e41495c1e2268f2db.png","multiLanguage":1,"name":"花未眠","notice":"代码已经开源，如果你感觉还行就给一个star吧。。。","qq":"","qqLogin":1,"stackoverflow":"","touristAvatar":"https://static.linhaojun.top/config/2af2e2db20740e712f0a011a6f8c9af5.jpg","twitter":"","userAvatar":"https://static.linhaojun.top/config/0af1901da1e64dfb99bb61db21e716c4.jpeg","weChat":"","websiteCreateTime":"2022-08-19","weiXinQRCode":"https://static.linhaojun.top/config/ed47edae605f74306f751c6fba9f14bd.png","weibo":"","zhihu":""}, 2022-07-24 12:05:33, 2022-08-20 12:48:28
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38206681]
+2025-05-12T17:49:40.703+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-7] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:40.704+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-7] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+2025-05-12T17:49:42.228+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-8] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:42.228+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-8] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+2025-05-12T17:49:42.272+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-2] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:42.273+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-2] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+2025-05-12T17:49:42.277+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-1] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:42.278+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-1] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+2025-05-12T17:49:42.280+08:00 DEBUG 76716 --- [Blog] [io-8080-exec-10] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:42.280+08:00 DEBUG 76716 --- [Blog] [io-8080-exec-10] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+Successfully connected to MySQL database!
+2025-05-12T17:49:42.305+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-9] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:42.306+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-9] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+2025-05-12T17:49:43.268+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-3] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:43.268+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-3] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+2025-05-12T17:49:43.651+08:00  INFO 76716 --- [Blog] [nio-8080-exec-4] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 316 ms
+2025-05-12T17:49:43.662+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-4] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:43.662+08:00 DEBUG 76716 --- [Blog] [nio-8080-exec-4] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+2025-05-12T17:49:47.815+08:00 DEBUG 76716 --- [Blog] [ionShutdownHook] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:47.815+08:00 DEBUG 76716 --- [Blog] [ionShutdownHook] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+2025-05-12T17:49:47.819+08:00 DEBUG 76716 --- [Blog] [ionShutdownHook] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:47.819+08:00 DEBUG 76716 --- [Blog] [ionShutdownHook] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+2025-05-12T17:49:47.829+08:00  INFO 76716 --- [Blog] [ntContainer#0-2] o.s.a.r.l.SimpleMessageListenerContainer : Waiting for workers to finish.
+2025-05-12T17:49:47.830+08:00  INFO 76716 --- [Blog] [ntContainer#1-2] o.s.a.r.l.SimpleMessageListenerContainer : Waiting for workers to finish.
+2025-05-12T17:49:47.831+08:00  INFO 76716 --- [Blog] [ntContainer#2-2] o.s.a.r.l.SimpleMessageListenerContainer : Waiting for workers to finish.
+2025-05-12T17:49:48.136+08:00  INFO 76716 --- [Blog] [ntContainer#1-2] o.s.a.r.l.SimpleMessageListenerContainer : Successfully waited for workers to finish.
+2025-05-12T17:49:48.137+08:00  INFO 76716 --- [Blog] [ntContainer#0-2] o.s.a.r.l.SimpleMessageListenerContainer : Successfully waited for workers to finish.
+2025-05-12T17:49:48.145+08:00  INFO 76716 --- [Blog] [ntContainer#2-2] o.s.a.r.l.SimpleMessageListenerContainer : Successfully waited for workers to finish.
+2025-05-12T17:49:48.150+08:00 DEBUG 76716 --- [Blog] [ntContainer#0-1] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:48.150+08:00 DEBUG 76716 --- [Blog] [ntContainer#2-1] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:48.150+08:00 DEBUG 76716 --- [Blog] [ntContainer#0-1] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+2025-05-12T17:49:48.150+08:00 DEBUG 76716 --- [Blog] [ntContainer#1-1] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT 1]
+2025-05-12T17:49:48.150+08:00 DEBUG 76716 --- [Blog] [ntContainer#2-1] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+2025-05-12T17:49:48.150+08:00 DEBUG 76716 --- [Blog] [ntContainer#1-1] o.s.jdbc.datasource.DataSourceUtils      : Fetching JDBC Connection from DataSource
+Successfully connected to MySQL database!
+Successfully connected to MySQL database!
+Successfully connected to MySQL database!

@@ -16,6 +16,11 @@ services:
       - "TZ=Asia/Shanghai"
     ports:
       - 3306:3306
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin -u root -proot ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       blog_network:
         ipv4_address: 172.28.0.2
@@ -24,16 +29,20 @@ services:
     image: redis:7.0.4
     restart: always
     container_name: "redis"
-    networks:
-      blog_network:
-        ipv4_address: 172.28.0.3
-
+    healthcheck:
+      test: ["CMD", "redis-cli", "PING"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     ports:
       - "6379:6379"
     volumes:
       - ./config/init/redis/redis.conf:/etc/redis/redis.conf
       - ./.cache/redis/data:/data
-
+    networks:
+      blog_network:
+        ipv4_address: 172.28.0.3
+    
   opensearch:
     image: opensearchproject/opensearch:2.19.1
     container_name: opensearch
@@ -61,6 +70,7 @@ services:
     environment:
       OPENSEARCH_HOSTS: '["http://localhost:9200","http://opensearch:9200"]'
       DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+    restart: always
     networks:
       blog_network:
         ipv4_address: 172.28.0.5
@@ -100,39 +110,7 @@ services:
     networks:
       blog_network:
         ipv4_address: 172.28.0.7
-  
-  maven:
-    image:  maven:3.8.7
-    container_name: maven
-    depends_on:
-      - maxwell
-    working_dir: /app
-    volumes:
-      - ./config/init/m2/settings.xml:/root/.m2/settings.xml
-      - ~/.m2/repository:/root/.m2/repository
-      - ./blog:/app
-      - ./.cache/output:/app/target
-    networks:
-      - blog_network
-    command: ["mvn", "install","package"]
-    restart:  "no"
 
-
-
-  java:
-    image: openjdk:17-jdk
-    container_name: java
-    depends_on:
-      - maven
-    volumes:
-      - "./.cache/output/app.jar:/app/app.jar"
-    ports:
-      - "8080:8080"
-    #   - "25:25"
-    command: ["java", "-jar", "/app/app.jar"]
-    networks:
-      - blog_network
-    restart: on-failure
 
 # docker network create --driver bridge blog_network
 networks:
