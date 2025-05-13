@@ -12,7 +12,7 @@ spring:
   mail:
     host: smtp.126.com
     username: rx_ted@126.com
-    password: WFbSTRf8QfcVQmYt
+    password: 输入你邮箱密码
     port: 25
     protocol: smtp
     test-connection: true

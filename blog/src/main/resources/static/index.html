@@ -1,36 +1,6 @@
 <html>
   <head> </head>
-
   <body>
-    <form id="upload" enctype="multipart/form-data" method="post">
-      <input type="file" name="file" id="pic" />
-      <!-- 多文件上传 -->
-      <!-- <input type="file" name="file" id="pic" multiple="multipart"/> -->
-      <input type="button" value="提交" onclick="uploadFile()" />
-    </form>
+  <h1>Please access <a href="http://localhost:8080/doc.html">http://localhost:8080/doc.html</a></h1>
   </body>
-
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
-  <script>
-    function uploadFile() {
-      //第一种
-      // formData = new FormData($('#upload')[0]);
-      //第二种
-      formData = new FormData();
-      formData.append("file", $("#pic")[0].files[0]);
-      $.ajax({
-        url: "http://localhost:8080/file/upload",
-        type: "post",
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function (res) {
-          alert("success");
-        },
-        error: function (err) {
-          alert("fail");
-        },
-      });
-    }
-  </script>
 </html>
