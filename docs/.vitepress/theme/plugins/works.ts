@@ -1,4 +1,4 @@
-import type { Theme } from './theme/config/theme'
+import type { Theme } from '../config/theme'
 
 const workConfig: Theme.UserWorks = {
   title: '个人项目/线上作品',

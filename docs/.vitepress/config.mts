@@ -62,7 +62,11 @@ export default defineConfig({
       {
         text: 'About',
         link: '/notes/about'
-      }
+      },
+      {
+        text: 'Login',
+        link: '/utils/login'
+      },
     ],
     socialLinks: [
       {
@@ -82,5 +86,17 @@ export default defineConfig({
     },
     returnToTopLabel: '回到顶部',
     sidebarMenuLabel: '相关推荐'
+  },
+  markdown: {
+    container: {
+      infoLabel: "ℹ️",
+      noteLabel: "📝",
+      tipLabel: "💡",
+      warningLabel: "⚠️",
+      dangerLabel: "🔥",
+      detailsLabel: "📂",
+      importantLabel: "📌",
+      cautionLabel: "☢️",
+    }
   }
 })

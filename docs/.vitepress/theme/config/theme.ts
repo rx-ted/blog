@@ -1,4 +1,3 @@
-import type { ElButton } from 'element-plus'
 import type { DefaultTheme, Route, UserConfig } from 'vitepress'
 import type { Mapping, Repo } from '@giscus/vue'
 import type { Options as Oml2dOptions } from 'oh-my-live2d'
@@ -13,40 +12,14 @@ import { patchVPConfig, patchVPThemeConfig } from '../utils/node/theme'
 import { getVitePlugins, registerVitePlugins } from '../utils/node/vitePlugins'
 import type { PagefindConfig } from 'vitepress-plugin-pagefind'
 import type { RSSOptions } from 'vitepress-plugin-rss'
+import { MyConfig } from '../types/my'
+import { BlogPopover } from '../types/popover'
 
 type RSSPluginOptions = RSSOptions
 
 
 // TODO: 重构 lint 问题
-export declare namespace BlogPopover {
-    export interface Title {
-        type: 'title'
-        content: string
-        style?: string
-    }
 
-    export interface Text {
-        type: 'text'
-        content: string
-        style?: string
-    }
-
-    export interface Image {
-        type: 'image'
-        src: string
-        style?: string
-    }
-
-    export interface Button {
-        type: 'button'
-        link: string
-        content: string
-        style?: string
-        props?: InstanceType<typeof ElButton>['$props']
-    }
-
-    export type Value = Title | Text | Image | Button
-}
 
 export type ThemeableImage =
     | string
@@ -67,7 +40,7 @@ export namespace Theme {
         author?: string
         hidden?: boolean
         layout?: string
-        original?:boolean
+        original?: boolean
         // old
         categories: string[]
         tags: string[]
@@ -539,6 +512,8 @@ export namespace Theme {
          * 渲染时替换图片地址
          */
         imageStyle?: ImageStyleConfig
+
+        my?: MyConfig
     }
 
     export type FormatShowDate = {

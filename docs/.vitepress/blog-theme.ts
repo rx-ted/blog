@@ -1,6 +1,6 @@
 import { getThemeConfig } from './theme/config/theme'
 import { notificationSvg } from './theme/constants/svg'
-import workConfig from './works'
+import workConfig from './theme/plugins/works'
 import { HeadConfig, loadEnv } from 'vitepress'
 
 export const blogTheme = getThemeConfig({
@@ -105,6 +105,9 @@ export const blogTheme = getThemeConfig({
   },
   footer: {
     copyright: 'MIT License | rx-ted',
+  },
+  my: {
+    text: 'Ben Gao'
   }
 })
 

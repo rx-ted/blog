@@ -25,10 +25,13 @@ import UserWorks from './components/UserWorks.vue'
 import BlogApp from './components/BlogApp.vue'
 import BlogEditor from './components/BlogEditor.vue'
 import BlogTags from './components/BlogTags.vue'
+import BlogLogin from './components/BlogLogin.vue'
+
 const components = {
     'UserWorks': UserWorks,
     "BlogEditor": BlogEditor,
     "BlogTags": BlogTags,
+    "BlogLogin":BlogLogin
 };
 
 export const BlogTheme: Theme = {
