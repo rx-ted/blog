@@ -45,5 +45,11 @@
     "vitepress-plugin-rss": "^0.2.10",
     "vitepress-plugin-tabs": "^0.5.0",
     "web-editor-markdown": "^1.0.8"
+  },
+  "devDependencies": {
+    "mermaid": "^11.8.1",
+    "nprogress-v2": "^1.1.10",
+    "vitepress-plugin-google-analytics": "^1.0.2",
+    "vitepress-protect-plugin": "^1.0.6"
   }
 }

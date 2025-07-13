@@ -1,8 +1,11 @@
 ---
-lastUpdated: true
+editLink: false
+lastUpdated: false
 publish: false
-comment: true
+comment: false
 sidebar: false
+
+
 ---
 # 归档
 

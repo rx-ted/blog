@@ -17,7 +17,7 @@ const authorImgUrl =computed(() =>
   ?? frontmatter.value?.blog?.authorImgUrl
   ?? home?.authorImgUrl
   ?? site.value?.themeConfig?.authorImgUrl
-  ?? '/author.jpg'
+  ?? '/imgs/author.jpg'
 )
 
 const show = computed(() => author.value || authorImgUrl.value)

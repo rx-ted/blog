@@ -1,13 +1,11 @@
 import { getThemeConfig } from './theme/config/theme'
 import { notificationSvg } from './theme/constants/svg'
-import workConfig from './theme/plugins/works'
 import { HeadConfig, loadEnv } from 'vitepress'
 import { common } from './theme/constants/common'
 
 const currentYear = new Date().getFullYear()
 
 export const blogTheme = getThemeConfig({
-  works: workConfig,
   article: {
     analyzeTitles: {
       inlineWordCount: '{{value}} word counts',
@@ -56,7 +54,7 @@ export const blogTheme = getThemeConfig({
   ],
   // 文章默认作者
   author: 'rx-ted',
-  authorImgUrl: "/author.jpg",
+  authorImgUrl: "/imgs/author.jpg",
   search: {
     pageResultCount: 5
   },
@@ -74,7 +72,7 @@ export const blogTheme = getThemeConfig({
   buttonAfterArticle: {
     openTitle: '投"币"支持',
     closeTitle: '下次一定',
-    content: '<img src="https://telegraph-image-659.pages.dev/file/5580b67229af032279924.jpg">',
+    content: `<img src="https://rx-ted.github.io/picx-images-hosting/20250713/WechatIMG41.7eh2aj39yq.jpg">`,
     icon: 'wechatPay',
   },
   popover: {
@@ -109,8 +107,11 @@ export const blogTheme = getThemeConfig({
   },
   footer: {
 
-    copyright: `MIT License |  © 2022-${currentYear} rx-ted All rights reserved.`,
-    message: "点点滴滴，记录美好",
+    copyright: `2022-${currentYear} rx-ted All rights reserved.`,
+    message: [
+      "点点滴滴，记录美好",
+      "MIT License"
+    ],
     version: {
       name: 'rx-ted/blog',
       link: 'https://github.com/rx-ted/blog/tree/vitepress',
@@ -131,7 +132,7 @@ export const extraHead: HeadConfig[]
   = [
     ['link',
       {
-        href: getUrl() + '/logo.png',
+        href: getUrl() + '/imgs/logo.png',
         type: "image/x-icon",
         rel: "shortcut icon"
       }

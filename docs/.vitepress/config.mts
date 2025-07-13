@@ -1,6 +1,8 @@
 import { defineConfig } from 'vitepress'
 import { blogTheme, extraHead, getUrl } from './blog-theme'
 import packageJSON from '../../package.json'
+import timeline from "vitepress-markdown-timeline";
+import vitepressProtectPlugin from "vitepress-protect-plugin"
 
 
 // https://vitepress.dev/reference/site-config
@@ -25,11 +27,19 @@ export default defineConfig({
           api: 'modern', // ["modern-compiler", "modern", "legacy"]
         }
       }
-    }
+    },
+    plugins: [
+      // vitepressProtectPlugin({
+      //   disableF12: false, // 禁用F12开发者模式
+      //   disableCopy: false, // 禁用文本复制
+      //   disableSelect: false, // 禁用文本选择
+      // }),
+    ]
   },
+
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
-    logo: '/logo.png',
+    logo: '/imgs/logo.png',
 
     nav: [
       { text: '🏠 首页', link: '/' },
@@ -49,13 +59,13 @@ export default defineConfig({
             link: '/modules/article/tags'
           },
           {
-            text: '✍️ Editor',
+            text: '✍️ 写作',
             link: '/modules/editor'
           },
-          {
-            text: "🕰️ 时间轴",
-            link: "/modules/timeline"
-          }
+          // {
+          //   text: "🕰️ 时间轴",
+          //   link: "/modules/timeline"
+          // }
         ]
       },
       {
@@ -99,7 +109,12 @@ export default defineConfig({
     returnToTopLabel: '回到顶部',
     sidebarMenuLabel: '相关推荐'
   },
+
   markdown: {
+    lineNumbers: true,
+    config(md) {
+      md.use(timeline)
+    },
     container: {
       infoLabel: "ℹ️",
       noteLabel: "📝",

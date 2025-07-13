@@ -27,8 +27,6 @@ const activeTagSymbol: InjectionKey<Ref<Theme.activeTag>> = Symbol('active-tag')
 
 const currentPageNum: InjectionKey<Ref<number>> = Symbol('home-page-num')
 
-const userWorks: InjectionKey<Ref<Theme.UserWorks>> = Symbol('user-works')
-
 const homeFooter: InjectionKey<Theme.Footer | Theme.Footer[] | undefined> = Symbol('home-footer')
 
 export function withConfigProvider(App: Component) {
@@ -39,17 +37,6 @@ export function withConfigProvider(App: Component) {
             const config = computed(() => resolveConfig(theme.value))
             provide(homeFooter, config.value.blog?.footer)
             provide(configSymbol, config)
-            provide(
-                userWorks,
-                ref(
-                    config.value.blog?.works || {
-                        title: '',
-                        description: '',
-                        list: []
-                    }
-                )
-            )
-
             const activeTag = ref<Theme.activeTag>({
                 label: '',
                 type: ''
@@ -143,9 +130,6 @@ export function useCurrentArticle() {
     return currentArticle
 }
 
-export function useUserWorks() {
-    return inject(userWorks)!
-}
 function resolveConfig(config: Theme.Config): Theme.Config {
     return {
         ...config,

@@ -1,6 +1,5 @@
 import type { DefaultTheme, Route, UserConfig } from 'vitepress'
 import type { Mapping, Repo } from '@giscus/vue'
-import type { Options as Oml2dOptions } from 'oh-my-live2d'
 import type { Ref } from 'vue'
 import {
     getMarkdownPlugins,
@@ -384,12 +383,7 @@ export namespace Theme {
         | false
         | PagefindConfig
 
-    export interface UserWorks {
-        title: string
-        description?: string
-        topTitle?: string
-        list: UserWork[]
-    }
+
     export type ThemeColor =
         | 'vp-default'
         | 'vp-green'
@@ -448,7 +442,6 @@ export namespace Theme {
          * @default false
          */
         tabs?: boolean
-        works?: UserWorks
         /**
          * https://mermaid.js.org/config/setup/modules/mermaidAPI.html#mermaidapi-configuration-defaults for options
          * @default true
@@ -502,7 +495,7 @@ export namespace Theme {
          * oh-my-live2d 的 loadOml2d 方法的配置选项
          * 详见 https://oml2d.com/options/Options.html
          */
-        oml2d?: Oml2dOptions
+        // oml2d?: Oml2dOptions
         homeTags?: boolean | HomeTagsConfig
         buttonAfterArticle?: ButtonAfterArticleConfig | false
         /**

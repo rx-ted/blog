@@ -5,7 +5,7 @@ layout: home
 # 首页部分元素定制
 blog:
   author: rx-ted
-  logo: /logo.png
+  logo: /imgs/logo.png
   avatarMode: split
   minScreenAvatar: false
   name: "@rx-ted/theme"
