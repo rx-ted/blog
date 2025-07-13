@@ -269,6 +269,8 @@ export namespace Theme {
      * 公告
      */
     export interface Popover {
+        status: boolean
+
         title: string
         /**
          * 细粒度的时间控制
@@ -309,6 +311,7 @@ export namespace Theme {
          */
         onRouteChanged?: (to: Route, show: Ref<boolean>) => void
     }
+
     export interface FriendLink {
         nickname: string
         des: string

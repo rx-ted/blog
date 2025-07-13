@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useHomeFooterConfig } from '../config/blog'
-import packageJSON from '../../../../package.json'
-import { copyrightSVG, icpSVG, themeSVG } from '../constants/svg'
+import { copyrightSVG, icpSVG } from '../constants/svg'
 import { vOuterHtml } from '../directives'
 
 const footerData = useHomeFooterConfig()
@@ -29,9 +28,9 @@ const renderData = computed(() => {
       const versionItem = typeof version === 'object' ? version : {}
 
       data.push({
-        name: versionItem?.name || `rx-ted/blog@${packageJSON.version}`,
+        name: versionItem?.name ?? "",
         link: versionItem?.link || 'https://github.com/rx-ted/blog/tree/vitepress',
-        icon: versionItem?.icon || themeSVG
+        icon: versionItem?.icon ?? ""
       })
     }
     // copyright
@@ -99,12 +98,7 @@ const renderData = computed(() => {
               <img src="./../styles/gongan.png" alt="公网安备" />
             </i>
             <i v-else-if="item.icon" v-html="item.icon" />
-            <a
-              v-if="item.link"
-              :href="item.link"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a v-if="item.link" :href="item.link" target="_blank" rel="noopener noreferrer">
               {{ item.name }}
             </a>
             <span v-else>{{ item.name }}</span>

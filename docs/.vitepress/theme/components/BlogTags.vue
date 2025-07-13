@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ElButton, ElTag, ElLink } from 'element-plus'
-import { useData, useRouter, withBase } from 'vitepress'
+import { useData } from 'vitepress'
 import { useBlogConfig } from '../config/blog'
 import {
     useArticles,

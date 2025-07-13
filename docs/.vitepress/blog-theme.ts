@@ -2,6 +2,9 @@ import { getThemeConfig } from './theme/config/theme'
 import { notificationSvg } from './theme/constants/svg'
 import workConfig from './theme/plugins/works'
 import { HeadConfig, loadEnv } from 'vitepress'
+import { common } from './theme/constants/common'
+
+const currentYear = new Date().getFullYear()
 
 export const blogTheme = getThemeConfig({
   works: workConfig,
@@ -75,13 +78,14 @@ export const blogTheme = getThemeConfig({
     icon: 'wechatPay',
   },
   popover: {
+    status: false,
     title: '公告',
     icon: notificationSvg,
     body: [
       { type: 'text', content: '👇 微信 👇' },
       {
         type: 'image',
-        src: 'https://telegraph-image-659.pages.dev/file/cddf30e15e6b5f724a788.jpg'
+        src: common.myWechat
       },
       {
         type: 'text',
@@ -94,17 +98,24 @@ export const blogTheme = getThemeConfig({
       },
       {
         type: 'button',
-        content: '加我交流',
+        content: '关于我',
         props: {
           type: 'success'
         },
-        link: getUrl() + '/notes/about/wechat',
+        link: getUrl() + '/notes/about',
       }
     ],
     duration: 0
   },
   footer: {
-    copyright: 'MIT License | rx-ted',
+
+    copyright: `MIT License |  © 2022-${currentYear} rx-ted All rights reserved.`,
+    message: "点点滴滴，记录美好",
+    version: {
+      name: 'rx-ted/blog',
+      link: 'https://github.com/rx-ted/blog/tree/vitepress',
+      icon: '🚀'
+    }
   },
   my: {
     text: 'Ben Gao'

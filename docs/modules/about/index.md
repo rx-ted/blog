@@ -1,10 +1,8 @@
 ---
-date: 2022-7-1
+lastUpdated: true
+publish: false
+comment: true
 sidebar: false
-description: 描述关于我的信息。
-tag:
-  - 关于
-sticky: 9
 ---
 
 # 关于我

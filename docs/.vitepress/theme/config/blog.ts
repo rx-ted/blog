@@ -99,16 +99,7 @@ export function useConfig() {
 export function useBlogConfig() {
     return inject(configSymbol)!.value.blog!
 }
-/**
- * 获取 oh-my-live2d的配置选项
- */
-export function useOml2dOptions() {
-    return inject(configSymbol)!.value.blog?.oml2d
-}
 
-export function useMyOptions() {
-    return inject(configSymbol)!.value.blog?.my
-}
 
 export function useDarkTransitionConfig() {
     return inject(configSymbol)!.value.blog?.darkTransition ?? true

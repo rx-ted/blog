@@ -16,7 +16,6 @@ import BlogFooter from './BlogFooter.vue'
 import BlogHomeHeaderAvatar from './BlogHomeHeaderAvatar.vue'
 import BlogBackToTop from './BlogBackToTop.vue'
 import CommentGiscus from './CommentGiscus.vue'
-import BlogOml2d from './BlogOml2d.vue'
 
 import CommentArtalk from './CommentArtalk.vue'
 import BlogButtonAfterArticle from './BlogButtonAfterArticle.vue'
@@ -38,7 +37,6 @@ const openTransition = useDarkTransitionConfig()
     <template #layout-top>
       <slot name="layout-top" />
       <ClientOnly>
-        <BlogOml2d />
         <BlogAlert />
         <BlogPopover />
       </ClientOnly>
@@ -92,8 +90,9 @@ const openTransition = useDarkTransitionConfig()
       </ClientOnly>
     </template>
     <template #layout-bottom>
-      <BlogFooter v-if="layout === 'home'" />
+      <!-- v-if="layout === 'home'"  -->
       <slot name="layout-bottom" />
+      <BlogFooter />
     </template>
     <!-- 透传默认主题的其它插槽 -->
     <!-- navbar -->

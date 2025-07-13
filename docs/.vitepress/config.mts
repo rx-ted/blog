@@ -32,40 +32,52 @@ export default defineConfig({
     logo: '/logo.png',
 
     nav: [
-      { text: 'Index', link: '/' },
+      { text: '🏠 首页', link: '/' },
       {
-        text: `v${packageJSON.version}`,
-        link: '/notes/changelog'
-      },
-      {
-        text: 'Tags',
-        link: '/notes/article/tags'
-      },
-      {
-        text: 'Editor',
-        link: '/notes/work/editor'
-      },
-      {
-        text: 'work',
-        // link:'/notes/work'
+        text: '🔍 探索',
         items: [
           {
-            text: '个人图床',
+            text: `🚀 v${packageJSON.version}`,
+            link: '/modules/changelog'
+          },
+          {
+            text: '📂 归档',
+            link: '/modules/article/archives'
+          },
+          {
+            text: '🏷️ 标签',
+            link: '/modules/article/tags'
+          },
+          {
+            text: '✍️ Editor',
+            link: '/modules/editor'
+          },
+          {
+            text: "🕰️ 时间轴",
+            link: "/modules/timeline"
+          }
+        ]
+      },
+      {
+        text: '🛠️ 工具',
+        items: [
+          {
+            text: '🤖 个人图床',
             link: 'https://telegraph-image-659.pages.dev'
           },
           {
-            text: 'ChatGPT',
+            text: '🖼️ ChatGPT',
             link: 'https://wechat-bot.pages.dev/'
           },
         ]
       },
       {
-        text: 'About',
-        link: '/notes/about'
+        text: '👤 关于',
+        link: '/modules/about'
       },
       {
-        text: 'Login',
-        link: '/utils/login'
+        text: "💬 留言",
+        link: '/modules/comment'
       },
     ],
     socialLinks: [
@@ -74,11 +86,11 @@ export default defineConfig({
         link: 'https://github.com/rx-ted',
       },
     ],
-    editLink: {
-      pattern:
-        'https://github.com/rx-ted',
-      text: '去 GitHub 上编辑内容'
-    },
+    // editLink: {
+    //   pattern:
+    //     'https://github.com/rx-ted',
+    //   text: '去 GitHub 上编辑内容'
+    // },
     lastUpdatedText: '上次更新于',
     outline: {
       level: "deep",

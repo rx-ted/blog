@@ -1,8 +1,10 @@
 ---
+lastUpdated: true
 publish: false
-date: 2024-9-6
+comment: true
+sidebar: false
 ---
-# this is archives
+# 归档
 
 ## TODO(rx-ted): show more archives
 

@@ -1,13 +1,10 @@
 ---
-title: 我的标签
+layout: BlogEditor
+title: Markdown编辑器
 editLink: false
 lastUpdated: false
 publish: false
 comment: false
 sidebar: false
-sticky: 5
 ---
 
-<ClientOnly>
- <BlogTags />
-</ClientOnly>

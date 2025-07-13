@@ -11,12 +11,13 @@
 <script lang="ts" setup>
 import 'md-editor-v3/lib/style.css';
 import { computed, reactive, onMounted, ref, onUnmounted } from 'vue';
-
+import {  useWindowSize } from '@vueuse/core'
 import { useData } from 'vitepress'
 import { TEXT_web_editor_markdown } from "../constants/text";
 
 import { MdEditor } from 'md-editor-v3';
 const { isDark } = useData()
+const { width,height } = useWindowSize()
 
 const themeMode = computed(() => isDark.value ? "dark" : 'light');
 
@@ -30,8 +31,8 @@ const message = ref("📱 请在桌面端访问以获得更好体验")
 const blockHeight = ref('85vh')
 
 const update = () => {
-  isMobile.value = window.innerWidth < 768
-  blockHeight.value = `${window.innerHeight * 0.85}px`
+  isMobile.value = width.value < 768
+  blockHeight.value = `${height.value * 0.85}px`
 }
 
 

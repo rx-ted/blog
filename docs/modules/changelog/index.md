@@ -1,15 +1,13 @@
 ---
-title: 更新日志
-description: 每次迭代有变化，作为记录。
-author: rx-ted
-tag:
-  - 日志
+date: 2024-9-19
 sidebar: false
-date: 2024-9-20
+publish: false
 sticky: 5
 ---
 
 # 更新日志
+
+每次迭代有变化，作为记录。
 
 克隆主题，如下命令
 

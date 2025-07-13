@@ -9,6 +9,7 @@ import { useRoute, useRouter } from 'vitepress'
 import { useBlogConfig } from '../config/blog'
 import { vOuterHtml } from '../directives'
 import { notificationSvg } from '../constants/svg'
+import { url2Img } from '../utils/common'
 
 const { popover: popoverProps } = useBlogConfig()
 
@@ -32,20 +33,19 @@ onMounted(() => {
   if (!popoverProps?.title) {
     return
   }
-
   // 取旧值
   const oldValue = localStorage.getItem(storageKey)
   const newValue = JSON.stringify(popoverProps)
   localStorage.setItem(storageKey, newValue)
 
   // 移动端最小化
-  if (width.value < 768 && popoverProps?.mobileMinify) {
+  if (width.value < 768 && popoverProps?.mobileMinify && popoverProps.status) {
     show.value = false
     return
   }
 
   // >= 0 每次都展示，区别是否自动消失
-  if (Number(popoverProps?.duration ?? '') >= 0) {
+  if (Number(popoverProps?.duration ?? '') >= 0 && popoverProps.status) {
     show.value = true
     if (popoverProps?.duration) {
       setTimeout(() => {
@@ -104,7 +104,7 @@ function PopoverValue(props: { key: number; item: BlogPopover.Value },
   }
   if (item.type === 'image') {
     return h('img', {
-      src: item.src,
+      src: url2Img(item.src),
       style: parseStringStyle(item.style || '')
     })
   }
@@ -164,8 +164,9 @@ function PopoverValue(props: { key: number; item: BlogPopover.Value },
       </PopoverValue>
     </div>
   </div>
-  <div style="font-size: large;" v-show="!show && (popoverProps?.reopen ?? true) && popoverProps?.title" class="theme-blog-popover-close"
-    :class="{ twinkle: !show && (popoverProps?.twinkle ?? true) }" @click="show = true">
+  <div style="font-size: large;" v-show="!show && (popoverProps?.reopen ?? true) && popoverProps?.title"
+    class="theme-blog-popover-close" :class="{ twinkle: !show && (popoverProps?.twinkle ?? true) }"
+    @click="show = true">
     <p v-if="popoverProps?.icon" v-outer-html="popoverProps.icon" />
     <p v-else>
       {{ notificationSvg }}
