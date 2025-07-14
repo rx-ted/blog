@@ -17,7 +17,7 @@ export function formatDate(d: any, fmt = 'yyyy-MM-dd hh:mm:ss') {
         `${d.getFullYear()}`.substr(4 - RegExp.$1.length)
     )
   }
-  // eslint-disable-next-line no-restricted-syntax
+   
   for (const k in o) {
     if (new RegExp(`(${k})`).test(fmt))
       fmt = fmt.replace(
