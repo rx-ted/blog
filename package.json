@@ -1,6 +1,15 @@
 {
   "name": "blog",
   "version": "0.0.4",
+  "description": "blog theme, based on vitepress",
+  "author": "rx-ted",
+  "license": "MIT",
+  "keywords": [
+    "vitepress",
+    "theme",
+    "vue",
+    "typescript"
+  ],
   "scripts": {
     "deploy": "sh ./deploy.sh",
     "clean": "rm -rf .env",
@@ -8,17 +17,10 @@
     "env:blog": "echo 'VITE_BASE_URL=/blog' > .env",
     "build:blog": "npm run env:blog && vitepress build docs && npm run clean",
     "build": "vitepress build docs",
-    "preview": "vitepress preview docs "
+    "preview": "vitepress preview docs ",
+    "lint": "eslint . ",
+    "fix": "eslint --fix . "
   },
-  "keywords": [
-    "vitepress",
-    "theme",
-    "vue",
-    "typescript"
-  ],
-  "author": "rx-ted",
-  "license": "MIT",
-  "description": "blog theme, based on vitepress",
   "dependencies": {
     "@antv/g2plot": "^2.4.32",
     "@giscus/vue": "^3.0.0",
@@ -48,7 +50,9 @@
     "web-editor-markdown": "^1.0.8"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^4.16.2",
     "@octokit/rest": "^22.0.0",
+    "eslint": "^9.31.0",
     "mermaid": "^11.8.1",
     "nprogress-v2": "^1.1.10",
     "prettier": "^3.6.2",
