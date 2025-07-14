@@ -216,8 +216,13 @@ export function useImageStyle() {
 }
 
 export function useHomeAnalysis() {
-    return inject(configSymbol)?.value?.blog?.home?.analysis
+    return inject(configSymbol)!.value?.blog?.home?.analysis
 }
+
+export function useGithubConfig() {
+    return inject(configSymbol)?.value!.blog?.github
+}
+
 
 export function useAnalyzeTitles(wordCount: Ref<number>, readTime: ComputedRef<number>) {
     const { article } = useBlogConfig()

@@ -2,7 +2,6 @@ import { defineConfig } from 'vitepress'
 import { blogTheme, extraHead, getUrl } from './blog-theme'
 import packageJSON from '../../package.json'
 import timeline from "vitepress-markdown-timeline";
-import vitepressProtectPlugin from "vitepress-protect-plugin"
 
 
 // https://vitepress.dev/reference/site-config
@@ -20,7 +19,7 @@ export default defineConfig({
   head: [...extraHead],
   extends: blogTheme,
   vite: {
-    // https://vitejs.dev/config/shared-options.html#css-postcss
+    // https://vitejs.dev/config/shared-options.html
     css: {
       preprocessorOptions: {
         scss: {
@@ -44,6 +43,10 @@ export default defineConfig({
     nav: [
       { text: '🏠 首页', link: '/' },
       {
+        text: '✍️ 写作',
+        link: '/modules/editor'
+      },
+      {
         text: '🔍 探索',
         items: [
           {
@@ -57,10 +60,6 @@ export default defineConfig({
           {
             text: '🏷️ 标签',
             link: '/modules/article/tags'
-          },
-          {
-            text: '✍️ 写作',
-            link: '/modules/editor'
           },
           // {
           //   text: "🕰️ 时间轴",

@@ -3,7 +3,8 @@
     <div class="mobile-message">{{ message }}</div>
   </div>
   <div v-else>
-    <MdEditor v-model="state.text" :theme="themeMode" :style="{ height: blockHeight }" />
+    <MdEditor v-model="state.text" :theme="themeMode" :style="{ height: blockHeight }" @on-save="onSave()"
+      @on-upload-img="onUploadImg" />
   </div>
 
 </template>
@@ -11,13 +12,15 @@
 <script lang="ts" setup>
 import 'md-editor-v3/lib/style.css';
 import { computed, reactive, onMounted, ref, onUnmounted } from 'vue';
-import {  useWindowSize } from '@vueuse/core'
+import { useWindowSize } from '@vueuse/core'
 import { useData } from 'vitepress'
 import { TEXT_web_editor_markdown } from "../constants/text";
-
+import axios from 'axios'
 import { MdEditor } from 'md-editor-v3';
+import { uploadImg } from '../utils/common';
+import { useBlogConfig } from '../config/blog';
 const { isDark } = useData()
-const { width,height } = useWindowSize()
+const { width, height } = useWindowSize()
 
 const themeMode = computed(() => isDark.value ? "dark" : 'light');
 
@@ -44,6 +47,30 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', update)
 })
+
+const onSave = () => {
+  console.log(1111)
+  const config = useBlogConfig().github
+  console.log(config)
+  // uploadImg()
+}
+const onUploadImg = async (files, callback) => {
+  const res = await Promise.all(
+    files.map((file) => {
+      return new Promise((rev, rej) => {
+        const form = new FormData();
+        form.append('file', file);
+        axios
+          .post('/api/img/upload', form, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          })
+          .then((res) => rev(res))
+          .catch((error) => rej(error));
+      });
+    }))
+}
 
 </script>
 

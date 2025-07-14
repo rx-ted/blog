@@ -26,6 +26,7 @@
     "@types/node": "^22.5.4",
     "@types/qrcode": "^1.5.5",
     "artalk": "^2.9.0",
+    "axios": "^1.10.0",
     "cross-spawn": "^7.0.3",
     "dotenv": "^16.4.5",
     "element-plus": "^2.8.1",
@@ -47,6 +48,7 @@
     "web-editor-markdown": "^1.0.8"
   },
   "devDependencies": {
+    "@octokit/rest": "^22.0.0",
     "mermaid": "^11.8.1",
     "nprogress-v2": "^1.1.10",
     "vitepress-plugin-google-analytics": "^1.0.2",

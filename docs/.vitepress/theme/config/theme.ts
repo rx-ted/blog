@@ -11,7 +11,7 @@ import { patchVPConfig, patchVPThemeConfig } from '../utils/node/theme'
 import { getVitePlugins, registerVitePlugins } from '../utils/node/vitePlugins'
 import type { PagefindConfig } from 'vitepress-plugin-pagefind'
 import type { RSSOptions } from 'vitepress-plugin-rss'
-import { MyConfig } from '../types/my'
+import { githubConfig } from '../types/github'
 import { BlogPopover } from '../types/popover'
 
 type RSSPluginOptions = RSSOptions
@@ -509,7 +509,11 @@ export namespace Theme {
          */
         imageStyle?: ImageStyleConfig
 
-        my?: MyConfig
+        github?: {
+            update?: githubConfig.UpdateRepoContent
+            get?: githubConfig.GetRepoContent
+            delete?: githubConfig.DeleteRepoContent
+        }
     }
 
     export type FormatShowDate = {

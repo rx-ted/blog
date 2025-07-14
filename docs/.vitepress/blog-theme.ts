@@ -1,3 +1,4 @@
+// import { getThemeConfig } from './theme/config/theme'
 import { getThemeConfig } from './theme/config/theme'
 import { notificationSvg } from './theme/constants/svg'
 import { HeadConfig, loadEnv } from 'vitepress'
@@ -118,8 +119,18 @@ export const blogTheme = getThemeConfig({
       icon: '🚀'
     }
   },
-  my: {
-    text: 'Ben Gao'
+  github: {
+    update: {
+      owner: "rx-ted",
+      repo: "picx-images-hosting",
+      content: {
+        message: "Update image via blog",
+        committer: {
+          name: "rx-ted",
+          email: "1552488649@qq.com"
+        }
+      }
+    }
   }
 })
 
@@ -137,24 +148,24 @@ export const extraHead: HeadConfig[]
         rel: "shortcut icon"
       }
     ],
-    [
-      'script',
-      {
-        charset: 'UTF-8',
-        id: 'LA_COLLECT',
-        src: '//sdk.51.la/js-sdk-pro.min.js'
-      },
-    ],
-    [
-      'script',
-      {},
-      `LA.init({id:"3JYAa4Wu44u52ZV9",ck:"3JYAa4Wu44u52ZV9"})`
-    ],
-    [
-      'meta',
-      {
-        name: "google-adsense-account",
-        content: "ca-pub-8298257926987022"
-      },
-    ],
+    // [
+    //   'script',
+    //   {
+    //     charset: 'UTF-8',
+    //     id: 'LA_COLLECT',
+    //     src: '//sdk.51.la/js-sdk-pro.min.js'
+    //   },
+    // ],
+    // [
+    //   'script',
+    //   {},
+    //   `LA.init({id:"3JYAa4Wu44u52ZV9",ck:"3JYAa4Wu44u52ZV9"})`
+    // ],
+    // [
+    //   'meta',
+    //   {
+    //     name: "google-adsense-account",
+    //     content: "ca-pub-8298257926987022"
+    //   },
+    // ],
   ]
