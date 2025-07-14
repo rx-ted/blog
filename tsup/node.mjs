@@ -1,0 +1,810 @@
+var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
+  get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
+}) : x)(function(x) {
+  if (typeof require !== "undefined") return require.apply(this, arguments);
+  throw Error('Dynamic require of "' + x + '" is not supported');
+});
+
+// src/utils/node/theme.ts
+import fs2 from "fs";
+import path3 from "path";
+import process2 from "process";
+import glob from "fast-glob";
+
+// src/utils/date.ts
+function formatDate(date, fmt = "yyyy-MM-dd hh:mm:ss") {
+  const d = date instanceof Date ? date : new Date(date);
+  const o = {
+    "M+": d.getMonth() + 1,
+    // 月份
+    "d+": d.getDate(),
+    // 日
+    "h+": d.getHours(),
+    // 小时
+    "m+": d.getMinutes(),
+    // 分
+    "s+": d.getSeconds(),
+    // 秒
+    "q+": Math.floor((d.getMonth() + 3) / 3),
+    // 季度
+    "S": d.getMilliseconds()
+    // 毫秒
+  };
+  fmt = fmt.replace(/(y+)/, (_, yearMatch) => `${d.getFullYear()}`.slice(4 - yearMatch.length));
+  for (const k in o) {
+    fmt = fmt.replace(new RegExp(`(${k})`), (_, match) => {
+      const val = o[k].toString();
+      return match.length === 1 ? val : val.padStart(match.length, "0");
+    });
+  }
+  return fmt;
+}
+
+// src/utils/fsfs.ts
+import fs from "fs";
+import os from "os";
+import path from "path";
+import process from "process";
+import { spawn } from "cross-spawn";
+import matter from "gray-matter";
+import pLimit from "p-limit";
+var timeLimit = pLimit(+(process.env.P_LIMT_MAX || os.cpus().length));
+function getDefaultTitle(content) {
+  const match = content.match(/^(#+)\s+(.+)/m);
+  return match?.[2] || "";
+}
+var cache = /* @__PURE__ */ new Map();
+async function getFileLastModifyTime(url) {
+  const cached = cache.get(url);
+  if (cached) {
+    return cached;
+  }
+  let date = await timeLimit(() => getFileLastModifyTimeByGit(url));
+  if (!date) {
+    date = await getFileLastModifyTimeByFs(url);
+  }
+  if (date) {
+    cache.set(url, date);
+  }
+  return date;
+}
+function getFileLastModifyTimeByGit(url) {
+  return new Promise((resolve) => {
+    const cwd = path.dirname(url);
+    try {
+      const fileName = path.basename(url);
+      const child = spawn("git", ["log", "-1", '--pretty="%ai"', fileName], {
+        cwd
+      });
+      let output = "";
+      child.stdout.on("data", (d) => output += String(d));
+      child.on("close", async () => {
+        let date;
+        if (output.trim()) {
+          date = new Date(output);
+        }
+        resolve(date);
+      });
+      child.on("error", async () => {
+        resolve(void 0);
+      });
+    } catch {
+      resolve(void 0);
+    }
+  });
+}
+async function getFileLastModifyTimeByFs(url) {
+  try {
+    const fsStat = await fs.promises.stat(url);
+    return fsStat.mtime;
+  } catch {
+    return void 0;
+  }
+}
+function joinPath(base, path5) {
+  return `${base}${path5}`.replace(/\/+/g, "/");
+}
+var grayMatter = matter;
+function getTextSummary(text, count = 100) {
+  return text?.replace(/^#+\s+.*/, "")?.replace(/#/g, "")?.replace(/!\[.*?\]\(.*?\)/g, "")?.replace(/\[(.*?)\]\(.*?\)/g, "$1")?.replace(/\*\*(.*?)\*\*/g, "$1")?.split("\n")?.filter((v) => !!v)?.join("\n")?.replace(/>(.*)/, "")?.replace(/</g, "&lt;").replace(/>/g, "&gt;")?.trim()?.slice(0, count);
+}
+var windowsSlashRE = /\\/g;
+var isWindows = os.platform() === "win32";
+function slash(p) {
+  return p.replace(windowsSlashRE, "/");
+}
+function normalizePath(id) {
+  return path.posix.normalize(isWindows ? slash(id) : id);
+}
+
+// src/utils/node/index.ts
+import path2 from "path";
+function aliasObjectToArray(obj) {
+  return Object.entries(obj).map(([find, replacement]) => ({
+    find,
+    replacement
+  }));
+}
+function isBase64ImageURL(url) {
+  const regex = /^data:image\/[a-z]+;base64,/;
+  return regex.test(url);
+}
+var imageRegex = /!\[([^\]]*)\]\(([^)\s]+)\s*(?:"([^"]*)")?\)/;
+function getFirstImagURLFromMD(content, route) {
+  const url = content.match(imageRegex)?.[1];
+  const isHTTPSource = url && url.startsWith("http");
+  if (!url) {
+    return "";
+  }
+  if (isHTTPSource || isBase64ImageURL(url)) {
+    return url;
+  }
+  const paths = joinPath("/", route).split("/");
+  paths.splice(paths.length - 1, 1);
+  const relativePath = url.startsWith("/") ? url : path2.join(paths.join("/") || "", url);
+  return joinPath("/", relativePath);
+}
+function debounce(func, delay = 1e3) {
+  let timeoutId;
+  return (...rest) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func(...rest);
+    }, delay);
+  };
+}
+function isEqual(obj1, obj2, excludeKeys = []) {
+  const keys1 = Object.keys(obj1).filter((key) => !excludeKeys.includes(key));
+  const keys2 = Object.keys(obj2).filter((key) => !excludeKeys.includes(key));
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+  for (const key of keys1) {
+    if (!keys2.includes(key)) {
+      return false;
+    }
+    const val1 = obj1[key];
+    const val2 = obj2[key];
+    const areObjects = isObject(val1) && isObject(val2);
+    if (areObjects && !isEqual(val1, val2, excludeKeys) || !areObjects && val1 !== val2) {
+      return false;
+    }
+  }
+  return true;
+}
+function isObject(obj) {
+  return obj != null && typeof obj === "object";
+}
+
+// src/utils/node/theme.ts
+function patchDefaultThemeSideBar(cfg) {
+  return cfg?.blog !== false && cfg?.recommend !== false ? {
+    sidebar: [
+      {
+        text: "",
+        items: []
+      }
+    ]
+  } : void 0;
+}
+function getPageRoute(filepath, srcDir) {
+  const route = normalizePath(path3.relative(srcDir, filepath)).replace(/\.md$/, "");
+  return `/${route}`;
+}
+var defaultTimeZoneOffset = (/* @__PURE__ */ new Date()).getTimezoneOffset() / -60;
+async function getArticleMeta(filepath, route, timeZone = defaultTimeZoneOffset) {
+  const fileContent = await fs2.promises.readFile(filepath, "utf-8");
+  const { data: frontmatter, excerpt, content } = grayMatter(fileContent, {
+    excerpt: true
+  });
+  const meta = {
+    ...frontmatter
+  };
+  if (!meta.title) {
+    meta.title = getDefaultTitle(content);
+  }
+  const date = await (meta.date && /* @__PURE__ */ new Date(`${new Date(meta.date).toUTCString()}+${timeZone}`) || getFileLastModifyTime(filepath));
+  meta.date = formatDate(date || /* @__PURE__ */ new Date());
+  meta.categories = typeof meta.categories === "string" ? [meta.categories] : meta.categories;
+  meta.tags = typeof meta.tags === "string" ? [meta.tags] : meta.tags;
+  meta.tag = [meta.tag || []].flat().concat([
+    .../* @__PURE__ */ new Set([...meta.categories || [], ...meta.tags || []])
+  ]);
+  meta.description = meta.description || getTextSummary(content, 100) || excerpt;
+  meta.cover = meta.cover ?? getFirstImagURLFromMD(fileContent, route);
+  if (meta.publish === false) {
+    meta.hidden = true;
+    meta.recommend = false;
+  }
+  return meta;
+}
+async function getArticles(cfg, vpConfig) {
+  const srcDir = cfg?.srcDir || vpConfig.srcDir.replace(vpConfig.root, "").replace(/^\//, "") || process2.argv.slice(2)?.[1] || ".";
+  const files = glob.sync(`${srcDir}/**/*.md`, { ignore: ["node_modules"], absolute: true });
+  const metaResults = files.reduce((prev, curr) => {
+    const route = getPageRoute(curr, vpConfig.srcDir);
+    const metaPromise = getArticleMeta(curr, route, cfg?.timeZone);
+    prev[curr] = {
+      route,
+      metaPromise
+    };
+    return prev;
+  }, {});
+  const pageData = [];
+  for (const file of files) {
+    const { route, metaPromise } = metaResults[file];
+    const meta = await metaPromise;
+    if (meta.layout === "home") {
+      continue;
+    }
+    pageData.push({
+      route,
+      meta
+    });
+  }
+  return pageData;
+}
+function patchVPConfig(vpConfig, cfg) {
+  vpConfig.head = vpConfig.head || [];
+  if (cfg?.comment && "type" in cfg.comment && cfg?.comment?.type === "artalk") {
+    const server = cfg.comment?.options?.server;
+    if (server) {
+      vpConfig.head.push(["link", { href: `${server}/dist/Artalk.css`, rel: "stylesheet" }]);
+      vpConfig.head.push(["script", { src: `${server}/dist/Artalk.js`, id: "artalk-script" }]);
+    }
+  }
+}
+function patchVPThemeConfig(cfg, vpThemeConfig = {}) {
+  vpThemeConfig.sidebar = patchDefaultThemeSideBar(cfg)?.sidebar;
+  return vpThemeConfig;
+}
+function checkConfig(cfg) {
+  console.log(cfg);
+}
+
+// src/utils/node/mdPlugins.ts
+import { createRequire } from "module";
+import timeline from "vitepress-markdown-timeline";
+
+// node_modules/vitepress-plugin-tabs/dist/index.js
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __commonJS = (cb, mod) => function __require2() {
+  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+var require_markdown_it_container = __commonJS({
+  "../../node_modules/.pnpm/markdown-it-container@3.0.0/node_modules/markdown-it-container/index.js"(exports, module) {
+    "use strict";
+    module.exports = function container_plugin(md, name, options) {
+      function validateDefault(params) {
+        return params.trim().split(" ", 2)[0] === name;
+      }
+      function renderDefault(tokens, idx, _options, env, slf) {
+        if (tokens[idx].nesting === 1) {
+          tokens[idx].attrJoin("class", name);
+        }
+        return slf.renderToken(tokens, idx, _options, env, slf);
+      }
+      options = options || {};
+      var min_markers = 3, marker_str = options.marker || ":", marker_char = marker_str.charCodeAt(0), marker_len = marker_str.length, validate = options.validate || validateDefault, render = options.render || renderDefault;
+      function container2(state, startLine, endLine, silent) {
+        var pos, nextLine, marker_count, markup, params, token, old_parent, old_line_max, auto_closed = false, start = state.bMarks[startLine] + state.tShift[startLine], max = state.eMarks[startLine];
+        if (marker_char !== state.src.charCodeAt(start)) {
+          return false;
+        }
+        for (pos = start + 1; pos <= max; pos++) {
+          if (marker_str[(pos - start) % marker_len] !== state.src[pos]) {
+            break;
+          }
+        }
+        marker_count = Math.floor((pos - start) / marker_len);
+        if (marker_count < min_markers) {
+          return false;
+        }
+        pos -= (pos - start) % marker_len;
+        markup = state.src.slice(start, pos);
+        params = state.src.slice(pos, max);
+        if (!validate(params, markup)) {
+          return false;
+        }
+        if (silent) {
+          return true;
+        }
+        nextLine = startLine;
+        for (; ; ) {
+          nextLine++;
+          if (nextLine >= endLine) {
+            break;
+          }
+          start = state.bMarks[nextLine] + state.tShift[nextLine];
+          max = state.eMarks[nextLine];
+          if (start < max && state.sCount[nextLine] < state.blkIndent) {
+            break;
+          }
+          if (marker_char !== state.src.charCodeAt(start)) {
+            continue;
+          }
+          if (state.sCount[nextLine] - state.blkIndent >= 4) {
+            continue;
+          }
+          for (pos = start + 1; pos <= max; pos++) {
+            if (marker_str[(pos - start) % marker_len] !== state.src[pos]) {
+              break;
+            }
+          }
+          if (Math.floor((pos - start) / marker_len) < marker_count) {
+            continue;
+          }
+          pos -= (pos - start) % marker_len;
+          pos = state.skipSpaces(pos);
+          if (pos < max) {
+            continue;
+          }
+          auto_closed = true;
+          break;
+        }
+        old_parent = state.parentType;
+        old_line_max = state.lineMax;
+        state.parentType = "container";
+        state.lineMax = nextLine;
+        token = state.push("container_" + name + "_open", "div", 1);
+        token.markup = markup;
+        token.block = true;
+        token.info = params;
+        token.map = [startLine, nextLine];
+        state.md.block.tokenize(state, startLine + 1, nextLine);
+        token = state.push("container_" + name + "_close", "div", -1);
+        token.markup = state.src.slice(start, pos);
+        token.block = true;
+        state.parentType = old_parent;
+        state.lineMax = old_line_max;
+        state.line = nextLine + (auto_closed ? 1 : 0);
+        return true;
+      }
+      md.block.ruler.before("fence", "container_" + name, container2, {
+        alt: ["paragraph", "reference", "blockquote", "list"]
+      });
+      md.renderer.rules["container_" + name + "_open"] = render;
+      md.renderer.rules["container_" + name + "_close"] = render;
+    };
+  }
+});
+var import_markdown_it_container = __toESM(require_markdown_it_container(), 1);
+var tabMarker = "=";
+var tabMarkerCode = tabMarker.charCodeAt(0);
+var minTabMarkerLen = 2;
+var ruleBlockTab = (state, startLine, endLine, silent) => {
+  let pos = state.bMarks[startLine] + state.tShift[startLine];
+  const max = state.eMarks[startLine];
+  if (state.parentType !== "container") {
+    return false;
+  }
+  if (pos + minTabMarkerLen > max) {
+    return false;
+  }
+  const marker = state.src.charCodeAt(pos);
+  if (marker !== tabMarkerCode) {
+    return false;
+  }
+  const mem = pos;
+  pos = state.skipChars(pos + 1, marker);
+  const tabMarkerLen = pos - mem;
+  if (tabMarkerLen < minTabMarkerLen - 1) {
+    return false;
+  }
+  if (silent) {
+    return true;
+  }
+  let nextLine = startLine;
+  let endStart = mem;
+  let endPos = pos;
+  for (; ; ) {
+    nextLine++;
+    if (nextLine >= endLine) {
+      break;
+    }
+    endStart = state.bMarks[nextLine] + state.tShift[nextLine];
+    const max2 = state.eMarks[nextLine];
+    if (endStart < max2 && state.sCount[nextLine] < state.blkIndent) {
+      break;
+    }
+    const startCharCode = state.src.charCodeAt(endStart);
+    if (startCharCode !== tabMarkerCode) {
+      continue;
+    }
+    const p = state.skipChars(endStart + 1, marker);
+    if (p - endStart !== tabMarkerLen) {
+      continue;
+    }
+    endPos = p;
+    break;
+  }
+  const oldParent = state.parentType;
+  const oldLineMax = state.lineMax;
+  state.parentType = "tab";
+  state.lineMax = nextLine;
+  const startToken = state.push("tab_open", "div", 1);
+  startToken.markup = state.src.slice(mem, pos);
+  startToken.block = true;
+  startToken.info = state.src.slice(pos, max).trimStart();
+  startToken.map = [startLine, nextLine - 1];
+  state.md.block.tokenize(state, startLine + 1, nextLine);
+  const endToken = state.push("tab_close", "div", -1);
+  endToken.markup = state.src.slice(endStart, endPos);
+  endToken.block = true;
+  state.parentType = oldParent;
+  state.lineMax = oldLineMax;
+  state.line = nextLine;
+  return true;
+};
+var parseTabsParams = (input) => {
+  const match = input.match(/key:(\S+)/);
+  return {
+    shareStateKey: match == null ? void 0 : match[1]
+  };
+};
+var tabsPlugin = (md) => {
+  md.use(import_markdown_it_container.default, "tabs", {
+    render(tokens, index) {
+      const token = tokens[index];
+      if (token.nesting === 1) {
+        const params = parseTabsParams(token.info);
+        const shareStateKeyProp = params.shareStateKey ? `sharedStateKey="${md.utils.escapeHtml(params.shareStateKey)}"` : "";
+        return `<PluginTabs ${shareStateKeyProp}>
+`;
+      } else {
+        return `</PluginTabs>
+`;
+      }
+    }
+  });
+  md.block.ruler.after("container_tabs", "tab", ruleBlockTab);
+  const renderTab = (tokens, index) => {
+    const token = tokens[index];
+    if (token.nesting === 1) {
+      const label = token.info;
+      const labelProp = `label="${md.utils.escapeHtml(label)}"`;
+      return `<PluginTabsTab ${labelProp}>
+`;
+    } else {
+      return `</PluginTabsTab>
+`;
+    }
+  };
+  md.renderer.rules["tab_open"] = renderTab;
+  md.renderer.rules["tab_close"] = renderTab;
+};
+
+// src/utils/node/mdPlugins.ts
+function _require(module) {
+  return (typeof import.meta?.url !== "undefined" ? createRequire(import.meta.url) : __require)(module);
+}
+function getMarkdownPlugins(cfg) {
+  const markdownPlugin = [];
+  if (cfg?.tabs !== false) {
+    markdownPlugin.push(tabsPlugin);
+  }
+  if (cfg?.mermaid !== false) {
+    const { MermaidMarkdown } = _require("vitepress-plugin-mermaid");
+    markdownPlugin.push(MermaidMarkdown);
+  }
+  if (cfg?.taskCheckbox !== false) {
+    markdownPlugin.push(taskCheckboxPlugin(typeof cfg?.taskCheckbox === "boolean" ? {} : cfg?.taskCheckbox));
+  }
+  if (cfg?.timeline !== false) {
+    markdownPlugin.push(timeline);
+  }
+  return markdownPlugin;
+}
+function taskCheckboxPlugin(ops) {
+  return (md) => {
+    md.use(_require("markdown-it-task-checkbox"), ops);
+  };
+}
+function registerMdPlugins(vpCfg, plugins) {
+  if (plugins.length) {
+    vpCfg.markdown = {
+      config(...rest) {
+        plugins.forEach((plugin) => {
+          plugin?.(...rest);
+        });
+      }
+    };
+  }
+}
+function patchMermaidPluginCfg(config) {
+  if (!config.vite.resolve)
+    config.vite.resolve = {};
+  if (!config.vite.resolve.alias)
+    config.vite.resolve.alias = {};
+  config.vite.resolve.alias = [
+    ...aliasObjectToArray({
+      ...config.vite.resolve.alias,
+      "cytoscape/dist/cytoscape.umd.js": "cytoscape/dist/cytoscape.esm.js",
+      "mermaid": "mermaid/dist/mermaid.esm.mjs"
+    }),
+    { find: /^dayjs\/(.*).js/, replacement: "dayjs/esm/$1" }
+  ];
+}
+function patchOptimizeDeps(config) {
+  if (!config.vite.optimizeDeps) {
+    config.vite.optimizeDeps = {};
+  }
+  config.vite.optimizeDeps.exclude = ["vitepress-plugin-tabs", "@sugarat/theme"];
+  config.vite.optimizeDeps.include = ["element-plus"];
+}
+
+// src/utils/node/vitePlugins.ts
+import { Buffer as Buffer2 } from "buffer";
+import { existsSync, readFileSync } from "fs";
+import path4 from "path";
+import {
+  pagefindPlugin
+} from "vitepress-plugin-pagefind";
+import { RssPlugin } from "vitepress-plugin-rss";
+
+// src/utils/node/hot-reload-plugin.ts
+function themeReloadPlugin() {
+  let blogConfig;
+  let vitepressConfig;
+  let docsDir;
+  const generateRoute = (filepath) => {
+    return filepath.replace(docsDir, "").replace(".md", "");
+  };
+  return {
+    name: "theme-reload",
+    apply: "serve",
+    configureServer(server) {
+      const restart = debounce(() => {
+        server.restart();
+      }, 500);
+      server.watcher.on("add", async (path5) => {
+        const route = generateRoute(path5);
+        const meta = await getArticleMeta(path5, route, blogConfig?.timeZone);
+        blogConfig.pagesData.push({
+          route,
+          meta
+        });
+        restart();
+      });
+      server.watcher.on("change", async (path5) => {
+        const route = generateRoute(path5);
+        const meta = await getArticleMeta(path5, route, blogConfig?.timeZone);
+        const matched = blogConfig.pagesData.find((v) => v.route === route);
+        if (matched && !isEqual(matched.meta, meta, ["date", "description"])) {
+          matched.meta = meta;
+          restart();
+        }
+      });
+      server.watcher.on("unlink", (path5) => {
+        const route = generateRoute(path5);
+        const idx = blogConfig.pagesData.findIndex((v) => v.route === route);
+        if (idx >= 0) {
+          blogConfig.pagesData.splice(idx, 1);
+          restart();
+        }
+      });
+    },
+    configResolved(config) {
+      vitepressConfig = config.vitepress;
+      docsDir = vitepressConfig.srcDir;
+      blogConfig = config.vitepress.site.themeConfig.blog;
+    }
+  };
+}
+
+// src/utils/node/vitePlugins.ts
+function getVitePlugins(cfg = {}) {
+  const plugins = [];
+  plugins.push(coverImgTransform());
+  if (cfg.themeColor) {
+    plugins.push(setThemeScript(cfg.themeColor));
+  }
+  plugins.push(themeReloadPlugin());
+  plugins.push(providePageData(cfg));
+  if (cfg && cfg.search !== false) {
+    const ops = cfg.search instanceof Object ? cfg.search : {};
+    plugins.push(
+      pagefindPlugin({
+        ...ops
+      })
+    );
+  }
+  if (cfg?.mermaid !== false) {
+    const { MermaidPlugin } = _require("vitepress-plugin-mermaid");
+    plugins.push(inlineInjectMermaidClient());
+    plugins.push(MermaidPlugin(cfg?.mermaid === true ? {} : cfg?.mermaid ?? {}));
+  }
+  if (cfg?.RSS) {
+    ;
+    [cfg?.RSS].flat().forEach((rssConfig) => plugins.push(RssPlugin(rssConfig)));
+  }
+  return plugins;
+}
+function registerVitePlugins(vpCfg, plugins) {
+  vpCfg.vite = {
+    plugins
+  };
+}
+function inlineInjectMermaidClient() {
+  return {
+    // TODO(rx-ted): what is the root cause?
+    name: "theme-plugin-inline-inject-mermaid-client",
+    enforce: "pre"
+    // transform(code, id) {
+    //   if (id.endsWith('src/index.ts') && code.startsWith('// @sugarat/theme index')) {
+    //     return code
+    //       .replace('// replace-mermaid-import-code', 'import Mermaid from \'vitepress-plugin-mermaid/Mermaid.vue\'')
+    //       .replace('// replace-mermaid-mounted-code', 'if (!ctx.app.component(\'Mermaid\')) { ctx.app.component(\'Mermaid\', Mermaid as any) }')
+    //   }
+    //   return code
+    // },
+  };
+}
+function coverImgTransform() {
+  let blogConfig;
+  let vitepressConfig;
+  let assetsDir;
+  return {
+    // TODO(rx-ted): why?
+    name: "@sugarat/theme-plugin-cover-transform",
+    apply: "build",
+    enforce: "pre",
+    configResolved(config) {
+      vitepressConfig = config.vitepress;
+      assetsDir = vitepressConfig.assetsDir;
+      blogConfig = config.vitepress.site.themeConfig.blog;
+    },
+    async generateBundle(_, bundle) {
+      const assetsMap = Object.entries(bundle).filter(([key]) => {
+        return key.startsWith(assetsDir);
+      }).map(([_2, value]) => {
+        return value;
+      });
+      for (const page of blogConfig.pagesData) {
+        const { cover } = page.meta;
+        if (!cover?.startsWith?.("/")) {
+          continue;
+        }
+        try {
+          const realPath = path4.join(vitepressConfig.root, cover);
+          if (!existsSync(realPath)) {
+            continue;
+          }
+          const fileBuffer = readFileSync(realPath);
+          const matchAsset = assetsMap.find((v) => Buffer2.compare(fileBuffer, v.source) === 0);
+          if (matchAsset) {
+            page.meta.cover = joinPath("/", matchAsset.fileName);
+          }
+        } catch (e) {
+          vitepressConfig.logger.warn(e?.message);
+        }
+      }
+    }
+  };
+}
+function providePageData(cfg) {
+  return {
+    // TODO(rx-ted): what is @sugarat/theme-plugin-provide-page-data
+    name: "@sugarat/theme-plugin-provide-page-data",
+    async config(config) {
+      const pagesData = await getArticles(cfg, config.vitepress);
+      config.vitepress.site.themeConfig.blog.pagesData = pagesData;
+    }
+  };
+}
+function setThemeScript(themeColor) {
+  let resolveConfig;
+  const pluginOps = {
+    // TODO(rx-ted): what is @sugarat/theme-plugin-theme-color-script
+    name: "@sugarat/theme-plugin-theme-color-script",
+    enforce: "pre",
+    configResolved(config) {
+      if (resolveConfig) {
+        return;
+      }
+      resolveConfig = config;
+      const vitepressConfig = config.vitepress;
+      if (!vitepressConfig) {
+        return;
+      }
+      const selfTransformHead = vitepressConfig.transformHead;
+      vitepressConfig.transformHead = async (ctx) => {
+        const selfHead = await Promise.resolve(selfTransformHead?.(ctx)) || [];
+        return selfHead.concat([
+          ["script", { type: "text/javascript" }, `;(function() {
+            document.documentElement.setAttribute("theme", "${themeColor}");
+          })()`]
+        ]);
+      };
+    }
+  };
+  return pluginOps;
+}
+
+// src/node.ts
+function getThemeConfig(cfg = {}) {
+  checkConfig(cfg);
+  cfg.mermaid = cfg.mermaid ?? false;
+  const pagesData = [];
+  const extraVPConfig = {
+    vite: {
+      // see https://sass-lang.com/documentation/breaking-changes/legacy-js-api/
+      css: {
+        preprocessorOptions: {
+          scss: {
+            api: "modern"
+          }
+        }
+      },
+      build: {
+        // https://vite.dev/config/build-options.html#build-chunksizewarninglimit
+        chunkSizeWarningLimit: 2048
+      }
+    }
+  };
+  const vitePlugins = getVitePlugins(cfg);
+  registerVitePlugins(extraVPConfig, vitePlugins);
+  const markdownPlugin = getMarkdownPlugins(cfg);
+  registerMdPlugins(extraVPConfig, markdownPlugin);
+  if (cfg?.mermaid !== false) {
+    patchMermaidPluginCfg(extraVPConfig);
+  }
+  patchOptimizeDeps(extraVPConfig);
+  patchVPConfig(extraVPConfig, cfg);
+  return {
+    themeConfig: {
+      blog: {
+        pagesData,
+        // 插件里补全
+        ...cfg
+      },
+      // 补充一些额外的配置用于继承
+      ...patchVPThemeConfig(cfg)
+    },
+    ...extraVPConfig
+  };
+}
+function defineConfig(config) {
+  return config;
+}
+function defineLocaleConfig(cfg) {
+  return cfg;
+}
+function footerHTML(footerData) {
+  const data = [footerData || []].flat();
+  return data.map((d) => {
+    const { icon, text, link } = d;
+    return `<span class="footer-item">
+    ${icon ? `<i>${icon}</i>` : ""}
+    ${link ? `<a href="${link}" target="_blank" rel="noopener noreferrer">${text}</a>` : `<span>${text}</span>`}
+</span>`;
+  }).join("");
+}
+export {
+  defineConfig,
+  defineLocaleConfig,
+  footerHTML,
+  getThemeConfig,
+  tabsPlugin as tabsMarkdownPlugin
+};

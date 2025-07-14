@@ -1,13 +1,12 @@
 import { defineConfig } from 'vitepress'
-import { blogTheme, extraHead, getUrl } from './blog-theme'
+import timeline from 'vitepress-markdown-timeline'
 import packageJSON from '../../package.json'
-import timeline from "vitepress-markdown-timeline";
-
+import { blogTheme, extraHead, getUrl } from './blog-theme'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "Blog",
-  description: "blog, recording",
+  title: 'Blog',
+  description: 'blog, recording',
   lastUpdated: true,
   cleanUrls: true,
   metaChunk: true,
@@ -20,12 +19,13 @@ export default defineConfig({
   extends: blogTheme,
   vite: {
     // https://vitejs.dev/config/shared-options.html
+    cacheDir: '../.cache',
     css: {
       preprocessorOptions: {
         scss: {
           api: 'modern', // ["modern-compiler", "modern", "legacy"]
-        }
-      }
+        },
+      },
     },
     plugins: [
       // vitepressProtectPlugin({
@@ -33,7 +33,7 @@ export default defineConfig({
       //   disableCopy: false, // 禁用文本复制
       //   disableSelect: false, // 禁用文本选择
       // }),
-    ]
+    ],
   },
 
   themeConfig: {
@@ -44,49 +44,49 @@ export default defineConfig({
       { text: '🏠 首页', link: '/' },
       {
         text: '✍️ 写作',
-        link: '/modules/editor'
+        link: '/modules/editor',
       },
       {
         text: '🔍 探索',
         items: [
           {
             text: `🚀 v${packageJSON.version}`,
-            link: '/modules/changelog'
+            link: '/modules/changelog',
           },
           {
             text: '📂 归档',
-            link: '/modules/article/archives'
+            link: '/modules/article/archives',
           },
           {
             text: '🏷️ 标签',
-            link: '/modules/article/tags'
+            link: '/modules/article/tags',
           },
           // {
           //   text: "🕰️ 时间轴",
           //   link: "/modules/timeline"
           // }
-        ]
+        ],
       },
       {
         text: '🛠️ 工具',
         items: [
           {
             text: '🤖 个人图床',
-            link: 'https://telegraph-image-659.pages.dev'
+            link: 'https://telegraph-image-659.pages.dev',
           },
           {
             text: '🖼️ ChatGPT',
-            link: 'https://wechat-bot.pages.dev/'
+            link: 'https://wechat-bot.pages.dev/',
           },
-        ]
+        ],
       },
       {
         text: '👤 关于',
-        link: '/modules/about'
+        link: '/modules/about',
       },
       {
-        text: "💬 留言",
-        link: '/modules/comment'
+        text: '💬 留言',
+        link: '/modules/comment',
       },
     ],
     socialLinks: [
@@ -102,11 +102,11 @@ export default defineConfig({
     // },
     lastUpdatedText: '上次更新于',
     outline: {
-      level: "deep",
-      label: '目录'
+      level: 'deep',
+      label: '目录',
     },
     returnToTopLabel: '回到顶部',
-    sidebarMenuLabel: '相关推荐'
+    sidebarMenuLabel: '相关推荐',
   },
 
   markdown: {
@@ -115,14 +115,14 @@ export default defineConfig({
       md.use(timeline)
     },
     container: {
-      infoLabel: "ℹ️",
-      noteLabel: "📝",
-      tipLabel: "💡",
-      warningLabel: "⚠️",
-      dangerLabel: "🔥",
-      detailsLabel: "📂",
-      importantLabel: "📌",
-      cautionLabel: "☢️",
-    }
-  }
+      infoLabel: 'ℹ️',
+      noteLabel: '📝',
+      tipLabel: '💡',
+      warningLabel: '⚠️',
+      dangerLabel: '🔥',
+      detailsLabel: '📂',
+      importantLabel: '📌',
+      cautionLabel: '☢️',
+    },
+  },
 })

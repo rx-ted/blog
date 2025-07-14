@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "jsx": "preserve",
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "baseUrl": ".",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "paths": {
+      "@/node": [
+        "./tsup/node"
+      ],
+      "@rx/theme": [
+        "src/index.ts"
+      ],
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "outDir": "dist",
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src",
+    "types",
+    "docs/.vitepress/*.ts",
+    "docs/.vitepress/config.mts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "node.d.ts"
+  ]
+}

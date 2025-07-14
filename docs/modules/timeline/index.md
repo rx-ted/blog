@@ -17,5 +17,3 @@ print("error") # [!code error]
 print("error") # [!code warning]
 
 ```
-
-

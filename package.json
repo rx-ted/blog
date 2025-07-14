@@ -10,16 +10,35 @@
     "vue",
     "typescript"
   ],
+  "exports": {
+    "./node": {
+      "types": "./tsup/node.d.ts",
+      "import": "./tsup/node.mjs",
+      "require": "./tsup/node.js",
+      "default": "./tsup/node.js"
+    },
+    "./package.json": "./package.json",
+    ".": "./src/index.ts"
+  },
+  "main": "src/index.ts",
+  "files": [
+    "src",
+    "tsup/node.d.ts",
+    "tsup/node.js",
+    "tsup/node.mjs",
+    "types"
+  ],
   "scripts": {
     "deploy": "sh ./deploy.sh",
     "clean": "rm -rf .env",
-    "dev": "vitepress dev docs ",
+    "dev": "tsup && vitepress dev docs ",
+    "build:tsup":"tsup",
     "env:blog": "echo 'VITE_BASE_URL=/blog' > .env",
     "build:blog": "npm run env:blog && vitepress build docs && npm run clean",
     "build": "vitepress build docs",
     "preview": "vitepress preview docs ",
-    "lint": "eslint . ",
-    "fix": "eslint --fix . "
+    "lint": "eslint src docs ",
+    "fix": "eslint --fix src docs "
   },
   "dependencies": {
     "@antv/g2plot": "^2.4.32",
@@ -29,7 +48,7 @@
     "@types/qrcode": "^1.5.5",
     "artalk": "^2.9.0",
     "axios": "^1.10.0",
-    "cross-spawn": "^7.0.3",
+    "cross-spawn": "^7.0.6",
     "dotenv": "^16.4.5",
     "element-plus": "^2.8.1",
     "fast-glob": "^3.3.2",
@@ -52,6 +71,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^4.16.2",
     "@octokit/rest": "^22.0.0",
+    "@types/cross-spawn": "^6.0.6",
     "eslint": "^9.31.0",
     "mermaid": "^11.8.1",
     "nprogress-v2": "^1.1.10",
