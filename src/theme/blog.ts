@@ -1,13 +1,10 @@
+import { useData, useRoute, withBase } from 'vitepress'
 import type {
   Component,
   ComputedRef,
   InjectionKey,
-  Ref,
+  Ref
 } from 'vue'
-import type { Theme } from '.'
-import { formatDate, useColorMode } from '@vueuse/core'
-import { useData, useRoute, withBase } from 'vitepress'
-
 import {
   computed,
   defineComponent,
@@ -18,8 +15,13 @@ import {
   provide,
   reactive,
   ref,
+  watch,
 } from 'vue'
-import { replaceValue } from '../utils/client/index'
+import { useColorMode } from '@vueuse/core'
+
+import type { Theme } from '../types/theme'
+import { replaceValue } from '../utils/common'
+import { formatDate } from '../utils/date'
 
 const configSymbol: InjectionKey<Ref<Theme.Config>> = Symbol('theme-config')
 
@@ -27,19 +29,18 @@ const activeTagSymbol: InjectionKey<Ref<Theme.activeTag>> = Symbol('active-tag')
 
 const currentPageNum: InjectionKey<Ref<number>> = Symbol('home-page-num')
 
-const homeFooter: InjectionKey<Theme.Footer | Theme.Footer[] | undefined> = Symbol('home-footer')
-
 export function withConfigProvider(App: Component) {
   return defineComponent({
     name: 'ConfigProvider',
     setup(_, { slots }) {
-      const { theme } = useData()
-      const config = computed(() => resolveConfig(theme.value))
-      provide(homeFooter, config.value.blog?.footer)
+      const { theme, localeIndex } = useData()
+      const config = computed(() => resolveConfig(theme.value, localeIndex.value))
+
       provide(configSymbol, config)
+
       const activeTag = ref<Theme.activeTag>({
         label: '',
-        type: '',
+        type: ''
       })
       provide(activeTagSymbol, activeTag)
 
@@ -57,62 +58,161 @@ export function withConfigProvider(App: Component) {
           'el-blue': 'el-blue',
           'el-yellow': 'el-yellow',
           'el-green': 'el-green',
-          'el-red': 'el-red',
-        },
+          'el-red': 'el-red'
+        }
       })
-      mode.value = config.value.blog?.themeColor ?? 'vp-default'
+      watch(config, () => {
+        mode.value = config.value.blog?.themeColor ?? 'vp-default'
+      }, {
+        immediate: true
+      })
+
       return () => h(App, null, slots)
-    },
+    }
   })
 }
+
+export function useGlobalAuthor() {
+  const blogConfig = useBlogConfig()
+  return computed(() => blogConfig.value?.author || '')
+}
+
+export function useArticleConfig() {
+  const blogConfig = useBlogConfig()
+  return computed(() => blogConfig.value?.article)
+}
+
+export function useAuthorList() {
+  const blogConfig = useBlogConfig()
+  return computed(() => blogConfig.value?.authorList)
+}
+
+export function useHotArticleConfig() {
+  const blogConfig = useBlogConfig()
+  return computed(() => {
+    const cfg = blogConfig.value?.hotArticle
+    return cfg === false ? undefined : cfg
+  })
+}
+
+export function useShowHotArticle() {
+  const blogConfig = useBlogConfig()
+  return computed(() => {
+    const cfg = blogConfig.value?.hotArticle
+    return cfg !== false
+  })
+}
+
+export function useRecommendConfig() {
+  const blogConfig = useBlogConfig()
+  return computed(() => {
+    const cfg = blogConfig.value?.recommend
+    return cfg === false ? undefined : cfg
+  })
+}
+
+export function useShowRecommend() {
+  const blogConfig = useBlogConfig()
+  return computed(() => {
+    const cfg = blogConfig.value?.recommend
+    return cfg !== false
+  })
+}
+
+export function useAlertConfig() {
+  const blogConfig = useBlogConfig()
+  return computed(() => blogConfig.value?.alert)
+}
+
+export function useHomeConfig() {
+  const blogConfig = useBlogConfig()
+  return computed(() => blogConfig.value?.home)
+}
+
+export function useHomeTagsConfig() {
+  const blogConfig = useBlogConfig()
+  return computed(() => blogConfig.value?.homeTags)
+}
+
 export function useDocMetaInsertSelector() {
   const blogConfig = useConfig()
   const { frontmatter } = useData()
-  return computed(() => frontmatter.value?.docMetaInsertSelector || blogConfig.config?.blog?.docMetaInsertSelector || 'h1')
+  return computed(() => frontmatter.value?.docMetaInsertSelector || blogConfig?.value?.blog?.docMetaInsertSelector || 'h1')
 }
 
 export function useDocMetaInsertPosition() {
   const blogConfig = useConfig()
   const { frontmatter } = useData()
-  return computed(() => frontmatter.value?.docMetaInsertPosition || blogConfig.config?.blog?.docMetaInsertPosition || 'after')
+  return computed(() => frontmatter.value?.docMetaInsertPosition || blogConfig?.value?.blog?.docMetaInsertPosition || 'after')
 }
 
 export function useConfig() {
-  return {
-    config: inject(configSymbol)!.value,
-  }
+  return inject(configSymbol)
 }
 
 export function useBlogConfig() {
-  return inject(configSymbol)!.value.blog!
+  const resolveConfig = useConfig()
+  return computed(() => resolveConfig?.value?.blog)
+}
+
+export function useButtonAfterConfig() {
+  const blogConfig = useBlogConfig()
+  const { frontmatter } = useData()
+  const frontmatterConfig = computed(() => frontmatter.value.buttonAfterArticle)
+
+  const buttonAfterArticleConfig = computed<Theme.ButtonAfterArticleConfig | false>(() => {
+    if (frontmatterConfig.value === false || (!frontmatterConfig.value && !blogConfig.value?.buttonAfterArticle)) {
+      return false
+    }
+
+    return { ...blogConfig.value?.buttonAfterArticle, ...frontmatterConfig.value }
+  })
+
+  return buttonAfterArticleConfig
+}
+
+/**
+ * 获取 oh-my-live2d的配置选项
+ */
+export function useOml2dOptions() {
+  const blogConfig = useBlogConfig()
+  return computed(() => blogConfig.value?.oml2d)
 }
 
 export function useDarkTransitionConfig() {
-  return inject(configSymbol)!.value.blog?.darkTransition ?? true
+  return inject(configSymbol)?.value.blog?.darkTransition ?? true
 }
 
 export function useBlogThemeMode() {
-  return inject(configSymbol)!.value?.blog?.blog ?? true
+  return inject(configSymbol)?.value?.blog?.blog ?? true
 }
 
 export function useArticles() {
   const blogConfig = useConfig()
-  const articles = computed(() => blogConfig.config?.blog?.pagesData || [])
+  const { localeIndex, site } = useData()
+
+  const localeKeys = computed(() => Object.keys(site.value.locales))
+
+  const articles = computed(() => {
+    if (localeKeys.value.length === 0) {
+      return (blogConfig?.value?.blog?.pagesData || [])
+    }
+    return blogConfig?.value?.blog?.locales?.[localeIndex.value]?.pagesData || []
+  })
   return articles
 }
 
 export function useActiveTag() {
-  return inject(activeTagSymbol)!
+  return inject(activeTagSymbol)
 }
 export function useCurrentPageNum() {
-  return inject(currentPageNum)!
+  return inject(currentPageNum)
 }
 
 export function useCurrentArticle() {
-  const blogConfig = useConfig()
   const route = useRoute()
 
-  const docs = computed(() => blogConfig.config?.blog?.pagesData)
+  const docs = useArticles()
   const currentArticle = computed(() => {
     const currentPath = route.path.replace(/.html$/, '')
     // 兼容中文路径
@@ -120,7 +220,7 @@ export function useCurrentArticle() {
     // 兼容 /(index.md)
     if (currentPath.endsWith('/')) {
       okPaths.push(
-        ...[`${currentPath}index`, `${decodeURIComponent(currentPath)}index`],
+        ...[`${currentPath}index`, `${decodeURIComponent(currentPath)}index`]
       )
     }
     return docs.value?.find(v => okPaths.includes(withBase(v.route)))
@@ -129,14 +229,26 @@ export function useCurrentArticle() {
   return currentArticle
 }
 
-function resolveConfig(config: Theme.Config): Theme.Config {
-  return {
+export function useUserWorks() {
+  const blogConfig = useBlogConfig()
+
+  return computed(() => blogConfig.value?.works || {
+    title: '',
+    description: '',
+    list: []
+  })
+}
+function resolveConfig(config: Theme.Config, locale = 'root'): Theme.Config {
+  const mergeConfig = {
     ...config,
     blog: {
       ...config?.blog,
       pagesData: config?.blog?.pagesData || [],
-    },
+      // i18n 支持
+      ...config?.blog?.locales?.[locale]
+    }
   }
+  return mergeConfig
 }
 
 /**
@@ -160,7 +272,7 @@ export function useAutoUpdateAnchor() {
   // 初始化当前锚点
   const currentAnchor = reactive({
     id: '',
-    top: -1,
+    top: -1
   })
 
   // 定义计算当前锚点的方法
@@ -198,11 +310,36 @@ export function useAutoUpdateAnchor() {
 }
 
 export function useHomeFooterConfig() {
-  return inject(homeFooter)
+  const blogConfig = useBlogConfig()
+  return computed(() => blogConfig.value?.footer)
 }
 
 export function useBackToTopConfig() {
-  return useBlogConfig().backToTop
+  const blogConfig = useBlogConfig()
+  return computed(() => typeof blogConfig.value?.backToTop === 'boolean' ? undefined : blogConfig.value?.backToTop)
+}
+
+export function useOpenBackToTop() {
+  const blogConfig = useBlogConfig()
+  return computed(() => blogConfig.value?.backToTop !== false)
+}
+
+export function useCommentConfig() {
+  const blogConfig = useBlogConfig()
+  return computed(() => {
+    return blogConfig.value?.comment === false ? undefined : blogConfig.value?.comment
+  })
+}
+
+export function useOpenCommentConfig() {
+  const blogConfig = useBlogConfig()
+  const { frontmatter } = useData()
+  return computed(() => !!blogConfig.value?.comment && frontmatter.value.comment !== false)
+}
+
+export function useFriendData() {
+  const blogConfig = useBlogConfig()
+  return computed(() => blogConfig.value?.friend)
 }
 
 export function useCleanUrls() {
@@ -211,54 +348,52 @@ export function useCleanUrls() {
 }
 
 export function useImageStyle() {
-  return inject(configSymbol)?.value?.blog?.imageStyle || {} as Theme.ImageStyleConfig
+  const blogConfig = useBlogConfig()
+  return computed<Theme.ImageStyleConfig>(() => blogConfig.value?.imageStyle || {})
 }
 
 export function useHomeAnalysis() {
-  return inject(configSymbol)!.value?.blog?.home?.analysis
-}
-
-export function useGithubConfig() {
-  return inject(configSymbol)?.value!.blog?.github
+  const home = useHomeConfig()
+  return computed(() => home.value?.analysis)
 }
 
 export function useAnalyzeTitles(wordCount: Ref<number>, readTime: ComputedRef<number>) {
-  const { article } = useBlogConfig()
+  const article = computed(() => useConfig()?.value.blog?.article)
 
   const topWordCount = computed(() =>
-    replaceValue(article?.analyzeTitles?.topWordCount || '字数：{{value}} 个字', wordCount.value),
+    replaceValue(article.value?.analyzeTitles?.topWordCount || '字数：{{value}} 个字', wordCount.value)
   )
   const topReadTime = computed(() =>
-    replaceValue(article?.analyzeTitles?.topReadTime || '预计：{{value}} 分钟', readTime.value),
+    replaceValue(article.value?.analyzeTitles?.topReadTime || '预计：{{value}} 分钟', readTime.value)
   )
   const inlineWordCount = computed(() =>
-    replaceValue(article?.analyzeTitles?.inlineWordCount || '{{value}} 个字', wordCount.value),
+    replaceValue(article.value?.analyzeTitles?.inlineWordCount || '{{value}} 个字', wordCount.value)
   )
   const inlineReadTime = computed(() =>
-    replaceValue(article?.analyzeTitles?.inlineReadTime || '{{value}} 分钟', readTime.value),
+    replaceValue(article.value?.analyzeTitles?.inlineReadTime || '{{value}} 分钟', readTime.value)
   )
 
   const wordCountTitle = computed(() =>
-    article?.analyzeTitles?.wordCount || '文章字数',
+    article.value?.analyzeTitles?.wordCount || '文章字数'
   )
   const readTimeTitle = computed(() =>
-    article?.analyzeTitles?.readTime || '预计阅读时间',
+    article.value?.analyzeTitles?.readTime || '预计阅读时间'
   )
 
   const authorTitle = computed(() =>
-    article?.analyzeTitles?.author || '本文作者',
+    article.value?.analyzeTitles?.author || '本文作者'
   )
 
   const publishDateTitle = computed(() =>
-    article?.analyzeTitles?.publishDate || '发布时间',
+    article.value?.analyzeTitles?.publishDate || '发布时间'
   )
 
   const lastUpdatedTitle = computed(() =>
-    article?.analyzeTitles?.lastUpdated || '最近修改时间',
+    article.value?.analyzeTitles?.lastUpdated || '最近修改时间'
   )
 
   const tagTitle = computed(() =>
-    article?.analyzeTitles?.tag || '标签',
+    article.value?.analyzeTitles?.tag || '标签'
   )
 
   return {
@@ -271,51 +406,56 @@ export function useAnalyzeTitles(wordCount: Ref<number>, readTime: ComputedRef<n
     authorTitle,
     publishDateTitle,
     lastUpdatedTitle,
-    tagTitle,
+    tagTitle
   }
 }
 
 export function useFormatShowDate() {
   const blog = useBlogConfig()
-
-  function formatShowDate(date: string) {
-    const source = +new Date(date)
-    const now = +new Date()
-    const diff = now - source
-    const oneSeconds = 1000
-    const oneMinute = oneSeconds * 60
-    const oneHour = oneMinute * 60
-    const oneDay = oneHour * 24
-    const oneWeek = oneDay * 7
-
-    const langMap = {
-      justNow: '刚刚',
-      secondsAgo: '秒前',
-      minutesAgo: '分钟前',
-      hoursAgo: '小时前',
-      daysAgo: '天前',
-      weeksAgo: '周前',
-      ...blog.formatShowDate,
-    }
-    const mapValue = langMap
-
-    if (diff < 10) {
-      return mapValue.justNow
-    }
-    if (diff < oneMinute) {
-      return `${Math.floor(diff / oneSeconds)}${mapValue.secondsAgo}`
-    }
-    if (diff < oneHour) {
-      return `${Math.floor(diff / oneMinute)}${mapValue.minutesAgo}`
-    }
-    if (diff < oneDay) {
-      return `${Math.floor(diff / oneHour)}${mapValue.hoursAgo}`
-    }
-    if (diff < oneWeek) {
-      return `${Math.floor(diff / oneDay)}${mapValue.daysAgo}`
+  return computed(() => {
+    if (typeof blog.value?.formatShowDate === 'function') {
+      return blog.value.formatShowDate
     }
 
-    return formatDate(new Date(date), 'yyyy-MM-dd')
-  }
-  return formatShowDate
+    function formatShowDate(date: any) {
+      const source = +new Date(date)
+      const now = +new Date()
+      const diff = now - source
+      const oneSeconds = 1000
+      const oneMinute = oneSeconds * 60
+      const oneHour = oneMinute * 60
+      const oneDay = oneHour * 24
+      const oneWeek = oneDay * 7
+
+      const langMap = {
+        justNow: '刚刚',
+        secondsAgo: '秒前',
+        minutesAgo: '分钟前',
+        hoursAgo: '小时前',
+        daysAgo: '天前',
+        weeksAgo: '周前',
+        ...blog.value?.formatShowDate
+      }
+      const mapValue = langMap
+
+      if (diff < 10) {
+        return mapValue.justNow
+      }
+      if (diff < oneMinute) {
+        return `${Math.floor(diff / oneSeconds)}${mapValue.secondsAgo}`
+      }
+      if (diff < oneHour) {
+        return `${Math.floor(diff / oneMinute)}${mapValue.minutesAgo}`
+      }
+      if (diff < oneDay) {
+        return `${Math.floor(diff / oneHour)}${mapValue.hoursAgo}`
+      }
+      if (diff < oneWeek) {
+        return `${Math.floor(diff / oneDay)}${mapValue.daysAgo}`
+      }
+
+      return formatDate(new Date(date), 'yyyy-MM-dd')
+    }
+    return formatShowDate
+  })
 }

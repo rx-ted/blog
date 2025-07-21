@@ -8,10 +8,11 @@ import { useRoute, useRouter } from 'vitepress'
 import { computed, h, onMounted, ref, watch } from 'vue'
 import { useBlogConfig } from '../theme/blog'
 import { url2Img } from '../utils/common'
-import { notificationSvg } from '../constants/svg'
 import { vOuterHtml } from '../directives'
 
-const { popover: popoverProps } = useBlogConfig()
+
+const notificationSvg = '🔔'
+const popoverProps = useBlogConfig().value?.popover
 
 const show = ref(false)
 
@@ -163,11 +164,9 @@ function PopoverValue(props: { key: number, item: BlogPopover.Value }, { slots }
       </PopoverValue>
     </div>
   </div>
-  <div
-    v-show="!show && (popoverProps?.reopen ?? true) && popoverProps?.title" style="font-size: large;"
+  <div v-show="!show && (popoverProps?.reopen ?? true) && popoverProps?.title" style="font-size: large;"
     class="theme-blog-popover-close" :class="{ twinkle: !show && (popoverProps?.twinkle ?? true) }"
-    @click="show = true"
-  >
+    @click="show = true">
     <p v-if="popoverProps?.icon" v-outer-html="popoverProps.icon" />
     <p v-else>
       {{ notificationSvg }}

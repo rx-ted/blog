@@ -1,6 +1,5 @@
 <script setup lang="ts" name="BlogApp">
 import Theme from 'vitepress/theme'
-import { useDarkTransition } from '../hooks/useDarkTransition'
 import { useBlogThemeMode, useDarkTransitionConfig } from '../theme/blog'
 import BlogAlert from './BlogAlert.vue'
 import BlogArticleAnalyze from './BlogArticleAnalyze.vue'
@@ -14,20 +13,29 @@ import BlogHomeInfo from './BlogHomeInfo.vue'
 import BlogImagePreview from './BlogImagePreview.vue'
 import BlogList from './BlogList.vue'
 import BlogPopover from './BlogPopover.vue'
-
+import BlogOml2d from './BlogOml2d.vue'
+import BlogUserMenu from './BlogUserMenu.vue'
 import BlogSidebar from './BlogSidebar.vue'
 import CommentArtalk from './CommentArtalk.vue'
 import CommentGiscus from './CommentGiscus.vue'
+
+import { useDarkTransition } from '../hooks/useDarkTransition'
+import { onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 
 // const { frontmatter } = useData()
 // const layout = computed(() => frontmatter.value.layout)
 const isBlogTheme = useBlogThemeMode()
 const { Layout } = Theme
-
 // 切换深色模式过渡
 // https://vitepress.dev/zh/guide/extending-default-theme#on-appearance-toggle
 useDarkTransition()
 const openTransition = useDarkTransitionConfig()
+
+onMounted(() => {
+  useAuthStore().fetchMe()
+})
+
 </script>
 
 <template>
@@ -35,6 +43,7 @@ const openTransition = useDarkTransitionConfig()
     <template #layout-top>
       <slot name="layout-top" />
       <ClientOnly>
+        <BlogOml2d />
         <BlogAlert />
         <BlogPopover />
       </ClientOnly>
@@ -88,9 +97,9 @@ const openTransition = useDarkTransitionConfig()
       </ClientOnly>
     </template>
     <template #layout-bottom>
-      <!-- v-if="layout === 'home'"  -->
-      <slot name="layout-bottom" />
+      <!-- v-if="layout === 'home'" -->
       <BlogFooter />
+      <slot name="layout-bottom" />
     </template>
     <!-- 透传默认主题的其它插槽 -->
     <!-- navbar -->
@@ -102,6 +111,9 @@ const openTransition = useDarkTransitionConfig()
     </template>
     <template #nav-bar-content-after>
       <slot name="nav-bar-content-after" />
+      <ClientOnly>
+        <BlogUserMenu />
+      </ClientOnly>
     </template>
     <template #nav-screen-content-before>
       <slot name="nav-screen-content-before" />

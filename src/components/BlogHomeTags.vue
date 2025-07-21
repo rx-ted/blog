@@ -6,27 +6,26 @@ import { computed, watch } from 'vue'
 import {
   useActiveTag,
   useArticles,
-  useConfig,
   useCurrentPageNum,
-} from '../theme/blog'
-import { tagsSvg } from '../constants/svg'
+  useHomeTagsConfig,
+} from '@/theme/blog'
 
 const route = useRoute()
 const docs = useArticles()
-const homeTagsConfig = useConfig()?.config?.blog?.homeTags
-const showTags = computed(() => !!(homeTagsConfig ?? true))
-const title = computed(() => (typeof homeTagsConfig === 'boolean' || !homeTagsConfig?.title)
-  ? `${tagsSvg}标签`
-  : homeTagsConfig?.title,
+const homeTagsConfig = useHomeTagsConfig()
+const showTags = computed(() => !!(homeTagsConfig.value ?? true))
+const title = computed(() => (typeof homeTagsConfig.value === 'boolean' || !homeTagsConfig.value?.title)
+  ? `🏷️ 标签`
+  : homeTagsConfig.value?.title
 )
 const tags = computed(() => {
   return [...new Set(docs.value.map(v => v.meta.tag || []).flat(3))]
 })
 
-const activeTag = useActiveTag()
+const activeTag = useActiveTag();
 
 const isDark = useDark({
-  storageKey: 'vitepress-theme-appearance',
+  storageKey: 'vitepress-theme-appearance'
 })
 
 const colorMode = computed(() => (isDark.value ? 'light' : 'dark'))
@@ -53,7 +52,7 @@ function handleTagClick(tag: string, type: string) {
   activeTag.value.label = tag
   currentPage.value = 1
   router.go(
-    `${location.value.origin}${router.route.path}?tag=${tag}&type=${type}`,
+    `${location.value.origin}${router.route.path}?tag=${tag}&type=${type}`
   )
 }
 
@@ -67,8 +66,8 @@ watch(
     }
   },
   {
-    immediate: true,
-  },
+    immediate: true
+  }
 )
 
 watch(
@@ -79,7 +78,7 @@ watch(
       activeTag.value.type = ''
       activeTag.value.label = ''
     }
-  },
+  }
 )
 </script>
 
@@ -88,20 +87,16 @@ watch(
     <!-- 头部 -->
     <div class="card-header">
       <span class="title svg-icon" v-html="title" />
-      <ElTag
-        v-if="activeTag.label" :type="activeTag.type || 'primary'" :effect="colorMode" closable
-        @close="handleCloseTag"
-      >
+      <ElTag v-if="activeTag.label" :type="activeTag.type || 'primary'" :effect="colorMode" closable
+        @close="handleCloseTag">
         {{ activeTag.label }}
       </ElTag>
     </div>
     <!-- 标签列表 -->
     <ul class="tag-list">
       <li v-for="(tag, idx) in tags" :key="tag">
-        <ElTag
-          :type="tagType[idx % tagType.length] || 'primary'" :effect="colorMode"
-          @click="handleTagClick(tag, tagType[idx % tagType.length])"
-        >
+        <ElTag :type="tagType[idx % tagType.length] || 'primary'" :effect="colorMode"
+          @click="handleTagClick(tag, tagType[idx % tagType.length])">
           {{ tag }}
         </ElTag>
       </li>

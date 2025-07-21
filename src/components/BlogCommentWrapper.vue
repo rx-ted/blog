@@ -1,43 +1,25 @@
 <script setup lang="ts">
-import { Comment } from '@element-plus/icons-vue'
 import { useElementSize, useElementVisibility, useWindowSize } from '@vueuse/core'
-import { ElIcon } from 'element-plus'
-import { useData } from 'vitepress'
-import { computed, h, ref } from 'vue'
-import { useBlogConfig } from '../theme/blog'
+import { computed, ref } from 'vue'
+import Icon from '@/components/Icon.vue'
+import { useCommentConfig, useOpenCommentConfig } from '@/theme/blog'
 
-const { frontmatter } = useData()
 const commentEl = ref(null)
 const commentIsVisible = useElementVisibility(commentEl)
 
 function handleScrollToComment() {
   document.querySelector('#blog-comment-wrapper')?.scrollIntoView({
     behavior: 'smooth',
-    block: 'start',
+    block: 'start'
   })
 }
 
-const { comment: _comment } = useBlogConfig()
-const commentConfig = computed(() =>
-  _comment === false ? undefined : _comment,
-)
+const commentConfig = useCommentConfig()
 
-const show = computed(() => {
-  return _comment && frontmatter.value.comment !== false
-})
+const show = useOpenCommentConfig()
 
 const { width } = useWindowSize()
 const mobileMinify = computed(() => width.value < 768 && (commentConfig.value?.mobileMinify ?? true))
-
-const CommentIcon = commentConfig.value?.icon
-  ? h('i', {
-      onVnodeMounted(vnode) {
-        if (vnode.el) {
-          vnode.el.outerHTML = commentConfig.value?.icon
-        }
-      },
-    })
-  : h(Comment)
 
 const $vpDoc = document.querySelector('.vp-doc')
 const el = ref<any>($vpDoc)
@@ -50,21 +32,28 @@ const labelText = computed(() => {
 </script>
 
 <template>
-  <div v-if="show && _docWidth" id="blog-comment-wrapper" ref="commentEl" class="blog-comment-wrapper" data-pagefind-ignore="all">
+  <div v-if="show && _docWidth" id="blog-comment-wrapper" ref="commentEl" class="blog-comment-wrapper"
+    data-pagefind-ignore="all">
     <slot />
     <div v-show="!commentIsVisible" class="comment-btn-wrapper">
       <span v-if="!mobileMinify && labelText" class="icon-wrapper-text" @click="handleScrollToComment">
-        <ElIcon :size="20">
-          <CommentIcon />
-        </ElIcon>
+        <Icon :size="20" :icon="commentConfig?.icon">
+          <svg data-v-f0aeb853="" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 1024 1024">
+            <path fill="currentColor"
+              d="M736 504a56 56 0 1 1 0-112 56 56 0 0 1 0 112m-224 0a56 56 0 1 1 0-112 56 56 0 0 1 0 112m-224 0a56 56 0 1 1 0-112 56 56 0 0 1 0 112M128 128v640h192v160l224-160h352V128z" />
+          </svg>
+        </Icon>
         <span class="text">
           {{ labelText }}
         </span>
       </span>
       <span v-else class="icon-wrapper" @click="handleScrollToComment">
-        <ElIcon :size="20">
-          <CommentIcon />
-        </ElIcon>
+        <Icon :size="20" :icon="commentConfig?.icon">
+          <svg data-v-f0aeb853="" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 1024 1024">
+            <path fill="currentColor"
+              d="M736 504a56 56 0 1 1 0-112 56 56 0 0 1 0 112m-224 0a56 56 0 1 1 0-112 56 56 0 0 1 0 112m-224 0a56 56 0 1 1 0-112 56 56 0 0 1 0 112M128 128v640h192v160l224-160h352V128z" />
+          </svg>
+        </Icon>
       </span>
     </div>
   </div>

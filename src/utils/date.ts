@@ -1,35 +1,38 @@
-export function formatDate(date: Date | string | number, fmt = 'yyyy-MM-dd hh:mm:ss') {
-  const d = date instanceof Date ? date : new Date(date)
-
-  const o: Record<string, number> = {
+export function formatDate(d: number | string | Date, fmt = 'yyyy-MM-dd hh:mm:ss') {
+  if (!(d instanceof Date)) {
+    d = new Date(d)
+  }
+  const o: any = {
     'M+': d.getMonth() + 1, // 月份
     'd+': d.getDate(), // 日
     'h+': d.getHours(), // 小时
     'm+': d.getMinutes(), // 分
     's+': d.getSeconds(), // 秒
     'q+': Math.floor((d.getMonth() + 3) / 3), // 季度
-    'S': d.getMilliseconds(), // 毫秒
+    'S': d.getMilliseconds() // 毫秒
   }
-
-  // 年份替换
-  fmt = fmt.replace(/(y+)/, (_, yearMatch) =>
-    `${d.getFullYear()}`.slice(4 - yearMatch.length))
-
-  // 其他替换
+  if (/(y+)/.test(fmt)) {
+    fmt = fmt.replace(
+      RegExp.$1,
+      `${d.getFullYear()}`.substr(4 - RegExp.$1.length)
+    )
+  }
   for (const k in o) {
-    fmt = fmt.replace(new RegExp(`(${k})`), (_, match) => {
-      const val = o[k].toString()
-      return match.length === 1 ? val : val.padStart(match.length, '0')
-    })
+    if (new RegExp(`(${k})`).test(fmt)) {
+      fmt = fmt.replace(
+        RegExp.$1,
+        RegExp.$1.length === 1 ? o[k] : `00${o[k]}`.substr(`${o[k]}`.length)
+      )
+    }
   }
 
   return fmt
 }
 
 export function formatShowDate(date: Date | string) {
-  const source = +new Date(date)
-  const now = +new Date()
-  const diff = now - source
+  const source = new Date(date)
+  const now = new Date()
+  const diff = now.getTime() - source.getTime()
   const oneSeconds = 1000
   const oneMinute = oneSeconds * 60
   const oneHour = oneMinute * 60
@@ -48,5 +51,5 @@ export function formatShowDate(date: Date | string) {
     return `${Math.floor(diff / oneDay)}天前`
   }
 
-  return formatDate(new Date(date), 'yyyy-MM-dd')
+  return formatDate(source, 'yyyy-MM-dd')
 }

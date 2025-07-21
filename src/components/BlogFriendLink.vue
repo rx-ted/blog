@@ -1,24 +1,23 @@
 <script lang="ts" setup>
-import type { Theme } from '@/theme'
+import { useFriendData } from '@/theme/blog'
+import type { Theme } from '@/types/theme'
 import { useDark, useIntervalFn } from '@vueuse/core'
 import { ElAvatar } from 'element-plus'
 import Swiper from 'swiper'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { useBlogConfig } from '../theme/blog'
-import { friendLinkSvg } from '../constants/svg'
-import { getImageUrl, shuffleArray } from '../utils/client'
+import { getImageUrl, shuffleArray } from '@/utils/common'
 
 const isDark = useDark({
-  storageKey: 'vitepress-theme-appearance',
+  storageKey: 'vitepress-theme-appearance'
 })
 
-const { friend } = useBlogConfig()
+const friendData = useFriendData()
 const friendConfig = computed<Theme.FriendConfig>(() => ({
   list: [],
   random: false,
   limit: Number.MAX_SAFE_INTEGER,
-  title: `${friendLinkSvg}友情链接`,
-  ...(Array.isArray(friend) ? { list: friend } : friend),
+  title: `🤝 友情链接`,
+  ...(Array.isArray(friendData.value) ? { list: friendData.value } : friendData.value)
 }))
 
 const limit = computed(() => {
@@ -57,7 +56,7 @@ const friendList = computed(() => {
     return {
       ...v,
       avatar: avatarUrl,
-      alt,
+      alt
     }
   })
   return list
@@ -79,6 +78,7 @@ const { resume, pause } = useIntervalFn(() => {
 onMounted(() => {
   pause()
   if (openScroll.value) {
+    // eslint-disable-next-line no-new
     swiper.value = new Swiper('.scroll-wrapper', {
       direction: 'vertical',
       slidesPerView: limit.value,
@@ -88,6 +88,7 @@ onMounted(() => {
   }
 })
 
+// TODO: SSR渲染支持
 onUnmounted(() => {
   pause()
 })
@@ -100,13 +101,11 @@ onUnmounted(() => {
       <span class="title svg-icon" v-html="friendConfig.title" />
     </div>
     <!-- 友链列表 -->
-    <div
-      class="scroll-wrapper" :style="{
-        height: containerHeight,
-      }"
-    >
+    <div class="scroll-wrapper" :style="{
+      height: containerHeight,
+    }">
       <ol class="friend-list swiper-wrapper">
-        <li v-for=" (v, idx) in friendList" :key="idx" class="swiper-slide">
+        <li v-for="(v, idx) in friendList" :key="idx" class="swiper-slide">
           <a :href="v.url" target="_blank">
             <ElAvatar :size="50" :src="v.avatar" :alt="v.alt" />
             <div class="info-wrapper">
@@ -176,6 +175,7 @@ onUnmounted(() => {
     box-sizing: border-box;
     padding: 0 5px;
     height: 76px;
+
     .el-avatar {
       min-width: 50px;
     }

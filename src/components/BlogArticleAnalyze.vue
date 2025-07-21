@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import type { Theme } from '@/theme'
 import {
   AlarmClock,
   Clock,
@@ -12,15 +11,16 @@ import { ElIcon } from 'element-plus'
 // https://zhuanlan.zhihu.com/p/36375802
 import { useData } from 'vitepress'
 import { computed, onMounted, ref } from 'vue'
-import { useAnalyzeTitles, useBlogConfig, useCurrentArticle, useDocMetaInsertPosition, useDocMetaInsertSelector, useFormatShowDate } from '../theme/blog'
-import countWord from '../utils/client'
-import BlogDocCover from './BlogDocCover.vue'
-import { formatDate } from '../utils/date'
+import { useAnalyzeTitles, useArticleConfig, useAuthorList, useCurrentArticle, useDocMetaInsertPosition, useDocMetaInsertSelector, useFormatShowDate, useGlobalAuthor } from '@/theme/blog'
+import countWord from '@/utils/common'
+import BlogDocCover from '@/components/BlogDocCover.vue'
+import { formatDate } from '@/utils/date'
 
 
 const formatShowDate = useFormatShowDate()
-const { article, authorList } = useBlogConfig()
-const readingTimePosition = article?.readingTimePosition || 'inline'
+const article = useArticleConfig()
+const authorList = useAuthorList()
+const readingTimePosition = computed(() => article?.value?.readingTimePosition || 'inline')
 
 const { frontmatter } = useData()
 const tags = computed(() => {
@@ -30,12 +30,12 @@ const tags = computed(() => {
       []
         .concat(tag, tags, categories)
         .flat()
-        .filter(v => !!v),
-    ),
+        .filter(v => !!v)
+    )
   ]
 })
 const showAnalyze = computed(
-  () => frontmatter.value?.readingTime ?? article?.readingTime ?? true,
+  () => frontmatter.value?.readingTime ?? article?.value?.readingTime ?? true
 )
 
 const wordCount = ref(0)
@@ -69,7 +69,7 @@ function analyze() {
   document.querySelectorAll('.meta-des').forEach(v => v.remove())
   const docDomContainer = window.document.querySelector('#VPContent')
   const imgs = docDomContainer?.querySelectorAll<HTMLImageElement>(
-    '.content-container .main img',
+    '.content-container .main img'
   )
   imageCount.value = imgs?.length || 0
 
@@ -95,7 +95,7 @@ onMounted(() => {
   })
   observer.observe(document.body, {
     childList: true, // 观察目标子节点的变化，是否有添加或者删除
-    subtree: true, // 观察后代节点，默认为 false
+    subtree: true // 观察后代节点，默认为 false
   })
 
   // 初始化时执行一次
@@ -104,7 +104,7 @@ onMounted(() => {
 
 const currentArticle = useCurrentArticle()
 const publishDate = computed(() => {
-  return formatShowDate(currentArticle.value?.meta?.date || '')
+  return formatShowDate.value(currentArticle.value?.meta?.date || '')
 })
 
 const hoverDate = computed(() => {
@@ -113,45 +113,44 @@ const hoverDate = computed(() => {
 
 const hiddenTime = computed(() => frontmatter.value.date === false)
 
-const { theme } = useData<Theme.Config>()
-const globalAuthor = computed(() => theme.value.blog?.author || '')
+const globalAuthor = useGlobalAuthor()
 const author = computed(
   () =>
     (frontmatter.value.author || currentArticle.value?.meta.author)
-    ?? globalAuthor.value,
+    ?? globalAuthor.value
 )
 const currentAuthorInfo = computed(() =>
-  authorList?.find(v => author.value === v.nickname),
+  authorList?.value?.find(v => author.value === v.nickname)
 )
 const hiddenAuthor = computed(() => frontmatter.value.author === false)
 
 const { topWordCount, topReadTime, inlineWordCount, inlineReadTime, authorTitle, readTimeTitle, wordCountTitle, publishDateTitle, lastUpdatedTitle, tagTitle } = useAnalyzeTitles(wordCount, readTime)
 const timeTitle = computed(() =>
-  frontmatter.value.date ? publishDateTitle.value : lastUpdatedTitle.value,
+  frontmatter.value.date ? publishDateTitle.value : lastUpdatedTitle.value
 )
 </script>
 
 <template>
   <div v-if="showAnalyze && readingTimePosition === 'top'" class="doc-analyze" data-pagefind-ignore="all">
     <span>
-      <ElIcon>
+      <el-icon>
         <EditPen />
-      </ElIcon>
+      </el-icon>
       {{ topWordCount }}
     </span>
     <span>
-      <ElIcon>
+      <el-icon>
         <AlarmClock />
-      </ElIcon>
+      </el-icon>
       {{ topReadTime }}
     </span>
   </div>
   <div id="hack-article-des" ref="$des" class="meta-des">
     <!-- TODO：是否需要原创？转载等标签，理论上可以添加标签解决，可以参考 charles7c -->
     <span v-if="author && !hiddenAuthor" class="author" :title="authorTitle">
-      <ElIcon>
+      <el-icon>
         <UserFilled />
-      </ElIcon>
+      </el-icon>
       <a v-if="currentAuthorInfo" class="link" :href="currentAuthorInfo.url" :title="currentAuthorInfo.des">
         {{ currentAuthorInfo.nickname }}
       </a>
@@ -160,44 +159,44 @@ const timeTitle = computed(() =>
       </template>
     </span>
     <span v-if="publishDate && !hiddenTime" class="publishDate" :title="timeTitle + hoverDate">
-      <ElIcon>
+      <el-icon>
         <Clock />
-      </ElIcon>
+      </el-icon>
       {{ publishDate }}
     </span>
     <span v-if="tags.length" class="tags" :title="tagTitle">
-      <ElIcon>
+      <el-icon>
         <CollectionTag />
-      </ElIcon>
+      </el-icon>
       <a v-for="tag in tags" :key="tag" class="link" :href="`/?tag=${tag}`">{{ tag }}
       </a>
     </span>
     <template v-if="readingTimePosition === 'inline' && showAnalyze">
       <span :title="wordCountTitle">
-        <ElIcon>
+        <el-icon>
           <EditPen />
-        </ElIcon>
+        </el-icon>
         {{ inlineWordCount }}
       </span>
       <span :title="readTimeTitle">
-        <ElIcon>
+        <el-icon>
           <AlarmClock />
-        </ElIcon>
+        </el-icon>
         {{ inlineReadTime }}
       </span>
     </template>
     <template v-if="readingTimePosition === 'newLine' && showAnalyze">
       <div style="width: 100%;" class="new-line-meta-des">
         <span :title="wordCountTitle">
-          <ElIcon>
+          <el-icon>
             <EditPen />
-          </ElIcon>
+          </el-icon>
           {{ inlineWordCount }}
         </span>
         <span :title="readTimeTitle">
-          <ElIcon>
+          <el-icon>
             <AlarmClock />
-          </ElIcon>
+          </el-icon>
           {{ inlineReadTime }}
         </span>
       </div>

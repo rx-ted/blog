@@ -3,8 +3,7 @@ import { useWindowSize } from '@vueuse/core'
 import { MdEditor } from 'md-editor-v3'
 import { useData } from 'vitepress'
 import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
-import { useBlogConfig } from '../theme/blog'
-import { TEXT_web_editor_markdown } from '../constants/text'
+import { TEXT_web_editor_markdown } from '@/constants/text'
 import 'md-editor-v3/lib/style.css'
 
 const { isDark } = useData()
@@ -36,8 +35,6 @@ onUnmounted(() => {
 
 function onSave() {
   console.log(1111)
-  const config = useBlogConfig().github
-  console.log(config)
   // uploadImg()
 }
 async function onUploadImg() {

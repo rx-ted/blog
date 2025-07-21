@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import BlogFriendLink from './BlogFriendLink.vue'
-import BlogHomeOverview from './BlogHomeOverview.vue'
-import BlogHomeTags from './BlogHomeTags.vue'
-import BlogHotArticle from './BlogHotArticle.vue'
+import BlogFriendLink from '@/components/BlogFriendLink.vue'
+import BlogHomeOverview from '@/components/BlogHomeOverview.vue'
+import BlogHomeTags from '@/components/BlogHomeTags.vue'
+import BlogHotArticle from '@/components/BlogHotArticle.vue'
 </script>
 
 <template>

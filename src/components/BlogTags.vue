@@ -2,12 +2,13 @@
 import { ElButton, ElLink, ElTag } from 'element-plus'
 import { useData } from 'vitepress'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
-import { useArticles, useBlogConfig, useConfig } from '../theme/blog'
+import { useArticles, useBlogConfig, useConfig } from '@/theme/blog'
 
 const { frontmatter, site } = useData()
-const { home } = useBlogConfig()
+const home = useBlogConfig().value?.home
 
-const homeTagsConfig = useConfig()?.config?.blog?.homeTags
+const homeTagsConfig = useConfig()?.value.blog?.homeTags
+
 const title = computed(() =>
   typeof homeTagsConfig === 'boolean' || !homeTagsConfig?.title
     ? '🏷️ 标签'
@@ -121,12 +122,10 @@ function toggleTag(tag: string) {
     <div id="wordcloud-container" class="wordcloud" />
 
     <div class="tag-buttons">
-      <ElButton
-        v-for="(value, tag_name, idx) in tagList" :key="tag_name"
-        :type="tagType[idx % tagType.length] || 'primary'" round @click="toggleTag(tag_name)"
-      >
+      <el-button v-for="(value, tag_name, idx) in tagList" :key="tag_name"
+        :type="tagType[idx % tagType.length] || 'primary'" round @click="toggleTag(tag_name)">
         {{ tag_name }} {{ value.length }}
-      </ElButton>
+      </el-button>
     </div>
 
     <div v-if="selectTag" class="tag-articles">
@@ -136,14 +135,14 @@ function toggleTag(tag: string) {
 
       <div v-for="item in tagList[selectTag]" :key="item.route" class="info-container">
         <div class="info-part">
-          <ElLink :href="item.route" target="_blank">
+          <el-link :href="item.route" target="_blank">
             {{ item.title }}
-          </ElLink>
+          </el-link>
           <div class="badge-list">
             <span class="split">
-              <ElTag :type="item.type">
+              <el-tag :type="item.type">
                 {{ item.original ? '原创' : '转载' }}
-              </ElTag>
+              </el-tag>
             </span>
             <span v-if="item.author" class="split">{{ item.author }}</span>
             <span class="split">{{ item.date }}</span>
@@ -162,72 +161,72 @@ function toggleTag(tag: string) {
 
 <style lang="scss" scoped>
 .main-container {
-    max-width: 800px;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+
+  .title {
+    font-size: 20px;
+    font-weight: 600;
+    display: flex;
+    margin: 20px 0;
+  }
+
+  .wordcloud {
     margin: 0 auto;
-    text-align: center;
+  }
 
-    .title {
-        font-size: 20px;
-        font-weight: 600;
-        display: flex;
-        margin: 20px 0;
+  .tag-buttons {
+    margin-top: 20px;
+
+    .el-button {
+      margin: 5px 8px;
+    }
+  }
+
+  .tag-articles {
+    margin-top: 30px;
+
+    .summary {
+      font-size: 16px;
+      margin-bottom: 10px;
+      text-align: left;
     }
 
-    .wordcloud {
-        margin: 0 auto;
-    }
+    .info-container {
+      border-top: 1px dashed var(--el-border-color);
+      padding: 10px 0;
 
-    .tag-buttons {
-        margin-top: 20px;
+      .info-part {
+        text-align: left;
 
-        .el-button {
-            margin: 5px 8px;
+        a {
+          display: inline-block;
+          font-weight: 600;
+          font-size: 16px;
+          color: var(--el-link-color);
         }
+      }
     }
+  }
 
-    .tag-articles {
-        margin-top: 30px;
+  .badge-list {
+    font-size: 13px;
+    margin-top: 6px;
 
-        .summary {
-            font-size: 16px;
-            margin-bottom: 10px;
-            text-align: left;
-        }
-
-        .info-container {
-            border-top: 1px dashed var(--el-border-color);
-            padding: 10px 0;
-
-            .info-part {
-                text-align: left;
-
-                a {
-                    display: inline-block;
-                    font-weight: 600;
-                    font-size: 16px;
-                    color: var(--el-link-color);
-                }
-            }
-        }
+    .split:not(:last-child)::after {
+      content: '';
+      display: inline-block;
+      width: 1px;
+      height: 10px;
+      margin: 0 8px;
+      background-color: #4e5969;
     }
+  }
 
-    .badge-list {
-        font-size: 13px;
-        margin-top: 6px;
-
-        .split:not(:last-child)::after {
-            content: '';
-            display: inline-block;
-            width: 1px;
-            height: 10px;
-            margin: 0 8px;
-            background-color: #4e5969;
-        }
-    }
-
-    .no-select {
-        margin-top: 20px;
-        color: red;
-    }
+  .no-select {
+    margin-top: 20px;
+    color: red;
+  }
 }
 </style>

@@ -54,18 +54,6 @@ Giscus 是一个基于 GitHub Discussion 的评论系统，启用简便
 
 ## 效果图
 
-![alt text](<img/Screenshot from 2024-09-20 14-57-34.png>)
-
-![alt text](<img/Screenshot from 2024-09-20 14-57-52.png>)
-
-![alt text](<img/Screenshot from 2024-09-20 15-12-15.png>)
-
-![alt text](<img/Screenshot from 2024-09-20 15-12-36.png>)
-
-![alt text](<img/Screenshot from 2024-09-20 15-13-01.png>)
-
-![alt text](<img/Screenshot from 2024-09-20 15-13-14.png>)
-
 ## TODO
 
 - [ ] 版权声明

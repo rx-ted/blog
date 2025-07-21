@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import type { Theme } from '@/theme'
+import type { Theme } from '../types/theme'
 import { ElPagination } from 'element-plus'
 import { useData, useRoute, useRouter } from 'vitepress'
 import { computed, watch } from 'vue'
 import {
   useActiveTag,
   useArticles,
-  useBlogConfig,
   useCurrentPageNum,
-} from '../theme/blog'
+  useGlobalAuthor,
+  useHomeConfig,
+} from '@/theme/blog'
 import BlogItem from './BlogItem.vue'
 
-const { theme, frontmatter } = useData<Theme.Config>()
-const globalAuthor = computed(() => theme.value.blog?.author || '')
+const { frontmatter } = useData<Theme.Config>()
+const globalAuthor = useGlobalAuthor()
 const docs = useArticles()
 
 const activeTag = useActiveTag()
@@ -27,7 +28,7 @@ const wikiList = computed(() => {
     return Number(aTop) - Number(bTop)
   })
   const data = docs.value.filter(
-    v => v.meta.date && v.meta.title && !v.meta.top && !v.meta.hidden,
+    v => v.meta.date && v.meta.title && !v.meta.top && !v.meta.hidden
   )
   data.sort((a, b) => +new Date(b.meta.date) - +new Date(a.meta.date))
   return topList.concat(data)
@@ -37,13 +38,13 @@ const filterData = computed(() => {
   if (!activeTagLabel.value)
     return wikiList.value
   return wikiList.value.filter(v =>
-    v.meta?.tag?.includes(activeTagLabel.value),
+    v.meta?.tag?.includes(activeTagLabel.value)
   )
 })
 
-const { home } = useBlogConfig()
+const home = useHomeConfig()
 const pageSize = computed(
-  () => frontmatter.value.blog?.pageSize || home?.pageSize || 6,
+  () => frontmatter.value.blog?.pageSize || home?.value?.pageSize || 6
 )
 const currentPage = useCurrentPageNum()
 const currentWikiData = computed(() => {
@@ -64,7 +65,7 @@ function handleUpdatePageNum(current: number) {
   searchParams.append(queryPageNumKey, String(current))
   window.scrollTo({ top: 0, behavior: 'auto' })
   router.go(
-    `${router.route.path}?${searchParams.toString()}`,
+    `${router.route.path}?${searchParams.toString()}`
   )
 }
 
@@ -93,21 +94,17 @@ router.onAfterRouteChanged = () => {
 <template>
   <ul data-pagefind-ignore="all">
     <li v-for="v in currentWikiData" :key="v.route">
-      <BlogItem
-        :route="v.route" :title="v.meta.title" :description="v.meta.description"
+      <BlogItem :route="v.route" :title="v.meta.title" :description="v.meta.description"
         :description-h-t-m-l="v.meta.descriptionHTML" :date="v.meta.date" :tag="v.meta.tag" :cover="v.meta.cover"
-        :author="v.meta.author || globalAuthor" :pin="v.meta.top"
-      />
+        :author="v.meta.author || globalAuthor" :pin="v.meta.top" />
     </li>
   </ul>
   <!-- 解决element-ui bug -->
   <ClientOnly>
     <div class="el-pagination-wrapper">
-      <ElPagination
-        v-if="wikiList.length >= pageSize" size="default" background :default-current-page="1"
+      <ElPagination v-if="wikiList.length >= pageSize" size="default" background :default-current-page="1"
         :current-page="currentPage" :page-size="pageSize" :total="filterData.length" layout="prev, pager, next, jumper"
-        @update:current-page="handleUpdatePageNum"
-      />
+        @update:current-page="handleUpdatePageNum" />
     </div>
   </ClientOnly>
 </template>

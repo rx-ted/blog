@@ -1,6 +1,4 @@
-docs/.vuepress/dist
-docs/.vuepress/cache
-docs/.vuepress/**/dist
+
 node_modules
 dist
 cache
@@ -11,5 +9,9 @@ _pagefind
 yarn.lock
 .env
 .env.*
+!.env.example
 package-lock.json
 .cache
+.vitepress/dist
+.vitepress/cache
+node_modules

@@ -1,16 +1,16 @@
 <script  setup lang="ts">
 import { useData, withBase } from 'vitepress'
 import { computed } from 'vue'
-import { useBlogConfig } from '../theme/blog'
+import {  useHomeConfig } from '@/theme/blog'
 
-const { home } = useBlogConfig()
+const home = useHomeConfig()
 const { frontmatter, site } = useData()
 const logo = computed(() =>
   frontmatter.value.logo
-  ?? frontmatter.value?.blog?.logo
-  ?? home?.logo
-  ?? site.value.themeConfig?.logo
-  ?? '/imgs/logo.png',
+    ?? frontmatter.value?.blog?.logo
+    ?? home?.value?.logo
+    ?? site.value.themeConfig?.logo
+    ?? '/logo.png'
 )
 const alwaysHide = computed(() => frontmatter.value.blog?.minScreenAvatar === false)
 </script>

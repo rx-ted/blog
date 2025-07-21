@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useHomeFooterConfig } from '../theme/blog'
-import { copyrightSVG, icpSVG } from '../constants/svg'
-import { vOuterHtml } from '../directives'
+import { useHomeFooterConfig } from '@/theme/blog'
+import { vOuterHtml } from '@/directives'
+import { copyrightSVG, icpSVG } from '@/constants/svg'
 
-const footerData = useHomeFooterConfig()
+
+
+const footerConfig = useHomeFooterConfig()
 
 const renderData = computed(() => {
+  const footerData = footerConfig.value
   if (!footerData) {
     return []
   }
@@ -28,37 +31,37 @@ const renderData = computed(() => {
       const versionItem = typeof version === 'object' ? version : {}
 
       data.push({
-        name: versionItem?.name ?? '',
-        link: versionItem?.link || 'https://github.com/rx-ted/blog/tree/vitepress',
-        icon: versionItem?.icon ?? '',
+        name: versionItem?.name || "",
+        link: versionItem?.link || "",
+        icon: versionItem?.icon || ""
       })
     }
     // copyright
     if (typeof copyright === 'string') {
       data.push({
         name: copyright,
-        icon: copyrightSVG,
+        icon: copyrightSVG
       })
     }
     if (copyright instanceof Object) {
       data.push({
         icon: copyrightSVG,
         name: copyright.message,
-        ...copyright,
+        ...copyright
       })
     }
     // 备案信息
     if (icpRecord) {
       data.push({
         icon: icpSVG,
-        ...icpRecord,
+        ...icpRecord
       })
     }
     // 网备信息
     if (securityRecord) {
       data.push({
         icon: 'security',
-        ...securityRecord,
+        ...securityRecord
       })
     }
     if (list) {
@@ -70,14 +73,14 @@ const renderData = computed(() => {
         return {
           name: v.text,
           icon: v.icon,
-          link: v.link,
+          link: v.link
         }
       }))
     }
     return {
       data,
       messageData,
-      bottomMessageData,
+      bottomMessageData
     }
   })
 })
@@ -87,7 +90,7 @@ const renderData = computed(() => {
   <footer v-if="renderData.length" class="blog-footer">
     <!-- eslint-disable vue/require-v-for-key -->
     <!-- see https://cn.vuejs.org/guide/essentials/list.html#v-for-on-template -->
-    <template v-for="{ data, messageData, bottomMessageData } in renderData">
+    <template v-for="({ data, messageData, bottomMessageData }) in renderData">
       <!-- 在内置footer上方渲染 -->
       <p v-for="message in messageData" v-html="message" />
       <!-- 内置的列表 -->
@@ -103,6 +106,7 @@ const renderData = computed(() => {
             </a>
             <span v-else>{{ item.name }}</span>
           </span>
+          <!-- TODO: 理论上存在问题，待优化 -->
           <span v-else v-outer-html="item" />
         </template>
       </p>

@@ -1,0 +1,3 @@
+# guide
+
+this is chinese.

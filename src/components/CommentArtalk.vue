@@ -3,7 +3,7 @@ import type Artalk from 'artalk'
 import { useData, useRoute } from 'vitepress'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
-import { useBlogConfig } from '../theme/blog'
+import { useCommentConfig, useOpenCommentConfig } from '../theme/blog'
 
 const { isDark, page } = useData()
 const el = ref<HTMLDivElement>()
@@ -12,14 +12,16 @@ const route = useRoute()
 
 const artalk = ref<Artalk>()
 
-const { comment } = useBlogConfig()
+const comment = useCommentConfig()
+
 const commentConfig = computed(() => {
-  if (comment && 'type' in comment && comment.type === 'artalk') {
-    return comment.options
+  if (comment.value && 'type' in comment.value && comment.value?.type === 'artalk') {
+    return comment.value.options
   }
 
   return false
 })
+const open = useOpenCommentConfig()
 
 onMounted(() => {
   // CDN 异步加载，有优化空间
@@ -64,7 +66,7 @@ watch(isDark, () => {
 </script>
 
 <template>
-  <div v-if="commentConfig" ref="el" class="artalk-container" />
+  <div v-if="open" ref="el" class="artalk-container" />
 </template>
 
 <style lang="scss" scoped>

@@ -1,31 +1,22 @@
 <script lang="ts" setup>
 import { ElButton } from 'element-plus'
-import { useData } from 'vitepress'
 import { computed, ref, watch } from 'vue'
-import { useBlogConfig } from '../theme/blog'
-import { aliPaySVG, weChatPaySVG } from '../constants/svg'
+import { aliPaySVG, weChatPaySVG } from '@/constants/svg'
+import { useButtonAfterConfig } from '@/theme/blog'
 
-const { buttonAfterArticle: _buttonAfterArticle } = useBlogConfig()
-const { frontmatter } = useData()
-const frontmatterConfig = computed(() => frontmatter.value.buttonAfterArticle)
-
-const buttonAfterArticleConfig = computed(() => {
-  if (frontmatterConfig.value === false || (!frontmatterConfig.value && !_buttonAfterArticle)) {
-    return false
-  }
-
-  return { ..._buttonAfterArticle, ...frontmatterConfig.value }
-})
+const buttonAfterArticleConfig = useButtonAfterConfig()
 
 const showContent = ref(false)
 
 watch(buttonAfterArticleConfig, () => {
-  showContent.value = !!buttonAfterArticleConfig.value?.expand
+  showContent.value = buttonAfterArticleConfig.value !== false && !!buttonAfterArticleConfig.value?.expand
 }, {
-  immediate: true,
+  immediate: true
 })
 
 const svg = computed(() => {
+  if (buttonAfterArticleConfig.value === false)
+    return ''
   const icon = buttonAfterArticleConfig.value?.icon
   if (icon === 'aliPay') {
     return aliPaySVG
@@ -45,7 +36,8 @@ function toggleContent() {
 
 <template>
   <div v-if="buttonAfterArticleConfig" class="appreciation-container">
-    <ElButton :size="buttonAfterArticleConfig.size || 'default'" class="content-button" :type="showContent ? 'danger' : 'primary'" @click="toggleContent">
+    <ElButton :size="buttonAfterArticleConfig.size || 'default'" class="content-button"
+      :type="showContent ? 'danger' : 'primary'" @click="toggleContent">
       <span class="content-icon" v-html="svg" />
       {{ showContent ? buttonAfterArticleConfig.closeTitle : buttonAfterArticleConfig.openTitle }}
     </ElButton>
@@ -62,7 +54,7 @@ function toggleContent() {
   font-size: 14px;
   color: #606266;
 
-  :deep(.el-button.el-button--primary){
+  :deep(.el-button.el-button--primary) {
     background-color: var(--vp-c-brand-2);
     border-color: var(--vp-c-brand-2);
   }
@@ -74,7 +66,8 @@ function toggleContent() {
   justify-content: center;
   align-items: center;
   margin-top: 20px;
-  :deep(img){
+
+  :deep(img) {
     height: 260px;
   }
 }

@@ -2,7 +2,7 @@
 import { useRouter, withBase } from 'vitepress'
 import { computed } from 'vue'
 import { useCleanUrls, useFormatShowDate, useImageStyle } from '../theme/blog'
-import { wrapperCleanUrls } from '../utils/client'
+import { wrapperCleanUrls } from '../utils/common';
 
 const props = defineProps<{
   route: string
@@ -20,7 +20,7 @@ const props = defineProps<{
 const formatShowDate = useFormatShowDate()
 
 const showTime = computed(() => {
-  return formatShowDate(props.date)
+  return formatShowDate.value(props.date)
 })
 const cleanUrls = useCleanUrls()
 const link = computed(() => withBase(wrapperCleanUrls(!!cleanUrls, props.route)))
@@ -30,14 +30,15 @@ function handleSkipDoc() {
   router.go(link.value)
 }
 
-const { coverPreview } = useImageStyle()
+const imageStyle = useImageStyle()
+const coverPreview = computed(() => imageStyle.value.coverPreview)
 
 const resultCover = computed(() => {
   if (!props.cover) {
     return ''
   }
   const baseCover = withBase(props.cover)
-  const coverRule = [coverPreview]
+  const coverRule = [coverPreview.value]
     .flat()
     .filter(v => !!v)
     .find((coverRule) => {
@@ -66,12 +67,10 @@ const resultCover = computed(() => {
 </script>
 
 <template>
-  <a
-    class="blog-item" :href="link" @click="(e) => {
-      e.preventDefault()
-      handleSkipDoc()
-    }"
-  >
+  <a class="blog-item" :href="link" @click="(e) => {
+    e.preventDefault()
+    handleSkipDoc()
+  }">
     <i v-show="!!pin" class="pin" />
     <!-- 标题 -->
     <p class="title mobile-visible">
@@ -82,7 +81,7 @@ const resultCover = computed(() => {
       <div class="info-part">
         <!-- 标题 -->
         <p class="title pc-visible">
-          {{ title }}
+          <span>{{ title }}</span>
         </p>
         <!-- 简短描述 -->
         <p v-show="!descriptionHTML && !!description" class="description">

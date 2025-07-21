@@ -1,30 +1,31 @@
 <script lang="ts" setup>
 import { ElAlert } from 'element-plus'
 import { onMounted, ref } from 'vue'
-import { useBlogConfig } from '../theme/blog'
+import { useAlertConfig } from '@/theme/blog'
 
-const { alert: alertProps } = useBlogConfig()
+// TODO：拆分插件，对标公告插件
+const alertProps = useAlertConfig()
 const show = ref(false)
 const storageKey = 'theme-blog-alert'
 const closeFlag = `${storageKey}-close`
 onMounted(() => {
   // 取旧值
   const oldValue = localStorage.getItem(storageKey)
-  const newValue = JSON.stringify(alertProps)
+  const newValue = JSON.stringify(alertProps.value)
   localStorage.setItem(storageKey, newValue)
 
   // >= 0 每次都展示，区别是否自动消失
-  if (Number(alertProps?.duration) >= 0) {
+  if (Number(alertProps?.value?.duration) >= 0) {
     show.value = true
-    if (alertProps?.duration) {
+    if (alertProps?.value?.duration) {
       setTimeout(() => {
         show.value = false
-      }, alertProps?.duration)
+      }, alertProps?.value?.duration)
     }
     return
   }
 
-  if (oldValue !== newValue && alertProps?.duration === -1) {
+  if (oldValue !== newValue && alertProps?.value?.duration === -1) {
     // 当做新值处理
     show.value = true
     localStorage.removeItem(closeFlag)
@@ -32,14 +33,14 @@ onMounted(() => {
   }
 
   // 新旧相等，判断是否点击过close，没点击关闭依然展示
-  if (oldValue === newValue && alertProps?.duration === -1 && !localStorage.getItem(closeFlag)) {
+  if (oldValue === newValue && alertProps?.value?.duration === -1 && !localStorage.getItem(closeFlag)) {
     show.value = true
   }
 })
 
 function handleClose() {
   show.value = false
-  if (alertProps?.duration === -1) {
+  if (alertProps?.value?.duration === -1) {
     localStorage.setItem(closeFlag, `${+new Date()}`)
   }
 }
@@ -47,16 +48,9 @@ function handleClose() {
 
 <template>
   <div v-if="show" class="global-alert" data-pagefind-ignore="all">
-    <ElAlert
-      :title="alertProps?.title"
-      :type="alertProps?.type"
-      :show-icon="alertProps?.showIcon"
-      :center="alertProps?.center"
-      :closable="alertProps?.closable"
-      :close-text="alertProps?.closeText"
-      :description="alertProps?.description"
-      @close="handleClose"
-    >
+    <ElAlert :title="alertProps?.title" :type="alertProps?.type" :show-icon="alertProps?.showIcon"
+      :center="alertProps?.center" :closable="alertProps?.closable" :close-text="alertProps?.closeText"
+      :description="alertProps?.description" @close="handleClose">
       <div v-if="alertProps?.html" v-html="alertProps?.html" />
     </ElAlert>
   </div>
@@ -72,10 +66,12 @@ function handleClose() {
   left: 50%;
   transform: translateX(-50%);
   width: auto;
+
   :deep(.el-alert__content) {
     padding-right: 20px;
   }
 }
+
 @media screen and (max-width: 1100px) {
   .global-alert {
     width: 50%;

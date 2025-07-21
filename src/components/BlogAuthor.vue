@@ -1,31 +1,37 @@
 <script setup>
 import { useData, withBase } from 'vitepress'
-import { computed } from 'vue'
-import { useBlogConfig } from '../theme/blog'
+import { computed, ref } from 'vue'
+import { useBlogConfig, useGlobalAuthor, useHomeConfig } from '@/theme/blog'
+import { useElementSize, useScroll } from '@vueuse/core'
+import { backRoTopSVG } from '@/constants/svg'
+import Icon from '@/components/Icon.vue'
 
-const { home } = useBlogConfig()
+
+const home = useHomeConfig()
 const { frontmatter, site } = useData()
+const globalAuthor = useGlobalAuthor()
+
 const author = computed(() =>
   frontmatter.value.author
   ?? frontmatter.value?.blog?.author
-  ?? home?.author
-  ?? site.value.themeConfig?.blog?.author,
+  ?? home?.value?.author
+  ?? globalAuthor?.value
+)
+const logo = computed(() =>
+  home?.value?.logo
+  ?? frontmatter.value?.blog?.logo
+  ?? frontmatter.value?.logo
+  ?? site.value?.themeConfig?.logo
+  ?? '/imgs/logo.png'
 )
 
-const authorImgUrl = computed(() =>
-  frontmatter.value?.authorImgUrl
-  ?? frontmatter.value?.blog?.authorImgUrl
-  ?? home?.authorImgUrl
-  ?? site.value?.themeConfig?.authorImgUrl
-  ?? '/imgs/author.jpg',
-)
 
-const show = computed(() => author.value || authorImgUrl.value)
+const show = computed(() => author.value || logo.value)
 </script>
 
 <template>
   <div v-if="show" class="blog-author">
-    <img v-if="authorImgUrl" :src="withBase(authorImgUrl)" alt="avatar">
+    <img v-if="logo" :src="withBase(logo)" alt="avatar">
     <p v-if="author">
       {{ author }}
     </p>

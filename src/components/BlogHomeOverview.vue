@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { useData } from 'vitepress'
 import { computed } from 'vue'
-import { useArticles, useBlogConfig, useHomeAnalysis } from '../theme/blog'
-import { isCurrentWeek } from '../utils/client'
-import BlogAuthor from './BlogAuthor.vue'
+import { useArticles,  useHomeAnalysis, useHomeConfig } from '../theme/blog'
+import BlogAuthor from '@/components/BlogAuthor.vue'
+import { isCurrentWeek } from '@/utils/common'
 
-const { home } = useBlogConfig()
+const home = useHomeConfig()
 const { frontmatter } = useData()
-const avatarMode = computed(() => frontmatter.value?.blog?.avatarMode || home?.avatarMode || 'card')
+const avatarMode = computed(() => frontmatter.value?.blog?.avatarMode || home?.value?.avatarMode || 'card')
 
 const showCardAvatar = computed(() => avatarMode.value === 'card')
 const showSplitCard = computed(() => avatarMode.value === 'split')
@@ -33,7 +33,7 @@ const currentWeek = computed(() => {
 })
 
 const analysis = useHomeAnalysis()
-const titles = computed(() => (frontmatter.value?.blog?.analysis?.articles?.title || analysis?.articles?.title || []))
+const titles = computed(() => (frontmatter.value?.blog?.analysis?.articles?.title || analysis?.value?.articles?.title || []))
 </script>
 
 <template>

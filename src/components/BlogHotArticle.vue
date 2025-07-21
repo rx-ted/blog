@@ -1,20 +1,16 @@
 <script lang="ts" setup>
-import { ElButton } from 'element-plus'
+import { wrapperCleanUrls } from '@/utils/common'
+import { useArticles, useCleanUrls, useFormatShowDate, useHotArticleConfig, useShowHotArticle } from '@/theme/blog'
 import { useRouter, withBase } from 'vitepress'
 import { computed, ref } from 'vue'
-import { useArticles, useBlogConfig, useCleanUrls, useFormatShowDate } from '../theme/blog'
-import { fireSVG } from '../constants/svg'
-import { wrapperCleanUrls } from '../utils/client'
+import { ElButton } from 'element-plus'
 
 const formatShowDate = useFormatShowDate()
 
-const { hotArticle: _hotArticle } = useBlogConfig()
+const hotArticle = useHotArticleConfig()
+const show = useShowHotArticle()
 
-const hotArticle = computed(() =>
-  _hotArticle === false ? undefined : _hotArticle,
-)
-
-const title = computed(() => hotArticle.value?.title || `${fireSVG}精选文章`)
+const title = computed(() => hotArticle.value?.title || `🔥 精选文章`)
 const nextText = computed(() => hotArticle.value?.nextText || '换一组')
 const pageSize = computed(() => hotArticle.value?.pageSize || 9)
 const empty = computed(() => hotArticle.value?.empty ?? '暂无精选内容')
@@ -45,7 +41,7 @@ const currentWikiData = computed(() => {
   const endIdx = startIdx + pageSize.value
   return recommendList.value.slice(startIdx, endIdx).map(v => ({
     ...v,
-    route: wrapperCleanUrls(cleanUrls, v.route),
+    route: wrapperCleanUrls(cleanUrls, v.route)
   }))
 })
 
@@ -55,16 +51,13 @@ const showChangeBtn = computed(() => {
 </script>
 
 <template>
-  <div
-    v-if="_hotArticle !== false && (recommendList.length || empty)" class="card recommend"
-    data-pagefind-ignore="all"
-  >
+  <div v-if="show && (recommendList.length || empty)" class="card recommend" data-pagefind-ignore="all">
     <!-- 头部 -->
     <div class="card-header">
       <span class="title svg-icon" v-html="title" />
-      <ElButton v-if="showChangeBtn" size="small" type="primary" text @click="changePage">
+      <el-button v-if="showChangeBtn" size="small" type="primary" text @click="changePage">
         {{ nextText }}
-      </ElButton>
+      </el-button>
     </div>
     <!-- 文章列表 -->
     <ol v-if="currentWikiData.length" class="recommend-container">
@@ -74,13 +67,10 @@ const showChangeBtn = computed(() => {
         <!-- 简介 -->
         <div class="des">
           <!-- title -->
-          <a
-            :href="withBase(v.route)"
-            class="title" @click="(e) => {
-              e.preventDefault()
-              handleLinkClick(withBase(v.route))
-            }"
-          >
+          <a :href="withBase(v.route)" class="title" @click="(e) => {
+            e.preventDefault()
+            handleLinkClick(withBase(v.route))
+          }">
             <span>
               {{
                 v.meta.title
