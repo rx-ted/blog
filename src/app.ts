@@ -26,6 +26,8 @@ import 'element-plus/theme-chalk/dark/css-vars.css';
 import 'vitepress-markdown-timeline/dist/theme/index.css';
 // 进度条样式
 import 'nprogress-v2/dist/index.css';
+// see more details for https://vitepress-plugins.sapphi.red/tabs/
+import { enhanceAppWithTabs } from 'vitepress-plugin-tabs/client';
 
 import BlogApp from '@/components/BlogApp.vue';
 import { withConfigProvider } from '@/theme/blog';
@@ -66,7 +68,6 @@ const BlogTheme: Theme = {
 
         DefaultTheme.enhanceApp(ctx);
 
-
         Object.keys(components).forEach((name) => {
             app.component(name, components[name]);
         });
@@ -75,8 +76,4 @@ const BlogTheme: Theme = {
 };
 
 export default BlogTheme;
-
-function enhanceAppWithTabs(app: App<any>) {
-    throw new Error('Function not implemented.');
-}
 
