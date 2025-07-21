@@ -1,11 +1,10 @@
-import type { Mapping, Repo } from '@giscus/vue'
-import type { DefaultTheme } from 'vitepress'
+import type { Mapping, Repo } from '@giscus/vue';
+import type { DefaultTheme } from 'vitepress';
 
-import type { PagefindConfig } from 'vitepress-plugin-pagefind'
-import type { RSSOptions } from 'vitepress-plugin-rss'
-import type { Popover } from './popover'
-import type { Options as Oml2dOptions } from 'oh-my-live2d'
-
+import type { PagefindConfig } from 'vitepress-plugin-pagefind';
+import type { RSSOptions } from 'vitepress-plugin-rss';
+import type { Popover } from './popover';
+import type { Options as Oml2dOptions } from 'oh-my-live2d';
 
 type RSSPluginOptions = RSSOptions
 

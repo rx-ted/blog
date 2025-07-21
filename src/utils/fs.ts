@@ -1,110 +1,110 @@
-import fs from 'node:fs'
-import os from 'node:os'
-import path from 'node:path'
-import process from 'node:process'
-import { spawn } from 'cross-spawn'
-import matter from 'gray-matter'
-import pLimit from 'p-limit'
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import process from 'node:process';
+import { spawn } from 'cross-spawn';
+import matter from 'gray-matter';
+import pLimit from 'p-limit';
 
-const timeLimit = pLimit(+(process.env.P_LIMT_MAX || os.cpus().length))
+const timeLimit = pLimit(+(process.env.P_LIMT_MAX || os.cpus().length));
 
 /**
  * 获取 markdown 内容中的标题
  */
 export function getDefaultTitle(content: string) {
-  const match = content.match(/^(#+)\s+(.+)/m)
-  return match?.[2] || ''
+  const match = content.match(/^(#+)\s+(.+)/m);
+  return match?.[2] || '';
 }
 
-const cache = new Map<string, Date | undefined>()
+const cache = new Map<string, Date | undefined>();
 /**
  * 获取文件最后修改时间
  * 优先使用 git 命令获取，如果失败则使用 fs.stat 获取
  */
 export async function getFileLastModifyTime(url: string) {
-  const cached = cache.get(url)
+  const cached = cache.get(url);
   if (cached) {
-    return cached
+    return cached;
   }
-  let date = await timeLimit(() => getFileLastModifyTimeByGit(url))
+  let date = await timeLimit(() => getFileLastModifyTimeByGit(url));
   if (!date) {
-    date = await getFileLastModifyTimeByFs(url)
+    date = await getFileLastModifyTimeByFs(url);
   }
   if (date) {
-    cache.set(url, date)
+    cache.set(url, date);
   }
-  return date
+  return date;
 }
 
 export function getFileLastModifyTimeByGit(url: string): Promise<Date | undefined> {
   return new Promise((resolve) => {
-    const cwd = path.dirname(url)
+    const cwd = path.dirname(url);
 
     // 有额外的耗时，try-catch 处理
     // if (!fs.existsSync(cwd))
     //   return resolve(undefined)
     try {
-      const fileName = path.basename(url)
+      const fileName = path.basename(url);
 
       // 使用异步回调
       const child = spawn('git', ['log', '-1', '--pretty="%ai"', fileName], {
         cwd,
-      })
-      let output = ''
-      child.stdout.on('data', d => (output += String(d)))
+      });
+      let output = '';
+      child.stdout.on('data', d => (output += String(d)));
       child.on('close', async () => {
-        let date: Date | undefined
+        let date: Date | undefined;
         if (output.trim()) {
-          date = new Date(output)
+          date = new Date(output);
         }
-        resolve(date)
-      })
+        resolve(date);
+      });
       child.on('error', async () => {
-        resolve(undefined)
-      })
+        resolve(undefined);
+      });
     }
     catch {
-      resolve(undefined)
+      resolve(undefined);
     }
-  })
+  });
 }
 
 export async function getFileBirthTimeByFs(url: string) {
   try {
-    const fsStat = await fs.promises.stat(url)
-    return fsStat.birthtime
+    const fsStat = await fs.promises.stat(url);
+    return fsStat.birthtime;
   }
   catch {
-    return undefined
+    return undefined;
   }
 }
 
 export async function getFileLastModifyTimeByFs(url: string) {
   try {
-    const fsStat = await fs.promises.stat(url)
-    return fsStat.mtime
+    const fsStat = await fs.promises.stat(url);
+    return fsStat.mtime;
   }
   catch {
-    return undefined
+    return undefined;
   }
 }
 
-export const EXTERNAL_URL_RE = /^[a-z]+:/i
+export const EXTERNAL_URL_RE = /^[a-z]+:/i;
 
 /**
  * Join two paths by resolving the slash collision.
  */
 export function joinPath(base: string, path: string): string {
-  return `${base}${path}`.replace(/\/+/g, '/')
+  return `${base}${path}`.replace(/\/+/g, '/');
 }
 
 export function withBase(base: string, path: string) {
   return EXTERNAL_URL_RE.test(path) || path.startsWith('.')
     ? path
-    : joinPath(base, path)
+    : joinPath(base, path);
 }
 
-export const grayMatter = matter
+export const grayMatter = matter;
 
 export function getTextSummary(text: string, count = 100) {
   return (
@@ -126,16 +126,16 @@ export function getTextSummary(text: string, count = 100) {
       ?.replace(/</g, '&lt;').replace(/>/g, '&gt;')
       ?.trim()
       ?.slice(0, count)
-  )
+  );
 }
 
-const windowsSlashRE = /\\/g
-export const isWindows = os.platform() === 'win32'
+const windowsSlashRE = /\\/g;
+export const isWindows = os.platform() === 'win32';
 
 export function slash(p: string): string {
-  return p.replace(windowsSlashRE, '/')
+  return p.replace(windowsSlashRE, '/');
 }
 
 export function normalizePath(id: string): string {
-  return path.posix.normalize(isWindows ? slash(id) : id)
+  return path.posix.normalize(isWindows ? slash(id) : id);
 }

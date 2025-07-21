@@ -113,7 +113,7 @@ export const blogTheme = getThemeConfig({
         props: {
           type: 'success',
         },
-        link: '/notes/about',
+        link: 'modules/about',
       },
     ],
     duration: 0,

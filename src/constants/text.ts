@@ -4,4 +4,4 @@ export const TEXT_web_editor_markdown = `> Beta: Markdown Editor
 ---
 You can input text or Markdown content here, edit or clear it as you wish. You can experiment with any formatting you can imagine right here!
 Please note that saving to the cloud is temporarily unavailable. Please manually save to your local device.
-`
+`;

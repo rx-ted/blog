@@ -1,6 +1,4 @@
-import type { EnhanceAppContext, MarkdownOptions } from 'vitepress'
-
-
+import type { EnhanceAppContext, MarkdownOptions } from 'vitepress';
 
 export interface PluginConfig {
     /** 插件配置 */
@@ -21,8 +19,6 @@ export interface VitePressPlugin {
     /** 插件配置 */
     config?: PluginConfig
 }
-
-
 
 /**
  * 插件管理器配置

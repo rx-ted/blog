@@ -1,15 +1,13 @@
-import { type UserConfig } from "vitepress"
-import { type Theme } from "../types/theme"
-import { checkConfig, patchVPConfig, patchVPThemeConfig } from "./theme"
-import { getMarkdownPlugins, getVitePlugins, patchMermaidPluginCfg, patchOptimizeDeps, registerMdPlugins, registerVitePlugins } from "./plugin"
-import path from "path"
-
+import { type UserConfig } from 'vitepress';
+import { type Theme } from '../types/theme';
+import { checkConfig, patchVPConfig, patchVPThemeConfig } from './theme';
+import { getMarkdownPlugins, getVitePlugins, patchMermaidPluginCfg, patchOptimizeDeps, registerMdPlugins, registerVitePlugins } from './plugin';
+import path from 'path';
 
 export const getThemeConfig = (cfg: Partial<Theme.BlogConfig>) => {
-    checkConfig(cfg)
+    checkConfig(cfg);
 
-    const pagesData: Theme.PageData[] = []
-
+    const pagesData: Theme.PageData[] = [];
 
     const extraVPConfig: Partial<UserConfig> = {
         vite: {
@@ -30,29 +28,28 @@ export const getThemeConfig = (cfg: Partial<Theme.BlogConfig>) => {
             },
             resolve: {
                 alias: {
-                    "@": path.resolve(__dirname, '..')
+                    '@': path.resolve(__dirname, '..')
                 }
             }
         },
+    };
 
-    }
-
-    const vitePlugins = getVitePlugins(cfg)
+    const vitePlugins = getVitePlugins(cfg);
 
     // 注册Vite插件
-    registerVitePlugins(extraVPConfig, vitePlugins)
+    registerVitePlugins(extraVPConfig, vitePlugins);
 
     // 获取要加载的markdown插件
-    const markdownPlugin = getMarkdownPlugins(cfg)
+    const markdownPlugin = getMarkdownPlugins(cfg);
     // 注册markdown插件
-    registerMdPlugins(extraVPConfig, markdownPlugin)
+    registerMdPlugins(extraVPConfig, markdownPlugin);
 
     // patch extraVPConfig
     if (cfg?.mermaid !== false) {
-        patchMermaidPluginCfg(extraVPConfig)
+        patchMermaidPluginCfg(extraVPConfig);
     }
-    patchOptimizeDeps(extraVPConfig)
-    patchVPConfig(extraVPConfig, cfg)
+    patchOptimizeDeps(extraVPConfig);
+    patchVPConfig(extraVPConfig, cfg);
 
     return {
         themeConfig: {
@@ -64,16 +61,13 @@ export const getThemeConfig = (cfg: Partial<Theme.BlogConfig>) => {
             ...patchVPThemeConfig(cfg)
         },
         ...extraVPConfig
-    }
+    };
 
-
-
-}
-
+};
 
 /**
  * defineConfig Helper
  */
 export function defineConfig(config: UserConfig<Theme.Config>): any {
-    return config
+    return config;
 }

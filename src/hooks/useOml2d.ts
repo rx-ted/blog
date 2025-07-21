@@ -1,7 +1,6 @@
-import { onMounted } from 'vue'
-import type { Options } from 'oh-my-live2d'
-import { useOml2dOptions } from '@/theme/blog'
-
+import { onMounted } from 'vue';
+import type { Options } from 'oh-my-live2d';
+import { useOml2dOptions } from '@/theme/blog';
 
 const defaultModelOptions: any = {
   scale: 0.08,
@@ -14,7 +13,7 @@ const defaultModelOptions: any = {
   mobileStageStyle: {
     width: 150
   },
-}
+};
 const defaultOptions: Options = {
   tips: {
     copyTips: {
@@ -35,12 +34,12 @@ const defaultOptions: Options = {
       width: '110px'
     }
   }
-}
+};
 export function useOml2d() {
-  const oml2dOptions = useOml2dOptions()
+  const oml2dOptions = useOml2dOptions();
   const init = async () => {
     if (oml2dOptions.value) {
-      const { loadOml2d } = await import('oh-my-live2d')
+      const { loadOml2d } = await import('oh-my-live2d');
       loadOml2d({
         ...defaultOptions,
         ...oml2dOptions?.value,
@@ -72,14 +71,14 @@ export function useOml2d() {
             ...oml2dOptions?.value.tips?.copyTips
           }
         }
-      })
+      });
     }
-  }
+  };
   // TODO: destroy
   // watch(oml2dOptions, () => {
   //   init()
   // })
   onMounted(() => {
-    init()
-  })
+    init();
+  });
 }

@@ -1,4 +1,4 @@
-import type Artalk, { ArtalkConfig } from 'artalk'
+import type Artalk, { ArtalkConfig } from 'artalk';
 
 declare global {
   interface Window {
@@ -9,12 +9,11 @@ declare global {
 }
 
 declare module '*.vue' {
-  import type { ComponentOptions } from 'vue'
+  import type { ComponentOptions } from 'vue';
 
-  const comp: ComponentOptions
-  export default comp
+  const comp: ComponentOptions;
+  export default comp;
 }
-
 
 declare module '*.vue' {
   import { DefineComponent } from 'vue';

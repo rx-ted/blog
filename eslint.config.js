@@ -6,8 +6,8 @@ import tseslint from 'typescript-eslint';
 export default tseslint.config(
     {
         ignores: [
-            "node_modules",
-            ".vitepress",
+            'node_modules',
+            '.vitepress',
         ]
     },
     eslint.configs.recommended,
@@ -16,10 +16,13 @@ export default tseslint.config(
     tseslint.configs.stylistic,
     {
         rules: {
-            "@typescript-eslint/no-namespace": "off",
-            "@typescript-eslint/no-explicit-any": "warn",
-            "@typescript-eslint/prefer-for-of": "off"
-
+            '@typescript-eslint/no-namespace': 'off',
+            '@typescript-eslint/no-explicit-any': 'warn',
+            '@typescript-eslint/prefer-for-of': 'off',
+            semi: ['error', 'always'],
+            'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 1 }],
+            quotes: ['error', 'single'],
+            'no-trailing-spaces': 'error',
 
         }
     }

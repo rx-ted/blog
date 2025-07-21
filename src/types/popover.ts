@@ -1,6 +1,6 @@
-import type { ElButton } from 'element-plus'
-import type { Route } from 'vitepress'
-import type { Ref } from 'vue'
+import type { ElButton } from 'element-plus';
+import type { Route } from 'vitepress';
+import type { Ref } from 'vue';
 
 export declare namespace BlogPopover {
   export interface Title {

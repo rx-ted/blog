@@ -2,6 +2,7 @@
     "compilerOptions": {
         "module": "ESNext",
         "moduleResolution": "Bundler",
+        // "moduleResolution": "node",
         "target": "esnext",
         "jsx": "preserve",
         "lib": [
@@ -26,7 +27,7 @@
         "noFallthroughCasesInSwitch": true,
         "baseUrl": ".",
         "@/*": [
-            "./src/*"
+            "src/*"
         ]
     },
     "include": [

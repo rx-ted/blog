@@ -1,7 +1,6 @@
 import { defineConfig } from 'vitepress'
-import path from 'path'
 import { blogTheme, extraHead } from './blog-theme'
-import packageJSON from '../../package.json'
+import packageJSON from "../package.json"
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
