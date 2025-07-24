@@ -17,6 +17,8 @@ export const getThemeConfig = (cfg: Partial<Theme.BlogConfig>) => {
                 preprocessorOptions: {
                     scss: {
                         api: 'modern',
+                        additionalData: '@use "sass:color";',
+
                     },
                 },
             },

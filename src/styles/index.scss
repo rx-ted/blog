@@ -1,3 +1,16 @@
+:root {
+  --background-image: url(./bg.png);
+  --input-bg: var(--bg-card);
+
+  --input-text: var(--text-primary);
+  --input-placeholder: var(--text-secondary);
+  --input-border: 1px solid var(--border-color);
+  --input-border-focus: var(--color-primary);
+  --input-shadow-focus: 0 0 0 3px rgba(64, 158, 255, 0.2);
+
+
+}
+
 html {
   --bg-gradient: 255, 255, 255, 0.1;
   --bg-gradient-home: 255, 255, 255;
@@ -10,6 +23,17 @@ html {
   --description-font-color: #86909c;
   --blog-theme-color: var(--vp-c-brand-1);
   // --blog-theme-color: #409eff;
+
+  --text-primary: #2c3e50;
+  --text-secondary: #6c757d;
+  --text-inverse: #ffffff;
+
+  --border-color: #e2e8f0;
+
+  --color-primary: #409eff; //  主题色（如按钮/链接）
+  --color-primary-hover: #79bbff;
+
+
 }
 
 html.dark {
@@ -20,6 +44,18 @@ html.dark {
   --box-shadow-hover: 0 2px 16px 0 rgba(0, 0, 0, 0.7);
   --badge-font-color: #bdc3cc;
   --description-font-color: #9facba;
+
+
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-inverse: #0f172a;
+  --border-color: #334155;
+
+  --color-primary: #3b82f6;
+  --color-primary-hover: #60a5fa;
+  --input-shadow-focus: 0 0 0 3px rgba(59, 130, 246, 0.3);
+
+
 }
 
 .VPHome {
@@ -32,7 +68,7 @@ html.dark {
     position: fixed;
     top: 0;
     z-index: -1;
-    background-image: url(./bg.png);
+    background-image: var(--background-image);
     background-repeat: repeat;
     min-height: 100%;
   }

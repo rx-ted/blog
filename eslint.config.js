@@ -14,6 +14,7 @@ export default tseslint.config(
     // tseslint.configs.recommended,
     tseslint.configs.strict,
     tseslint.configs.stylistic,
+    tseslint.configs.eslintRecommended,
     {
         rules: {
             '@typescript-eslint/no-namespace': 'off',
@@ -23,7 +24,10 @@ export default tseslint.config(
             'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 1 }],
             quotes: ['error', 'single'],
             'no-trailing-spaces': 'error',
-
+            '@typescript-eslint/no-unused-vars': ['warn', {
+                'argsIgnorePattern': '^_',
+                'varsIgnorePattern': '^_'
+            }]
         }
     }
 );

@@ -1,75 +1,60 @@
 <script setup lang="ts">
 import { ref, defineProps, defineEmits } from 'vue'
-import { ElMessage, ElButton, ElInput, ElImage, ElCheckbox, ElLink } from 'element-plus'
-import data from '@/constants/data'
+import { ElMessage, ElButton, ElInput, ElImage, ElCheckbox } from 'element-plus'
 
 const props = defineProps<{ show: boolean; isDark: boolean }>()
-const emit = defineEmits(['update:show', 'open-register'])
+const emit = defineEmits(['update:show', 'open-login'])
 
 const username = ref('')
 const password = ref('')
+
 const agreed = ref(false)
 
 const close = () => emit('update:show', false)
 
-const login = () => {
+const register = () => {
     if (!agreed.value) {
-        ElMessage.warning('请勾选已同意协议')
+        ElMessage.warning('请勾选协议')
         return
     }
-    ElMessage.success(`登录：${username.value}`)
-}
-
-const openGithub = () => {
-    const github_url = `${data.github.get_authorize_url}?client_id=${data.github.client_id}&redirect_uri=${data.github.redirect_uri}`
-    window.open(github_url, '_blank')
+    ElMessage.success(`注册成功：${username.value}`)
 }
 </script>
 
 <template>
     <div v-if="props.show" class="custom-modal">
-        <div class="custom-modal-content" :class="{ 'dark-mode': props.isDark }">
+        <div class="custom-modal-content">
             <button class="close-btn" @click="close">✕</button>
             <div class="modal-body">
                 <div class="left-pane">
-                    <el-image :lazy=true src="/imgs/i-wuv-you-i-luv-u.gif" />
+                    <el-image :lazy="true" src="/imgs/i-wuv-you-i-luv-u.gif" />
                 </div>
 
                 <div class="right-pane">
-                    <h3 class="modal-title">博客登录</h3>
-
-                    <div class="sso-row">
-                        <el-button class="sso-btn" @click="openGithub">
-                            <img src="/imgs/github.svg" class="sso-icon" /> GitHub SSO
-                        </el-button>
-                    </div>
-
-                    <div class="divider">或者</div>
+                    <h3 class="modal-title">注册账号</h3>
 
                     <div class="input-group">
-                        <div class="input-group-item">
-                            <el-input v-model="username" placeholder="请输入用户名" clearable class="input-field" />
-                        </div>
-                        <div class="input-group-item">
-                            <el-input v-model="password" type="password" placeholder="请输入密码" clearable show-password
-                                class="input-field" />
-                        </div>
+                        <el-input v-model="username" placeholder="请输入用户名" clearable class="input-field" />
                     </div>
-
+                    <div class="input-group">
+                        <el-input v-model="password" type="password" placeholder="请输入密码" clearable
+                            class="input-field" />
+                    </div>
 
                     <el-checkbox v-model="agreed" class="agree-checkbox">
                         已阅读并同意
-                        <el-link type="primary" href="/terms" target="_blank">使用说明</el-link>
-                        和
-                        <el-link type="primary" href="/privacy" target="_blank">隐私政策</el-link>
-
+                        <a href="/terms" target="_blank">使用说明</a> 和
+                        <a href="/privacy" target="_blank">隐私政策</a>
                     </el-checkbox>
 
-                    <el-button type="primary" class="action-btn" @click="login">登录</el-button>
+                    <el-button type="primary" class="action-btn" @click="register">注册</el-button>
+
 
                     <div class="switch-tip">
-                        还没有账号？<el-button type="text" @click="emit('open-register'); close()">点击注册</el-button>
+                        已有账号？<el-button type="text" @click="emit('open-login'); close()">去登录</el-button>
                     </div>
+
+
                 </div>
             </div>
         </div>
@@ -165,26 +150,20 @@ const openGithub = () => {
 .divider {
     font-size: 12px;
     color: #999;
-    margin: 5px 0;
+    margin: 16px 0;
     text-align: center;
 }
 
 .input-group {
     width: 100%;
-    justify-content: center;
-    margin: auto;
-    margin-bottom: 10px;
-}
-
-.input-group-item {
-    width: 100%;
     display: flex;
     justify-content: center;
-    margin: 10px 0;
+    margin-bottom: 12px;
 }
 
 .input-field {
     width: 90%;
+    max-width: 400px;
 }
 
 

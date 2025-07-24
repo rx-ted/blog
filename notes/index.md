@@ -19,7 +19,7 @@ blog:
   # 设置 inspiringTimeout 可以实现自动切换
   inspiringTimeout: 3000
   pageSize: 10
-pagefind-indexed: false
+pagefind-indexed: true
 ---
 
 <!-- 期待你提交[案例](./notes/author/@sugarat/example/index.md) 😄 -->

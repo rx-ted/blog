@@ -91,7 +91,7 @@ export function getVitePressPages(vpConfig: SiteConfig) {
   return result;
 }
 
-export function renderDynamicMarkdown(routeFile: string, params: Record<string, any>, content?: string) {
+export function renderDynamicMarkdown(routeFile: string, params: Record<string, string>, content?: string) {
   let baseContent = fs.readFileSync(routeFile, 'utf-8');
 
   if (content) {
@@ -102,7 +102,7 @@ export function renderDynamicMarkdown(routeFile: string, params: Record<string, 
   return baseContent.replace(/\{\{(.*?)\}\}/g, (all, $1) => {
     const key = $1?.trim?.() || '';
     if (key.startsWith('$params')) {
-      const value = key.split('.').reduce((prev: Record<string, any>, curr: string) => {
+      const value = key.split('.').reduce((prev: Record<string, string>, curr: string) => {
         if (prev !== null && typeof prev === 'object') {
           return prev[curr];
         }

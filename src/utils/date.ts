@@ -1,29 +1,31 @@
-export function formatDate(d: number | string | Date, fmt = 'yyyy-MM-dd hh:mm:ss') {
-  if (!(d instanceof Date)) {
-    d = new Date(d);
-  }
-  const o: any = {
-    'M+': d.getMonth() + 1, // 月份
-    'd+': d.getDate(), // 日
-    'h+': d.getHours(), // 小时
-    'm+': d.getMinutes(), // 分
-    's+': d.getSeconds(), // 秒
-    'q+': Math.floor((d.getMonth() + 3) / 3), // 季度
-    'S': d.getMilliseconds() // 毫秒
+export function formatDate(
+  input: number | string | Date,
+  fmt = 'yyyy-MM-dd hh:mm:ss'
+): string {
+  const d = input instanceof Date ? input : new Date(input);
+
+  const map: Record<string, number> = {
+    'M+': d.getMonth() + 1,
+    'd+': d.getDate(),
+    'h+': d.getHours(),
+    'm+': d.getMinutes(),
+    's+': d.getSeconds(),
+    'q+': Math.floor((d.getMonth() + 3) / 3),
+    S: d.getMilliseconds(),
   };
-  if (/(y+)/.test(fmt)) {
-    fmt = fmt.replace(
-      RegExp.$1,
-      `${d.getFullYear()}`.substr(4 - RegExp.$1.length)
+
+  // 年份
+  fmt = fmt.replace(/(y+)/g, (_, match) =>
+    d.getFullYear().toString().slice(4 - match.length)
+  );
+
+  // 其他
+  for (const [pattern, value] of Object.entries(map)) {
+    fmt = fmt.replace(new RegExp(`(${pattern})`), (_, match) =>
+      match.length === 1
+        ? value.toString()
+        : value.toString().padStart(match.length, '0')
     );
-  }
-  for (const k in o) {
-    if (new RegExp(`(${k})`).test(fmt)) {
-      fmt = fmt.replace(
-        RegExp.$1,
-        RegExp.$1.length === 1 ? o[k] : `00${o[k]}`.substr(`${o[k]}`.length)
-      );
-    }
   }
 
   return fmt;

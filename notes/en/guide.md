@@ -1,3 +1,0 @@
-# guide
-
-this is english.

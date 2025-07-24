@@ -3,19 +3,36 @@ import { ref } from 'vue'
 import { useData } from 'vitepress'
 import { useAuthStore } from '@/stores/auth'
 import BlogLoginModal from './BlogLoginModal.vue'
+import RegisterModal from './BlogRegisterModal.vue'
 import { UserFilled } from '@element-plus/icons-vue'
 import { ElIcon, ElAvatar } from 'element-plus'
+import BlogLoginRegisterDialog from './BlogLoginRegister.vue'
 
 const { isDark } = useData()
 
 const showLogin = ref(false)
+const showRegister = ref(false)
+
 const showDropdown = ref(false)
 
-const auth = useAuthStore()
 
-const toggleLogin = () => {
+const openLogin = () => {
     showLogin.value = true
 }
+
+const openRegister = () => {
+    showRegister.value = true
+}
+
+const closeLogin = () => {
+    showLogin.value = false
+}
+
+const closeRegister = () => {
+    showRegister.value = false
+}
+
+const auth = useAuthStore()
 
 const logout = () => {
     auth.logout()
@@ -52,14 +69,21 @@ const windowOpen = () => {
         </template>
 
         <template v-else>
-            <div class="avatar-wrapper" @click="toggleLogin">
+            <div class="avatar-wrapper" @click="openLogin">
                 <el-icon>
                     <UserFilled />
                 </el-icon>
             </div>
         </template>
 
-        <BlogLoginModal v-model:show="showLogin" :isDark="isDark" />
+        <!-- <BlogLoginModal v-model:show="showLogin" :isDark="isDark" @update:show="showLogin = $event"
+            @open-register="openRegister" />
+        <RegisterModal :show="showRegister" :is-dark="false" @update:show="showRegister = $event"
+            @open-login="openLogin" /> -->
+
+
+        <!-- <BlogLoginRegisterDialog v-model="showLogin" /> -->
+
     </div>
 </template>
 

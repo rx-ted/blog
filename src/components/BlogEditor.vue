@@ -43,32 +43,30 @@ async function onUploadImg() {
 </script>
 
 <template>
-  <div v-if="isMobile" class="mobile-block" :class="{ dark: isDark }" :style="{ height: blockHeight }">
-    <div class="mobile-message">
-      {{ message }}
+  <div class="container">
+    <div v-if="isMobile" class="mobile-block" :class="{ dark: isDark }" :style="{ height: blockHeight }">
+      <div class="mobile-message">
+        {{ message }}
+      </div>
     </div>
-  </div>
-  <div v-else>
-    <MdEditor
-      v-model="state.text" :theme="themeMode" :style="{ height: blockHeight }" @on-save="onSave()"
-      @on-upload-img="onUploadImg"
-    />
+    <div v-else>
+      <MdEditor v-model="state.text" :theme="themeMode" :style="{ height: blockHeight }" @on-save="onSave()"
+        @on-upload-img="onUploadImg" />
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.container {
+  background: rgba(var(--bg-gradient-home));
+
+}
+
 .mobile-block {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  background: #f0f0f0;
-  /* 默认亮色 */
-}
-
-.mobile-block.dark {
-  background: #111;
-  /* 暗色模式背景 */
 }
 
 .mobile-message {
@@ -78,15 +76,11 @@ async function onUploadImg() {
   padding: 2rem;
   border: 2px dashed #888;
   border-radius: 12px;
-  background: #fff;
   max-width: 80%;
 }
 
 .mobile-block.dark .mobile-message {
-  background: #222;
-  /* 暗色块 */
   color: #eee;
-  /* 暗色文字 */
   border-color: #666;
 }
 </style>

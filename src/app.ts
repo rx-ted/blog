@@ -36,12 +36,16 @@ import { withConfigProvider } from '@/theme/blog';
 import BlogTags from '@/components/BlogTags.vue';
 import BlogEditor from '@/components/BlogEditor.vue';
 import Callback from '@/components/Callback.vue';
-import { App } from 'vue';
+import BlogUserLogin from '@/components/BlogUserLogin.vue';
+import BlogUserRegister from '@/components/BlogUserRegister.vue';
+import { Component } from 'vue';
 
-const components: Record<string, any> = {
+const components: Record<string, Component> = {
     'BlogEditor': BlogEditor,
     'BlogTags': BlogTags,
-    'Callback': Callback
+    'Callback': Callback,
+    'BlogUserLogin': BlogUserLogin,
+    'BlogUserRegister': BlogUserRegister
 };
 const pinia = createPinia();
 
