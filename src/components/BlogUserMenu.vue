@@ -1,89 +1,65 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useData } from 'vitepress'
 import { useAuthStore } from '@/stores/auth'
-import BlogLoginModal from './BlogLoginModal.vue'
-import RegisterModal from './BlogRegisterModal.vue'
+import { ElIcon, ElAvatar, ElDropdown, ElDropdownItem, ElDropdownMenu, ElButton } from 'element-plus'
 import { UserFilled } from '@element-plus/icons-vue'
-import { ElIcon, ElAvatar } from 'element-plus'
-import BlogLoginRegisterDialog from './BlogLoginRegister.vue'
 
 const { isDark } = useData()
-
-const showLogin = ref(false)
-const showRegister = ref(false)
-
-const showDropdown = ref(false)
-
-
-const openLogin = () => {
-    showLogin.value = true
-}
-
-const openRegister = () => {
-    showRegister.value = true
-}
-
-const closeLogin = () => {
-    showLogin.value = false
-}
-
-const closeRegister = () => {
-    showRegister.value = false
-}
-
 const auth = useAuthStore()
-
-const logout = () => {
-    auth.logout()
-    showDropdown.value = false
-}
-
-window.addEventListener('message', (event) => {
-    if (event.data.type === 'github-auth-success') {
-        auth.fetchMe()
-    }
-})
 
 const windowOpen = () => {
     window.open(auth.user?.html_url, '_blank')
 }
 
+const logout = () => {
+    auth.logout()
+}
+
+const goToLogin = () => {
+    window.open('/modules/utils/login', '_self')
+}
+
+window.addEventListener('message', (event) => {
+    if (event.data.type === 'login-success') {
+        auth.fetchMe()
+        window.open('/', '_self')
+    }
+})
 </script>
 
 <template>
     <div class="user-menu">
-        <template v-if="auth.isLoggedIn">
-            <div class="avatar-wrapper" @mouseenter="showDropdown = true" @mouseleave="showDropdown = false">
-                <el-avatar :src="auth.user?.avatar_url" :size="24" />
-                <div v-if="showDropdown" class="dropdown" :class="{ dark: isDark }">
-                    <el-avatar :src="auth.user?.avatar_url" class="dropdown-avatar" />
-                    <p><strong>{{ auth.user?.name }}</strong></p>
-                    <p>{{ auth.user?.email }}</p>
-                    <div class="actions">
-                        <button @click="windowOpen">主页</button>
-                        <button @click="logout">注销</button>
-                    </div>
-                </div>
-            </div>
-        </template>
-
-        <template v-else>
-            <div class="avatar-wrapper" @click="openLogin">
-                <el-icon>
+        <el-dropdown trigger="click" placement="bottom-end">
+            <span class="avatar-wrapper">
+                <el-avatar v-if="auth.isLoggedIn" :src="auth.user?.avatar_url" :size="24" />
+                <el-icon v-else>
                     <UserFilled />
                 </el-icon>
-            </div>
-        </template>
+            </span>
 
-        <!-- <BlogLoginModal v-model:show="showLogin" :isDark="isDark" @update:show="showLogin = $event"
-            @open-register="openRegister" />
-        <RegisterModal :show="showRegister" :is-dark="false" @update:show="showRegister = $event"
-            @open-login="openLogin" /> -->
+            <template #dropdown>
+                <el-dropdown-menu :class="{ dark: isDark }">
+                    <template v-if="auth.isLoggedIn">
+                        <div class="dropdown-avatar-wrap">
+                            <el-avatar :src="auth.user?.avatar_url" class="dropdown-avatar" />
+                            <p><strong>{{ auth.user?.name }}</strong></p>
+                            <p>{{ auth.user?.email }}</p>
+                        </div>
+                        <el-dropdown-item @click="windowOpen">主页</el-dropdown-item>
+                        <el-dropdown-item divided @click="logout">注销</el-dropdown-item>
+                    </template>
 
-
-        <!-- <BlogLoginRegisterDialog v-model="showLogin" /> -->
-
+                    <template v-else>
+                        <div class="dropdown-avatar-wrap">
+                            <p>您尚未登录</p>
+                            <el-button type="primary" size="small" @click="goToLogin">
+                                立即登录
+                            </el-button>
+                        </div>
+                    </template>
+                </el-dropdown-menu>
+            </template>
+        </el-dropdown>
     </div>
 </template>
 
@@ -92,7 +68,7 @@ const windowOpen = () => {
     display: inline-flex;
     align-items: center;
     position: relative;
-    margin: 0px 8px;
+    margin: 0 8px;
 }
 
 .user-menu::before {
@@ -101,33 +77,17 @@ const windowOpen = () => {
     width: 1px;
     height: 24px;
     background-color: rgba(226, 226, 227, 0.2);
-    margin-right: 8px;
-    margin-left: 8px;
+    margin: 0 8px;
 }
 
 .avatar-wrapper {
-    position: relative;
     cursor: pointer;
     display: inline-flex;
 }
 
-.dropdown {
-    position: absolute;
-    top: 40px;
-    right: 0;
-    width: 200px;
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 6px;
-    padding: 16px;
+.dropdown-avatar-wrap {
     text-align: center;
-    z-index: 100;
-}
-
-.dropdown.dark {
-    background: #333;
-    color: #fff;
-    border-color: #555;
+    padding: 12px;
 }
 
 .dropdown-avatar {
@@ -137,33 +97,18 @@ const windowOpen = () => {
     margin-bottom: 8px;
 }
 
-.dropdown p {
+.dropdown-avatar-wrap p {
     margin: 4px 0;
     font-size: 14px;
     word-break: break-all;
 }
 
-.actions {
-    margin-top: 12px;
-    display: flex;
-    justify-content: space-between;
+.el-dropdown-menu.dark {
+    background: #333;
+    color: #fff;
 }
 
-.actions button {
-    background: none;
-    border: none;
-    padding: 6px 12px;
-    cursor: pointer;
-    font-size: 12px;
-    border-radius: 4px;
-    transition: background 0.2s;
-}
-
-.actions button:hover {
-    background: #f0f0f0;
-}
-
-.dropdown.dark .actions button:hover {
+.el-dropdown-menu.dark .el-dropdown-menu__item:hover {
     background: #444;
 }
 </style>

@@ -2,29 +2,39 @@
 
 import { onMounted } from 'vue'
 import data from '@/constants/data'
+import { showNotification } from '@/utils/common'
 
 onMounted(async () => {
     const url = new URL(window.location.href)
-    const code = url.searchParams.get('code')
-    if (code) {
-        const res = await fetch(data.github.access_token_url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            // credentials: 'include',
-            body: JSON.stringify({
-                code,
-                type: 'github'
-            }),
-        })
-        const resp = await res.json()
-        if (resp) {
-            localStorage.setItem('token', JSON.stringify(resp))
-            window.opener.postMessage({ type: 'github-auth-success' }, '*')
-            window.close()
-        } else {
-            console.error('授权失败: ', resp)
+    const type = url.searchParams.get('type')
+
+    if (type === 'github') {
+        const code = url.searchParams.get('code')
+        if (code) {
+            const res = await fetch(data.github.access_token_url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                // credentials: 'include',
+                body: JSON.stringify({
+                    code,
+                    type: 'github'
+                }),
+            })
+            const resp = await res.json()
+            if (resp) {
+                localStorage.setItem('token', JSON.stringify(resp))
+                window.opener.postMessage({ type: 'login-success' }, '*')
+                window.close()
+            } else {
+                console.error('授权失败: ', resp)
+            }
         }
     }
+    else{
+        showNotification()
+    }
+
+
 })
 </script>
 

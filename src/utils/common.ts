@@ -1,3 +1,4 @@
+import { ElNotification } from 'element-plus';
 import { ThemeableImage } from '../types/theme';
 
 import qrcode from 'qrcode';
@@ -83,3 +84,17 @@ export default function countWord(data: string) {
     }
     return count;
 }
+
+export const showNotification = (
+    message = '该功能正在开发中，敬请期待！',
+    title = '温馨提示',
+    duration = 3000,
+    showClose = false
+) => {
+    ElNotification.primary({
+        title: title,
+        message: message,
+        duration: duration,
+        showClose: showClose,
+    });
+};

@@ -19,7 +19,7 @@
                     <input placeholder="再次输入密码" type="password" />
                 </div>
                 <div class="link-group">
-                    <a to="/login">已有账号? 登录</a>
+                    <a href="./login">已有账号? 登录</a>
                 </div>
                 <div class="submit-group">
                     <button type="submit">注 册</button>
@@ -32,6 +32,7 @@
 <script setup>
 
 import { useRouter } from 'vitepress';
+import BlogUserLogin from './BlogUserLogin.vue';
 
 
 </script>

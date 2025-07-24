@@ -33,6 +33,10 @@ html {
   --color-primary: #409eff; //  主题色（如按钮/链接）
   --color-primary-hover: #79bbff;
 
+  --icon-bg: #efefef; // 浅色背景
+  --icon-bg-hover: #e2e3e4; // 浅色 hover
+
+
 
 }
 
@@ -55,6 +59,8 @@ html.dark {
   --color-primary-hover: #60a5fa;
   --input-shadow-focus: 0 0 0 3px rgba(59, 130, 246, 0.3);
 
+  --icon-bg: #2b2b2d; // 暗色背景
+  --icon-bg-hover: #334155; // 暗色 hover
 
 }
 

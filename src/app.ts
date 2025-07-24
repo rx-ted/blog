@@ -8,7 +8,7 @@ import { NProgress } from 'nprogress-v2/dist/index.js'; // 进度条组件
 import '@/styles/index.scss';
 
 // element-ui
-// import 'element-plus/dist/index.css'
+import 'element-plus/dist/index.css';
 import 'element-plus/theme-chalk/base.css';
 import 'element-plus/theme-chalk/el-button.css';
 import 'element-plus/theme-chalk/el-tag.css';

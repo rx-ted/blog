@@ -1,6 +1,4 @@
 ---
-layout: BlogUserLogin
-# layout: BlogUserRegister
 editLink: false
 lastUpdated: false
 publish: false
