@@ -1,3 +1,4 @@
+-- Active: 1753160770755@@mysql2.sqlpub.com@3307@db_blog_for_rx_ted
 <template>
     <div class="container">
         <div class="form-box">
@@ -5,53 +6,61 @@
                 <p class="title">欢迎登录</p>
                 <p class="subtitle">每一次登录都是与你の邂逅。</p>
             </div>
-            <form class="form-content">
-                <div class="input-group">
-                    <input placeholder="用户名" type="text" />
-                </div>
-                <div class="input-group">
-                    <input placeholder="密码" type="password" />
-                </div>
-                <div class="options">
-                    <label class="remember">
-                        <input type="checkbox" />
-                        <span>记住密码</span>
-                    </label>
-                    <div class="links">
-                        <a href="#">忘记密码</a>
-                        <span> / </span>
-                        <a href="./register">注册</a>
-                    </div>
-                </div>
-                <div class="submit-group">
-                    <button type="submit">登 录</button>
-                </div>
 
-                <!-- ✅ 新增 自动登录 复选框 -->
+            <el-form class="form-content" :model="userForm">
+                <el-form-item class="input-group" :error="usernameError">
+                    <el-input size="large" v-model="userForm.username" placeholder="用户名" type="text"
+                        @input="validateUsername" />
+                </el-form-item>
+                <el-form-item class="input-group" :error="passwordError">
+                    <el-input size="large" v-model="userForm.password" placeholder="密码" type="password" show-password
+                        @input="validatePassword" />
+                </el-form-item>
+                <el-form-item class="options">
+                    <div class="options-inner">
+                        <div class="left">
+                            <el-checkbox v-model="userForm.isRemeber"><el-text>记住密码</el-text></el-checkbox>
+                        </div>
+
+                        <div class="right">
+                            <el-link href="#" @click="forgetPassword" type="primary">忘记密码</el-link>
+                            <span> / </span>
+                            <el-link href="./register" @click="forgetPassword" type="primary">注册</el-link>
+                        </div>
+
+                    </div>
+
+                </el-form-item>
+
+                <el-button size="large" class="submit-group" type="primary" @click="handleSubmit">登 录</el-button>
+
                 <div class="auto-login">
-                    <label>
-                        <input type="checkbox" />
-                        <span>未注册账号后自动登录，且代表您已同意
-                            <a href="#"> 用户使用和隐私</a>
-                        </span>
-                    </label>
+                    <el-checkbox v-model="userForm.isRead" />
+                    <el-text class="auto-login-text">
+                        未注册账号后自动登录，且代表您已同意
+                    </el-text>
+                    <el-link href="#" type="primary">用户使用和隐私说明</el-link>
                 </div>
 
                 <div class="sso-line">
-                    <span class="sso-label">SSO 登录</span>
+                    <el-text>SSO 登录</el-text>
                     <div class="sso-icons">
-                        <button type="button" class="sso-icon-btn" aria-label="GitHub 登录" @click="openGithub">
-                            <img src="/imgs/github.svg" alt="GitHub" />
-                        </button>
-                        <button type="button" class="sso-icon-btn" aria-label="Gitee 登录" @click="openGitee">
-                            <img src="/imgs/gitee.svg" alt="Gitee" />
-                        </button>
-                        <button type="button" class="sso-icon-btn" aria-label="Google 登录" @click="openGoogle">
-                            <img src="/imgs/google.svg" alt="Google" />
-                        </button>
+
+                        <el-button circle @click="openGithub" aria-label="GitHub 登录" class="sso-icon-btn">
+                            <img src="/imgs/github.svg" alt="GitHub" class="sso-icon-img" />
+                        </el-button>
+
+                        <el-button circle @click="openGitee" aria-label="Gitee 登录" class="sso-icon-btn">
+                            <img src="/imgs/gitee.svg" alt="Gitee" class="sso-icon-img" />
+                        </el-button>
+
+                        <el-button circle @click="openGoogle" aria-label="Google 登录" class="sso-icon-btn">
+                            <img src="/imgs/google.svg" alt="Google" class="sso-icon-img" />
+                        </el-button>
+
                     </div>
                 </div>
-            </form>
+            </el-form>
         </div>
         <div class="image-box">
             <img src="/imgs/i-wuv-you-i-luv-u.gif" alt="" />
@@ -59,10 +68,20 @@
     </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
+import { onMounted, reactive, ref } from "vue";
+import { ElForm, ElFormItem, ElInput, ElCheckbox, ElLink, ElButton, ElText } from "element-plus";
 import data from '@/constants/data'
-import { ElNotification } from 'element-plus'
 import { showNotification } from '@/utils/common'
+import axios from "axios";
+import { useAuthStore } from "@/stores/auth";
+
+const userForm = reactive({
+    username: '',
+    password: '',
+    isRemeber: false,
+    isRead: true
+});
 
 const openGithub = () => {
     const redirectWithType = `${data.github.redirect_uri}?type=github`
@@ -78,6 +97,84 @@ const openGoogle = () => {
     showNotification()
 }
 
+const forgetPassword = () => {
+    showNotification()
+}
+
+
+
+const usernameError = ref('')
+const passwordError = ref('')
+
+
+const validateUsername = () => {
+    const pattern = /^[A-Za-z0-9_]{4,20}$/
+
+    if (userForm.username === '') {
+        usernameError.value = '请输入用户名'
+        return false
+    }
+
+    if (!pattern.test(userForm.username)) {
+        usernameError.value = '用户名只能包含字母、数字、下划线，且长度 4~20'
+        return false
+    } else {
+        usernameError.value = ''
+        return true
+    }
+}
+
+
+// 密码校验
+const validatePassword = () => {
+    const pattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+=-]{6,20}$/
+
+    if (userForm.password === '') {
+        passwordError.value = '请输入密码'
+        return false
+    }
+
+    if (!pattern.test(userForm.password)) {
+        passwordError.value = '密码需包含字母和数字，长度 6~20'
+        return false
+    } else {
+        passwordError.value = ''
+        return true
+    }
+}
+
+
+const handleSubmit = async () => {
+    if (!validateUsername() || !validatePassword()) return
+
+
+    const jsonData = {
+        type: "password",
+        username: userForm.username,
+        password: userForm.password,
+
+    }
+    console.log(jsonData)
+    const response = await axios.post(data.auth.login, jsonData)
+
+    if (response.status !== 200) {
+        showNotification("无效请求");
+        return;
+    }
+
+    localStorage.setItem('token', JSON.stringify(response.data))
+    window.open('/', "_self")
+}
+
+onMounted(() => {
+    const auth = useAuthStore();
+    console.log(auth.user)
+    if (!auth.user) {
+        auth.fetchMe()
+    }
+    if (auth.user)
+        window.open('/', '_self');
+});
 
 </script>
 
@@ -120,21 +217,6 @@ const openGoogle = () => {
 
     .input-group {
         margin-bottom: 20px;
-
-        input {
-            width: 100%;
-            padding: 12px 16px;
-            border: var(--input-border);
-            border-radius: 8px;
-            outline: none;
-            font-size: 1rem;
-            transition: border-color 0.2s;
-
-            &:focus {
-                border-color: var(--input-border-focus);
-                box-shadow: 0 0 0 1px var(--input-border-focus);
-            }
-        }
     }
 
     .options {
@@ -144,95 +226,43 @@ const openGoogle = () => {
         margin-bottom: 20px;
         flex-wrap: wrap;
 
-        .remember {
+        .options-inner {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-
-            input {
-                margin-right: 8px;
-            }
-
-            span {
-                color: #64748b;
-            }
-        }
-
-        .links {
-            a {
-                color: var(--color-primary);
-                text-decoration: none;
-
-                &:hover {
-                    text-decoration: underline;
-                    color: var(--color-primary-hover);
-                }
-            }
-
-            span {
-                margin: 0 5px;
-                color: #64748b;
-            }
-        }
-    }
-
-    .submit-group {
-        button {
             width: 100%;
-            padding: 12px 0;
-            background: var(--color-primary);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.25rem;
-            cursor: pointer;
-            transition: background 0.2s;
 
-            &:hover,
-            &:focus {
-                background: var(--color-primary-hover);
+            .left {
+                display: flex;
+                align-items: center;
+            }
+
+            .right {
+                display: flex;
+                align-items: center;
+                gap: 4px;
             }
         }
     }
 
     .auto-login {
-        margin-top: 15px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        font-size: 14px;
+        margin-top: 10px;
 
-        label {
-            display: flex;
-            align-items: center;
-            font-size: 0.875rem;
-            color: #64748b;
-
-            input {
-                margin-right: 8px;
-            }
-
-            span {
-                a {
-                    color: var(--color-primary);
-
-                    &:hover,
-                    &:focus {
-                        color: var(--color-primary-hover);
-                    }
-                }
-
-            }
-
-
+        .auto-login-text {
+            margin: 0 10px;
         }
+
     }
 
     .sso-line {
-        margin-top: 30px;
+        margin-top: 10px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-
-        .sso-label {
-            font-size: 1rem;
-            color: var(--title-primary);
-        }
 
         .sso-icons {
             display: flex;
@@ -246,17 +276,12 @@ const openGoogle = () => {
                 height: 40px;
                 border: 1px solid var(--input-border);
                 border-radius: 50%;
-                background: var(--icon-bg);
                 cursor: pointer;
                 transition: background 0.2s;
 
                 img {
                     width: 20px;
                     height: 20px;
-                }
-
-                &:hover {
-                    background: var(--icon-bg-hover);
                 }
             }
         }

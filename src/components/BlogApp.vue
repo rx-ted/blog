@@ -33,7 +33,7 @@ useDarkTransition()
 const openTransition = useDarkTransitionConfig()
 
 onMounted(() => {
-  useAuthStore().fetchMe()
+  useAuthStore().fetchMe();
 })
 
 </script>

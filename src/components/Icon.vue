@@ -10,24 +10,26 @@ const size = computed(() => props.size && (typeof props.size === 'number' ? `${p
 </script>
 
 <template>
-  <i v-if="props.icon" class="sugar-theme-icon" :style="{ fontSize: size }" v-html="props.icon" />
-  <i v-else class="sugar-theme-icon" :style="{ fontSize: size }">
+  <i v-if="props.icon" class="theme-icon" :style="{ fontSize: size, height: size, width: size }" v-html="props.icon" />
+  <i v-else class="theme-icon" :style="{ fontSize: size, height: size, width: size }">
     <slot />
   </i>
 </template>
 
 <style lang="css" scoped>
-.sugar-theme-icon {
-    --color: inherit;
-    align-items: center;
-    display: inline-flex;
-    height: 1em;
-    justify-content: center;
-    line-height: 1em;
-    position: relative;
-    width: 1em;
-    fill: currentColor;
-    color: var(--color);
-    font-size: inherit;
+.theme-icon {
+  --color: inherit;
+  align-items: center;
+  display: inline-flex;
+  height: 1em;
+  width: 1em;
+  /* width: 100%; */
+  /* height: 100%; */
+  justify-content: center;
+  line-height: 1em;
+  position: relative;
+  fill: currentColor;
+  color: var(--color);
+  font-size: inherit;
 }
 </style>

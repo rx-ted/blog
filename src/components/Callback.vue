@@ -3,6 +3,7 @@
 import { onMounted } from 'vue'
 import data from '@/constants/data'
 import { showNotification } from '@/utils/common'
+import axios from 'axios'
 
 onMounted(async () => {
     const url = new URL(window.location.href)
@@ -11,18 +12,18 @@ onMounted(async () => {
     if (type === 'github') {
         const code = url.searchParams.get('code')
         if (code) {
-            const res = await fetch(data.github.access_token_url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                // credentials: 'include',
-                body: JSON.stringify({
-                    code,
-                    type: 'github'
-                }),
+            const res = await axios.post(data.auth.login, {
+                code,
+                type: 'github'
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             })
-            const resp = await res.json()
-            if (resp) {
-                localStorage.setItem('token', JSON.stringify(resp))
+            console.log(res);
+            const resp = await res.data.data
+            if (resp.token) {
+                localStorage.setItem('token', resp.token)
                 window.opener.postMessage({ type: 'login-success' }, '*')
                 window.close()
             } else {
@@ -30,7 +31,7 @@ onMounted(async () => {
             }
         }
     }
-    else{
+    else {
         showNotification()
     }
 

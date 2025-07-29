@@ -1,6 +1,6 @@
 {
   "name": "blog",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "description": "blog theme, based on vitepress",
   "author": "rx-ted",
   "main": "src/app.ts",
@@ -42,7 +42,9 @@
     "@types/qrcode": "^1.5.5",
     "@vueuse/core": "^13.5.0",
     "artalk": "^2.9.1",
+    "axios": "^1.11.0",
     "element-plus": "^2.10.4",
+    "front-matter": "^4.0.2",
     "markdown-it-task-checkbox": "^1.0.6",
     "md-editor-v3": "^5.8.2",
     "nprogress-v2": "^1.1.10",

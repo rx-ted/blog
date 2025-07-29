@@ -1,6 +1,6 @@
 import { ElNotification } from 'element-plus';
-import { ThemeableImage } from '../types/theme';
-
+import { Theme, ThemeableImage } from '../types/theme';
+import fm from 'front-matter';
 import qrcode from 'qrcode';
 
 export function url2QRcore(url: string): string {
@@ -98,3 +98,14 @@ export const showNotification = (
         showClose: showClose,
     });
 };
+
+export function parseMD(data: string) {
+    const result = fm<Theme.PageMeta>(data);
+    return result;
+}
+
+export function getYYYYMMDD() {
+    const today = new Date();
+    const yyyymmdd = today.toISOString().slice(0, 10).replace(/-/g, '');
+    return yyyymmdd;
+}
