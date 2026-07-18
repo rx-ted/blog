@@ -1,0 +1,118 @@
+$ vitest run
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.7 [39m[90m/Users/ben/projects/app/apps/web-blog[39m
+
+ [32m✓[39m src/utils/searchPresentation.spec.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m src/http/client.spec.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m src/stores/blog.spec.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 129[2mms[22m[39m
+ [32m✓[39m src/stores/postDetail.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 151[2mms[22m[39m
+[90mstderr[2m | src/composables/useSearch.spec.ts[2m > [22m[2museSearch[2m > [22m[2mrunSearch calls API with correct parameters
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+ [32m✓[39m src/composables/useFloatingWidgets.spec.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 169[2mms[22m[39m
+[90mstderr[2m | src/composables/useSearch.spec.ts[2m > [22m[2museSearch[2m > [22m[2mhandles API errors with unavailableMessage
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/stores/session.spec.ts[2m > [22m[2msession store[2m > [22m[2mshould bootstrap with existing token and load current user
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/composables/useSearch.spec.ts[2m > [22m[2museSearch[2m > [22m[2mhandles generic errors with default SEARCH_UNAVAILABLE message
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/composables/useSearch.spec.ts[2m > [22m[2museSearch[2m > [22m[2msubmits empty keyword does not navigate
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/composables/useSearch.spec.ts[2m > [22m[2museSearch[2m > [22m[2msubmit navigates to search page with keyword
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/stores/session.spec.ts[2m > [22m[2msession store[2m > [22m[2mshould clear session when bootstrap fails
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/stores/session.spec.ts[2m > [22m[2msession store[2m > [22m[2mshould login with email code and persist token
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/stores/session.spec.ts[2m > [22m[2msession store[2m > [22m[2mshould clear session after logout
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+ [32m✓[39m src/composables/useSearch.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 173[2mms[22m[39m
+ [32m✓[39m src/composables/useAnnouncements.spec.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m src/stores/session.spec.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 164[2mms[22m[39m
+[90mstderr[2m | src/composables/useNotification.spec.ts[2m > [22m[2museNotification[2m > [22m[2mlist[2m > [22m[2mshould return empty array when not authenticated
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/composables/useNotification.spec.ts[2m > [22m[2museNotification[2m > [22m[2mlist[2m > [22m[2mshould fetch notification list when authenticated
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/composables/useNotification.spec.ts[2m > [22m[2museNotification[2m > [22m[2mlist[2m > [22m[2mshould handle empty response
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/composables/useNotification.spec.ts[2m > [22m[2museNotification[2m > [22m[2mlist[2m > [22m[2mshould handle error
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/composables/useNotification.spec.ts[2m > [22m[2museNotification[2m > [22m[2msummary[2m > [22m[2mshould return default summary when not authenticated
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/composables/useNotification.spec.ts[2m > [22m[2museNotification[2m > [22m[2msummary[2m > [22m[2mshould fetch summary when authenticated
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/composables/useNotification.spec.ts[2m > [22m[2museNotification[2m > [22m[2mmarkRead[2m > [22m[2mshould call mark read API
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/composables/useNotification.spec.ts[2m > [22m[2museNotification[2m > [22m[2mmarkRead[2m > [22m[2mshould do nothing when not authenticated
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/composables/useNotification.spec.ts[2m > [22m[2museNotification[2m > [22m[2mmarkAllRead[2m > [22m[2mshould call mark all read API
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/composables/useNotification.spec.ts[2m > [22m[2museNotification[2m > [22m[2mmarkAllRead[2m > [22m[2mshould do nothing when not authenticated
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+ [32m✓[39m src/composables/useNotification.spec.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m src/utils/commentThreadState.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m src/utils/headingId.spec.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/i18n/messages.spec.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+[90mstderr[2m | src/composables/useAuthGuard.spec.ts[2m > [22m[2museAuthGuard[2m > [22m[2mreturns isAuthenticated=true when session is authenticated
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+ [32m✓[39m src/composables/useMessage.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+[90mstderr[2m | src/composables/useAuthGuard.spec.ts[2m > [22m[2museAuthGuard[2m > [22m[2mreturns isAuthenticated=false when session is not authenticated
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/composables/useAuthGuard.spec.ts[2m > [22m[2museAuthGuard[2m > [22m[2mrequireAuth() returns true when authenticated
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+[90mstderr[2m | src/composables/useAuthGuard.spec.ts[2m > [22m[2museAuthGuard[2m > [22m[2mrequireAuth() redirects to login and returns false when not authenticated
+[22m[39m[Vue warn]: onMounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+[Vue warn]: onUnmounted is called when there is no active component instance to be associated with. Lifecycle injection APIs can only be used during execution of setup(). If you are using async setup(), make sure to register lifecycle hooks before the first await statement.
+
+ [32m✓[39m src/composables/useAuthGuard.spec.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 66[2mms[22m[39m
+ [32m✓[39m src/composables/useI18n.spec.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 134[2mms[22m[39m
+ [32m✓[39m src/stores/layout.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m16 passed[39m[22m[90m (16)[39m
+[2m      Tests [22m [1m[32m95 passed[39m[22m[90m (95)[39m
+[2m   Start at [22m 22:28:55
+[2m   Duration [22m 2.03s[2m (transform 2.47s, setup 0ms, import 3.41s, tests 1.08s, environment 1.16s)[22m
+
