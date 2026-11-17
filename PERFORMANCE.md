@@ -74,14 +74,17 @@ export const revalidate = 60 // 或 300
 ## 进一步优化建议
 
 ### 1. 使用本地 D1 数据库进行开发
-在 `wrangler.toml` 中将 `remote = true` 改为 `remote = false`：
+在 `wrangler.jsonc` 中将 `remote` 改为 `false`：
 
-```toml
-[[d1_databases]]
-binding = "DB"
-database_name = "qmblog-db"
-database_id = "e0af8dca-153a-4f10-9925-b465f304c5c9"
-remote = false  # 开发时使用本地数据库
+```jsonc
+"d1_databases": [
+  {
+    "binding": "DB",
+    "database_name": "qmblog-db",
+    "database_id": "e0af8dca-153a-4f10-9925-b465f304c5c9",
+    "remote": false // 开发时使用本地数据库
+  }
+]
 ```
 
 **优点**：

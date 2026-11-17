@@ -214,7 +214,7 @@ describe('/api/admin/wechat-publish route', () => {
     const [, , requestInit] = mocks.fetchWechatBridgeJson.mock.calls[0]
     const forwarded = JSON.parse(String(requestInit.body))
 
-    expect(forwarded.author).toBe('向阳乔木')
+    expect(forwarded.author).toBe('rx-ted')
     expect(forwarded.need_open_comment).toBe(true)
     expect(forwarded.only_fans_can_comment).toBe(false)
     expect(forwarded.cover_image_url).toMatch(/^https:\/\/blog\.qiaomu\.ai\/default-covers\/qm-cover-[1-3]\.jpg$/)

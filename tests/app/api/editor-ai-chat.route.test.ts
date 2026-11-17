@@ -686,7 +686,7 @@ describe('/api/editor/ai-chat route', () => {
         role: 'user',
         parts: [{
           type: 'text',
-          text: '读取小宇宙内容，用乔木风格重写一篇文章插入正文：https://www.xiaoyuzhoufm.com/episode/6a333603351c82c12b264c56',
+          text: '读取小宇宙内容，用木羽风格重写一篇文章插入正文：https://www.xiaoyuzhoufm.com/episode/6a333603351c82c12b264c56',
         }],
       }],
       context: {
@@ -772,7 +772,7 @@ describe('/api/editor/ai-chat route', () => {
           role: 'user',
           parts: [{
             type: 'text',
-            text: '读取小宇宙内容，用乔木风格重写一篇文章插入正文：https://www.xiaoyuzhoufm.com/episode/6a333603351c82c12b264c56',
+            text: '读取小宇宙内容，用木羽风格重写一篇文章插入正文：https://www.xiaoyuzhoufm.com/episode/6a333603351c82c12b264c56',
           }],
         },
         {

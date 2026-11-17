@@ -79,7 +79,7 @@ export function createWechatCalloutContent(kind: WechatCalloutKind = 'note', tit
   }
 }
 
-export function createWechatProfileContent(title = '向阳乔木') {
+export function createWechatProfileContent(title = 'rx-ted') {
   return {
     type: 'wechatProfile',
     attrs: { title },
@@ -468,9 +468,9 @@ export const WechatProfileNode = Node.create({
   addAttributes() {
     return {
       title: {
-        default: '向阳乔木',
-        parseHTML: element => getTitle(element as HTMLElement, '.wechat-profile-name', '向阳乔木'),
-        renderHTML: attributes => ({ 'data-title': String(attributes.title || '向阳乔木') }),
+        default: 'rx-ted',
+        parseHTML: element => getTitle(element as HTMLElement, '.wechat-profile-name', 'rx-ted'),
+        renderHTML: attributes => ({ 'data-title': String(attributes.title || 'rx-ted') }),
       },
     }
   },
@@ -480,7 +480,7 @@ export const WechatProfileNode = Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    const title = String(HTMLAttributes.title || '向阳乔木')
+    const title = String(HTMLAttributes.title || 'rx-ted')
     const attrs = removeNodeViewControls(HTMLAttributes)
 
     return [

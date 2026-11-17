@@ -149,7 +149,7 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
   },
   brandTheme({
     id: 'qiaomu-podcast',
-    name: '乔木播客',
+    name: '木羽播客',
     description: '白底中文长文阅读排版，大行高、大段距和轻字距，适合播客逐字稿与深度解读。',
     swatches: ['#ffffff', '#1a1a1a', '#576b95', '#f6f6f6'],
     css: buildEditorialCss({
@@ -221,7 +221,7 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
   }),
   brandTheme({
     id: 'qiaomu-clean-reading',
-    name: '乔木简阅',
+    name: '木羽简阅',
     description: '深青工程简报风：冷白纸面、通栏发线标题、浅青高亮重点和浅色纸面代码块。',
     swatches: ['#fbfdfe', '#25343f', '#0f7285', '#dff0f4'],
     css: buildEditorialCss({

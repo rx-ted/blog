@@ -248,13 +248,16 @@ function svgAttributeName(name: string) {
   return name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
 }
 
-function iconNodeToSvgContent(iconNodes: DynamicIconModule['__iconNode']) {
-  return iconNodes.map(([tag, attrs]) => {
-    const attrText = Object.entries(attrs)
+type CollageIconNode = NonNullable<DynamicIconModule['__iconData']>['node'][number]
+
+function iconNodeToSvgContent(iconNodes: readonly CollageIconNode[]): string {
+  return iconNodes.map(([tag, attrs, children]) => {
+    const attrText = Object.entries(attrs ?? {})
       .filter(([name]) => name !== 'key')
       .map(([name, value]) => `${svgAttributeName(name)}="${escapeXml(String(value))}"`)
       .join(' ')
-    return `<${tag}${attrText ? ` ${attrText}` : ''}/>`
+    const childrenText: string = children?.length ? iconNodeToSvgContent(children) : ''
+    return `<${tag}${attrText ? ` ${attrText}` : ''}>${childrenText}</${tag}>`
   }).join('')
 }
 
@@ -266,7 +269,7 @@ async function getCollageIconDataUrl(name: string, stroke: string, strokeWidth: 
   const normalizedOpacity = Math.max(0, Math.min(1, opacity))
   const svg = [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${COLLAGE_ICON_VIEWBOX_SIZE}" height="${COLLAGE_ICON_VIEWBOX_SIZE}" viewBox="0 0 ${COLLAGE_ICON_VIEWBOX_SIZE} ${COLLAGE_ICON_VIEWBOX_SIZE}" fill="none" stroke="${escapeXml(stroke)}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" opacity="${normalizedOpacity}">`,
-    iconNodeToSvgContent(iconModule.__iconNode),
+    iconNodeToSvgContent(iconModule.__iconData?.node ?? []),
     '</svg>',
   ].join('')
 

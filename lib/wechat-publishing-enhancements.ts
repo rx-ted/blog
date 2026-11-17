@@ -85,7 +85,7 @@ const WECHAT_BLOCK_TEMPLATES: Record<WechatBlockTemplateKind, string[]> = {
   note: [':::note 提示', '这里写需要读者特别留意的信息。', ':::'],
   warning: [':::warning 注意', '这里写风险、限制或容易误解的地方。', ':::'],
   conclusion: [':::conclusion 结论', '一句话总结这一节最重要的判断。', ':::'],
-  profile: [':::profile 向阳乔木', 'AI 不插电｜把前沿 AI 变成能用的工作流。', ':::'],
+  profile: [':::profile rx-ted', 'AI 不插电｜把前沿 AI 变成能用的工作流。', ':::'],
   qrcode: [':::qrcode 关注公众号', '把二维码图片拖到这里，或粘贴图片链接。', ':::'],
   badges: [':::badges', 'AI, 公众号排版, 深度解读', ':::'],
   grid: [':::grid', '适合场景 | 发布前检查、产品对比、步骤总结', '核心价值 | 信息密度更高，但移动端仍然好读', ':::'],
@@ -272,7 +272,7 @@ function createProfileBlock(doc: Document, title: string, nodes: Node[]) {
   const section = createSection(doc, 'wechat-profile-card', {
     'data-wechat-component': 'profile',
   })
-  section.appendChild(createTitle(doc, 'wechat-profile-name', title || '向阳乔木'))
+  section.appendChild(createTitle(doc, 'wechat-profile-name', title || 'rx-ted'))
 
   const body = createSection(doc, 'wechat-profile-body', {
     'data-wechat-component-body': 'true',

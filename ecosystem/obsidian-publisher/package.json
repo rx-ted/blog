@@ -8,7 +8,7 @@
     "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production"
   },
   "keywords": [],
-  "author": "joeseesun",
+  "author": "rx-ted",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.11.0",

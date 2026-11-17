@@ -43,7 +43,7 @@ describe('wechat export themes', () => {
   it('includes a Qiaomu podcast long-form reading theme', () => {
     const theme = WECHAT_EXPORT_BUILTIN_THEMES.find(theme => theme.id === 'qiaomu-podcast')
 
-    expect(theme?.name).toBe('乔木播客')
+    expect(theme?.name).toBe('木羽播客')
     expect(theme?.css).toContain('font-size: 17px;')
     expect(theme?.css).toContain('line-height: 1.9;')
     expect(theme?.css).toContain('letter-spacing: 0.04em;')
@@ -56,7 +56,7 @@ describe('wechat export themes', () => {
   it('includes a blueprint-annotation Qiaomu mobile reading theme', () => {
     const theme = WECHAT_EXPORT_BUILTIN_THEMES.find(theme => theme.id === 'qiaomu-clean-reading')
 
-    expect(theme?.name).toBe('乔木简阅')
+    expect(theme?.name).toBe('木羽简阅')
     expect(theme?.builtin).toBe(true)
     expect(theme?.swatches).toEqual(['#fbfdfe', '#25343f', '#0f7285', '#dff0f4'])
     expect(theme?.css).toContain('padding: 18px 8px 32px;')

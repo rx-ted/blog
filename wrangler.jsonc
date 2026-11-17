@@ -1,0 +1,92 @@
+// Cloudflare Workers 配置（Wrangler）。
+// 这是面向开源部署的模板：只声明 binding，不写入真实的资源 ID。
+// 运行 `npm run cf:init` 会基于此文件生成 `wrangler.local.jsonc`，并写入真实的 D1 / R2 / KV 绑定。
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+
+  // ── Worker ────────────────────────────────────────────────────────────────
+  "name": "qiaomu-blog-opensource",
+  "main": "worker.ts",
+  "compatibility_date": "2026-04-14",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+
+  // ── 本地开发 ──────────────────────────────────────────────────────────────
+  "dev": {
+    "port": 8788
+  },
+
+  // ── 静态资源（OpenNext 构建产物）─────────────────────────────────────────
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+
+  // ── Workers AI ────────────────────────────────────────────────────────────
+  "ai": {
+    "binding": "WORKERS_AI"
+  },
+
+  // 允许 Worker 通过 service binding 调用自身。
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "qiaomu-blog-opensource"
+    }
+  ],
+
+  // ── 资源绑定 ──────────────────────────────────────────────────────────────
+  // 现代 Wrangler 与 Cloudflare Deploy 按钮可自动置备这些资源。
+  // `npm run cf:init` 会把 database_id / bucket_name 等真实信息写入本地配置。
+  "d1_databases": [
+    {
+      "binding": "DB"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "IMAGES"
+    }
+  ],
+
+  // 可选：后台任务队列。创建队列后取消注释。
+  // "queues": {
+  //   "producers": [
+  //     {
+  //       "binding": "BACKGROUND_QUEUE",
+  //       "queue": "qiaomu-blog-background-jobs"
+  //     }
+  //   ],
+  //   "consumers": [
+  //     {
+  //       "queue": "qiaomu-blog-background-jobs"
+  //     }
+  //   ]
+  // },
+
+  // ── 环境变量 ──────────────────────────────────────────────────────────────
+  "vars": {
+    "NEXT_PUBLIC_SITE_URL": "https://your-domain.com",
+    "AI_BASE_URL": "https://api.openai.com/v1",
+    "AI_MODEL": "gpt-4o-mini",
+    "WORKERS_AI_MODEL": "@cf/meta/llama-3.1-8b-instruct",
+
+    // 可选：Umami 统计。填入自己的值后取消注释。
+    // "NEXT_PUBLIC_UMAMI_WEBSITE_ID": "",
+    // "NEXT_PUBLIC_UMAMI_SCRIPT_URL": "https://umami.example.com/script.js",
+    // "NEXT_PUBLIC_UMAMI_DOMAINS": "your-domain.com",
+
+    // 可选：功能开关。开源或低成本部署时保持关闭。
+    // "ENABLE_BACKGROUND_JOBS": "true",
+    // "ENABLE_WORKERS_AI": "true",
+    // "ENABLE_VECTOR_SEARCH": "true",
+    // "ENABLE_CF_IMAGE_PIPELINE": "true",
+  }
+}
+
+// Secrets（通过 `wrangler secret put` 设置，不要写进此文件）：
+// - ADMIN_PASSWORD
+// - ADMIN_TOKEN_SALT
+// - AI_CONFIG_ENCRYPTION_SECRET
+// - AI_API_KEY
+// - CLOUDFLARE_ACCOUNT_ID（可选，用于 Workers AI 模型发现）
+// - CLOUDFLARE_API_TOKEN（可选，用于 Workers AI 模型发现）

@@ -189,7 +189,7 @@ export async function prepareExternalArticle(target: ExternalPublishTarget, arti
     if (!video) blob = await preparePublishImage(blob, mediaSignal)
     if (video ? blob.type !== 'video/mp4' : !/^image\/(png|jpeg|webp|gif)$/.test(blob.type)) throw new Error('请将图片转为 PNG、JPEG、WebP 或 GIF 后再发送。')
     if (blob.size > fileLimit * 1024 * 1024) throw tooLarge()
-    if (!staging && total + blob.size > 40 * 1024 * 1024) throw new PublishTransferError('当前的乔木剪藏版本一次最多发送 40 MB 媒体，请更新扩展后重试。')
+    if (!staging && total + blob.size > 40 * 1024 * 1024) throw new PublishTransferError('当前的木羽剪藏版本一次最多发送 40 MB 媒体，请更新扩展后重试。')
     total += blob.size
     const bytes = new Uint8Array(await blob.arrayBuffer())
     let binary = ''

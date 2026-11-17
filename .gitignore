@@ -46,6 +46,7 @@ next-env.d.ts
 .wrangler/
 skills/
 wrangler.local.toml
+wrangler.local.jsonc
 worker-configuration.d.ts
 
 # Public distribution template (placeholders only)

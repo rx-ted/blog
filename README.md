@@ -1,15 +1,15 @@
 # Qiaomu Blog Open Source
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/joeseesun/qiaomu-blog-opensource)
-[![Use this template](https://img.shields.io/badge/GitHub-Use%20this%20template-111111?logo=github)](https://github.com/joeseesun/qiaomu-blog-opensource/generate)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/rx-ted/blog)
+[![Use this template](https://img.shields.io/badge/GitHub-Use%20this%20template-111111?logo=github)](https://github.com/rx-ted/blog/generate)
 
 如果你也想拥有一个真正属于自己的学习、写作、分享阵地，而不是把内容完全寄托在平台算法上，这个项目就是为此做的。
 
 Qiaomu Blog Open Source 不是一个只会渲染 Markdown 的静态模板，而是一套完整的博客系统：前后台双编辑器、AI 写作辅助、AI 生图、主题系统、全文检索、API Token、外部发布生态都已经接好，目标就是让你更容易持续写下去。
 
-- 在线示例：<https://blog.qiaomu.ai/>
-- 介绍文章：<https://blog.qiaomu.ai/qiaomu-blog-opensource>
-- 当前仓库：<https://github.com/joeseesun/qiaomu-blog-opensource>
+- 在线示例：<https://blog.19981204.xyz/>
+- 介绍文章：<https://blog.19981204.xyz/>
+- 当前仓库：<https://github.com/rx-ted/blog>
 
 ## 为什么值得做成自己的站
 
@@ -98,8 +98,9 @@ npm run deploy
 ## 本地开发
 
 ```bash
-git clone https://github.com/joeseesun/qiaomu-blog-opensource.git
-cd qiaomu-blog-opensource
+git clone https://github.com/rx-ted/blog.git
+cd blog
+git switch qiaomu-blog-opensource
 npm install
 cp .env.example .env.local
 npm run dev
@@ -114,8 +115,12 @@ npm run dev
 如果你要在 Worker 运行时本地预览：
 
 ```bash
-npm run preview
+npm run preview         # 使用 wrangler.local.jsonc 的绑定设置（D1 可能是远程）
+npm run db:local:init   # 首次：初始化本地 D1
+npm run preview:local   # 纯本地预览，不访问 Cloudflare
 ```
+
+`*.workers.dev` 不可访问时，远程绑定会让请求卡住，请使用 `preview:local`。
 
 ## 默认初始化内容
 
@@ -152,11 +157,12 @@ npm run preview
 | `npm run verify` | 跑完整验证链路 |
 | `npm run cf:init` | 初始化 Cloudflare 资源和模板默认设置 |
 | `npm run preview` | Worker 运行时预览 |
+| `npm run preview:local` | 纯本地绑定预览（D1/R2/AI 本地模拟） |
+| `npm run db:local:init` | 初始化本地 D1（支持 `-- --from-remote`） |
 | `npm run deploy` | 部署到 Cloudflare Workers |
 
 ## 作者
 
-- 向阳乔木
-- GitHub：<https://github.com/joeseesun>
-- X / Twitter：<https://x.com/vista8>
-- Blog：<https://blog.qiaomu.ai/>
+- rx-ted
+- GitHub：<https://github.com/rx-ted>
+- Blog：<https://blog.19981204.xyz/>

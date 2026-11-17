@@ -38,20 +38,20 @@ npm run cf:init -- --site-url=https://your-domain.com
 npm run cf:init -- --site-url=https://your-domain.com --with-kv
 ```
 
-这一步会生成本地的 `wrangler.local.toml`，并自动写入真实 D1 / R2 / KV 绑定。
+这一步会生成本地的 `wrangler.local.jsonc`，并自动写入真实 D1 / R2 / KV 绑定。
 
 ### 4. 设置 secrets
 
 ```bash
-npx wrangler secret put ADMIN_PASSWORD -c wrangler.local.toml
-npx wrangler secret put ADMIN_TOKEN_SALT -c wrangler.local.toml
-npx wrangler secret put AI_CONFIG_ENCRYPTION_SECRET -c wrangler.local.toml
+npx wrangler secret put ADMIN_PASSWORD -c wrangler.local.jsonc
+npx wrangler secret put ADMIN_TOKEN_SALT -c wrangler.local.jsonc
+npx wrangler secret put AI_CONFIG_ENCRYPTION_SECRET -c wrangler.local.jsonc
 ```
 
 如需外部 AI：
 
 ```bash
-npx wrangler secret put AI_API_KEY -c wrangler.local.toml
+npx wrangler secret put AI_API_KEY -c wrangler.local.jsonc
 ```
 
 ### 5. 生成类型并部署
@@ -68,7 +68,24 @@ npm run deploy
 npm run preview
 ```
 
-脚本会优先读取 `wrangler.local.toml`。模板仓库里的 `wrangler.toml` 不带真实资源绑定，不能直接拿来部署生产。
+脚本会优先读取 `wrangler.local.jsonc`。模板仓库里的 `wrangler.jsonc` 不带真实资源绑定，不能直接拿来部署生产。
+
+默认预览遵循 `wrangler.local.jsonc` 里每个绑定自己的 `remote` 设置。`cf:init` 会把 D1 标记为 `"remote": true`，此时 `wrangler dev` 需要在 `*.workers.dev` 上建立远程预览会话；如果该域名被网络屏蔽或无法访问，请求会长时间卡住（每个 D1 查询约 75 秒后报 `internal error`）。
+
+网络访问不了 `*.workers.dev` 时，改用纯本地预览：
+
+```bash
+npm run db:local:init    # 首次：写入 db/schema.sql 和种子数据到本地 D1
+npm run preview:local    # 所有绑定使用本地模拟，不再访问 Cloudflare
+```
+
+`db:local:init` 也可以拉取线上数据到本地：
+
+```bash
+npm run db:local:init -- --from-remote   # 会覆盖本地 D1 数据
+```
+
+本地 D1 数据保存在 `.wrangler/state/v3/d1`，删除或加 `--reset` 即可重建。
 
 ## 日常更新
 
@@ -94,8 +111,8 @@ npm run cf:init -- --site-url=https://your-domain.com
 至少补齐：
 
 ```bash
-npx wrangler secret put ADMIN_PASSWORD -c wrangler.local.toml
-npx wrangler secret put ADMIN_TOKEN_SALT -c wrangler.local.toml
+npx wrangler secret put ADMIN_PASSWORD -c wrangler.local.jsonc
+npx wrangler secret put ADMIN_TOKEN_SALT -c wrangler.local.jsonc
 ```
 
 ### AI Provider 已保存的 Key 无法解密
@@ -107,6 +124,6 @@ npx wrangler secret put ADMIN_TOKEN_SALT -c wrangler.local.toml
 检查：
 
 - `.env.local`
-- `wrangler.local.toml`
+- `wrangler.local.jsonc`
 
 两处的 `NEXT_PUBLIC_SITE_URL` 必须一致。

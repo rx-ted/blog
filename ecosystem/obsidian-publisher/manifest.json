@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "minAppVersion": "1.0.0",
   "description": "一键发布笔记到 Qiaomu Blog 草稿",
-  "author": "joeseesun",
-  "authorUrl": "https://github.com/joeseesun",
+  "author": "rx-ted",
+  "authorUrl": "https://github.com/rx-ted",
   "isDesktopOnly": false
 }
