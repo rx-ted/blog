@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
   }
 
-  const secret = resolveAiConfigSecret(env as Record<string, unknown>)
+  const secret = resolveAiConfigSecret(env)
   await ensureAiConfigInfrastructure(db, secret)
 
   const body = (await req.json()) as {

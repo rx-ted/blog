@@ -36,7 +36,7 @@ user_invocable: true
 
 如果没有 token，提示用户：
 
-1. 打开 `https://your-domain.com/admin/settings`
+1. 打开 `https://your-domain.com/dashboard/settings`
 2. 在 `API Token` 页面生成 token
 3. 保存到：
 

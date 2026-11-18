@@ -8,7 +8,7 @@ const PUBLIC_API_PATHS = new Set([
 
 const BYPASS_PREFIXES = [
   '/_next/',
-  '/admin',
+  '/dashboard',
   '/editor',
   '/api/',
   '/images/',

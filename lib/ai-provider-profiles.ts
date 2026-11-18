@@ -167,12 +167,13 @@ export function maskApiKey(apiKey: string): string {
   return `${trimmed.slice(0, 6)}...${trimmed.slice(-4)}`
 }
 
-export function resolveAiConfigSecret(env?: Record<string, unknown>): string {
-  const envSecret = typeof env?.AI_CONFIG_ENCRYPTION_SECRET === 'string'
-    ? env.AI_CONFIG_ENCRYPTION_SECRET
+export function resolveAiConfigSecret(env?: unknown): string {
+  const e = env as Record<string, unknown> | undefined
+  const envSecret = typeof e?.AI_CONFIG_ENCRYPTION_SECRET === 'string'
+    ? e.AI_CONFIG_ENCRYPTION_SECRET
     : ''
-  const envSalt = typeof env?.ADMIN_TOKEN_SALT === 'string'
-    ? env.ADMIN_TOKEN_SALT
+  const envSalt = typeof e?.ADMIN_TOKEN_SALT === 'string'
+    ? e.ADMIN_TOKEN_SALT
     : ''
 
   return (

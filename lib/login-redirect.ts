@@ -1,9 +1,9 @@
 // After login, go back to a path on this site or to one of the sites that use the admin
-// session cross-origin (www.qiaomu.ai/notes/ writes memos here). Anything else goes to /admin.
+// session cross-origin (www.qiaomu.ai/notes/ writes memos here). Anything else goes to /dashboard.
 const EXTERNAL_RETURN_ORIGINS = ['https://www.qiaomu.ai']
 
 export function resolveLoginRedirect(value: string | null): string {
-  if (!value) return '/admin'
+  if (!value) return '/dashboard'
   if (value.startsWith('/') && !value.startsWith('//') && !value.startsWith('/\\')) return value
   try {
     const url = new URL(value)
@@ -11,5 +11,5 @@ export function resolveLoginRedirect(value: string | null): string {
   } catch {
     // not a URL
   }
-  return '/admin'
+  return '/dashboard'
 }

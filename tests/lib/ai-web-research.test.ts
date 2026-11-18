@@ -63,14 +63,14 @@ describe('ai web research helpers', () => {
     const fetcher = vi.fn()
 
     const result = await fetchPageMarkdown({
-      url: 'http://127.0.0.1/admin',
+      url: 'http://127.0.0.1/dashboard',
       env: { ENABLE_AI_WEB_RESEARCH: 'true' },
       fetcher: fetcher as unknown as typeof fetch,
     })
 
     expect(result).toEqual({
       status: 'error',
-      url: 'http://127.0.0.1/admin',
+      url: 'http://127.0.0.1/dashboard',
       error: '不允许抓取内网地址',
     })
     expect(fetcher).not.toHaveBeenCalled()

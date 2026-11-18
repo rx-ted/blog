@@ -26,7 +26,7 @@ describe('edge response cache helpers', () => {
     expect(isPublicEdgeCacheableRequest(request('/', { headers: { cookie: 'qmblog_admin=1' } }))).toBe(false)
     expect(isPublicEdgeCacheableRequest(request('/', { headers: { authorization: 'Bearer token' } }))).toBe(false)
     expect(isPublicEdgeCacheableRequest(request('/', { method: 'POST' }))).toBe(false)
-    expect(isPublicEdgeCacheableRequest(request('/admin'))).toBe(false)
+    expect(isPublicEdgeCacheableRequest(request('/dashboard'))).toBe(false)
     expect(isPublicEdgeCacheableRequest(request('/editor'))).toBe(false)
     expect(isPublicEdgeCacheableRequest(request('/api/admin/session'))).toBe(false)
     expect(isPublicEdgeCacheableRequest(request('/favicon.ico'))).toBe(false)

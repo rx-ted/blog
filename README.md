@@ -46,7 +46,7 @@ Qiaomu Blog Open Source 不是一个只会渲染 Markdown 的静态模板，而�
 
 ### 后台设置与主题、代码、API Token 管理
 
-![后台设置](docs/screenshots/admin-settings.webp)
+![后台设置](docs/screenshots/dashboard-settings.webp)
 
 ### 多种发布状态
 
@@ -109,7 +109,7 @@ npm run dev
 常用入口：
 
 - 首页：`/`
-- 后台：`/admin`
+- 后台：`/dashboard`
 - 编辑器：`/editor`
 
 如果你要在 Worker 运行时本地预览：

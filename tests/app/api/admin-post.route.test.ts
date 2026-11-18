@@ -67,7 +67,7 @@ describe('/api/admin/posts/[slug] route', () => {
       html: '<p>更新后的正文</p>',
       description: '   ',
       tags: ['AI', '写作'],
-      cover_image: '/covers/admin.webp',
+      cover_image: '/covers/dashboard.webp',
     })
     mocks.invalidatePublicContentCache.mockRejectedValue(new Error('cache down'))
     mocks.enqueueBackgroundJob.mockResolvedValue(undefined)
@@ -96,7 +96,7 @@ describe('/api/admin/posts/[slug] route', () => {
         content: '更新后的正文',
         description: '更新后的正文',
         tags: ['AI', '写作'],
-        cover_image: '/covers/admin.webp',
+        cover_image: '/covers/dashboard.webp',
       }),
     )
     expect(mocks.enqueueBackgroundJob).toHaveBeenCalledTimes(1)
@@ -132,7 +132,7 @@ describe('/api/admin/posts/[slug] route', () => {
   })
 
   it('persists localized image URLs through the admin editor route', async () => {
-    const localizedUrl = '/api/images/image/remote/admin123'
+    const localizedUrl = '/api/images/image/remote/dashboard123'
     mocks.parseJsonBody.mockResolvedValue({
       content: '![图](https://cdn.example.com/image.png)',
       html: '<img src="https://cdn.example.com/image.png">',

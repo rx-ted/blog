@@ -15,7 +15,7 @@ export default async function AdminProtectedLayout({
   const token = cookieStore.get(COOKIE_NAME)?.value
 
   if (!(await isAdminAuthenticated(token))) {
-    redirect('/admin/login')
+    redirect('/dashboard/login')
   }
 
   const navCls = 'px-3 py-2 rounded-lg text-sm text-[var(--editor-muted)] hover:text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition-all duration-150 whitespace-nowrap'
@@ -37,9 +37,9 @@ export default async function AdminProtectedLayout({
           </div>
 
           <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
-            <Link href="/admin/posts" className={navCls}>文章</Link>
-            <Link href="/admin/categories" className={navCls}>分类</Link>
-            <Link href="/admin/settings" className={navCls}>设置</Link>
+            <Link href="/dashboard/posts" className={navCls}>文章</Link>
+            <Link href="/dashboard/categories" className={navCls}>分类</Link>
+            <Link href="/dashboard/settings" className={navCls}>设置</Link>
             <div className="w-px h-4 bg-[var(--editor-line)] mx-2 hidden md:block" />
             <Link
               href="/editor"

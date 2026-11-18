@@ -28,6 +28,6 @@ export async function getAppCloudflareContext(): Promise<AppCloudflareContext> {
   return getCloudflareContext<Record<string, unknown>, AppExecutionContext>({ async: true })
 }
 
-export async function getAppCloudflareEnv() {
-  return (await getAppCloudflareContext()).env
+export async function getAppCloudflareEnv(): Promise<CloudflareEnv> {
+  return (await getAppCloudflareContext()).env as CloudflareEnv
 }

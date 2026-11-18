@@ -19,15 +19,15 @@ export function AdminSearch({ initialQuery = '' }: AdminSearchProps) {
     e.preventDefault()
     const trimmed = query.trim()
     if (trimmed) {
-      router.push(`/admin/posts?q=${encodeURIComponent(trimmed)}`)
+      router.push(`/dashboard/posts?q=${encodeURIComponent(trimmed)}`)
     } else {
-      router.push('/admin/posts')
+      router.push('/dashboard/posts')
     }
   }
 
   const handleClear = () => {
     setQuery('')
-    router.push('/admin/posts')
+    router.push('/dashboard/posts')
   }
 
   return (

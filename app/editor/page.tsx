@@ -19,7 +19,7 @@ export default async function EditorPage({
     const params = await searchParams
     const editSlug = params.edit ?? params.slug
     const editParam = editSlug ? `?edit=${editSlug}` : params.new === '1' ? '?new=1' : ''
-    redirect(`/admin/login?redirect_to=${encodeURIComponent(`/editor${editParam}`)}`)
+    redirect(`/dashboard/login?redirect_to=${encodeURIComponent(`/editor${editParam}`)}`)
   }
 
   const params = await searchParams

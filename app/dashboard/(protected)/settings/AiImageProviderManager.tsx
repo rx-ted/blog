@@ -19,7 +19,7 @@ import {
   type BaseProviderProfile,
   type ModelsResponse,
   type ProviderTemplateGroup,
-} from '@/app/admin/(protected)/settings/provider-manager-shared'
+} from '@/app/dashboard/(protected)/settings/provider-manager-shared'
 
 const CUSTOM_PROVIDER_ID = 'custom'
 

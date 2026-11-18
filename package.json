@@ -1,7 +1,7 @@
 {
   "name": "qiaomu-blog-opensource",
   "version": "0.1.0",
-  "private": false,
+  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -101,7 +101,7 @@
         "description": "你的博客公网域名，例如 `https://blog.example.com`。"
       },
       "ADMIN_PASSWORD": {
-        "description": "后台 `/admin` 登录密码。请使用高强度独立密码。"
+        "description": "后台 `/dashboard` 登录密码。请使用高强度独立密码。"
       },
       "ADMIN_TOKEN_SALT": {
         "description": "管理员 Token 签名盐。可用 `openssl rand -hex 32` 生成。"

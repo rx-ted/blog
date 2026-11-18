@@ -105,7 +105,7 @@ export async function GET(req: NextRequest) {
   }
   if (!db) return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
 
-  const secret = resolveAiConfigSecret(env as Record<string, unknown>)
+  const secret = resolveAiConfigSecret(env)
   await ensureAiConfigInfrastructure(db, secret)
 
   const requestUrl = new URL(req.url)

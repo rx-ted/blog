@@ -45,7 +45,7 @@ export function FilterBar({
       params.set(key, value)
     }
     const qs = params.toString()
-    router.push(`/admin/posts${qs ? `?${qs}` : ''}`)
+    router.push(`/dashboard/posts${qs ? `?${qs}` : ''}`)
   }
 
   const handleSearch = (e: React.FormEvent) => {
@@ -58,7 +58,7 @@ export function FilterBar({
       params.delete('q')
     }
     const qs = params.toString()
-    router.push(`/admin/posts${qs ? `?${qs}` : ''}`)
+    router.push(`/dashboard/posts${qs ? `?${qs}` : ''}`)
   }
 
   const handleClear = () => {
@@ -66,7 +66,7 @@ export function FilterBar({
     const params = new URLSearchParams(searchParams.toString())
     params.delete('q')
     const qs = params.toString()
-    router.push(`/admin/posts${qs ? `?${qs}` : ''}`)
+    router.push(`/dashboard/posts${qs ? `?${qs}` : ''}`)
   }
 
   const activeStatus = currentStatus || 'all'
@@ -147,7 +147,7 @@ export function FilterBar({
                 type="button"
                 onClick={() => {
                   setQuery('')
-                  router.push('/admin/posts')
+                  router.push('/dashboard/posts')
                 }}
                 className="shrink-0 rounded-lg border border-[var(--editor-line)] px-3 py-2 text-sm text-[var(--editor-muted)] transition hover:bg-[var(--editor-soft)] hover:text-[var(--editor-ink)]"
               >

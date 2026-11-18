@@ -7,7 +7,7 @@ describe('Cloudflare static asset cache headers', () => {
     const rules = headers.split('\n').map(line => line.trim()).filter(line => line.startsWith('/'))
     expect(rules).toEqual(['/_next/static/*'])
     expect(headers).toMatch(/Cache-Control: public, max-age=31536000, immutable/)
-    for (const path of ['/editor', '/admin', '/api/posts', '/manifest.json', '/images/post.png']) {
+    for (const path of ['/editor', '/dashboard', '/api/posts', '/manifest.json', '/images/post.png']) {
       expect(rules.some(rule => path.startsWith(rule.slice(0, -1)))).toBe(false)
     }
   })

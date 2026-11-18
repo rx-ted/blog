@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
       profileId: body.profileId,
       source: 'image_modal',
       db,
-      env: env as Record<string, string | undefined>,
+      env,
       images,
     })
     if (result.assetId) {

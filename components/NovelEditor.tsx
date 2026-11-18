@@ -1672,7 +1672,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
         <div className="flex h-full items-center gap-2 px-4">
           {/* Left: Back */}
           <Link
-            href="/admin/posts"
+            href="/dashboard/posts"
             className="flex items-center gap-1 shrink-0 text-sm text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />

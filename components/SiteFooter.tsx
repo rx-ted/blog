@@ -57,7 +57,7 @@ export function SiteFooter() {
           {isAdmin ? (
             <>
               <Link
-                href="/admin"
+                href="/dashboard"
                 className="hover:text-[var(--editor-ink)] transition-colors duration-150 underline-offset-2 hover:underline"
               >
                 rx-ted

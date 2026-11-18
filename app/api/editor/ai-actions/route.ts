@@ -18,7 +18,7 @@ export async function GET() {
   }
 
   try {
-    const secret = resolveAiConfigSecret(env as Record<string, unknown>)
+    const secret = resolveAiConfigSecret(env)
     await ensureAiConfigInfrastructure(db, secret)
 
     const { results } = await db.prepare(
