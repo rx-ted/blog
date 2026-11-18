@@ -47,6 +47,11 @@
       "binding": "IMAGES"
     }
   ],
+  "kv_namespaces": [
+    {
+      "binding": "CACHE"
+    }
+  ],
 
   // 可选：后台任务队列。创建队列后取消注释。
   // "queues": {
