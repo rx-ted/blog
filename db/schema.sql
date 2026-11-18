@@ -68,9 +68,9 @@ CREATE TABLE IF NOT EXISTS media_assets (
     updated_at INTEGER DEFAULT(strftime ('%s', 'now'))
 );
 
-CREATE INDEX idx_media_assets_type_created ON media_assets(type, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_media_assets_type_created ON media_assets(type, created_at DESC);
 
-CREATE INDEX idx_media_assets_source_created ON media_assets (source, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_media_assets_source_created ON media_assets (source, created_at DESC);
 
 CREATE TABLE IF NOT EXISTS article_asset_links (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -88,11 +88,11 @@ CREATE TABLE IF NOT EXISTS article_asset_links (
     FOREIGN KEY (post_id) REFERENCES posts (id) ON DELETE SET NULL
 );
 
-CREATE INDEX idx_article_asset_links_asset_id ON article_asset_links (asset_id);
+CREATE INDEX IF NOT EXISTS idx_article_asset_links_asset_id ON article_asset_links (asset_id);
 
-CREATE INDEX idx_article_asset_links_post_id ON article_asset_links (post_id, inserted_at DESC);
+CREATE INDEX IF NOT EXISTS idx_article_asset_links_post_id ON article_asset_links (post_id, inserted_at DESC);
 
-CREATE INDEX idx_article_asset_links_slug ON article_asset_links (slug, inserted_at DESC);
+CREATE INDEX IF NOT EXISTS idx_article_asset_links_slug ON article_asset_links (slug, inserted_at DESC);
 
 CREATE TABLE IF NOT EXISTS ai_chat_tool_actions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -111,9 +111,9 @@ CREATE TABLE IF NOT EXISTS ai_chat_tool_actions (
     FOREIGN KEY (post_id) REFERENCES posts (id) ON DELETE SET NULL
 );
 
-CREATE INDEX idx_ai_chat_tool_actions_session ON ai_chat_tool_actions (session_id, applied_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_chat_tool_actions_session ON ai_chat_tool_actions (session_id, applied_at DESC);
 
-CREATE INDEX idx_ai_chat_tool_actions_post_id ON ai_chat_tool_actions (post_id, applied_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_chat_tool_actions_post_id ON ai_chat_tool_actions (post_id, applied_at DESC);
 
 -- AI 对话外部素材资源、异步任务和引用关系
 CREATE TABLE IF NOT EXISTS ai_research_resources (
@@ -135,13 +135,13 @@ CREATE TABLE IF NOT EXISTS ai_research_resources (
     updated_at INTEGER DEFAULT(strftime ('%s', 'now'))
 );
 
-CREATE INDEX idx_ai_research_resources_type_status ON ai_research_resources (
+CREATE INDEX IF NOT EXISTS idx_ai_research_resources_type_status ON ai_research_resources (
     source_type,
     status,
     updated_at DESC
 );
 
-CREATE INDEX idx_ai_research_resources_platform ON ai_research_resources (platform, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_research_resources_platform ON ai_research_resources (platform, updated_at DESC);
 
 CREATE TABLE IF NOT EXISTS ai_research_jobs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -159,17 +159,17 @@ CREATE TABLE IF NOT EXISTS ai_research_jobs (
     FOREIGN KEY (resource_id) REFERENCES ai_research_resources (id) ON DELETE CASCADE
 );
 
-CREATE UNIQUE INDEX idx_ai_research_jobs_provider_task ON ai_research_jobs (provider, provider_task_id)
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_research_jobs_provider_task ON ai_research_jobs (provider, provider_task_id)
 WHERE
     provider_task_id IS NOT NULL;
 
-CREATE UNIQUE INDEX idx_ai_research_jobs_provider_note ON ai_research_jobs (provider, provider_note_id)
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_research_jobs_provider_note ON ai_research_jobs (provider, provider_note_id)
 WHERE
     provider_note_id IS NOT NULL;
 
-CREATE INDEX idx_ai_research_jobs_resource ON ai_research_jobs (resource_id, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_research_jobs_resource ON ai_research_jobs (resource_id, updated_at DESC);
 
-CREATE INDEX idx_ai_research_jobs_status_poll ON ai_research_jobs (status, next_poll_at);
+CREATE INDEX IF NOT EXISTS idx_ai_research_jobs_status_poll ON ai_research_jobs (status, next_poll_at);
 
 CREATE TABLE IF NOT EXISTS ai_research_links (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -183,13 +183,13 @@ CREATE TABLE IF NOT EXISTS ai_research_links (
     FOREIGN KEY (post_id) REFERENCES posts (id) ON DELETE SET NULL
 );
 
-CREATE INDEX idx_ai_research_links_session ON ai_research_links (session_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_research_links_session ON ai_research_links (session_id, created_at DESC);
 
-CREATE INDEX idx_ai_research_links_post ON ai_research_links (post_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_research_links_post ON ai_research_links (post_id, created_at DESC);
 
-CREATE INDEX idx_ai_research_links_slug ON ai_research_links (slug, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_research_links_slug ON ai_research_links (slug, created_at DESC);
 
-CREATE UNIQUE INDEX idx_ai_research_links_unique ON ai_research_links (
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_research_links_unique ON ai_research_links (
     resource_id,
     COALESCE(session_id, ''),
     COALESCE(post_id, 0),
@@ -469,7 +469,7 @@ CREATE TABLE IF NOT EXISTS api_tokens (
     is_active INTEGER DEFAULT 1
 );
 
-CREATE INDEX idx_api_tokens_token ON api_tokens (token);
+CREATE INDEX IF NOT EXISTS idx_api_tokens_token ON api_tokens (token);
 
 -- 插入默认分类
 INSERT
