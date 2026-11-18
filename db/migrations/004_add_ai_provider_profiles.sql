@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS ai_provider_profiles (
   base_url TEXT NOT NULL,
   model TEXT NOT NULL,
   temperature REAL NOT NULL DEFAULT 0.7,
-  max_tokens INTEGER NOT NULL DEFAULT 1200,
+  max_tokens INTEGER NOT NULL DEFAULT 2000,
   api_key_encrypted TEXT NOT NULL DEFAULT '',
   api_key_masked TEXT NOT NULL DEFAULT '',
   is_default INTEGER NOT NULL DEFAULT 0,
