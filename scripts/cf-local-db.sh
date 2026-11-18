@@ -6,7 +6,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 CONFIG_PATH="$(bash "${SCRIPT_DIR}/cf-config.sh")"
 SCHEMA_PATH="${REPO_ROOT}/db/schema.sql"
-SEED_PATH="${REPO_ROOT}/db/seed-template.sql"
 RESET=0
 FROM_REMOTE=0
 
@@ -137,10 +136,7 @@ else
   npx wrangler d1 execute DB --local --yes --file "${SCHEMA_PATH}" -c "${CONFIG_PATH}" >/dev/null
 fi
 
-if [[ "${FROM_REMOTE}" != "1" && -f "${SEED_PATH}" ]]; then
-  echo "==> applying db/seed-template.sql to local D1"
-  npx wrangler d1 execute DB --local --yes --file "${SEED_PATH}" -c "${CONFIG_PATH}" >/dev/null
-fi
+
 
 npx wrangler d1 execute DB --local -c "${CONFIG_PATH}" --json \
   --command "SELECT count(*) AS n FROM posts" | node -e '

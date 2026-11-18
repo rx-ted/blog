@@ -10,7 +10,6 @@ DB_NAME="${CF_D1_NAME:-qiaomu-blog-db}"
 R2_NAME="${CF_R2_NAME:-qiaomu-blog-images}"
 KV_NAME="${CF_KV_NAME:-qiaomu-blog-cache}"
 SITE_URL="${SITE_URL:-${NEXT_PUBLIC_SITE_URL:-https://your-domain.com}}"
-SEED_TEMPLATE_PATH="${REPO_ROOT}/db/seed-template.sql"
 WITH_KV=0
 
 for arg in "$@"; do
@@ -80,13 +79,6 @@ npx wrangler d1 execute DB \
   --remote \
   --file="${REPO_ROOT}/db/schema.sql" \
   -c "${LOCAL_CONFIG_PATH}"
-
-if [[ -f "${SEED_TEMPLATE_PATH}" ]]; then
-  npx wrangler d1 execute DB \
-    --remote \
-    --file="${SEED_TEMPLATE_PATH}" \
-    -c "${LOCAL_CONFIG_PATH}"
-fi
 
 cat <<EOF
 ✅ Cloudflare 基础资源初始化完成
