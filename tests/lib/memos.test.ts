@@ -31,7 +31,7 @@ describe('memo payload', () => {
 describe('resolveLoginRedirect', () => {
   it('allows local paths and the www notes page only', () => {
     expect(resolveLoginRedirect('/dashboard/posts')).toBe('/dashboard/posts')
-    expect(resolveLoginRedirect('https://www.qiaomu.ai/notes/')).toBe('https://www.qiaomu.ai/notes/')
+    expect(resolveLoginRedirect('https://www.19981204.xyz/notes/')).toBe('https://www.19981204.xyz/notes/')
     expect(resolveLoginRedirect('//evil.example')).toBe('/dashboard')
     expect(resolveLoginRedirect('https://evil.example/')).toBe('/dashboard')
     expect(resolveLoginRedirect(null)).toBe('/dashboard')

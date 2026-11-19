@@ -29,7 +29,7 @@ function AdminLoginForm() {
       const data = await res.json().catch(() => null) as { error?: string } | null
 
       if (res.ok) {
-        // 安全检查：只允许跳转到本站路径或白名单站点（www.qiaomu.ai 的随想发布入口）
+        // 安全检查：只允许跳转到本站路径或白名单站点（www.19981204.xyz 的随想发布入口）
         const target = resolveLoginRedirect(searchParams.get('redirect_to'))
         if (target.startsWith('/')) {
           router.push(target)

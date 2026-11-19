@@ -217,7 +217,7 @@ describe('/api/admin/wechat-publish route', () => {
     expect(forwarded.author).toBe('rx-ted')
     expect(forwarded.need_open_comment).toBe(true)
     expect(forwarded.only_fans_can_comment).toBe(false)
-    expect(forwarded.cover_image_url).toMatch(/^https:\/\/blog\.qiaomu\.ai\/default-covers\/qm-cover-[1-3]\.jpg$/)
+    expect(forwarded.cover_image_url).toMatch(/^https:\/\/blog\.19981204\.xyz\/default-covers\/qm-cover-[1-3]\.jpg$/)
   })
 
   it('returns a clear timeout error when bridge publish takes too long', async () => {

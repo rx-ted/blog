@@ -297,7 +297,7 @@ async function handleUpload(req: NextRequest) {
   }
 }
 
-// www.qiaomu.ai/notes/ uploads memo media here with the admin cookie.
+// www.19981204.xyz/notes/ uploads memo media here with the admin cookie.
 export function OPTIONS(req: NextRequest) {
   return corsPreflight(req, 'POST, OPTIONS')
 }

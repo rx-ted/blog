@@ -1,6 +1,6 @@
 import type { Database } from '@/lib/repositories/schema'
 
-// Memos are short posts (like a personal Twitter / Flomo) written on www.qiaomu.ai/notes/.
+// Memos are short posts (like a personal Twitter / Flomo) written on www.19981204.xyz/notes/.
 // They live apart from `posts` so they never show up in the blog's lists, feed or sitemap.
 
 export const MEMO_VISIBILITIES = ['private', 'unlisted', 'public'] as const

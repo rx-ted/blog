@@ -34,12 +34,12 @@ vi.mock('@/lib/repositories/memos', async () => {
 import { GET as listRoute, OPTIONS as listOptions, POST as createRoute } from '@/app/api/memos/route'
 import { DELETE as deleteRoute, GET as getRoute, PATCH as patchRoute } from '@/app/api/memos/[slug]/route'
 
-const WWW = 'https://www.qiaomu.ai'
+const WWW = 'https://www.19981204.xyz'
 const memo = (visibility: string) => ({ id: 1, slug: 'abc', html: '<p>hi</p>', text: 'hi', visibility, syndication: {}, created_at: 1, updated_at: 1 })
 const request = (url: string, init: { method?: string; body?: string; origin?: string } = {}) => {
   const headers = new Headers()
   if (init.origin) headers.set('Origin', init.origin)
-  return new NextRequest(`https://blog.qiaomu.ai${url}`, { method: init.method, body: init.body, headers })
+  return new NextRequest(`https://blog.19981204.xyz${url}`, { method: init.method, body: init.body, headers })
 }
 const params = (slug: string) => ({ params: Promise.resolve({ slug }) })
 
@@ -74,7 +74,7 @@ describe('/api/memos', () => {
     mocks.authenticateRequest.mockResolvedValue(true)
     const response = await createRoute(request('/api/memos', {
       method: 'POST',
-      origin: 'https://other.qiaomu.ai',
+      origin: 'https://other.19981204.xyz',
       body: JSON.stringify({ html: '<p>x</p>' }),
     }))
     expect(response.status).toBe(403)

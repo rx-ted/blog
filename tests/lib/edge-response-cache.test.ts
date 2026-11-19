@@ -7,7 +7,7 @@ import {
 } from '@/lib/edge-response-cache'
 
 function request(path: string, init?: RequestInit) {
-  return new Request(`https://blog.qiaomu.ai${path}`, init)
+  return new Request(`https://blog.19981204.xyz${path}`, init)
 }
 
 describe('edge response cache helpers', () => {

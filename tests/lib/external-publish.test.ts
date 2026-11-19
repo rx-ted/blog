@@ -26,20 +26,20 @@ afterEach(() => vi.unstubAllGlobals())
 describe('automatic content preparation', () => {
   it('turns audio/video, YouTube, Bilibili and tweet embeds into useful links', () => {
     const doc = documentOf('<video src="/movie.mp4"></video><audio><source src="/podcast.mp3"></audio><iframe src="https://www.youtube.com/embed/abc123"></iframe><iframe src="https://player.bilibili.com/player.html?bvid=BV123"></iframe><div data-twitter-src="https://x.com/vista8/status/123"></div>')
-    expect(normalizePublishEmbeds(doc, 'https://blog.qiaomu.ai/test')).toBe(5)
+    expect(normalizePublishEmbeds(doc, 'https://blog.19981204.xyz/test')).toBe(5)
     expect(doc.querySelector('video,audio,iframe,[data-twitter-src]')).toBeFalsy()
     const urls = Array.from(doc.querySelectorAll('a')).map(node => node.getAttribute('href'))
-    expect(urls).toEqual(['https://blog.qiaomu.ai/movie.mp4', 'https://blog.qiaomu.ai/podcast.mp3', 'https://www.youtube.com/watch?v=abc123', 'https://www.bilibili.com/video/BV123', 'https://x.com/vista8/status/123'])
+    expect(urls).toEqual(['https://blog.19981204.xyz/movie.mp4', 'https://blog.19981204.xyz/podcast.mp3', 'https://www.youtube.com/watch?v=abc123', 'https://www.bilibili.com/video/BV123', 'https://x.com/vista8/status/123'])
   })
   it('does not turn invalid media addresses into executable links', () => {
     const doc = documentOf('<iframe src="javascript:alert(1)"></iframe><video></video>')
-    expect(normalizePublishEmbeds(doc, 'https://blog.qiaomu.ai/test')).toBe(2)
+    expect(normalizePublishEmbeds(doc, 'https://blog.19981204.xyz/test')).toBe(2)
     expect(doc.querySelector('a,iframe,video')).toBeFalsy()
     expect(doc.body.textContent).toContain('此媒体请查看原文')
   })
   it('prepares both platforms without requiring manual edits or touching the source article', async () => {
     vi.stubGlobal('DOMParser', class { parseFromString(html: string) { return documentOf(html) } })
-    vi.stubGlobal('location', { href: 'https://blog.qiaomu.ai/editor' })
+    vi.stubGlobal('location', { href: 'https://blog.19981204.xyz/editor' })
     const article = { title: '测试', html: '<p>正文</p><iframe src="https://www.youtube.com/embed/abc"></iframe>', hasContent: true }
     const html = article.html
     const zhihu = await prepareExternalArticle('zhihu', article, new AbortController().signal)
@@ -54,11 +54,11 @@ describe('direct extension handoff', () => {
   it('uses same-page messages and accepts only its own matching extension reply', async () => {
     const win = new EventTarget() as EventTarget & { postMessage: (value: unknown, origin: string) => void }
     vi.stubGlobal('window', win)
-    vi.stubGlobal('location', { origin: 'https://blog.qiaomu.ai' })
+    vi.stubGlobal('location', { origin: 'https://blog.19981204.xyz' })
     const emit = (data: unknown, origin: string, source: unknown) => { const event = new Event('message'); Object.assign(event, { data, origin, source }); win.dispatchEvent(event) }
     win.postMessage = (request: unknown, origin: string) => {
       const message = request as { id: string; channel: string; direction: string; kind: string }
-      expect(origin).toBe('https://blog.qiaomu.ai')
+      expect(origin).toBe('https://blog.19981204.xyz')
       expect(message.kind).toBe('ping')
       queueMicrotask(() => {
         const reply = { ...message, direction: 'response', result: { v: 1 } }
@@ -76,7 +76,7 @@ describe('direct extension handoff', () => {
 describe('large draft media', () => {
   it('sends original files one at a time beyond 40 MiB, and asks legacy users to update', async () => {
     vi.stubGlobal('DOMParser', class { parseFromString(html: string) { return documentOf(html) } })
-    vi.stubGlobal('location', { href: 'https://blog.qiaomu.ai/editor' })
+    vi.stubGlobal('location', { href: 'https://blog.19981204.xyz/editor' })
     const bytes = 14 * 1024 * 1024
     const bitmap = new Blob([new Uint8Array(bytes)], { type: 'image/png' })
     const gif = new Blob([new Uint8Array(bytes).fill(1)], { type: 'image/gif' })
@@ -105,7 +105,7 @@ describe('large draft media', () => {
 
   it('stops the draft if a prepared X video fails to reach the extension', async () => {
     vi.stubGlobal('DOMParser', class { parseFromString(html: string) { return documentOf(html) } })
-    vi.stubGlobal('location', { href: 'https://blog.qiaomu.ai/editor' })
+    vi.stubGlobal('location', { href: 'https://blog.19981204.xyz/editor' })
     vi.stubGlobal('fetch', vi.fn(async () => new Response(new Blob(['video'], { type: 'video/mp4' }))))
     const article = { title: '视频', html: '<video src="/demo.mp4"></video>', hasContent: true }
     await expect(prepareExternalArticle('x', article, new AbortController().signal, undefined, {
@@ -118,7 +118,7 @@ describe('large draft media', () => {
 describe('automatic MP4 uploads in X articles', () => {
   it('prepares videos and download cards as actual video assets for X', async () => {
     vi.stubGlobal('DOMParser', class { parseFromString(html: string) { return documentOf(html) } })
-    vi.stubGlobal('location', { href: 'https://blog.qiaomu.ai/editor' })
+    vi.stubGlobal('location', { href: 'https://blog.19981204.xyz/editor' })
     vi.stubGlobal('fetch', vi.fn(async () => new Response(new Blob([new Uint8Array([1,2,3])], { type: 'video/mp4' }))))
     const article = { title: '文章中的视频', html: '<p><a href="/demo.mp4">旧 Kindle.mp4</a></p><video src="/another.mp4" title="演示视频"></video>', hasContent: true }
     const result = await prepareExternalArticle('x', article, new AbortController().signal)
@@ -131,20 +131,20 @@ describe('automatic MP4 uploads in X articles', () => {
   })
   it('keeps a video that cannot be read as an inline link instead of requesting a missing upload', async () => {
     vi.stubGlobal('DOMParser', class { parseFromString(html: string) { return documentOf(html) } })
-    vi.stubGlobal('location', { href: 'https://blog.qiaomu.ai/editor' })
+    vi.stubGlobal('location', { href: 'https://blog.19981204.xyz/editor' })
     vi.stubGlobal('fetch', vi.fn(async () => new Response('', { status: 403 })))
     const result = await prepareExternalArticle('x', { title: '视频降级', html: '<video src="/demo.mp4" title="演示视频"></video>', hasContent: true }, new AbortController().signal)
     expect(result.job.assets).toEqual([])
     expect(result.videoFallbacks).toBe(1)
-    expect(result.job.content.markdown).toContain('视频：[演示视频](https://blog.qiaomu.ai/demo.mp4)')
+    expect(result.job.content.markdown).toContain('视频：[演示视频](https://blog.19981204.xyz/demo.mp4)')
     expect(result.job.content.markdown).not.toContain('<video')
   })
   it('continues to export videos as links for Zhihu', async () => {
     vi.stubGlobal('DOMParser', class { parseFromString(html: string) { return documentOf(html) } })
-    vi.stubGlobal('location', { href: 'https://blog.qiaomu.ai/editor' })
+    vi.stubGlobal('location', { href: 'https://blog.19981204.xyz/editor' })
     const result = await prepareExternalArticle('zhihu', { title: '知乎视频', html: '<video src="/demo.mp4"></video>', hasContent: true }, new AbortController().signal)
     expect(result.job.assets).toEqual([])
-    expect(result.job.content.html).toContain('href="https://blog.qiaomu.ai/demo.mp4"')
+    expect(result.job.content.html).toContain('href="https://blog.19981204.xyz/demo.mp4"')
     expect(result.videoCount).toBe(0)
   })
 })
@@ -152,7 +152,7 @@ describe('automatic MP4 uploads in X articles', () => {
 describe('SVG draft images', () => {
   function setup(options: { fail?: boolean; width?: number; height?: number; pending?: boolean; output?: Blob | null } = {}) {
     vi.stubGlobal('DOMParser', class { parseFromString(html: string) { return documentOf(html) } })
-    vi.stubGlobal('location', { href: 'https://blog.qiaomu.ai/editor' })
+    vi.stubGlobal('location', { href: 'https://blog.19981204.xyz/editor' })
     const revoke = vi.fn()
     const create = vi.fn(() => 'blob:svg-copy')
     vi.stubGlobal('URL', class extends URL {
@@ -221,7 +221,7 @@ describe('SVG draft images', () => {
 describe('X article media limit', () => {
   it.each([undefined, '/0.png', '/separate-cover.png'])('trims trailing images before any fetch or transfer with cover %s', async cover => {
     vi.stubGlobal('DOMParser', class { parseFromString(html: string) { return documentOf(html) } })
-    vi.stubGlobal('location', { href: 'https://blog.qiaomu.ai/editor' })
+    vi.stubGlobal('location', { href: 'https://blog.19981204.xyz/editor' })
     const fetcher = vi.fn(async (_url: string) => new Response(new Blob(['image'], { type: 'image/png' })))
     vi.stubGlobal('fetch', fetcher)
     const html = Array.from({ length: 29 }, (_, index) => `<p><img src="/${index}.png" alt="image-${index}"></p>`).join('') + '<p>最后一段</p>'
@@ -242,13 +242,13 @@ describe('X article media limit', () => {
 
   it('keeps overflow video and table content readable without fetching them', async () => {
     vi.stubGlobal('DOMParser', class { parseFromString(html: string) { return documentOf(html) } })
-    vi.stubGlobal('location', { href: 'https://blog.qiaomu.ai/editor' })
+    vi.stubGlobal('location', { href: 'https://blog.19981204.xyz/editor' })
     const fetcher = vi.fn(async () => new Response(new Blob(['image'], { type: 'image/png' })))
     vi.stubGlobal('fetch', fetcher)
     const html = '<p><img src="/image.png"></p>'.repeat(25) + '<video src="/demo.mp4" title="演示"></video><table><tr><td>表格数据</td></tr></table>'
     const result = await prepareExternalArticle('x', { title: '图文', html, hasContent: true }, new AbortController().signal)
     expect(result.omittedMedia).toBe(2)
-    expect(result.job.content.markdown).toContain('[演示](https://blog.qiaomu.ai/demo.mp4)')
+    expect(result.job.content.markdown).toContain('[演示](https://blog.19981204.xyz/demo.mp4)')
     expect(result.job.content.markdown).toContain('表格数据')
     expect(fetcher).toHaveBeenCalledTimes(1)
   })

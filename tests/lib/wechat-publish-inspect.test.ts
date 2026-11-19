@@ -16,7 +16,7 @@ describe('wechat publish inspect', () => {
       normalizedDigest: '摘'.repeat(40),
       contentHtml: '<h1>题题</h1><ul><li>Item</li></ul>',
       coverImageUrl: '',
-      resolvedCoverImageUrl: 'https://blog.qiaomu.ai/default-covers/qm-cover-1.jpg',
+      resolvedCoverImageUrl: 'https://blog.19981204.xyz/default-covers/qm-cover-1.jpg',
     })
 
     expect(inspect.checks.map(check => check.code)).toEqual(expect.arrayContaining([

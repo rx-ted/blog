@@ -1,4 +1,4 @@
-// Asks GitHub Actions to rebuild www.qiaomu.ai so a memo shows up within minutes
+// Asks GitHub Actions to rebuild www.19981204.xyz so a memo shows up within minutes
 // instead of at the next hourly build. Optional: without the token it does nothing.
 //   npx wrangler secret put WWW_REBUILD_GITHUB_TOKEN   (fine-grained PAT, Contents: read & write on the repo)
 const DEFAULT_REPO = 'rx-ted/blog'

@@ -2,7 +2,7 @@ import { isMemoVisibility, type MemoWriteInput } from '@/lib/repositories/memos'
 
 const MAX_HTML_LENGTH = 200_000
 
-// Memos are written by the admin only, but the HTML is rendered on www.qiaomu.ai as-is,
+// Memos are written by the admin only, but the HTML is rendered on www.19981204.xyz as-is,
 // so drop scripts and inline event handlers as a second line of defence.
 export function sanitizeMemoHtml(html: string) {
   return html

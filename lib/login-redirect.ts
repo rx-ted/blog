@@ -1,6 +1,6 @@
 // After login, go back to a path on this site or to one of the sites that use the admin
-// session cross-origin (www.qiaomu.ai/notes/ writes memos here). Anything else goes to /dashboard.
-const EXTERNAL_RETURN_ORIGINS = ['https://www.qiaomu.ai']
+// session cross-origin (www.19981204.xyz/notes/ writes memos here). Anything else goes to /dashboard.
+const EXTERNAL_RETURN_ORIGINS = ['https://www.19981204.xyz']
 
 export function resolveLoginRedirect(value: string | null): string {
   if (!value) return '/dashboard'

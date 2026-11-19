@@ -29,7 +29,7 @@ describe('remote image localization', () => {
       content: `![示例](${sourceUrl})`,
       html: `<p><img src="https://cdn.example.com/article/image.png?x=1&amp;y=2"></p>`,
       coverImage: sourceUrl,
-      siteUrl: 'https://blog.qiaomu.ai',
+      siteUrl: 'https://blog.19981204.xyz',
       fetchImpl: fetchImpl as unknown as typeof fetch,
     })
 
@@ -164,8 +164,8 @@ describe('remote image localization', () => {
 
   it('skips same-site images and degrades safely when R2 is not configured', async () => {
     const sameSite = await localizeRemotePostImages({
-      html: '<img src="https://blog.qiaomu.ai/api/images/image/example.webp">',
-      siteUrl: 'https://blog.qiaomu.ai',
+      html: '<img src="https://blog.19981204.xyz/api/images/image/example.webp">',
+      siteUrl: 'https://blog.19981204.xyz',
     })
     expect(sameSite.report.found).toBe(0)
 

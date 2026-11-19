@@ -1,4 +1,4 @@
--- Short posts written on www.qiaomu.ai/notes/. Also created at runtime by ensureMemosTable().
+-- Short posts written on www.19981204.xyz/notes/. Also created at runtime by ensureMemosTable().
 CREATE TABLE IF NOT EXISTS memos (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   slug TEXT UNIQUE NOT NULL,

@@ -32,12 +32,12 @@ describe('wechat publishing enhancements', () => {
 
   it('collects external links as plain reference URLs without inline markers', () => {
     const body = parseBody(`
-      <p>正文<a href="https://example.com/a">示例文章</a>和<a href="https://blog.qiaomu.ai/about">站内链接</a>。</p>
+      <p>正文<a href="https://example.com/a">示例文章</a>和<a href="https://blog.19981204.xyz/about">站内链接</a>。</p>
       <p>重复<a href="https://example.com/a">另一处</a>。</p>
       <figure><a href="https://example.com/image-source">图片来源</a></figure>
     `)
 
-    normalizeWechatExternalLinkFootnotes(body, 'https://blog.qiaomu.ai')
+    normalizeWechatExternalLinkFootnotes(body, 'https://blog.19981204.xyz')
 
     expect(body.querySelectorAll('sup.wechat-link-ref')).toHaveLength(0)
 
@@ -55,7 +55,7 @@ describe('wechat publishing enhancements', () => {
       <section class="wechat-link-references"><p>[9] https://old.example.com</p></section>
     `)
 
-    normalizeWechatExternalLinkFootnotes(body, 'https://blog.qiaomu.ai')
+    normalizeWechatExternalLinkFootnotes(body, 'https://blog.19981204.xyz')
 
     expect(body.querySelectorAll('sup.wechat-link-ref')).toHaveLength(0)
     expect(body.querySelectorAll('.wechat-link-references')).toHaveLength(1)

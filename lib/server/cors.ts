@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
 
 // Origins allowed to call memo, upload and session APIs with the admin cookie.
-// www.qiaomu.ai is same-site with blog.qiaomu.ai, so the SameSite=Lax admin cookie is sent along.
-const DEFAULT_ALLOWED_ORIGINS = ['https://www.qiaomu.ai']
+const DEFAULT_ALLOWED_ORIGINS = ['https://www.19981204.xyz', 'https://19981204.xyz']
 
 export function getAllowedOrigins(): string[] {
   const configured = process.env.MEMO_ALLOWED_ORIGINS
