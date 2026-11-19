@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { isAdminAuthenticated, COOKIE_NAME } from '@/lib/admin-auth'
 import Link from 'next/link'
 import { LogoutButton } from './LogoutButton'
+import { ImportArticleButton } from './ImportArticleButton'
 import { PenLine, ExternalLink } from 'lucide-react'
 import { AdminFooter } from '@/components/AdminFooter'
 
@@ -48,6 +49,7 @@ export default async function AdminProtectedLayout({
               <PenLine className="w-4 h-4" />
               <span className="hidden md:inline">写文章</span>
             </Link>
+            <ImportArticleButton />
             <Link
               href="/"
               className={`${navCls} hidden md:inline-flex items-center gap-1`}

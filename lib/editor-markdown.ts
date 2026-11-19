@@ -2,11 +2,40 @@ import { DOMParser as PMDOMParser } from '@tiptap/pm/model'
 import { TextSelection } from '@tiptap/pm/state'
 import type { EditorInstance } from 'novel'
 import MarkdownIt from 'markdown-it'
+import TurndownService from 'turndown'
 import type StateBlock from 'markdown-it/lib/rules_block/state_block.mjs'
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline.mjs'
 import type Token from 'markdown-it/lib/token.mjs'
 
 type MarkdownItInstance = ReturnType<typeof MarkdownIt>
+
+let turndownService: TurndownService | null = null
+
+function getTurndownService() {
+  if (turndownService) return turndownService
+
+  turndownService = new TurndownService({
+    headingStyle: 'atx',
+    bulletListMarker: '-',
+    codeBlockStyle: 'fenced',
+  })
+
+  turndownService.addRule('editorMath', {
+    filter: (node) => {
+      if (!(node instanceof HTMLElement)) return false
+      return node.hasAttribute('data-math-latex')
+    },
+    replacement: (_content, node) => {
+      const element = node as HTMLElement
+      const latex = element.getAttribute('data-math-latex') || ''
+      const displayMode = element.getAttribute('data-display-mode') === 'true'
+      if (!latex.trim()) return ''
+      return displayMode ? `\n$$\n${latex}\n$$\n` : `$${latex}$`
+    },
+  })
+
+  return turndownService
+}
 
 const markdownParser = MarkdownIt({
   html: false,
@@ -330,4 +359,14 @@ export function replaceEditorRangeWithMarkdown(
   const tr = editor.view.state.tr.setSelection(selection).replaceSelection(slice).scrollIntoView()
   editor.view.dispatch(tr)
   return true
+}
+
+export function htmlToMarkdownBody(html: string) {
+  const normalized = (html || '').trim()
+  if (!normalized) return ''
+  try {
+    return getTurndownService().turndown(normalized).trim()
+  } catch {
+    return ''
+  }
 }

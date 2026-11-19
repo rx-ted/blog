@@ -15,6 +15,7 @@ import {
   Lock,
   Link2,
   FileDown,
+  FileUp,
   Smartphone,
   Pilcrow,
   PanelRightOpen,
@@ -48,7 +49,8 @@ import { EditorTocRail } from '@/components/ArticleToc'
 import { BlockHandleMenu } from '@/lib/editor-block-menu'
 import { useToast } from '@/components/Toast'
 import { startBackgroundTask } from '@/lib/client-background-task'
-import { renderMarkdownToEditorHtml, replaceEditorRangeWithMarkdown } from '@/lib/editor-markdown'
+import { htmlToMarkdownBody, renderMarkdownToEditorHtml, replaceEditorRangeWithMarkdown } from '@/lib/editor-markdown'
+import { parseImportedMarkdown } from '@/lib/import-markdown-post'
 import { resolveExactTextRangeInDoc } from '@/lib/editor-ai-edit'
 import {
   COVER_IMAGE_OPTIMIZE_OPTIONS,
@@ -110,6 +112,7 @@ type SaveFeedback =
 type PublishStatus = 'public' | 'draft' | 'encrypted' | 'unlisted'
 type SaveState = 'saved' | 'dirty' | 'saving' | 'error'
 type SidebarTab = 'properties' | 'ai'
+type EditorViewMode = 'source' | 'preview' | 'wysiwyg'
 
 type EditorAiToolInsertTarget = {
   mode: 'cursor' | 'section'
@@ -149,8 +152,9 @@ type EditorAiEditArticleContentInput = {
 
 const SIDEBAR_KEY = 'qmblog:sidebar-open'
 const TOC_COLLAPSED_KEY = 'qmblog:editor-toc-collapsed'
-const AUTOSAVE_DEBOUNCE_MS = 1500
+const AUTOSAVE_DEBOUNCE_MS = 5 * 60 * 1000
 const AUTOSAVE_MAX_RETRY_DELAY_MS = 10000
+const IMPORT_MARKDOWN_STORAGE_KEY = 'qmblog:pending-editor-import-markdown'
 const SITE_DISPLAY_URL = getSiteDisplayUrl()
 
 const EMPTY_DOCUMENT = {
@@ -259,6 +263,9 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
   const editorRef = useRef<EditorInstance | null>(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const fileUploadRef = useRef<HTMLInputElement | null>(null)
+  const markdownImportInputRef = useRef<HTMLInputElement | null>(null)
+  const pendingImportedMarkdownRef = useRef<string | null>(null)
+  const pendingImportConsumedRef = useRef(false)
 
   // ── Fields ──
   const [postId, setPostId] = useState<number | null>(initialData?.id ?? null)
@@ -287,6 +294,8 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
   const [activeTocId, setActiveTocId] = useState('')
   const [tocCollapsed, setTocCollapsed] = useState(false)
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false)
+  const [editorViewMode, setEditorViewMode] = useState<EditorViewMode>('wysiwyg')
+  const [sourceMarkdown, setSourceMarkdown] = useState('')
   const [publishPanelOpen, setPublishPanelOpen] = useState(false)
   const [wechatPublishOpen, setWechatPublishOpen] = useState(false)
   const [copywritingMenuOpen, setCopywritingMenuOpen] = useState(false)
@@ -305,7 +314,14 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
   const titleRef = useRef<HTMLTextAreaElement>(null)
   const editorScrollAreaRef = useRef<HTMLDivElement>(null)
   const mobilePreviewScrollRef = useRef<HTMLDivElement>(null)
+  const editorViewModeRef = useRef<EditorViewMode>('wysiwyg')
+  const sourceMarkdownRef = useRef('')
+  const lastContentModeRef = useRef<'source' | 'wysiwyg'>('wysiwyg')
   const toast = useToast()
+
+  useEffect(() => {
+    editorViewModeRef.current = editorViewMode
+  }, [editorViewMode])
 
   const selectedWechatTheme = useMemo(() => (
     getWechatExportTheme(wechatThemeConfig, selectedWechatThemeId)
@@ -567,19 +583,43 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
 
     const { postId: currentPostId, editSlug: currentSlug, slug: nextSlugRaw, category, tags, description, coverImage } = latestMetaRef.current
     const nextSlug = normalizePostSlug(nextSlugRaw)
-    const normalizedTitle = nextTitle.trim() || '无标题'
-    const contentJson = editor.getJSON()
-    const html = editor.getHTML()
-    const plainText = editor.getText({ blockSeparator: '\n\n' }).trim()
-    const hasMedia = /<(img|video|audio|iframe)\b/i.test(html)
-    const hasMeaningfulContent = Boolean(nextTitle.trim() || plainText || hasMedia)
+    const trimmedTitle = nextTitle.trim()
+    const isSourceMode = editorViewModeRef.current === 'source'
+    let contentJson = editor.getJSON()
+    let html = editor.getHTML()
+    let plainText = editor.getText({ blockSeparator: '\n\n' }).trim()
 
-    if (!hasMeaningfulContent) {
-      setSaveState('saved')
+    if (isSourceMode) {
+      const markdown = sourceMarkdownRef.current || ''
+      html = markdown.trim() ? renderMarkdownToEditorHtml(markdown) : ''
+      if (typeof window !== 'undefined') {
+        const parsed = new DOMParser().parseFromString(html || '<p></p>', 'text/html')
+        plainText = parsed.body.textContent?.replace(/\s+/g, ' ').trim() || markdown.trim()
+      } else {
+        plainText = markdown.trim()
+      }
+    }
+
+    const hasMedia = /<(img|video|audio|iframe)\b/i.test(html)
+    const hasBody = Boolean(plainText || hasMedia)
+    const normalizedDescription = (description || buildAutoDescription(plainText) || '').trim()
+    const canAutosave = Boolean(trimmedTitle) && hasBody
+
+    if (!canAutosave) {
+      const hasAnyDraftInput = Boolean(
+        trimmedTitle ||
+        hasBody ||
+        normalizedDescription ||
+        coverImage ||
+        (tags && tags.length > 0) ||
+        (category && category !== '未分类') ||
+        nextSlug
+      )
+      setSaveState(hasAnyDraftInput ? 'dirty' : 'saved')
       return
     }
 
-    const normalizedDescription = (description || buildAutoDescription(plainText) || '').trim()
+    const normalizedTitle = trimmedTitle
     const snapshot = buildAutosaveSnapshot({
       currentSlug,
       nextSlug,
@@ -980,9 +1020,21 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     const normalizedSlug = normalizePostSlug(slug)
     if (!normalizedTitle) { setFeedback({ type: 'error', message: '先把文章标题写上。' }); return }
     if (!editor) { setFeedback({ type: 'error', message: '编辑器还没准备好。' }); return }
-    const content = editor.getText({ blockSeparator: '\n\n' }).trim()
-    const html = editor.getHTML()
-    const hasContent = content || /<(img|video|audio|iframe)\s/.test(html)
+
+    let content = editor.getText({ blockSeparator: '\n\n' }).trim()
+    let html = editor.getHTML()
+    if (editorViewModeRef.current === 'source') {
+      const markdown = sourceMarkdownRef.current || ''
+      html = markdown.trim() ? renderMarkdownToEditorHtml(markdown) : ''
+      if (typeof window !== 'undefined') {
+        const parsed = new DOMParser().parseFromString(html || '<p></p>', 'text/html')
+        content = parsed.body.textContent?.replace(/\s+/g, ' ').trim() || markdown.trim()
+      } else {
+        content = markdown.trim()
+      }
+    }
+
+    const hasContent = content || /<(img|video|audio|iframe)\b/i.test(html)
     if (!hasContent) { setFeedback({ type: 'error', message: '正文还是空的。' }); return }
     const normalizedDescription = (description || buildAutoDescription(content) || '').trim()
 
@@ -1118,6 +1170,11 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     setLastSavedAt(Date.now())
     setReferenceImageTarget(null)
     setCropImageTarget(null)
+    sourceMarkdownRef.current = ''
+    setSourceMarkdown('')
+    lastContentModeRef.current = 'wysiwyg'
+    editorViewModeRef.current = 'wysiwyg'
+    setEditorViewMode('wysiwyg')
 
     draftAiDocumentKeyRef.current = createEditorDraftDocumentKey()
     lastAutosaveSnapshotRef.current = null
@@ -1141,6 +1198,17 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     const editor = editorRef.current
     const normalizedTitle = title.trim() || '无标题'
 
+    if (editorViewModeRef.current === 'source') {
+      const markdown = sourceMarkdownRef.current || ''
+      const html = markdown.trim() ? renderMarkdownToEditorHtml(markdown) : ''
+      const plain = markdown.trim()
+      return {
+        title: normalizedTitle,
+        html,
+        hasContent: Boolean(plain),
+      }
+    }
+
     if (!editor) {
       return {
         title: normalizedTitle,
@@ -1161,26 +1229,16 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
   }
 
   const handleDownloadPdf = async () => {
-    const editor = editorRef.current
-    const normalizedTitle = title.trim() || '无标题'
+    const exported = getCurrentCopyExport()
 
-    if (!editor) {
-      toast.error('编辑器还没准备好。')
-      return
-    }
-
-    const content = editor.getText({ blockSeparator: '\n\n' }).trim()
-    const html = editor.getHTML()
-    const hasContent = content || /<(img|video|audio|iframe)\s/i.test(html)
-
-    if (!hasContent) {
+    if (!exported.hasContent) {
       toast.error('正文还是空的。')
       return
     }
 
     try {
       const { downloadArticleAsPdf } = await import('@/lib/wechat-copy')
-      await downloadArticleAsPdf(normalizedTitle, html, { theme: selectedWechatTheme })
+      await downloadArticleAsPdf(exported.title, exported.html, { theme: selectedWechatTheme })
     } catch (error) {
       toast.error(error instanceof Error ? error.message : '导出 PDF 失败')
     }
@@ -1211,22 +1269,11 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
   }, [markDirty, toast])
 
   const handleOpenWechatPublish = () => {
-    const editor = editorRef.current
-
-    if (!editor) {
-      toast.error('编辑器还没准备好。')
-      return
-    }
-
-    const content = editor.getText({ blockSeparator: '\n\n' }).trim()
-    const html = editor.getHTML()
-    const hasContent = content || /<(img|video|audio|iframe)\s/i.test(html)
-
-    if (!hasContent) {
+    const exported = getCurrentCopyExport()
+    if (!exported.hasContent) {
       toast.error('正文还是空的。')
       return
     }
-
     setWechatPublishOpen(true)
   }
 
@@ -1358,6 +1405,151 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     setCharCount(st.characterCount?.characters?.() ?? 0)
     refreshToc(editor)
   }, [refreshToc, scheduleDraftSave])
+
+  const applyImportedMarkdown = useCallback((markdownText: string) => {
+    const editor = editorRef.current
+    if (!editor) {
+      throw new Error('编辑器还没有准备好')
+    }
+
+    const parsed = parseImportedMarkdown(markdownText)
+    const currentMeta = latestMetaRef.current
+
+    const nextTitle = typeof parsed.title === 'string' ? parsed.title : (latestTitleRef.current || '')
+    const nextSlug = typeof parsed.slug === 'string' ? normalizePostSlug(parsed.slug) : currentMeta.slug
+    const nextDescription = typeof parsed.description === 'string' ? parsed.description : currentMeta.description
+    const nextTags = Array.isArray(parsed.tags) ? parsed.tags : currentMeta.tags
+    const nextCoverImage = typeof parsed.coverImage === 'string' ? parsed.coverImage : currentMeta.coverImage
+    const nextCategory = typeof parsed.category === 'string' && parsed.category.trim() ? parsed.category.trim() : currentMeta.category
+
+    latestTitleRef.current = nextTitle
+    latestMetaRef.current = {
+      ...currentMeta,
+      slug: nextSlug,
+      category: nextCategory,
+      tags: nextTags,
+      description: nextDescription,
+      coverImage: nextCoverImage,
+    }
+
+    setTitle(nextTitle)
+    setSlug(nextSlug)
+    setDescription(nextDescription)
+    setTags(nextTags)
+    setCoverImage(nextCoverImage)
+    setCategory(nextCategory)
+
+    const bodyMarkdown = parsed.body || ''
+    const bodyHtml = bodyMarkdown.trim() ? renderMarkdownToEditorHtml(bodyMarkdown) : ''
+    skipNextEditorUpdateRef.current = true
+    if (bodyHtml) {
+      editor.commands.setContent(bodyHtml)
+    } else {
+      editor.commands.clearContent()
+    }
+
+    lastAutosaveSnapshotRef.current = null
+    setPreviewHtml(editor.getHTML())
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const st = editor.storage as any
+    setCharCount(st.characterCount?.characters?.() ?? 0)
+    refreshToc(editor)
+    sourceMarkdownRef.current = ''
+    setSourceMarkdown('')
+    lastContentModeRef.current = 'wysiwyg'
+    editorViewModeRef.current = 'wysiwyg'
+    setEditorViewMode('wysiwyg')
+    setFeedback(null)
+    clearAutosaveTimers()
+    abortAutosaveRequest()
+    setSaveState('dirty')
+    scheduleDraftSave(nextTitle, editor)
+
+    if (typeof window !== 'undefined') {
+      window.requestAnimationFrame(() => {
+        resizeTextareaHeight(titleRef.current)
+      })
+    }
+  }, [abortAutosaveRequest, clearAutosaveTimers, refreshToc, scheduleDraftSave])
+
+  const handleImportedMarkdownFile = useCallback(async (file: File) => {
+    try {
+      const text = await file.text()
+      if (!text && file.size === 0) {
+        setFeedback({ type: 'error', message: '导入的文件是空的' })
+        return
+      }
+      applyImportedMarkdown(text)
+      setFeedback({ type: 'success', message: '已导入 Markdown 内容' })
+    } catch (error) {
+      setFeedback({ type: 'error', message: error instanceof Error ? error.message : '导入失败' })
+    } finally {
+      if (markdownImportInputRef.current) {
+        markdownImportInputRef.current.value = ''
+      }
+    }
+  }, [applyImportedMarkdown])
+
+  const switchToSourceMode = useCallback(() => {
+    const editor = editorRef.current
+    if (!editor || editorViewModeRef.current === 'source') return
+
+    if (editorViewModeRef.current !== 'preview' || lastContentModeRef.current === 'wysiwyg') {
+      const markdown = htmlToMarkdownBody(editor.getHTML())
+      sourceMarkdownRef.current = markdown
+      setSourceMarkdown(markdown)
+    }
+
+    lastContentModeRef.current = 'source'
+    editorViewModeRef.current = 'source'
+    setEditorViewMode('source')
+  }, [])
+
+  const switchToPreviewMode = useCallback(() => {
+    const editor = editorRef.current
+    if (!editor || editorViewModeRef.current === 'preview') return
+
+    if (editorViewModeRef.current === 'source') {
+      const markdown = sourceMarkdownRef.current || ''
+      const html = markdown.trim() ? renderMarkdownToEditorHtml(markdown) : ''
+      setPreviewHtml(html)
+    } else {
+      setPreviewHtml(editor.getHTML())
+    }
+
+    editorViewModeRef.current = 'preview'
+    setEditorViewMode('preview')
+  }, [])
+
+  const switchToWysiwygMode = useCallback(() => {
+    const editor = editorRef.current
+    if (!editor || editorViewModeRef.current === 'wysiwyg') return
+
+    if (editorViewModeRef.current === 'source' || (editorViewModeRef.current === 'preview' && lastContentModeRef.current === 'source')) {
+      const markdown = sourceMarkdownRef.current || ''
+      const html = markdown.trim() ? renderMarkdownToEditorHtml(markdown) : ''
+      skipNextEditorUpdateRef.current = true
+      if (html) {
+        editor.commands.setContent(html)
+      } else {
+        editor.commands.clearContent()
+      }
+      setPreviewHtml(editor.getHTML())
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const st = editor.storage as any
+      setCharCount(st.characterCount?.characters?.() ?? 0)
+      refreshToc(editor)
+      clearAutosaveTimers()
+      setSaveState('dirty')
+      scheduleDraftSave(latestTitleRef.current, editor)
+    } else {
+      setPreviewHtml(editor.getHTML())
+    }
+
+    lastContentModeRef.current = 'wysiwyg'
+    editorViewModeRef.current = 'wysiwyg'
+    setEditorViewMode('wysiwyg')
+  }, [clearAutosaveTimers, refreshToc, scheduleDraftSave])
 
   const handleEditorCompositionEnd = useCallback(() => {
     const editor = editorRef.current
@@ -1702,6 +1894,46 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                 </div>
               </>
             )}
+
+            <div className="hidden h-4 w-px bg-[var(--editor-line)] sm:block" />
+            <div className="inline-flex items-center rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] p-0.5">
+              <button
+                type="button"
+                onClick={switchToSourceMode}
+                className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${
+                  editorViewMode === 'source'
+                    ? 'bg-[var(--editor-accent)]/10 text-[var(--editor-accent)]'
+                    : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
+                }`}
+                title="源码编辑（Markdown）"
+              >
+                源码
+              </button>
+              <button
+                type="button"
+                onClick={switchToPreviewMode}
+                className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${
+                  editorViewMode === 'preview'
+                    ? 'bg-[var(--editor-accent)]/10 text-[var(--editor-accent)]'
+                    : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
+                }`}
+                title="预览模式"
+              >
+                预览
+              </button>
+              <button
+                type="button"
+                onClick={switchToWysiwygMode}
+                className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${
+                  editorViewMode === 'wysiwyg'
+                    ? 'bg-[var(--editor-accent)]/10 text-[var(--editor-accent)]'
+                    : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
+                }`}
+                title="Live Preview / WYSIWYG"
+              >
+                可视
+              </button>
+            </div>
           </div>
 
           {/* Upload progress (overlay) */}
@@ -1716,6 +1948,16 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => markdownImportInputRef.current?.click()}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--editor-muted)] transition hover:bg-[var(--editor-soft)] hover:text-[var(--editor-accent)]"
+              title="导入 Markdown"
+              aria-label="导入 Markdown"
+            >
+              <FileUp className="h-4 w-4" />
+            </button>
+
             <button
               type="button"
               onClick={() => setTocCollapsed((value) => !value)}
@@ -1948,6 +2190,16 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
       {/* Hidden file inputs */}
       <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={e => { void handleSelectedFiles(e.target.files) }} />
       <input ref={fileUploadRef} type="file" accept="video/*,audio/*,.pdf,.zip,.rar,.7z,.epub,.mobi,.azw,.azw3,.txt,image/*" multiple className="hidden" onChange={e => { void handleSelectedFiles(e.target.files) }} />
+      <input
+        ref={markdownImportInputRef}
+        type="file"
+        accept=".md,.markdown,text/markdown,text/plain"
+        className="hidden"
+        onChange={e => {
+          const file = e.target.files?.[0]
+          if (file) void handleImportedMarkdownFile(file)
+        }}
+      />
       <input ref={coverInputRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) void handleCoverUpload(f) }} />
 
       {/* ── Main layout: editor + sidebar ── */}
@@ -2005,78 +2257,164 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
               />
             </div>
 
-            {/* Novel editor */}
+            {/* Novel editor / Source editor */}
             {!draftReady ? (
               <div className={mobilePreviewOpen ? 'editor-surface editor-mobile-preview-surface' : 'editor-surface'} />
             ) : (
-              <EditorRoot>
-                <div>
-                  <EditorContent
-                    initialContent={initialContent}
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    extensions={imageExtensions as any}
-                    className={mobilePreviewOpen ? 'editor-surface editor-mobile-preview-surface' : 'editor-surface'}
-                    immediatelyRender={false}
-                    editorProps={buildEditorProps(
-                      (file) => uploadImageAndGetUrl(file),
-                      (file) => void insertNonImageFile(file),
-                      'editor-main-prose',
-                      handleEditorCompositionEnd,
-                    )}
-                    onCreate={({ editor }) => {
-                      editorRef.current = editor
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      const st = editor.storage as any
-                      setCharCount(st.characterCount?.characters?.() ?? 0)
-                      if (initialData?.html) {
-                        const initialHtml = normalizeWechatPublishingHtml(initialData.html)
-                        skipNextEditorUpdateRef.current = true
-                        editor.commands.setContent(initialHtml)
-                        setPreviewHtml(initialHtml)
-                      } else {
-                        skipNextEditorUpdateRef.current = false
-                        setPreviewHtml(editor.getHTML())
-                      }
-
-                      if (initialData?.slug) {
-                        lastAutosaveSnapshotRef.current = buildAutosaveSnapshot({
-                          currentSlug: initialData.slug,
-                          nextSlug: initialData.slug,
-                          title: initialData.title || '无标题',
-                          html: normalizeWechatPublishingHtml(initialData.html || ''),
-                          description: (initialData.description || '').trim(),
-                          category: initialData.category || '未分类',
-                          tags: initialData.tags || [],
-                          coverImage: initialData.cover_image || '',
-                        })
-                      } else {
-                        lastAutosaveSnapshotRef.current = null
-                      }
-
-                      refreshToc(editor)
-                    }}
-                    onUpdate={({ editor }) => {
-                      editorRef.current = editor
-
-                      if (editor.view.composing) return
-
-                      if (skipNextEditorUpdateRef.current) {
-                        skipNextEditorUpdateRef.current = false
+              <>
+                <div className={editorViewMode === 'wysiwyg' ? '' : 'hidden'}>
+                  <EditorRoot>
+                    <div>
+                      <EditorContent
+                        initialContent={initialContent}
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        const st = editor.storage as any
-                        setCharCount(st.characterCount?.characters?.() ?? 0)
-                        return
-                      }
+                        extensions={imageExtensions as any}
+                        className={mobilePreviewOpen ? 'editor-surface editor-mobile-preview-surface' : 'editor-surface'}
+                        immediatelyRender={false}
+                        editorProps={buildEditorProps(
+                          (file) => uploadImageAndGetUrl(file),
+                          (file) => void insertNonImageFile(file),
+                          'editor-main-prose',
+                          handleEditorCompositionEnd,
+                        )}
+                        onCreate={({ editor }) => {
+                          editorRef.current = editor
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          const st = editor.storage as any
+                          setCharCount(st.characterCount?.characters?.() ?? 0)
 
-                      syncEditorContentState(editor)
-                    }}
-                  >
-                    <BlockHandleMenu />
-                    <FormattingBubble />
-                    <SlashMenu />
-                  </EditorContent>
+                          let pendingMarkdown: string | null = pendingImportedMarkdownRef.current
+                          if (!pendingMarkdown && typeof window !== 'undefined') {
+                            try {
+                              const params = new URLSearchParams(window.location.search)
+                              if (params.get('import') === 'pending') {
+                                const raw = window.sessionStorage.getItem(IMPORT_MARKDOWN_STORAGE_KEY)
+                                if (raw) {
+                                  try {
+                                    const parsed = JSON.parse(raw) as { markdown?: string }
+                                    pendingMarkdown = typeof parsed?.markdown === 'string' ? parsed.markdown : raw
+                                  } catch {
+                                    pendingMarkdown = raw
+                                  }
+                                }
+                              }
+                            } catch {}
+                          }
+
+                          const shouldApplyPendingImport = Boolean(pendingMarkdown) && !pendingImportConsumedRef.current
+
+                          if (initialData?.html && !shouldApplyPendingImport) {
+                            const initialHtml = normalizeWechatPublishingHtml(initialData.html)
+                            skipNextEditorUpdateRef.current = true
+                            editor.commands.setContent(initialHtml)
+                            setPreviewHtml(initialHtml)
+                          } else if (!shouldApplyPendingImport) {
+                            skipNextEditorUpdateRef.current = false
+                            setPreviewHtml(editor.getHTML())
+                          }
+
+                          if (initialData?.slug && !shouldApplyPendingImport) {
+                            lastAutosaveSnapshotRef.current = buildAutosaveSnapshot({
+                              currentSlug: initialData.slug,
+                              nextSlug: initialData.slug,
+                              title: initialData.title || '无标题',
+                              html: normalizeWechatPublishingHtml(initialData.html || ''),
+                              description: (initialData.description || '').trim(),
+                              category: initialData.category || '未分类',
+                              tags: initialData.tags || [],
+                              coverImage: initialData.cover_image || '',
+                            })
+                          } else {
+                            lastAutosaveSnapshotRef.current = null
+                          }
+
+                          refreshToc(editor)
+
+                          if (shouldApplyPendingImport && pendingMarkdown) {
+                            pendingImportConsumedRef.current = true
+                            pendingImportedMarkdownRef.current = null
+                            try {
+                              applyImportedMarkdown(pendingMarkdown)
+                              setFeedback({ type: 'success', message: '已导入 Markdown 内容' })
+                            } catch (error) {
+                              setFeedback({ type: 'error', message: error instanceof Error ? error.message : '导入失败' })
+                            } finally {
+                              try {
+                                window.sessionStorage.removeItem(IMPORT_MARKDOWN_STORAGE_KEY)
+                                const params = new URLSearchParams(window.location.search)
+                                if (params.get('import') === 'pending') {
+                                  params.delete('import')
+                                  const qs = params.toString()
+                                  window.history.replaceState({}, '', qs ? `/editor?${qs}` : '/editor')
+                                }
+                              } catch {}
+                            }
+                          }
+                        }}
+                        onUpdate={({ editor }) => {
+                          editorRef.current = editor
+
+                          if (editor.view.composing) return
+
+                          if (skipNextEditorUpdateRef.current) {
+                            skipNextEditorUpdateRef.current = false
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            const st = editor.storage as any
+                            setCharCount(st.characterCount?.characters?.() ?? 0)
+                            return
+                          }
+
+                          if (editorViewModeRef.current !== 'wysiwyg') return
+                          syncEditorContentState(editor)
+                        }}
+                      >
+                        <BlockHandleMenu />
+                        <FormattingBubble />
+                        <SlashMenu />
+                      </EditorContent>
+                    </div>
+                  </EditorRoot>
                 </div>
-              </EditorRoot>
+
+                {editorViewMode === 'source' && (
+                  <textarea
+                    value={sourceMarkdown}
+                    onChange={(e) => {
+                      const next = e.target.value
+                      sourceMarkdownRef.current = next
+                      setSourceMarkdown(next)
+                      const html = next.trim() ? renderMarkdownToEditorHtml(next) : ''
+                      setPreviewHtml(html)
+                      const plainText = typeof window !== 'undefined'
+                        ? (new DOMParser().parseFromString(html || '<p></p>', 'text/html').body.textContent?.replace(/\s+/g, ' ').trim() || next.trim())
+                        : next.trim()
+                      setCharCount(plainText.length)
+                      if (editorRef.current) {
+                        scheduleDraftSave(latestTitleRef.current, editorRef.current)
+                      } else {
+                        setSaveState('dirty')
+                      }
+                    }}
+                    className="editor-surface min-h-[60vh] w-full resize-y rounded-none border-0 bg-transparent p-0 font-mono text-[15px] leading-7 text-[var(--editor-ink)] outline-none placeholder:text-[var(--stone-gray)]"
+                    placeholder="在此输入 Markdown 源码..."
+                    spellCheck={false}
+                  />
+                )}
+
+                {editorViewMode === 'preview' && (
+                  <article
+                    className={`editor-surface editor-main-prose prose prose-neutral max-w-none ${
+                      mobilePreviewOpen ? 'editor-mobile-preview-surface' : ''
+                    }`}
+                  >
+                    {previewHtml ? (
+                      <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+                    ) : (
+                      <p className="text-[var(--editor-muted)]">暂无内容可预览</p>
+                    )}
+                  </article>
+                )}
+              </>
             )}
           </div>
         </main>
@@ -2342,7 +2680,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
           isOpen={wechatPublishOpen}
           onClose={() => setWechatPublishOpen(false)}
           title={title.trim() || '无标题'}
-          html={editorRef.current?.getHTML() || ''}
+          html={previewHtml || ''}
           defaultDigest={description}
           defaultSourceUrl={wechatSourceUrl}
           defaultCoverImageUrl={resolvePostCoverImage({
