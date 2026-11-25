@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { extractTweetId } from '@/lib/twitter-widgets'
+import { extractTweetId } from '@/lib/editor/nodes/embeds/twitter-widgets'
 
 describe('twitter-widgets', () => {
   it('extracts tweet id from x.com urls', () => {

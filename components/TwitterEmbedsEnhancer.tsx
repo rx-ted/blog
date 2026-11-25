@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { enhanceTwitterEmbeds } from '@/lib/twitter-widgets'
+import { enhanceTwitterEmbeds } from '@/lib/editor/nodes/embeds/twitter-widgets'
 
 export function TwitterEmbedsEnhancer({
   containerId,

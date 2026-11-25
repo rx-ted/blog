@@ -13,9 +13,7 @@ import {
 import { invalidatePublicContentCache } from '@/lib/cache'
 import { enqueueBackgroundJob } from '@/lib/background-jobs'
 import { nanoid } from 'nanoid'
-import { remark } from 'remark'
-import remarkGfm from 'remark-gfm'
-import remarkHtml from 'remark-html'
+import { renderMarkdownToPublicHtml } from '@/lib/markdown/public'
 import { buildAutoDescription, normalizePostSlug } from '@/lib/post-utils'
 import {
   localizeRemotePostImages,
@@ -118,17 +116,8 @@ async function normalizeCategoryForWrite(db: Database, value: unknown) {
   return matched?.name ?? category
 }
 
-async function renderMarkdownToHtml(content: string) {
-  return (
-    await remark()
-      .use(remarkGfm)
-      .use(remarkHtml, { sanitize: false })
-      .process(content)
-  ).toString()
-}
-
 async function buildHtmlContent(content: string, rawHtml: string) {
-  return rawHtml || await renderMarkdownToHtml(content)
+  return rawHtml || await renderMarkdownToPublicHtml(content)
 }
 
 async function normalizeCreatePayload(db: Database, payload: PostWritePayload) {
@@ -191,7 +180,7 @@ async function buildPostUpdates(
   if (hasHtml) {
     updates.html = payload.html as string
   } else if (hasContent) {
-    updates.html = await renderMarkdownToHtml(payload.content as string)
+    updates.html = await renderMarkdownToPublicHtml(payload.content as string)
   }
 
   if (payload.description !== undefined) {

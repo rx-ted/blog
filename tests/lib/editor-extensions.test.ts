@@ -16,7 +16,7 @@ import {
   createWechatBadgeGroupContent,
   createWechatCalloutContent,
   createWechatInfoGridContent,
-} from '@/lib/wechat-editor-nodes'
+} from '@/lib/editor/nodes/wechat/wechat-editor-nodes'
 
 describe('editor-extensions helpers', () => {
   it('creates a default table with header row and paragraph cells', () => {

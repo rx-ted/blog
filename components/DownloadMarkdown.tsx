@@ -2,9 +2,9 @@
 
 import { useToast } from '@/components/Toast'
 import type { copyAsWechatArticleFormat } from '@/lib/wechat-copy'
+import { htmlToMarkdownBody } from '@/lib/markdown'
 import { Copy, FileDown, ImageDown } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import TurndownService from 'turndown'
 
 const URL_ATTRIBUTES = [
   ['img', 'src'],
@@ -45,14 +45,8 @@ function absolutizeHtmlUrls(html: string) {
 }
 
 function htmlToMarkdown(title: string, html: string) {
-  const td = new TurndownService({
-    headingStyle: 'atx',
-    bulletListMarker: '-',
-    codeBlockStyle: 'fenced',
-  })
   const normalizedHtml = absolutizeHtmlUrls(html)
-  // 保留图片标签（turndown 默认就支持 img → ![](src)）
-  const markdown = td.turndown(normalizedHtml)
+  const markdown = htmlToMarkdownBody(normalizedHtml)
   return `# ${title}\n\n${markdown}`
 }
 

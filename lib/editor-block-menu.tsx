@@ -50,7 +50,7 @@ import {
   createWechatInfoGridContent,
   createWechatProfileContent,
   createWechatQRCodeContent,
-} from '@/lib/wechat-editor-nodes'
+} from '@/lib/editor/nodes/wechat/wechat-editor-nodes'
 
 type BlockMenuState = {
   open: boolean
