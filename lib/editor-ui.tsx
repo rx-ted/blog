@@ -40,14 +40,14 @@ export function extractFilesFromClipboard(event: React.ClipboardEvent<HTMLElemen
   })
 }
 
-type EditorInputModalState = {
+export type EditorInputModalState = {
   open: boolean
   title: string
   placeholder: string
   callback: ((value: string) => void) | null
 }
 
-type EditorAiModalState = {
+export type EditorAiModalState = {
   open: boolean
   selectedText: string
   position: { top: number; left: number } | null
@@ -57,7 +57,7 @@ type EditorAiModalState = {
   documentText: string
 }
 
-type EditorImageModalState = {
+export type EditorImageModalState = {
   open: boolean
   insertPos: number | null
   contextText: string
