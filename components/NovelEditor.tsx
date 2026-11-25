@@ -6,7 +6,6 @@ import type { EditorInstance, JSONContent } from 'novel'
 import { buildEditorProps } from '@/lib/editor-extensions'
 import { EditorTocRail } from '@/components/ArticleToc'
 import { useToast } from '@/components/Toast'
-import { renderMarkdownToEditorHtml } from '@/lib/editor-markdown'
 import { insertGeneratedImageAtPosition } from '@/lib/editor-file-upload'
 import {
   extractFilesFromClipboard,
@@ -34,7 +33,6 @@ import {
   createEditorDraftDocumentKey,
   relativeTime,
   type DraftMetaState,
-  type EditorViewMode,
   type MetaGenerationTarget,
   type PublishStatus,
   type SaveFeedback,
@@ -56,8 +54,6 @@ import { useNovelEditorInit } from '@/components/editor/novel/hooks/useNovelEdit
 import type { EditorAdapter } from '@/components/editor/shared/types/editor'
 import { useNovelAiBridge } from '@/components/editor/novel/hooks/useNovelAiBridge'
 import { useNovelScroll } from '@/components/editor/novel/hooks/useNovelScroll'
-import { NovelSourceView } from '@/components/editor/novel/components/NovelSourceView'
-import { NovelPreview } from '@/components/editor/novel/components/NovelPreview'
 import { NovelMobilePreview } from '@/components/editor/novel/components/NovelMobilePreview'
 import { NovelEditorModals } from '@/components/editor/novel/components/NovelEditorModals'
 import { NovelWysiwygCanvas } from '@/components/editor/novel/components/NovelWysiwygCanvas'
@@ -114,6 +110,8 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
 
   // ── Metadata / theme ──
   const {
+    postId,
+    editSlug,
     slug,
     setSlug,
     category,
@@ -177,9 +175,6 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
   const publishPanelRef = useRef<HTMLDivElement>(null)
   const copywritingMenuRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLTextAreaElement>(null)
-  const editorViewModeRef = useRef<EditorViewMode>('wysiwyg')
-  const sourceMarkdownRef = useRef('')
-  const lastContentModeRef = useRef<'source' | 'wysiwyg'>('wysiwyg')
   const toast = useToast()
 
   const draftAiDocumentKeyRef = useRef(createEditorDraftDocumentKey())
@@ -189,68 +184,42 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     (
       editor: EditorInstance,
     ): { contentJson: unknown; html: string; plainText: string } => {
-      const isSourceMode = editorViewModeRef.current === 'source'
       const contentJson = editor.getJSON()
-      let html = editor.getHTML()
-      let plainText = editor.getText({ blockSeparator: '\n\n' }).trim()
-
-      if (isSourceMode) {
-        const markdown = sourceMarkdownRef.current || ''
-        html = markdown.trim() ? renderMarkdownToEditorHtml(markdown) : ''
-        if (typeof window !== 'undefined') {
-          const parsed = new DOMParser().parseFromString(
-            html || '<p></p>',
-            'text/html',
-          )
-          plainText =
-            parsed.body.textContent?.replace(/\s+/g, ' ').trim() ||
-            markdown.trim()
-        } else {
-          plainText = markdown.trim()
-        }
-      }
-
+      const html = editor.getHTML()
+      const plainText = editor.getText({ blockSeparator: '\n\n' }).trim()
       return { contentJson, html, plainText }
     },
     [],
   )
 
-  const { clearAutosaveTimers, abortAutosaveRequest, scheduleDraftSave } =
-    useEditorAutosave({
-      draftReady,
-      editorRef,
-      latestTitleRef,
-      latestMetaRef,
-      getEditorContent,
-      patchMetadata,
-      syncPersistedSlug,
-      setSaveState,
-      setLastSavedAt,
-    })
+  const {
+    clearAutosaveTimers,
+    abortAutosaveRequest,
+    scheduleDraftSave,
+    lastAutosaveSnapshotRef,
+  } = useEditorAutosave({
+    draftReady,
+    editorRef,
+    latestTitleRef,
+    latestMetaRef,
+    getEditorContent,
+    patchMetadata,
+    syncPersistedSlug,
+    setSaveState,
+    setLastSavedAt,
+  })
 
   const {
-    editorViewMode,
-    setEditorViewMode,
-    sourceMarkdown,
-    setSourceMarkdown,
     previewHtml,
-    setPreviewHtml,
     syncEditorContentState,
     handleImportedMarkdownFile,
     handleEditorCreate,
-    switchToSourceMode,
-    switchToPreviewMode,
-    switchToWysiwygMode,
   } = useNovelContent({
     editorRef,
     latestTitleRef,
     titleRef,
     latestMetaRef,
-    initialHtml: initialData?.html || '',
     initialData,
-    editorViewModeRef,
-    sourceMarkdownRef,
-    lastContentModeRef,
     skipNextEditorUpdateRef,
     markdownImportInputRef,
     patchMetadata,
@@ -333,7 +302,6 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     initialData,
     latestTitleRef,
     setTitle,
-    setPreviewHtml,
     setInitialContent,
     setDraftReady,
     setSidebarOpen,
@@ -406,15 +374,12 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     editSlug,
     postId,
     initialPassword: initialData?.password,
-    editorViewModeRef,
-    sourceMarkdownRef,
     latestTitleRef,
     latestMetaRef,
     titleRef,
     draftAiDocumentKeyRef,
     lastAutosaveSnapshotRef,
     skipNextEditorUpdateRef,
-    lastContentModeRef,
     clearAutosaveTimers,
     abortAutosaveRequest,
     patchMetadata,
@@ -424,7 +389,6 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     setDescription,
     setCharCount,
     setPublishStatus,
-    setPreviewHtml,
     setPublishPanelOpen,
     setWechatPublishOpen,
     setSaving,
@@ -434,8 +398,6 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     setLastSavedAt,
     setReferenceImageTarget,
     setCropImageTarget,
-    setSourceMarkdown,
-    setEditorViewMode,
   })
   handleSaveRef.current = handleSave
 
@@ -448,8 +410,6 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
   } = useNovelExportActions({
     editorRef,
     title,
-    editorViewModeRef,
-    sourceMarkdownRef,
     selectedWechatTheme,
     setSelectedWechatThemeId,
     setCopywritingMenuOpen,
@@ -555,12 +515,6 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
           calcReadTime,
           uploadingImage,
           uploadProgress,
-        }}
-        view={{
-          editorViewMode,
-          onSwitchSource: switchToSourceMode,
-          onSwitchPreview: switchToPreviewMode,
-          onSwitchWysiwyg: switchToWysiwygMode,
         }}
         tools={{
           onImportMarkdown: () => markdownImportInputRef.current?.click(),
@@ -690,7 +644,6 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
             focusEditorDocumentStart(editorRef.current)
           }}
           draftReady={draftReady}
-          editorViewMode={editorViewMode}
           wysiwygContent={
             <NovelWysiwygCanvas
               initialContent={initialContent}
@@ -714,39 +667,8 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                   setCharCount(st.characterCount?.characters?.() ?? 0)
                   return
                 }
-                if (editorViewModeRef.current !== 'wysiwyg') return
                 syncEditorContentState(editor)
               }}
-            />
-          }
-          sourceContent={
-            <NovelSourceView
-              value={sourceMarkdown}
-              onChange={(next) => {
-                sourceMarkdownRef.current = next
-                setSourceMarkdown(next)
-                const html = next.trim() ? renderMarkdownToEditorHtml(next) : ''
-                setPreviewHtml(html)
-                const plainText =
-                  typeof window !== 'undefined'
-                    ? new DOMParser()
-                        .parseFromString(html || '<p></p>', 'text/html')
-                        .body.textContent?.replace(/\s+/g, ' ')
-                        .trim() || next.trim()
-                    : next.trim()
-                setCharCount(plainText.length)
-                if (editorRef.current) {
-                  scheduleDraftSave(latestTitleRef.current, editorRef.current)
-                } else {
-                  setSaveState('dirty')
-                }
-              }}
-            />
-          }
-          previewContent={
-            <NovelPreview
-              html={previewHtml}
-              mobilePreviewOpen={mobilePreviewOpen}
             />
           }
         />

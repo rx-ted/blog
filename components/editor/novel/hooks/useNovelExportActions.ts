@@ -1,6 +1,5 @@
 import { useCallback } from 'react'
 import type { EditorInstance } from 'novel'
-import { renderMarkdownToEditorHtml } from '@/lib/editor-markdown'
 import {
   formatChineseCopywritingInEditor,
   type ChineseCopywritingScope,
@@ -11,8 +10,6 @@ import type { WechatExportTheme } from '@/lib/wechat-themes'
 interface UseNovelExportActionsOptions {
   editorRef: React.RefObject<EditorInstance | null>
   title: string
-  editorViewModeRef: React.MutableRefObject<'wysiwyg' | 'source' | 'preview'>
-  sourceMarkdownRef: React.MutableRefObject<string>
   selectedWechatTheme: WechatExportTheme
   setSelectedWechatThemeId: (id: string) => void
   setCopywritingMenuOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -28,8 +25,6 @@ interface UseNovelExportActionsOptions {
 export function useNovelExportActions({
   editorRef,
   title,
-  editorViewModeRef,
-  sourceMarkdownRef,
   selectedWechatTheme,
   setSelectedWechatThemeId,
   setCopywritingMenuOpen,
@@ -40,17 +35,6 @@ export function useNovelExportActions({
   const getCurrentCopyExport = useCallback(() => {
     const editor = editorRef.current
     const normalizedTitle = title.trim() || '无标题'
-
-    if (editorViewModeRef.current === 'source') {
-      const markdown = sourceMarkdownRef.current || ''
-      const html = markdown.trim() ? renderMarkdownToEditorHtml(markdown) : ''
-      const plain = markdown.trim()
-      return {
-        title: normalizedTitle,
-        html,
-        hasContent: Boolean(plain),
-      }
-    }
 
     if (!editor) {
       return {
@@ -69,7 +53,7 @@ export function useNovelExportActions({
       html,
       hasContent: Boolean(hasContent),
     }
-  }, [editorRef, editorViewModeRef, sourceMarkdownRef, title])
+  }, [editorRef, title])
 
   const handleDownloadPdf = useCallback(async () => {
     const exported = getCurrentCopyExport()

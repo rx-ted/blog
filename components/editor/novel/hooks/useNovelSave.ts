@@ -1,7 +1,6 @@
 import { useCallback } from 'react'
 import type { EditorInstance } from 'novel'
 import { generatePassword } from '@/lib/password'
-import { renderMarkdownToEditorHtml } from '@/lib/editor-markdown'
 import {
   createEditorDraftDocumentKey,
   type DraftMetaState,
@@ -26,15 +25,12 @@ interface UseNovelSaveOptions {
   editSlug: string | null
   postId: number | null
   initialPassword?: string | null
-  editorViewModeRef: React.MutableRefObject<'wysiwyg' | 'source' | 'preview'>
-  sourceMarkdownRef: React.MutableRefObject<string>
   latestTitleRef: React.MutableRefObject<string>
   latestMetaRef: React.RefObject<DraftMetaState>
   titleRef: React.RefObject<HTMLTextAreaElement | null>
   draftAiDocumentKeyRef: React.MutableRefObject<string>
   lastAutosaveSnapshotRef: React.MutableRefObject<string | null>
   skipNextEditorUpdateRef: React.MutableRefObject<boolean>
-  lastContentModeRef: React.MutableRefObject<'source' | 'wysiwyg'>
   clearAutosaveTimers: () => void
   abortAutosaveRequest: () => void
   patchMetadata: (metaOverrides?: Partial<DraftMetaState>) => void
@@ -48,7 +44,6 @@ interface UseNovelSaveOptions {
   setDescription: React.Dispatch<React.SetStateAction<string>>
   setCharCount: React.Dispatch<React.SetStateAction<number>>
   setPublishStatus: React.Dispatch<React.SetStateAction<PublishStatus>>
-  setPreviewHtml: React.Dispatch<React.SetStateAction<string>>
   setPublishPanelOpen: React.Dispatch<React.SetStateAction<boolean>>
   setWechatPublishOpen: React.Dispatch<React.SetStateAction<boolean>>
   setSaving: React.Dispatch<React.SetStateAction<boolean>>
@@ -58,10 +53,6 @@ interface UseNovelSaveOptions {
   setLastSavedAt: React.Dispatch<React.SetStateAction<number>>
   setReferenceImageTarget: React.Dispatch<React.SetStateAction<any>>
   setCropImageTarget: React.Dispatch<React.SetStateAction<any>>
-  setSourceMarkdown: React.Dispatch<React.SetStateAction<string>>
-  setEditorViewMode: React.Dispatch<
-    React.SetStateAction<'wysiwyg' | 'source' | 'preview'>
-  >
 }
 
 export function useNovelSave({
@@ -76,15 +67,12 @@ export function useNovelSave({
   editSlug,
   postId,
   initialPassword,
-  editorViewModeRef,
-  sourceMarkdownRef,
   latestTitleRef,
   latestMetaRef,
   titleRef,
   draftAiDocumentKeyRef,
   lastAutosaveSnapshotRef,
   skipNextEditorUpdateRef,
-  lastContentModeRef,
   clearAutosaveTimers,
   abortAutosaveRequest,
   patchMetadata,
@@ -94,7 +82,6 @@ export function useNovelSave({
   setDescription,
   setCharCount,
   setPublishStatus,
-  setPreviewHtml,
   setPublishPanelOpen,
   setWechatPublishOpen,
   setSaving,
@@ -104,8 +91,6 @@ export function useNovelSave({
   setLastSavedAt,
   setReferenceImageTarget,
   setCropImageTarget,
-  setSourceMarkdown,
-  setEditorViewMode,
 }: UseNovelSaveOptions) {
   const handleSave = useCallback(async () => {
     const editor = editorRef.current
@@ -119,23 +104,8 @@ export function useNovelSave({
       return
     }
 
-    let content = editor.getText({ blockSeparator: '\n\n' }).trim()
-    let html = editor.getHTML()
-    if (editorViewModeRef.current === 'source') {
-      const markdown = sourceMarkdownRef.current || ''
-      html = markdown.trim() ? renderMarkdownToEditorHtml(markdown) : ''
-      if (typeof window !== 'undefined') {
-        const parsed = new DOMParser().parseFromString(
-          html || '<p></p>',
-          'text/html',
-        )
-        content =
-          parsed.body.textContent?.replace(/\s+/g, ' ').trim() ||
-          markdown.trim()
-      } else {
-        content = markdown.trim()
-      }
-    }
+    const content = editor.getText({ blockSeparator: '\n\n' }).trim()
+    const html = editor.getHTML()
 
     const hasContent = content || /<(img|video|audio|iframe)\b/i.test(html)
     if (!hasContent) {
@@ -288,7 +258,6 @@ export function useNovelSave({
     description,
     editSlug,
     editorRef,
-    editorViewModeRef,
     initialPassword,
     lastAutosaveSnapshotRef,
     latestMetaRef,
@@ -304,7 +273,6 @@ export function useNovelSave({
     setSaving,
     setTitle,
     slug,
-    sourceMarkdownRef,
     syncPersistedSlug,
     tags,
     title,
@@ -320,7 +288,6 @@ export function useNovelSave({
     latestTitleRef.current = ''
     setCharCount(0)
     setPublishStatus('public')
-    setPreviewHtml('')
     setPublishPanelOpen(false)
     setWechatPublishOpen(false)
     setSaving(false)
@@ -330,11 +297,6 @@ export function useNovelSave({
     setLastSavedAt(Date.now())
     setReferenceImageTarget(null)
     setCropImageTarget(null)
-    sourceMarkdownRef.current = ''
-    setSourceMarkdown('')
-    lastContentModeRef.current = 'wysiwyg'
-    editorViewModeRef.current = 'wysiwyg'
-    setEditorViewMode('wysiwyg')
 
     draftAiDocumentKeyRef.current = createEditorDraftDocumentKey()
     lastAutosaveSnapshotRef.current = null
@@ -348,28 +310,22 @@ export function useNovelSave({
     clearAutosaveTimers,
     draftAiDocumentKeyRef,
     editorRef,
-    editorViewModeRef,
     lastAutosaveSnapshotRef,
-    lastContentModeRef,
     latestTitleRef,
     resetMetadata,
     setCharCount,
     setCropImageTarget,
-    setEditorViewMode,
     setFeedback,
     setLastSavedAt,
     setPendingMetadataTargets,
-    setPreviewHtml,
     setPublishPanelOpen,
     setPublishStatus,
     setReferenceImageTarget,
     setSaveState,
     setSaving,
-    setSourceMarkdown,
     setTitle,
     setWechatPublishOpen,
     skipNextEditorUpdateRef,
-    sourceMarkdownRef,
     titleRef,
   ])
 

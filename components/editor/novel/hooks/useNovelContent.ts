@@ -1,9 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import type { EditorInstance } from 'novel'
-import {
-  htmlToMarkdownBody,
-  renderMarkdownToEditorHtml,
-} from '@/lib/editor-markdown'
+import { renderMarkdownToEditorHtml } from '@/lib/editor-markdown'
 import { parseImportedMarkdown } from '@/lib/import-markdown-post'
 import { resolveImportedMarkdownDraftMeta } from '@/components/editor/shared/utils/import-markdown'
 import { resizeTextareaHeight } from '@/lib/textarea-autosize'
@@ -14,7 +11,6 @@ import { createNovelEditorAdapter } from '@/components/editor/novel/adapters/nov
 import type { EditorAdapter } from '@/components/editor/shared/types/editor'
 import type {
   DraftMetaState,
-  EditorViewMode,
   SaveFeedback,
   SaveState,
 } from '@/components/editor/shared'
@@ -24,7 +20,6 @@ interface UseNovelContentOptions {
   latestTitleRef: React.RefObject<string>
   titleRef: React.RefObject<HTMLTextAreaElement | null>
   latestMetaRef: React.RefObject<DraftMetaState>
-  initialHtml?: string
   initialData?: {
     title?: string
     html?: string
@@ -34,9 +29,6 @@ interface UseNovelContentOptions {
     tags?: string[]
     cover_image?: string | null
   }
-  editorViewModeRef: React.MutableRefObject<EditorViewMode>
-  sourceMarkdownRef: React.MutableRefObject<string>
-  lastContentModeRef: React.MutableRefObject<'source' | 'wysiwyg'>
   skipNextEditorUpdateRef: React.MutableRefObject<boolean>
   markdownImportInputRef: React.RefObject<HTMLInputElement | null>
   patchMetadata: (metaOverrides?: Partial<DraftMetaState>) => void
@@ -60,11 +52,7 @@ export function useNovelContent({
   latestTitleRef,
   titleRef,
   latestMetaRef,
-  initialHtml,
   initialData,
-  editorViewModeRef,
-  sourceMarkdownRef,
-  lastContentModeRef,
   skipNextEditorUpdateRef,
   markdownImportInputRef,
   patchMetadata,
@@ -81,14 +69,9 @@ export function useNovelContent({
 }: UseNovelContentOptions) {
   const pendingImportedMarkdownRef = useRef<string | null>(null)
   const pendingImportConsumedRef = useRef(false)
-  const [editorViewMode, setEditorViewMode] =
-    useState<EditorViewMode>('wysiwyg')
-  const [sourceMarkdown, setSourceMarkdown] = useState('')
-  const [previewHtml, setPreviewHtml] = useState(initialHtml || '')
-
-  useEffect(() => {
-    editorViewModeRef.current = editorViewMode
-  }, [editorViewMode])
+  const [previewHtml, setPreviewHtml] = useState(
+    initialData?.html ? normalizeWechatPublishingHtml(initialData.html) : '',
+  )
 
   const syncEditorContentState = useCallback(
     (editor: EditorInstance) => {
@@ -151,11 +134,6 @@ export function useNovelContent({
       const st = editor.storage as any
       setCharCount(st.characterCount?.characters?.() ?? 0)
       refreshToc(editor)
-      sourceMarkdownRef.current = ''
-      setSourceMarkdown('')
-      lastContentModeRef.current = 'wysiwyg'
-      editorViewModeRef.current = 'wysiwyg'
-      setEditorViewMode('wysiwyg')
       setFeedback(null)
       clearAutosaveTimers()
       abortAutosaveRequest()
@@ -182,6 +160,7 @@ export function useNovelContent({
       setFeedback,
       setSaveState,
       setTitle,
+      skipNextEditorUpdateRef,
       titleRef,
     ],
   )
@@ -207,84 +186,8 @@ export function useNovelContent({
         }
       }
     },
-    [applyImportedMarkdown, setFeedback],
+    [applyImportedMarkdown, markdownImportInputRef, setFeedback],
   )
-
-  const switchToSourceMode = useCallback(() => {
-    const editor = editorRef.current
-    if (!editor || editorViewModeRef.current === 'source') return
-
-    if (
-      editorViewModeRef.current !== 'preview' ||
-      lastContentModeRef.current === 'wysiwyg'
-    ) {
-      const markdown = htmlToMarkdownBody(editor.getHTML())
-      sourceMarkdownRef.current = markdown
-      setSourceMarkdown(markdown)
-    }
-
-    lastContentModeRef.current = 'source'
-    editorViewModeRef.current = 'source'
-    setEditorViewMode('source')
-  }, [editorRef])
-
-  const switchToPreviewMode = useCallback(() => {
-    const editor = editorRef.current
-    if (!editor || editorViewModeRef.current === 'preview') return
-
-    if (editorViewModeRef.current === 'source') {
-      const markdown = sourceMarkdownRef.current || ''
-      const html = markdown.trim() ? renderMarkdownToEditorHtml(markdown) : ''
-      setPreviewHtml(html)
-    } else {
-      setPreviewHtml(editor.getHTML())
-    }
-
-    editorViewModeRef.current = 'preview'
-    setEditorViewMode('preview')
-  }, [editorRef])
-
-  const switchToWysiwygMode = useCallback(() => {
-    const editor = editorRef.current
-    if (!editor || editorViewModeRef.current === 'wysiwyg') return
-
-    if (
-      editorViewModeRef.current === 'source' ||
-      (editorViewModeRef.current === 'preview' &&
-        lastContentModeRef.current === 'source')
-    ) {
-      const markdown = sourceMarkdownRef.current || ''
-      const html = markdown.trim() ? renderMarkdownToEditorHtml(markdown) : ''
-      skipNextEditorUpdateRef.current = true
-      if (html) {
-        editor.commands.setContent(html)
-      } else {
-        editor.commands.clearContent()
-      }
-      setPreviewHtml(editor.getHTML())
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const st = editor.storage as any
-      setCharCount(st.characterCount?.characters?.() ?? 0)
-      refreshToc(editor)
-      clearAutosaveTimers()
-      setSaveState('dirty')
-      scheduleDraftSave(latestTitleRef.current ?? '', editor)
-    } else {
-      setPreviewHtml(editor.getHTML())
-    }
-
-    lastContentModeRef.current = 'wysiwyg'
-    editorViewModeRef.current = 'wysiwyg'
-    setEditorViewMode('wysiwyg')
-  }, [
-    clearAutosaveTimers,
-    editorRef,
-    latestTitleRef,
-    refreshToc,
-    scheduleDraftSave,
-    setCharCount,
-    setSaveState,
-  ])
 
   const handleEditorCreate = useCallback(
     ({ editor }: { editor: EditorInstance }) => {
@@ -386,29 +289,15 @@ export function useNovelContent({
       refreshToc,
       setCharCount,
       setFeedback,
-      setPreviewHtml,
       skipNextEditorUpdateRef,
     ],
   )
 
   return {
-    editorViewMode,
-    setEditorViewMode,
-    sourceMarkdown,
-    setSourceMarkdown,
     previewHtml,
-    setPreviewHtml,
-    editorViewModeRef,
-    sourceMarkdownRef,
-    lastContentModeRef,
-    skipNextEditorUpdateRef,
-    markdownImportInputRef,
     syncEditorContentState,
     applyImportedMarkdown,
     handleImportedMarkdownFile,
     handleEditorCreate,
-    switchToSourceMode,
-    switchToPreviewMode,
-    switchToWysiwygMode,
   }
 }

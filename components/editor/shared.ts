@@ -13,7 +13,6 @@ export type SaveFeedback = {
 export type PublishStatus = 'public' | 'draft' | 'encrypted' | 'unlisted'
 export type SaveState = 'saved' | 'dirty' | 'saving' | 'error'
 export type SidebarTab = 'properties' | 'ai'
-export type EditorViewMode = 'source' | 'preview' | 'wysiwyg'
 
 export type EditorAiToolInsertTarget = {
   mode: 'cursor' | 'section'

@@ -21,11 +21,7 @@ import { CopyFormatDropdown } from '@/components/DownloadMarkdown'
 import { PublishChannelMenu } from '@/components/PublishChannelMenu'
 import { CategorySelector } from '@/components/CategorySelector'
 import type { WechatExportTheme } from '@/lib/wechat-themes'
-import type {
-  EditorViewMode,
-  PublishStatus,
-  SaveFeedback,
-} from '@/components/editor/shared'
+import type { PublishStatus, SaveFeedback } from '@/components/editor/shared'
 
 interface StatusOption {
   key: PublishStatus
@@ -59,13 +55,6 @@ export interface EditorHeaderStatusProps {
   calcReadTime: (chars: number) => string
   uploadingImage: boolean
   uploadProgress: number
-}
-
-export interface EditorHeaderViewProps {
-  editorViewMode: EditorViewMode
-  onSwitchSource: () => void
-  onSwitchPreview: () => void
-  onSwitchWysiwyg: () => void
 }
 
 export interface EditorHeaderToolsProps {
@@ -115,7 +104,6 @@ export interface EditorHeaderFeedbackProps {
 
 interface EditorHeaderProps {
   status: EditorHeaderStatusProps
-  view: EditorHeaderViewProps
   tools: EditorHeaderToolsProps
   publish: EditorHeaderPublishProps
   feedback: EditorHeaderFeedbackProps
@@ -123,7 +111,6 @@ interface EditorHeaderProps {
 
 export function EditorHeader({
   status,
-  view,
   tools,
   publish,
   feedback,
@@ -170,34 +157,6 @@ export function EditorHeader({
               </div>
             </>
           )}
-
-          <div className="hidden h-4 w-px bg-[var(--editor-line)] sm:block" />
-          <div className="inline-flex items-center rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] p-0.5">
-            <button
-              type="button"
-              onClick={view.onSwitchSource}
-              className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${view.editorViewMode === 'source' ? 'bg-[var(--editor-accent)]/10 text-[var(--editor-accent)]' : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'}`}
-              title="源码编辑（Markdown）"
-            >
-              源码
-            </button>
-            <button
-              type="button"
-              onClick={view.onSwitchPreview}
-              className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${view.editorViewMode === 'preview' ? 'bg-[var(--editor-accent)]/10 text-[var(--editor-accent)]' : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'}`}
-              title="预览模式"
-            >
-              预览
-            </button>
-            <button
-              type="button"
-              onClick={view.onSwitchWysiwyg}
-              className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${view.editorViewMode === 'wysiwyg' ? 'bg-[var(--editor-accent)]/10 text-[var(--editor-accent)]' : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'}`}
-              title="Live Preview / WYSIWYG"
-            >
-              可视
-            </button>
-          </div>
         </div>
 
         {status.uploadingImage && (

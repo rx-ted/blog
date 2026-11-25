@@ -9,10 +9,7 @@ interface NovelMainPaneProps {
   onTitlePaste: (e: React.ClipboardEvent<HTMLTextAreaElement>) => void
   onTitleKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void
   draftReady: boolean
-  editorViewMode: 'wysiwyg' | 'source' | 'preview'
   wysiwygContent: ReactNode
-  sourceContent: ReactNode
-  previewContent: ReactNode
 }
 
 export function NovelMainPane({
@@ -24,10 +21,7 @@ export function NovelMainPane({
   onTitlePaste,
   onTitleKeyDown,
   draftReady,
-  editorViewMode,
   wysiwygContent,
-  sourceContent,
-  previewContent,
 }: NovelMainPaneProps) {
   return (
     <main className="flex-1 min-w-0">
@@ -62,14 +56,7 @@ export function NovelMainPane({
             }
           />
         ) : (
-          <>
-            <div className={editorViewMode === 'wysiwyg' ? '' : 'hidden'}>
-              {wysiwygContent}
-            </div>
-
-            {editorViewMode === 'source' && sourceContent}
-            {editorViewMode === 'preview' && previewContent}
-          </>
+          wysiwygContent
         )}
       </div>
     </main>
