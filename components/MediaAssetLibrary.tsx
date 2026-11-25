@@ -150,7 +150,7 @@ export function MediaAssetLibrary({
               onClick={() => setScope('article')}
               className={`rounded-full px-3 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-40 ${
                 effectiveScope === 'article'
-                  ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                  ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                   : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
               }`}
             >
@@ -161,7 +161,7 @@ export function MediaAssetLibrary({
               onClick={() => setScope('all')}
               className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
                 effectiveScope === 'all'
-                  ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                  ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                   : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
               }`}
             >
@@ -183,7 +183,7 @@ export function MediaAssetLibrary({
           </button>
         </div>
 
-        <div className="flex items-center gap-2 rounded-lg border border-[var(--editor-line)] bg-white px-3 py-2 focus-within:border-[var(--editor-accent)] focus-within:ring-2 focus-within:ring-[var(--editor-accent)]/15">
+        <div className="flex items-center gap-2 rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] px-3 py-2 focus-within:border-[var(--editor-accent)] focus-within:ring-2 focus-within:ring-[var(--editor-accent)]/15">
           <Search className="h-4 w-4 shrink-0 text-[var(--editor-muted)]" />
           <input
             value={query}
@@ -216,7 +216,7 @@ export function MediaAssetLibrary({
             加载图库中…
           </div>
         ) : assets.length === 0 ? (
-          <div className="flex min-h-[320px] items-center justify-center rounded-2xl border border-dashed border-[var(--editor-line)] bg-white/40">
+          <div className="flex min-h-[320px] items-center justify-center rounded-2xl border border-dashed border-[var(--editor-line)] bg-[var(--editor-panel)]/40">
             {debouncedQuery.trim() ? (
               <div className="text-sm text-[var(--editor-muted)]">
                 没有匹配的图片
@@ -230,7 +230,7 @@ export function MediaAssetLibrary({
             {assets.map((asset) => (
               <div
                 key={asset.id}
-                className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-white"
+                className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)]"
               >
                 <img
                   src={getPreviewUrl(asset)}

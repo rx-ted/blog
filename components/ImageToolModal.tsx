@@ -90,7 +90,7 @@ export function ImageToolModal({
                 onClick={() => setActiveMode('generate')}
                 className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition ${
                   activeMode === 'generate'
-                    ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                    ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                     : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                 }`}
               >
@@ -102,7 +102,7 @@ export function ImageToolModal({
                 onClick={() => setActiveMode('collage')}
                 className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition ${
                   activeMode === 'collage'
-                    ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                    ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                     : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                 }`}
               >
@@ -114,7 +114,7 @@ export function ImageToolModal({
                 onClick={() => setActiveMode('library')}
                 className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition ${
                   activeMode === 'library'
-                    ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                    ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                     : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                 }`}
               >

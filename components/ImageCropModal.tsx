@@ -148,7 +148,7 @@ export function ImageCropModal({
                     <div className="text-xs font-medium text-[var(--editor-muted)]">
                       原图预览
                     </div>
-                    <div className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-white">
+                    <div className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)]">
                       <img
                         src={imageUrl}
                         alt={imageAlt || '待裁剪图片'}
@@ -189,7 +189,7 @@ export function ImageCropModal({
                         onClick={() => setPlacementMode('replace')}
                         className={`rounded-xl px-3 py-2 text-sm font-medium transition ${
                           placementMode === 'replace'
-                            ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                            ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                             : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                         }`}
                       >
@@ -200,7 +200,7 @@ export function ImageCropModal({
                         onClick={() => setPlacementMode('insert')}
                         className={`rounded-xl px-3 py-2 text-sm font-medium transition ${
                           placementMode === 'insert'
-                            ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                            ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                             : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                         }`}
                       >

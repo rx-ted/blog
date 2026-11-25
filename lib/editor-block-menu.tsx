@@ -583,7 +583,7 @@ export function BlockHandleMenu() {
     <>
       <div
         ref={menuRef}
-        className="fixed z-[70] max-h-[min(560px,calc(100vh-24px))] w-[292px] overflow-y-auto rounded-xl border border-[var(--editor-line)] bg-white p-1.5 shadow-[0_18px_48px_rgba(37,32,24,0.18)]"
+        className="fixed z-[70] max-h-[min(560px,calc(100vh-24px))] w-[292px] overflow-y-auto rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-1.5 shadow-[0_18px_48px_rgba(37,32,24,0.18)]"
         style={{ left: menu.x, top: menu.y }}
       >
         <div className="grid grid-cols-6 gap-0.5 border-b border-[var(--editor-line)] pb-1.5">
@@ -747,7 +747,7 @@ export function BlockHandleMenu() {
       {insertPlacement && (
         <div
           ref={insertMenuRef}
-          className="fixed z-[71] max-h-[min(440px,calc(100vh-24px))] w-[244px] overflow-y-auto rounded-xl border border-[var(--editor-line)] bg-white p-1.5 shadow-[0_18px_48px_rgba(37,32,24,0.16)]"
+          className="fixed z-[71] max-h-[min(440px,calc(100vh-24px))] w-[244px] overflow-y-auto rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-1.5 shadow-[0_18px_48px_rgba(37,32,24,0.16)]"
           style={{ left: insertMenuPosition.x, top: insertMenuPosition.y }}
         >
           <div className="px-2.5 pb-1.5 pt-1 text-[11px] font-medium text-[var(--editor-muted)]">

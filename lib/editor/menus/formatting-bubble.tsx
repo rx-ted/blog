@@ -349,7 +349,7 @@ export function FormattingBubble() {
           currentEditor.isEditable,
         )
       }}
-      className="overflow-hidden rounded-xl border border-[var(--editor-line)] bg-white shadow-[0_12px_30px_rgba(37,32,24,0.12)]"
+      className="overflow-hidden rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] shadow-[0_12px_30px_rgba(37,32,24,0.12)]"
     >
       <div className="flex items-center gap-0.5 p-1">
         <button
@@ -554,7 +554,7 @@ export function FormattingBubble() {
                   onClick={() => setColorTarget('text')}
                   className={`flex-1 rounded-md px-3 py-1.5 text-sm transition ${
                     colorTarget === 'text'
-                      ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                      ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                       : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                   }`}
                 >
@@ -566,7 +566,7 @@ export function FormattingBubble() {
                   onClick={() => setColorTarget('highlight')}
                   className={`flex-1 rounded-md px-3 py-1.5 text-sm transition ${
                     colorTarget === 'highlight'
-                      ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                      ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                       : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                   }`}
                 >
@@ -616,10 +616,11 @@ export function FormattingBubble() {
                                 color: colorOption.value || 'var(--editor-ink)',
                                 background: colorOption.value
                                   ? `${colorOption.value}18`
-                                  : 'white',
+                                  : 'var(--editor-panel)',
                               }
                             : {
-                                background: colorOption.value || 'white',
+                                background:
+                                  colorOption.value || 'var(--editor-panel)',
                                 color: 'var(--editor-ink)',
                               }
                         }

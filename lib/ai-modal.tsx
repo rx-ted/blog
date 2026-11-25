@@ -584,7 +584,7 @@ export function AIModal({
   return (
     <div
       ref={modalRef}
-      className="fixed z-50 w-[520px] rounded-xl border border-[var(--editor-line)] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.15)] flex flex-col"
+      className="fixed z-50 w-[520px] rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] shadow-[0_20px_50px_rgba(0,0,0,0.15)] flex flex-col"
       style={{
         ...(showAbove
           ? { bottom: `${viewportH - position.top + 16}px` }
@@ -631,7 +631,7 @@ export function AIModal({
               onClick={() => setContextMode('selection')}
               className={`flex-1 rounded-md px-3 py-1.5 text-sm transition ${
                 effectiveContext === 'selection'
-                  ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                  ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                   : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
               }`}
             >
@@ -642,7 +642,7 @@ export function AIModal({
               onClick={() => setContextMode('document')}
               className={`flex-1 rounded-md px-3 py-1.5 text-sm transition ${
                 effectiveContext === 'document'
-                  ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                  ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                   : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
               }`}
             >
@@ -672,7 +672,7 @@ export function AIModal({
               }
             }}
             disabled={aiLoading}
-            className="w-full rounded-lg border border-[var(--editor-line)] bg-white pl-10 pr-3 py-2.5 text-sm text-[var(--editor-ink)] placeholder:text-[var(--stone-gray)] outline-none focus:border-[var(--editor-accent)] focus:ring-1 focus:ring-[var(--editor-accent)] disabled:opacity-50"
+            className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] pl-10 pr-3 py-2.5 text-sm text-[var(--editor-ink)] placeholder:text-[var(--stone-gray)] outline-none focus:border-[var(--editor-accent)] focus:ring-1 focus:ring-[var(--editor-accent)] disabled:opacity-50"
           />
         </div>
         <div className="text-[11px] text-[var(--editor-muted)]">
@@ -700,7 +700,7 @@ export function AIModal({
                         )
                       }
                       disabled={aiLoading}
-                      className="rounded-full border border-[var(--editor-line)] bg-white px-4 py-1.5 text-sm text-[var(--editor-ink)] transition hover:border-[var(--editor-accent)] hover:bg-[var(--editor-soft)] disabled:opacity-50"
+                      className="rounded-full border border-[var(--editor-line)] bg-[var(--editor-panel)] px-4 py-1.5 text-sm text-[var(--editor-ink)] transition hover:border-[var(--editor-accent)] hover:bg-[var(--editor-soft)] disabled:opacity-50"
                       title={action.description}
                     >
                       {action.label}
@@ -714,7 +714,7 @@ export function AIModal({
                         applyAiAction('custom', action.prompt, action.label)
                       }
                       disabled={aiLoading || !hasDocumentContext}
-                      className="rounded-full border border-[var(--editor-line)] bg-white px-4 py-1.5 text-sm text-[var(--editor-ink)] transition hover:border-[var(--editor-accent)] hover:bg-[var(--editor-soft)] disabled:opacity-50"
+                      className="rounded-full border border-[var(--editor-line)] bg-[var(--editor-panel)] px-4 py-1.5 text-sm text-[var(--editor-ink)] transition hover:border-[var(--editor-accent)] hover:bg-[var(--editor-soft)] disabled:opacity-50"
                       title={action.description}
                     >
                       {action.label}
@@ -733,7 +733,7 @@ export function AIModal({
               {historyItems.map((item) => (
                 <div
                   key={item.id}
-                  className="rounded-lg border border-[var(--editor-line)] bg-white p-3"
+                  className="rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] p-3"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -811,7 +811,7 @@ export function AIModal({
             <button
               type="button"
               onClick={stopGeneration}
-              className="rounded-full border border-[var(--editor-line)] bg-white px-3 py-1 text-xs font-medium text-[var(--editor-ink)] transition hover:bg-[var(--editor-panel)]"
+              className="rounded-full border border-[var(--editor-line)] bg-[var(--editor-panel)] px-3 py-1 text-xs font-medium text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)]"
             >
               停止生成
             </button>
@@ -841,7 +841,7 @@ export function AIModal({
               <button
                 type="button"
                 onClick={() => copyToClipboard()}
-                className="absolute top-2 right-2 flex items-center justify-center h-7 w-7 rounded-md bg-white/80 backdrop-blur border border-[var(--editor-line)] text-[var(--editor-muted)] hover:text-[var(--editor-ink)] hover:bg-white transition"
+                className="absolute top-2 right-2 flex items-center justify-center h-7 w-7 rounded-md bg-[var(--editor-panel)]/80 backdrop-blur border border-[var(--editor-line)] text-[var(--editor-muted)] hover:text-[var(--editor-ink)] hover:bg-[var(--editor-panel)] transition"
                 title="复制"
               >
                 {copied ? (

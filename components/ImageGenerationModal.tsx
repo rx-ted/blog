@@ -536,7 +536,7 @@ export function ImageGenerationModal({
                     value={prompt}
                     onChange={(event) => setPrompt(event.target.value)}
                     placeholder="例如：一个在暴雨里抬头看霓虹灯牌的孤独程序员，Mondo 风格，但不要在图里放文字"
-                    className="w-full rounded-2xl border border-[var(--editor-line)] bg-white px-3 py-3 pl-10 text-sm leading-6 text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)] focus:ring-1 focus:ring-[var(--editor-accent)]"
+                    className="w-full rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)] px-3 py-3 pl-10 text-sm leading-6 text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)] focus:ring-1 focus:ring-[var(--editor-accent)]"
                   />
                 </div>
               </div>
@@ -546,7 +546,7 @@ export function ImageGenerationModal({
                   <div className="text-xs font-medium text-[var(--editor-muted)]">
                     参考图片
                   </div>
-                  <div className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-white">
+                  <div className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)]">
                     <img
                       src={referenceImageUrl}
                       alt="参考图片"
@@ -626,7 +626,7 @@ export function ImageGenerationModal({
                           event.target.value as AIImageAspectRatio,
                         )
                       }
-                      className="w-full rounded-xl border border-[var(--editor-line)] bg-white px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                      className="w-full rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
                     >
                       {AI_IMAGE_ASPECT_RATIO_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -646,7 +646,7 @@ export function ImageGenerationModal({
                           event.target.value as AIImageResolution,
                         )
                       }
-                      className="w-full rounded-xl border border-[var(--editor-line)] bg-white px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                      className="w-full rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
                     >
                       {AI_IMAGE_RESOLUTION_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -684,7 +684,7 @@ export function ImageGenerationModal({
                       onClick={() => setPlacementMode('replace')}
                       className={`rounded-xl px-3 py-2 text-sm font-medium transition ${
                         placementMode === 'replace'
-                          ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                          ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                           : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                       }`}
                     >
@@ -695,7 +695,7 @@ export function ImageGenerationModal({
                       onClick={() => setPlacementMode('insert')}
                       className={`rounded-xl px-3 py-2 text-sm font-medium transition ${
                         placementMode === 'insert'
-                          ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                          ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                           : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                       }`}
                     >
@@ -710,7 +710,7 @@ export function ImageGenerationModal({
                   <button
                     type="button"
                     onClick={() => setShowContext((value) => !value)}
-                    className="flex w-full items-start justify-between gap-3 rounded-2xl border border-[var(--editor-line)] bg-white px-4 py-3 text-left transition hover:bg-[var(--editor-soft)]/50"
+                    className="flex w-full items-start justify-between gap-3 rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)] px-4 py-3 text-left transition hover:bg-[var(--editor-soft)]/50"
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-3">
@@ -793,7 +793,7 @@ export function ImageGenerationModal({
                     return (
                       <div
                         key={item.id}
-                        className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-white"
+                        className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)]"
                       >
                         <button
                           type="button"
@@ -850,7 +850,7 @@ export function ImageGenerationModal({
                 </div>
               ) : result ? (
                 <div className="flex h-full min-h-0 flex-col gap-4">
-                  <div className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-white">
+                  <div className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)]">
                     <img
                       src={result.variants?.content || result.url}
                       alt={result.alt}
@@ -867,13 +867,13 @@ export function ImageGenerationModal({
                     </div>
 
                     <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-[var(--editor-muted)]">
-                      <span className="rounded-full bg-white px-2.5 py-1">
+                      <span className="rounded-full bg-[var(--editor-panel)] px-2.5 py-1">
                         比例：{getAiImageAspectRatioLabel(result.aspectRatio)}
                       </span>
-                      <span className="rounded-full bg-white px-2.5 py-1">
+                      <span className="rounded-full bg-[var(--editor-panel)] px-2.5 py-1">
                         分辨率：{getAiImageResolutionLabel(result.resolution)}
                       </span>
-                      <span className="rounded-full bg-white px-2.5 py-1">
+                      <span className="rounded-full bg-[var(--editor-panel)] px-2.5 py-1">
                         模型：{`${result.profileName} · ${result.model}`}
                       </span>
                     </div>
@@ -895,7 +895,7 @@ export function ImageGenerationModal({
                           查看模型润色后的提示词
                         </button>
                         {showRevisedPrompt ? (
-                          <div className="mt-2 whitespace-pre-wrap rounded-xl border border-[var(--editor-line)] bg-white px-3 py-3 text-xs leading-6 text-[var(--editor-ink)]">
+                          <div className="mt-2 whitespace-pre-wrap rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] px-3 py-3 text-xs leading-6 text-[var(--editor-ink)]">
                             {result.revisedPrompt}
                           </div>
                         ) : null}
@@ -923,7 +923,7 @@ export function ImageGenerationModal({
                   </div>
                 </div>
               ) : (
-                <div className="flex min-h-[320px] items-center justify-center rounded-2xl border border-dashed border-[var(--editor-line)]/70 bg-white/35">
+                <div className="flex min-h-[320px] items-center justify-center rounded-2xl border border-dashed border-[var(--editor-line)]/70 bg-[var(--editor-panel)]/35">
                   <div className="flex flex-col items-center gap-3 text-[var(--editor-muted)] opacity-60">
                     <ImageIcon className="h-11 w-11" />
                   </div>

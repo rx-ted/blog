@@ -648,7 +648,7 @@ function TextEditOverlay({
           commit()
         }
       }}
-      className="absolute z-30 resize-none overflow-hidden rounded-sm bg-white/95 px-1 py-0.5 shadow-sm outline-none"
+      className="absolute z-30 resize-none overflow-hidden rounded-sm bg-[var(--editor-panel)]/95 px-1 py-0.5 shadow-sm outline-none"
       style={{
         left: CANVAS_FRAME_PADDING + item.x,
         top: CANVAS_FRAME_PADDING + item.y,
@@ -2250,7 +2250,7 @@ export function CollageModal({
                   onClick={() => setSidePanelMode('properties')}
                   className={`rounded-md px-2 py-1.5 text-xs font-medium transition ${
                     sidePanelMode === 'properties'
-                      ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                      ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                       : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                   }`}
                 >
@@ -2261,7 +2261,7 @@ export function CollageModal({
                   onClick={() => setSidePanelMode('library')}
                   className={`rounded-md px-2 py-1.5 text-xs font-medium transition ${
                     sidePanelMode === 'library'
-                      ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                      ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                       : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                   }`}
                 >
@@ -2272,7 +2272,7 @@ export function CollageModal({
                   onClick={() => setSidePanelMode('icons')}
                   className={`rounded-md px-2 py-1.5 text-xs font-medium transition ${
                     sidePanelMode === 'icons'
-                      ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                      ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                       : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                   }`}
                 >
@@ -2299,7 +2299,7 @@ export function CollageModal({
                       value={libraryQuery}
                       onChange={(event) => setLibraryQuery(event.target.value)}
                       placeholder="搜索图片"
-                      className="min-w-0 flex-1 rounded-md border border-[var(--editor-line)] bg-white px-2.5 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                      className="min-w-0 flex-1 rounded-md border border-[var(--editor-line)] bg-[var(--editor-panel)] px-2.5 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
                     />
                     <button
                       type="submit"
@@ -2329,7 +2329,7 @@ export function CollageModal({
                         type="button"
                         onClick={() => void addOpenLibraryImage(item)}
                         disabled={busy}
-                        className="group overflow-hidden rounded-lg border border-[var(--editor-line)] bg-white text-left transition hover:border-[var(--editor-accent)] disabled:cursor-not-allowed disabled:opacity-55"
+                        className="group overflow-hidden rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] text-left transition hover:border-[var(--editor-accent)] disabled:cursor-not-allowed disabled:opacity-55"
                       >
                         <img
                           src={item.thumbnail}
@@ -2377,7 +2377,7 @@ export function CollageModal({
                       value={iconQuery}
                       onChange={(event) => setIconQuery(event.target.value)}
                       placeholder="搜索图标"
-                      className="w-full rounded-md border border-[var(--editor-line)] bg-white py-2 pl-8 pr-2.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                      className="w-full rounded-md border border-[var(--editor-line)] bg-[var(--editor-panel)] py-2 pl-8 pr-2.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
                     />
                   </div>
                   <div className="flex gap-1 overflow-x-auto pb-1">
@@ -2389,7 +2389,7 @@ export function CollageModal({
                         className={`shrink-0 rounded-md border px-2 py-1 text-xs transition ${
                           selectedIconCategory === category
                             ? 'border-[var(--editor-accent)] bg-[var(--editor-accent)] text-white'
-                            : 'border-[var(--editor-line)] bg-white text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
+                            : 'border-[var(--editor-line)] bg-[var(--editor-panel)] text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                         }`}
                       >
                         {category === 'all' ? '全部' : category}
@@ -2411,7 +2411,7 @@ export function CollageModal({
                               key={`recent-${icon.name}`}
                               type="button"
                               onClick={() => void addIcon(icon)}
-                              className="flex aspect-square flex-col items-center justify-center rounded-lg border border-[var(--editor-line)] bg-white p-2 text-[var(--editor-ink)] transition hover:border-[var(--editor-accent)] hover:text-[var(--editor-accent)]"
+                              className="flex aspect-square flex-col items-center justify-center rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] p-2 text-[var(--editor-ink)] transition hover:border-[var(--editor-accent)] hover:text-[var(--editor-accent)]"
                               title={icon.name}
                             >
                               {iconName ? (
@@ -2437,7 +2437,7 @@ export function CollageModal({
                           type="button"
                           onClick={() => void addIcon(icon)}
                           disabled={!iconName || busy}
-                          className="group flex aspect-square flex-col items-center justify-center rounded-lg border border-[var(--editor-line)] bg-white p-2 text-[var(--editor-ink)] transition hover:border-[var(--editor-accent)] hover:text-[var(--editor-accent)] disabled:cursor-not-allowed disabled:opacity-40"
+                          className="group flex aspect-square flex-col items-center justify-center rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] p-2 text-[var(--editor-ink)] transition hover:border-[var(--editor-accent)] hover:text-[var(--editor-accent)] disabled:cursor-not-allowed disabled:opacity-40"
                           title={icon.name}
                         >
                           {iconName ? (
@@ -2453,7 +2453,7 @@ export function CollageModal({
                     })}
                   </div>
                   {iconResults.length === 0 ? (
-                    <div className="rounded-md bg-white px-3 py-6 text-center text-sm text-[var(--editor-muted)]">
+                    <div className="rounded-md bg-[var(--editor-panel)] px-3 py-6 text-center text-sm text-[var(--editor-muted)]">
                       未找到图标
                     </div>
                   ) : null}
@@ -2752,7 +2752,7 @@ export function CollageModal({
                                 className={`relative rounded-lg border px-2 py-2 text-center transition ${
                                   selectedItem.fontFamily === font.family
                                     ? 'border-[var(--editor-accent)] bg-[var(--editor-accent)]/8 text-[var(--editor-accent)]'
-                                    : 'border-[var(--editor-line)] bg-white text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]'
+                                    : 'border-[var(--editor-line)] bg-[var(--editor-panel)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]'
                                 }`}
                                 title={
                                   isFailed

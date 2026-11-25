@@ -10,7 +10,7 @@ import { suggestionItems } from './suggestion-items'
 
 export function SlashMenu() {
   return (
-    <EditorCommand className="z-50 h-auto max-h-[340px] w-80 overflow-y-auto rounded-md border border-[var(--editor-line)] bg-white p-1 shadow-[0_20px_40px_rgba(37,32,24,0.14)]">
+    <EditorCommand className="z-50 h-auto max-h-[340px] w-80 overflow-y-auto rounded-md border border-[var(--editor-line)] bg-[var(--editor-panel)] p-1 shadow-[0_20px_40px_rgba(37,32,24,0.14)]">
       <EditorCommandEmpty className="px-3 py-2 text-sm text-[var(--editor-muted)]">
         没找到匹配项
       </EditorCommandEmpty>
