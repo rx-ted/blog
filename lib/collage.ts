@@ -149,7 +149,15 @@ export const DEFAULT_COLLAGE_TEXT_STYLE = {
   align: 'left',
   lineHeight: 1.25,
   letterSpacing: 0,
-} satisfies Pick<TextItem, 'fontFamily' | 'fontWeight' | 'fontStyle' | 'align' | 'lineHeight' | 'letterSpacing'>
+} satisfies Pick<
+  TextItem,
+  | 'fontFamily'
+  | 'fontWeight'
+  | 'fontStyle'
+  | 'align'
+  | 'lineHeight'
+  | 'letterSpacing'
+>
 
 export const COLLAGE_FONT_OPTIONS: CollageFontOption[] = [
   {
@@ -165,7 +173,8 @@ export const COLLAGE_FONT_OPTIONS: CollageFontOption[] = [
     label: '霞鹜文楷',
     family: '"LXGW WenKai", "TsangerJinKai02", "Kaiti SC", serif',
     loadFamily: 'LXGW WenKai',
-    cssUrl: 'https://cdn.jsdelivr.net/npm/@chinese-fonts/lxgwwenkai/dist/LXGWWenKai-Regular/result.css',
+    cssUrl:
+      'https://cdn.jsdelivr.net/npm/@chinese-fonts/lxgwwenkai/dist/LXGWWenKai-Regular/result.css',
     external: true,
     preview: '文',
   },
@@ -174,16 +183,19 @@ export const COLLAGE_FONT_OPTIONS: CollageFontOption[] = [
     label: '优设标题',
     family: '"YouSheBiaoTiHei", "PingFang SC", "Microsoft YaHei", sans-serif',
     loadFamily: 'YouSheBiaoTiHei',
-    cssUrl: 'https://cdn.jsdelivr.net/npm/@chinese-fonts/ysbth/dist/%E4%BC%98%E8%AE%BE%E6%A0%87%E9%A2%98%E9%BB%91/result.css',
+    cssUrl:
+      'https://cdn.jsdelivr.net/npm/@chinese-fonts/ysbth/dist/%E4%BC%98%E8%AE%BE%E6%A0%87%E9%A2%98%E9%BB%91/result.css',
     external: true,
     preview: '题',
   },
   {
     id: 'smiley-sans',
     label: '得意黑',
-    family: '"Smiley Sans Oblique", "PingFang SC", "Microsoft YaHei", sans-serif',
+    family:
+      '"Smiley Sans Oblique", "PingFang SC", "Microsoft YaHei", sans-serif',
     loadFamily: 'Smiley Sans Oblique',
-    cssUrl: 'https://cdn.jsdelivr.net/npm/@chinese-fonts/dyh/dist/SmileySans-Oblique/result.css',
+    cssUrl:
+      'https://cdn.jsdelivr.net/npm/@chinese-fonts/dyh/dist/SmileySans-Oblique/result.css',
     external: true,
     preview: '酷',
   },
@@ -192,7 +204,8 @@ export const COLLAGE_FONT_OPTIONS: CollageFontOption[] = [
     label: '思源宋体',
     family: '"Noto Serif SC", "Source Han Serif SC", Songti SC, STSong, serif',
     loadFamily: 'Noto Serif SC',
-    cssUrl: 'https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap',
+    cssUrl:
+      'https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap',
     external: true,
     preview: '宋',
   },
@@ -201,7 +214,8 @@ export const COLLAGE_FONT_OPTIONS: CollageFontOption[] = [
     label: '汇文明朝',
     family: '"Huiwen-mincho", "Noto Serif SC", Songti SC, serif',
     loadFamily: 'Huiwen-mincho',
-    cssUrl: 'https://cdn.jsdelivr.net/npm/@chinese-fonts/hwmct/dist/%E6%B1%87%E6%96%87%E6%98%8E%E6%9C%9D%E4%BD%93/result.css',
+    cssUrl:
+      'https://cdn.jsdelivr.net/npm/@chinese-fonts/hwmct/dist/%E6%B1%87%E6%96%87%E6%98%8E%E6%9C%9D%E4%BD%93/result.css',
     external: true,
     preview: '明',
   },
@@ -210,7 +224,8 @@ export const COLLAGE_FONT_OPTIONS: CollageFontOption[] = [
     label: '抖音美好',
     family: '"Douyin Sans", "PingFang SC", "Microsoft YaHei", sans-serif',
     loadFamily: 'Douyin Sans',
-    cssUrl: 'https://cdn.jsdelivr.net/npm/@chinese-fonts/dymh/dist/DouyinSansBold/result.css',
+    cssUrl:
+      'https://cdn.jsdelivr.net/npm/@chinese-fonts/dymh/dist/DouyinSansBold/result.css',
     external: true,
     preview: '潮',
   },
@@ -223,7 +238,8 @@ export const COLLAGE_OPEN_IMAGE_LIBRARY: OpenImageLibraryItem[] = [
     category: '自然',
     source: 'Unsplash',
     src: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=85',
-    thumbnail: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=400&q=70',
+    thumbnail:
+      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=400&q=70',
   },
   {
     id: 'unsplash-desk',
@@ -231,7 +247,8 @@ export const COLLAGE_OPEN_IMAGE_LIBRARY: OpenImageLibraryItem[] = [
     category: '工作',
     source: 'Unsplash',
     src: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=85',
-    thumbnail: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=400&q=70',
+    thumbnail:
+      'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=400&q=70',
   },
   {
     id: 'unsplash-code',
@@ -239,7 +256,8 @@ export const COLLAGE_OPEN_IMAGE_LIBRARY: OpenImageLibraryItem[] = [
     category: '科技',
     source: 'Unsplash',
     src: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1600&q=85',
-    thumbnail: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=400&q=70',
+    thumbnail:
+      'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=400&q=70',
   },
   {
     id: 'unsplash-circuit',
@@ -247,7 +265,8 @@ export const COLLAGE_OPEN_IMAGE_LIBRARY: OpenImageLibraryItem[] = [
     category: '科技',
     source: 'Unsplash',
     src: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=85',
-    thumbnail: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=400&q=70',
+    thumbnail:
+      'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=400&q=70',
   },
   {
     id: 'unsplash-abstract',
@@ -255,7 +274,8 @@ export const COLLAGE_OPEN_IMAGE_LIBRARY: OpenImageLibraryItem[] = [
     category: '纹理',
     source: 'Unsplash',
     src: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1600&q=85',
-    thumbnail: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=400&q=70',
+    thumbnail:
+      'https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=400&q=70',
   },
   {
     id: 'unsplash-matrix',
@@ -263,7 +283,8 @@ export const COLLAGE_OPEN_IMAGE_LIBRARY: OpenImageLibraryItem[] = [
     category: '科技',
     source: 'Unsplash',
     src: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1600&q=85',
-    thumbnail: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=400&q=70',
+    thumbnail:
+      'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=400&q=70',
   },
   {
     id: 'unsplash-forest',
@@ -271,7 +292,8 @@ export const COLLAGE_OPEN_IMAGE_LIBRARY: OpenImageLibraryItem[] = [
     category: '自然',
     source: 'Unsplash',
     src: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=1600&q=85',
-    thumbnail: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=400&q=70',
+    thumbnail:
+      'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=400&q=70',
   },
   {
     id: 'unsplash-night',
@@ -279,7 +301,8 @@ export const COLLAGE_OPEN_IMAGE_LIBRARY: OpenImageLibraryItem[] = [
     category: '自然',
     source: 'Unsplash',
     src: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1600&q=85',
-    thumbnail: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&q=70',
+    thumbnail:
+      'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&q=70',
   },
 ]
 
@@ -302,7 +325,9 @@ export function cloneCollageItem(item: CollageItem): CollageItem {
   return { ...item }
 }
 
-export function createCollageHistorySnapshot(snapshot: CollageHistorySnapshot): CollageHistorySnapshot {
+export function createCollageHistorySnapshot(
+  snapshot: CollageHistorySnapshot,
+): CollageHistorySnapshot {
   return {
     presetKey: snapshot.presetKey,
     canvasSize: { ...snapshot.canvasSize },
@@ -360,18 +385,30 @@ export function getFitStageScale(
   viewportHeight: number,
   padding = 32,
 ) {
-  if (canvasWidth <= 0 || canvasHeight <= 0 || viewportWidth <= 0 || viewportHeight <= 0) return 1
+  if (
+    canvasWidth <= 0 ||
+    canvasHeight <= 0 ||
+    viewportWidth <= 0 ||
+    viewportHeight <= 0
+  )
+    return 1
 
   const availableWidth = Math.max(1, viewportWidth - padding * 2)
   const availableHeight = Math.max(1, viewportHeight - padding * 2)
-  return Math.min(1, availableWidth / canvasWidth, availableHeight / canvasHeight)
+  return Math.min(
+    1,
+    availableWidth / canvasWidth,
+    availableHeight / canvasHeight,
+  )
 }
 
 export function isImageFile(file: Pick<File, 'type'>) {
   return file.type.startsWith('image/')
 }
 
-export function getImageFiles<T extends Pick<File, 'type'>>(files: Iterable<T>) {
+export function getImageFiles<T extends Pick<File, 'type'>>(
+  files: Iterable<T>,
+) {
   return Array.from(files).filter(isImageFile)
 }
 
@@ -385,7 +422,11 @@ export function shouldInterceptCollagePaste({
   return hasImageFiles || !targetInsideModal
 }
 
-export function fitImageIntoBox(image: LoadedImage, boxWidth: number, boxHeight: number) {
+export function fitImageIntoBox(
+  image: LoadedImage,
+  boxWidth: number,
+  boxHeight: number,
+) {
   const scale = Math.min(boxWidth / image.width, boxHeight / image.height, 1)
   return {
     width: Math.max(MIN_IMAGE_SIZE, image.width * scale),
@@ -402,7 +443,10 @@ export function layoutImages(
   const count = images.length
   const columns = Math.ceil(Math.sqrt(count))
   const rows = Math.ceil(count / columns)
-  const gap = Math.max(18, Math.round(Math.min(canvasWidth, canvasHeight) * 0.025))
+  const gap = Math.max(
+    18,
+    Math.round(Math.min(canvasWidth, canvasHeight) * 0.025),
+  )
   const cellWidth = (canvasWidth - gap * (columns + 1)) / columns
   const cellHeight = (canvasHeight - gap * (rows + 1)) / rows
 
@@ -452,17 +496,26 @@ export function getTransformedTextWidth(width: number, scaleX: number) {
   return Math.max(MIN_TEXT_WIDTH, width * Math.abs(scaleX))
 }
 
-export function getKonvaTextFontStyle(item: Pick<TextItem, 'fontWeight' | 'fontStyle'>) {
+export function getKonvaTextFontStyle(
+  item: Pick<TextItem, 'fontWeight' | 'fontStyle'>,
+) {
   const style = item.fontStyle === 'italic' ? 'italic' : ''
-  const weight = item.fontWeight && item.fontWeight !== '400' ? item.fontWeight : ''
+  const weight =
+    item.fontWeight && item.fontWeight !== '400' ? item.fontWeight : ''
   return [style, weight].filter(Boolean).join(' ') || 'normal'
 }
 
-export function getArrowRelativePoints(item: ArrowItem): [number, number, number, number] {
+export function getArrowRelativePoints(
+  item: ArrowItem,
+): [number, number, number, number] {
   return [0, 0, item.x2 - item.x1, item.y2 - item.y1]
 }
 
-export function moveArrowTo(item: ArrowItem, nextX1: number, nextY1: number): ArrowItem {
+export function moveArrowTo(
+  item: ArrowItem,
+  nextX1: number,
+  nextY1: number,
+): ArrowItem {
   const dx = nextX1 - item.x1
   const dy = nextY1 - item.y1
   return {
@@ -497,7 +550,10 @@ export function getItemBounds(item: CollageItem): RectBounds | null {
       x: item.x,
       y: item.y,
       width: item.width,
-      height: item.fontSize * (item.lineHeight || DEFAULT_COLLAGE_TEXT_STYLE.lineHeight) * lineCount,
+      height:
+        item.fontSize *
+        (item.lineHeight || DEFAULT_COLLAGE_TEXT_STYLE.lineHeight) *
+        lineCount,
     }
   }
 
@@ -520,7 +576,11 @@ export function getItemBounds(item: CollageItem): RectBounds | null {
   }
 }
 
-export function getLineGuideStops(bounds: RectBounds[], canvasSize: CanvasSize, skipId: string) {
+export function getLineGuideStops(
+  bounds: RectBounds[],
+  canvasSize: CanvasSize,
+  skipId: string,
+) {
   const vertical = [0, canvasSize.width / 2, canvasSize.width]
   const horizontal = [0, canvasSize.height / 2, canvasSize.height]
 
@@ -561,28 +621,50 @@ export function findSnapGuides({
 }): SnapGuide[] {
   const guideStops = getLineGuideStops(bounds, canvasSize, activeBounds.id)
   const itemEdges = getObjectSnappingEdges(activeBounds)
-  const verticalMatches = guideStops.vertical.flatMap((lineGuide) => (
+  const verticalMatches = guideStops.vertical.flatMap((lineGuide) =>
     itemEdges.vertical
-      .map((itemBound) => ({ lineGuide, diff: Math.abs(lineGuide - itemBound.guide), offset: itemBound.offset }))
-      .filter((match) => match.diff < threshold)
-  ))
-  const horizontalMatches = guideStops.horizontal.flatMap((lineGuide) => (
+      .map((itemBound) => ({
+        lineGuide,
+        diff: Math.abs(lineGuide - itemBound.guide),
+        offset: itemBound.offset,
+      }))
+      .filter((match) => match.diff < threshold),
+  )
+  const horizontalMatches = guideStops.horizontal.flatMap((lineGuide) =>
     itemEdges.horizontal
-      .map((itemBound) => ({ lineGuide, diff: Math.abs(lineGuide - itemBound.guide), offset: itemBound.offset }))
-      .filter((match) => match.diff < threshold)
-  ))
+      .map((itemBound) => ({
+        lineGuide,
+        diff: Math.abs(lineGuide - itemBound.guide),
+        offset: itemBound.offset,
+      }))
+      .filter((match) => match.diff < threshold),
+  )
   const guides: SnapGuide[] = []
   const vertical = verticalMatches.sort((a, b) => a.diff - b.diff)[0]
   const horizontal = horizontalMatches.sort((a, b) => a.diff - b.diff)[0]
 
-  if (vertical) guides.push({ orientation: 'V', lineGuide: vertical.lineGuide, offset: vertical.offset })
-  if (horizontal) guides.push({ orientation: 'H', lineGuide: horizontal.lineGuide, offset: horizontal.offset })
+  if (vertical)
+    guides.push({
+      orientation: 'V',
+      lineGuide: vertical.lineGuide,
+      offset: vertical.offset,
+    })
+  if (horizontal)
+    guides.push({
+      orientation: 'H',
+      lineGuide: horizontal.lineGuide,
+      offset: horizontal.offset,
+    })
   return guides
 }
 
 export function applySnapGuides(x: number, y: number, guides: SnapGuide[]) {
-  return guides.reduce((position, guide) => {
-    if (guide.orientation === 'V') return { ...position, x: guide.lineGuide + guide.offset }
-    return { ...position, y: guide.lineGuide + guide.offset }
-  }, { x, y })
+  return guides.reduce(
+    (position, guide) => {
+      if (guide.orientation === 'V')
+        return { ...position, x: guide.lineGuide + guide.offset }
+      return { ...position, y: guide.lineGuide + guide.offset }
+    },
+    { x, y },
+  )
 }

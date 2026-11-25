@@ -57,10 +57,7 @@ describe('editor AI edit helpers', () => {
   })
 
   it('requires a disambiguating occurrence when the text appears more than once', () => {
-    const doc = schema.node('doc', null, [
-      paragraph('重复'),
-      paragraph('重复'),
-    ])
+    const doc = schema.node('doc', null, [paragraph('重复'), paragraph('重复')])
 
     expect(resolveExactTextRangeInDoc(doc, '重复')).toEqual({
       status: 'ambiguous',

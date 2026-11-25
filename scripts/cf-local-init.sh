@@ -4,14 +4,14 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-CONFIG_PATH="$(bash "${SCRIPT_DIR}/cf-config.sh")"
+CONFIG_PATH="$(bash "${SCRIPT_DIR}/cf-config.sh" local)"
 SCHEMA_PATH="${REPO_ROOT}/db/schema.sql"
 RESET=0
 FROM_REMOTE=0
 
 usage() {
   cat <<'EOF'
-Usage: bash scripts/cf-local-db.sh [--reset] [--from-remote]
+Usage: bash scripts/cf-local-init.sh [--reset] [--from-remote]
 
 初始化 wrangler dev / preview 使用的本地 D1 数据库。
 
@@ -108,24 +108,54 @@ if [[ "${FROM_REMOTE}" == "1" ]]; then
     exit 1
   fi
 
+  echo "==> applying db/schema.sql to local D1"
+  npx wrangler d1 execute DB --local --yes --file "${SCHEMA_PATH}" -c "${CONFIG_PATH}" >/dev/null
+
+  LOCAL_TABLES_JSON="$(npx wrangler d1 execute DB --local -c "${CONFIG_PATH}" --json --command \
+    "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%'")"
+  LOCAL_TABLES="$(printf '%s' "${LOCAL_TABLES_JSON}" | node -e '
+    let input = ""
+    process.stdin.on("data", (chunk) => { input += chunk })
+    process.stdin.on("end", () => {
+      try {
+        const parsed = JSON.parse(input)
+        const names = (parsed?.[0]?.results ?? []).map((row) => row.name)
+        process.stdout.write(names.join("\n"))
+      } catch {
+        process.exit(1)
+      }
+    })
+  ')"
+
   TABLE_ARGS=()
+  DELETE_SQL=""
+  SKIPPED_TABLES=()
   for table in ${TABLES}; do
-    TABLE_ARGS+=(--table "${table}")
+    if printf '%s\n' "${LOCAL_TABLES}" | grep -Fqx "${table}"; then
+      TABLE_ARGS+=(--table "${table}")
+      DELETE_SQL+="DELETE FROM \"${table}\";"
+    else
+      SKIPPED_TABLES+=("${table}")
+    fi
   done
+
+  if [[ "${#SKIPPED_TABLES[@]}" -gt 0 ]]; then
+    echo "==> skipping remote tables missing from local schema: ${SKIPPED_TABLES[*]}"
+  fi
+
+  if [[ "${#TABLE_ARGS[@]}" -eq 0 ]]; then
+    echo "❌ no remote tables matched local schema; aborting import" >&2
+    exit 1
+  fi
 
   echo "==> exporting remote D1 data: ${DB_NAME}"
   npx wrangler d1 export "${DB_NAME}" --remote --no-schema --skip-confirmation \
     "${TABLE_ARGS[@]}" --output "${TMP_SQL}" -c "${CONFIG_PATH}"
 
-  echo "==> applying db/schema.sql to local D1"
-  npx wrangler d1 execute DB --local --yes --file "${SCHEMA_PATH}" -c "${CONFIG_PATH}" >/dev/null
-
   # schema.sql 会写入默认分类/设置，先清空这些表再导入远程数据，避免主键冲突。
-  DELETE_SQL=""
-  for table in ${TABLES}; do
-    DELETE_SQL+="DELETE FROM \"${table}\";"
-  done
-  npx wrangler d1 execute DB --local --yes -c "${CONFIG_PATH}" --command "${DELETE_SQL}" >/dev/null
+  if [[ -n "${DELETE_SQL}" ]]; then
+    npx wrangler d1 execute DB --local --yes -c "${CONFIG_PATH}" --command "${DELETE_SQL}" >/dev/null
+  fi
 
   echo "==> importing remote data into local D1"
   npx wrangler d1 execute DB --local --yes --file "${TMP_SQL}" -c "${CONFIG_PATH}" >/dev/null

@@ -11,7 +11,8 @@ export interface AnthropicCompatibleMessage {
   content: string
 }
 
-export interface RunAnthropicCompatibleTextInput extends AnthropicCompatibleIdentity {
+export interface RunAnthropicCompatibleTextInput
+  extends AnthropicCompatibleIdentity {
   apiKey: string
   baseURL: string
   model: string
@@ -31,16 +32,20 @@ function toStringSafe(value: unknown): string {
   return String(value)
 }
 
-export function isAnthropicCompatibleConfig(input: AnthropicCompatibleIdentity): boolean {
+export function isAnthropicCompatibleConfig(
+  input: AnthropicCompatibleIdentity,
+): boolean {
   const providerType = (input.providerType || '').trim().toLowerCase()
   const provider = (input.provider || '').trim().toLowerCase()
   const providerName = (input.providerName || '').trim().toLowerCase()
 
-  return providerType === 'anthropic_compatible'
-    || provider === 'anthropic'
-    || provider === 'aigocode_anthropic'
-    || providerName.includes('anthropic')
-    || providerName.includes('claude')
+  return (
+    providerType === 'anthropic_compatible' ||
+    provider === 'anthropic' ||
+    provider === 'aigocode_anthropic' ||
+    providerName.includes('anthropic') ||
+    providerName.includes('claude')
+  )
 }
 
 export function buildAnthropicMessagesUrl(baseURL: string): string {
@@ -50,7 +55,9 @@ export function buildAnthropicMessagesUrl(baseURL: string): string {
   return `${normalized}/v1/messages`
 }
 
-function buildAnthropicBody(input: RunAnthropicCompatibleTextInput): Record<string, unknown> {
+function buildAnthropicBody(
+  input: RunAnthropicCompatibleTextInput,
+): Record<string, unknown> {
   const system = input.messages
     .filter((message) => message.role === 'system' && message.content.trim())
     .map((message) => message.content.trim())
@@ -66,7 +73,8 @@ function buildAnthropicBody(input: RunAnthropicCompatibleTextInput): Record<stri
     model: input.model,
     max_tokens: input.maxTokens,
     ...(system ? { system } : {}),
-    messages: messages.length > 0 ? messages : [{ role: 'user', content: 'Say "OK"' }],
+    messages:
+      messages.length > 0 ? messages : [{ role: 'user', content: 'Say "OK"' }],
   }
 }
 
@@ -93,7 +101,11 @@ export function extractAnthropicText(payload: unknown): string {
     .map((item) => {
       if (typeof item === 'string') return item
       if (!item || typeof item !== 'object') return ''
-      const block = item as { type?: unknown; text?: unknown; content?: unknown }
+      const block = item as {
+        type?: unknown
+        text?: unknown
+        content?: unknown
+      }
       return toStringSafe(block.text || block.content)
     })
     .filter(Boolean)
@@ -115,7 +127,11 @@ export function extractAnthropicReasoning(payload: unknown): string {
     .join('\n')
 }
 
-export function buildAnthropicErrorMessage(status: number, statusText: string, rawBody: string): string {
+export function buildAnthropicErrorMessage(
+  status: number,
+  statusText: string,
+  rawBody: string,
+): string {
   let parsed: unknown
   try {
     parsed = rawBody ? JSON.parse(rawBody) : null
@@ -133,12 +149,18 @@ export function buildAnthropicErrorMessage(status: number, statusText: string, r
     if (payload.error && typeof payload.error === 'object') {
       const message = toStringSafe(payload.error.message)
       const type = toStringSafe(payload.error.type)
-      return [message || 'Anthropic compatible provider returned error', type ? `Type: ${type}` : '']
+      return [
+        message || 'Anthropic compatible provider returned error',
+        type ? `Type: ${type}` : '',
+      ]
         .filter(Boolean)
         .join(' · ')
     }
 
-    const message = toStringSafe(payload.error) || toStringSafe(payload.message) || toStringSafe(payload.detail)
+    const message =
+      toStringSafe(payload.error) ||
+      toStringSafe(payload.message) ||
+      toStringSafe(payload.detail)
     if (message.trim()) return message.trim()
   }
 
@@ -163,7 +185,9 @@ export async function runAnthropicCompatibleText(
 
   const rawBody = await response.text().catch(() => '')
   if (!response.ok) {
-    throw new Error(buildAnthropicErrorMessage(response.status, response.statusText, rawBody))
+    throw new Error(
+      buildAnthropicErrorMessage(response.status, response.statusText, rawBody),
+    )
   }
 
   const raw = rawBody ? JSON.parse(rawBody) : null

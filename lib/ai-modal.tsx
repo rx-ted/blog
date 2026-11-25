@@ -8,7 +8,10 @@ import {
   LOCAL_HISTORY_UPDATED_EVENT,
   readStoredHistory,
 } from '@/lib/client-background-task'
-import { renderMarkdownToHtml, replaceEditorRangeWithMarkdown } from '@/lib/editor-markdown'
+import {
+  renderMarkdownToHtml,
+  replaceEditorRangeWithMarkdown,
+} from '@/lib/editor-markdown'
 import { useToast } from '@/components/Toast'
 
 interface AiActionItem {
@@ -42,12 +45,42 @@ interface ActiveAiRequestControl {
 }
 
 const DEFAULT_AI_ACTIONS: AiActionItem[] = [
-  { id: 1, action_key: 'improve', label: '润色', description: '让表达更顺更自然' },
-  { id: 2, action_key: 'shorten', label: '缩写', description: '压缩成更短版本' },
-  { id: 3, action_key: 'expand', label: '扩写', description: '补充为更完整表述' },
-  { id: 4, action_key: 'summarize', label: '总结', description: '提炼为清晰摘要' },
-  { id: 5, action_key: 'translate_zh', label: '译成中文', description: '翻成简体中文' },
-  { id: 6, action_key: 'translate_en', label: '译成英文', description: '翻成自然英文' },
+  {
+    id: 1,
+    action_key: 'improve',
+    label: '润色',
+    description: '让表达更顺更自然',
+  },
+  {
+    id: 2,
+    action_key: 'shorten',
+    label: '缩写',
+    description: '压缩成更短版本',
+  },
+  {
+    id: 3,
+    action_key: 'expand',
+    label: '扩写',
+    description: '补充为更完整表述',
+  },
+  {
+    id: 4,
+    action_key: 'summarize',
+    label: '总结',
+    description: '提炼为清晰摘要',
+  },
+  {
+    id: 5,
+    action_key: 'translate_zh',
+    label: '译成中文',
+    description: '翻成简体中文',
+  },
+  {
+    id: 6,
+    action_key: 'translate_en',
+    label: '译成英文',
+    description: '翻成自然英文',
+  },
 ]
 
 const DOCUMENT_QUICK_ACTIONS: DocumentQuickAction[] = [
@@ -55,19 +88,22 @@ const DOCUMENT_QUICK_ACTIONS: DocumentQuickAction[] = [
     id: 'doc_summary',
     label: '总结全文',
     description: '提炼核心观点',
-    prompt: '请基于下面的标题和正文，总结核心观点，输出 3-5 条 Markdown 列表，直接返回结果，不要解释。',
+    prompt:
+      '请基于下面的标题和正文，总结核心观点，输出 3-5 条 Markdown 列表，直接返回结果，不要解释。',
   },
   {
     id: 'doc_title',
     label: '生成标题',
     description: '给出更好的标题候选',
-    prompt: '请基于下面的标题和正文，生成 5 个更好的中文标题，使用 Markdown 编号列表返回，直接返回结果，不要解释。',
+    prompt:
+      '请基于下面的标题和正文，生成 5 个更好的中文标题，使用 Markdown 编号列表返回，直接返回结果，不要解释。',
   },
   {
     id: 'doc_description',
     label: '生成摘要',
     description: '写一段导语或摘要',
-    prompt: '请基于下面的标题和正文，生成 1 段适合作为文章摘要或导语的文字，控制在 120-180 字，直接返回结果，不要解释。',
+    prompt:
+      '请基于下面的标题和正文，生成 1 段适合作为文章摘要或导语的文字，控制在 120-180 字，直接返回结果，不要解释。',
   },
 ]
 
@@ -77,14 +113,17 @@ const DEFAULT_HISTORY_SCOPE = 'default'
 export function buildDocumentContextText(title: string, text: string) {
   const normalizedTitle = title.trim()
   const normalizedText = text.trim()
-  const fullText = normalizedText.length > 12000
-    ? `${normalizedText.slice(0, 12000)}\n\n[正文过长，以下内容已截断]`
-    : normalizedText
+  const fullText =
+    normalizedText.length > 12000
+      ? `${normalizedText.slice(0, 12000)}\n\n[正文过长，以下内容已截断]`
+      : normalizedText
 
   return [
     normalizedTitle ? `标题：${normalizedTitle}` : '',
     fullText ? `正文：\n${fullText}` : '',
-  ].filter(Boolean).join('\n\n')
+  ]
+    .filter(Boolean)
+    .join('\n\n')
 }
 
 export function formatHistoryTime(timestamp: number) {
@@ -158,7 +197,9 @@ export function AIModal({
   const [historyOpen, setHistoryOpen] = useState(false)
   const [historyItems, setHistoryItems] = useState<AiHistoryItem[]>([])
   const [historyReady, setHistoryReady] = useState(false)
-  const [contextMode, setContextMode] = useState<'selection' | 'document'>('selection')
+  const [contextMode, setContextMode] = useState<'selection' | 'document'>(
+    'selection',
+  )
   const aiLoadingRef = useRef(false)
   const modalRef = useRef<HTMLDivElement>(null)
   const outputScrollRef = useRef<HTMLDivElement>(null)
@@ -169,18 +210,23 @@ export function AIModal({
   )
 
   const hasSelectionContext = selectedText.trim().length > 0
-  const hasDocumentContext = documentTitle.trim().length > 0 || documentText.trim().length > 0
+  const hasDocumentContext =
+    documentTitle.trim().length > 0 || documentText.trim().length > 0
 
-  const effectiveContext = hasSelectionContext
-    ? contextMode
-    : 'document'
+  const effectiveContext = hasSelectionContext ? contextMode : 'document'
 
-  const effectiveInputText = effectiveContext === 'selection'
-    ? selectedText.trim()
-    : buildDocumentContextText(documentTitle, documentText)
+  const effectiveInputText =
+    effectiveContext === 'selection'
+      ? selectedText.trim()
+      : buildDocumentContextText(documentTitle, documentText)
 
   const syncHistoryItems = useCallback(() => {
-    setHistoryItems(readStoredHistory<AiHistoryItem>(historyStorageKey).slice(0, MAX_HISTORY_ITEMS))
+    setHistoryItems(
+      readStoredHistory<AiHistoryItem>(historyStorageKey).slice(
+        0,
+        MAX_HISTORY_ITEMS,
+      ),
+    )
     setHistoryReady(true)
   }, [historyStorageKey])
 
@@ -192,20 +238,23 @@ export function AIModal({
     setHistoryOpen(false)
   }, [])
 
-  const detachActiveRequest = useCallback((notify = false) => {
-    if (!activeRequestRef.current) return false
+  const detachActiveRequest = useCallback(
+    (notify = false) => {
+      if (!activeRequestRef.current) return false
 
-    activeRequestRef.current.detach()
-    activeRequestRef.current = null
-    aiLoadingRef.current = false
-    setAiLoading(false)
+      activeRequestRef.current.detach()
+      activeRequestRef.current = null
+      aiLoadingRef.current = false
+      setAiLoading(false)
 
-    if (notify) {
-      toast.info('后台生成中', 2400)
-    }
+      if (notify) {
+        toast.info('后台生成中', 2400)
+      }
 
-    return true
-  }, [toast])
+      return true
+    },
+    [toast],
+  )
 
   const requestClose = useCallback(() => {
     detachActiveRequest(true)
@@ -224,32 +273,36 @@ export function AIModal({
     setAiError('')
   }, [])
 
-  const storeHistoryItem = useCallback((output: string, promptLabel: string) => {
-    const normalizedOutput = output.trim()
-    if (!normalizedOutput) return
+  const storeHistoryItem = useCallback(
+    (output: string, promptLabel: string) => {
+      const normalizedOutput = output.trim()
+      if (!normalizedOutput) return
 
-    appendStoredHistoryItem<AiHistoryItem>(
-      historyStorageKey,
-      {
-        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        output: normalizedOutput,
-        promptLabel,
-        contextMode: effectiveContext,
-        selectionPreview: selectedText.trim().slice(0, 80),
-        documentTitle: documentTitle.trim(),
-        createdAt: Date.now(),
-      },
-      {
-        maxItems: MAX_HISTORY_ITEMS,
-      },
-    )
-  }, [documentTitle, effectiveContext, historyStorageKey, selectedText])
+      appendStoredHistoryItem<AiHistoryItem>(
+        historyStorageKey,
+        {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          output: normalizedOutput,
+          promptLabel,
+          contextMode: effectiveContext,
+          selectionPreview: selectedText.trim().slice(0, 80),
+          documentTitle: documentTitle.trim(),
+          createdAt: Date.now(),
+        },
+        {
+          maxItems: MAX_HISTORY_ITEMS,
+        },
+      )
+    },
+    [documentTitle, effectiveContext, historyStorageKey, selectedText],
+  )
 
   useEffect(() => {
     fetch('/api/editor/ai-actions')
       .then((r) => r.json() as Promise<{ actions?: AiActionItem[] }>)
       .then((data: { actions?: AiActionItem[] }) => {
-        if (Array.isArray(data.actions) && data.actions.length > 0) setAiActions(data.actions)
+        if (Array.isArray(data.actions) && data.actions.length > 0)
+          setAiActions(data.actions)
       })
       .catch(() => {})
   }, [])
@@ -274,14 +327,24 @@ export function AIModal({
 
   useEffect(() => {
     const handleHistoryUpdated = (event: Event) => {
-      const detail = (event as CustomEvent<{ storageKey?: string; items?: AiHistoryItem[] }>).detail
-      if (detail?.storageKey !== historyStorageKey || !Array.isArray(detail.items)) return
+      const detail = (
+        event as CustomEvent<{ storageKey?: string; items?: AiHistoryItem[] }>
+      ).detail
+      if (
+        detail?.storageKey !== historyStorageKey ||
+        !Array.isArray(detail.items)
+      )
+        return
       setHistoryItems(detail.items.slice(0, MAX_HISTORY_ITEMS))
       setHistoryReady(true)
     }
 
     window.addEventListener(LOCAL_HISTORY_UPDATED_EVENT, handleHistoryUpdated)
-    return () => window.removeEventListener(LOCAL_HISTORY_UPDATED_EVENT, handleHistoryUpdated)
+    return () =>
+      window.removeEventListener(
+        LOCAL_HISTORY_UPDATED_EVENT,
+        handleHistoryUpdated,
+      )
   }, [historyStorageKey])
 
   useEffect(() => {
@@ -327,11 +390,7 @@ export function AIModal({
     if (isOpen) {
       const frame = window.requestAnimationFrame(() => {
         resetModalState()
-        setContextMode(
-          hasSelectionContext
-            ? initialContext
-            : 'document',
-        )
+        setContextMode(hasSelectionContext ? initialContext : 'document')
       })
       return () => window.cancelAnimationFrame(frame)
     }
@@ -342,9 +401,19 @@ export function AIModal({
       resetModalState()
     })
     return () => window.cancelAnimationFrame(frame)
-  }, [detachActiveRequest, hasSelectionContext, initialContext, isOpen, resetModalState])
+  }, [
+    detachActiveRequest,
+    hasSelectionContext,
+    initialContext,
+    isOpen,
+    resetModalState,
+  ])
 
-  const applyAiAction = (actionKey: string, customInput?: string, actionLabel?: string) => {
+  const applyAiAction = (
+    actionKey: string,
+    customInput?: string,
+    actionLabel?: string,
+  ) => {
     if (!effectiveInputText || aiLoadingRef.current) return
 
     const promptLabel = actionLabel || customInput || '自定义提问'
@@ -389,7 +458,11 @@ export function AIModal({
         })
 
         if (!res.ok) {
-          const errData = await res.json().catch(() => ({ error: 'AI 处理失败' })) as { error?: string }
+          const errData = (await res
+            .json()
+            .catch(() => ({ error: 'AI 处理失败' }))) as {
+            error?: string
+          }
           throw new Error(errData.error || 'AI 处理失败')
         }
 
@@ -463,7 +536,10 @@ export function AIModal({
   const insertAiBelow = (content = aiOutput) => {
     const normalized = content.trim()
     if (!normalized || !selectionRange) return
-    replaceEditorRangeWithMarkdown(editor, normalized, { from: selectionRange.to, to: selectionRange.to })
+    replaceEditorRangeWithMarkdown(editor, normalized, {
+      from: selectionRange.to,
+      to: selectionRange.to,
+    })
     requestClose()
   }
 
@@ -522,7 +598,9 @@ export function AIModal({
       <div className="p-4 space-y-3 overflow-y-auto overscroll-contain flex-1">
         <div className="flex items-center justify-between gap-3">
           <div className="text-xs font-medium text-[var(--editor-muted)]">
-            {effectiveContext === 'selection' ? '当前默认作用于选中文本' : '当前默认作用于标题和正文'}
+            {effectiveContext === 'selection'
+              ? '当前默认作用于选中文本'
+              : '当前默认作用于标题和正文'}
           </div>
           <div className="flex items-center gap-2">
             {historyItems.length > 0 && (
@@ -604,44 +682,59 @@ export function AIModal({
         {!aiOutput && !aiLoading && !historyOpen && (
           <div>
             <div className="mb-2 text-xs font-medium text-[var(--editor-muted)]">
-              {effectiveContext === 'selection' ? '快捷操作' : '基于全文的快捷操作'}
+              {effectiveContext === 'selection'
+                ? '快捷操作'
+                : '基于全文的快捷操作'}
             </div>
             <div className="flex flex-wrap gap-2">
               {effectiveContext === 'selection'
                 ? aiActions.map((action) => (
-                  <button
-                    key={action.id}
-                    type="button"
-                    onClick={() => applyAiAction(action.action_key, undefined, action.label)}
-                    disabled={aiLoading}
-                    className="rounded-full border border-[var(--editor-line)] bg-white px-4 py-1.5 text-sm text-[var(--editor-ink)] transition hover:border-[var(--editor-accent)] hover:bg-[var(--editor-soft)] disabled:opacity-50"
-                    title={action.description}
-                  >
-                    {action.label}
-                  </button>
-                ))
+                    <button
+                      key={action.id}
+                      type="button"
+                      onClick={() =>
+                        applyAiAction(
+                          action.action_key,
+                          undefined,
+                          action.label,
+                        )
+                      }
+                      disabled={aiLoading}
+                      className="rounded-full border border-[var(--editor-line)] bg-white px-4 py-1.5 text-sm text-[var(--editor-ink)] transition hover:border-[var(--editor-accent)] hover:bg-[var(--editor-soft)] disabled:opacity-50"
+                      title={action.description}
+                    >
+                      {action.label}
+                    </button>
+                  ))
                 : DOCUMENT_QUICK_ACTIONS.map((action) => (
-                  <button
-                    key={action.id}
-                    type="button"
-                    onClick={() => applyAiAction('custom', action.prompt, action.label)}
-                    disabled={aiLoading || !hasDocumentContext}
-                    className="rounded-full border border-[var(--editor-line)] bg-white px-4 py-1.5 text-sm text-[var(--editor-ink)] transition hover:border-[var(--editor-accent)] hover:bg-[var(--editor-soft)] disabled:opacity-50"
-                    title={action.description}
-                  >
-                    {action.label}
-                  </button>
-                ))}
+                    <button
+                      key={action.id}
+                      type="button"
+                      onClick={() =>
+                        applyAiAction('custom', action.prompt, action.label)
+                      }
+                      disabled={aiLoading || !hasDocumentContext}
+                      className="rounded-full border border-[var(--editor-line)] bg-white px-4 py-1.5 text-sm text-[var(--editor-ink)] transition hover:border-[var(--editor-accent)] hover:bg-[var(--editor-soft)] disabled:opacity-50"
+                      title={action.description}
+                    >
+                      {action.label}
+                    </button>
+                  ))}
             </div>
           </div>
         )}
 
         {historyOpen && historyItems.length > 0 && (
           <div className="space-y-2 rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-3">
-            <div className="text-xs font-medium text-[var(--editor-muted)]">最近生成</div>
+            <div className="text-xs font-medium text-[var(--editor-muted)]">
+              最近生成
+            </div>
             <div className="space-y-2">
               {historyItems.map((item) => (
-                <div key={item.id} className="rounded-lg border border-[var(--editor-line)] bg-white p-3">
+                <div
+                  key={item.id}
+                  className="rounded-lg border border-[var(--editor-line)] bg-white p-3"
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="truncate text-sm font-medium text-[var(--editor-ink)]">
@@ -671,7 +764,10 @@ export function AIModal({
                     <button
                       type="button"
                       onClick={() => {
-                        if (effectiveContext === 'selection' && selectionRange) {
+                        if (
+                          effectiveContext === 'selection' &&
+                          selectionRange
+                        ) {
                           insertAiBelow(item.output)
                           return
                         }
@@ -737,7 +833,9 @@ export function AIModal({
               >
                 <div
                   className="rich-content text-sm text-[var(--editor-ink)]"
-                  dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(aiOutput) }}
+                  dangerouslySetInnerHTML={{
+                    __html: renderMarkdownToHtml(aiOutput),
+                  }}
                 />
               </div>
               <button
@@ -746,7 +844,11 @@ export function AIModal({
                 className="absolute top-2 right-2 flex items-center justify-center h-7 w-7 rounded-md bg-white/80 backdrop-blur border border-[var(--editor-line)] text-[var(--editor-muted)] hover:text-[var(--editor-ink)] hover:bg-white transition"
                 title="复制"
               >
-                {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
+                {copied ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
               </button>
             </div>
             <div className="flex flex-wrap justify-end gap-2">

@@ -20,7 +20,10 @@ export async function GET(req: NextRequest) {
   if (unauthorized) return unauthorized
 
   try {
-    const config = await resolveUnsplashAccessKey(route.db, route.env as Record<string, unknown>)
+    const config = await resolveUnsplashAccessKey(
+      route.db,
+      route.env as Record<string, unknown>,
+    )
     return jsonOk({
       enabled: Boolean(config.accessKey),
       source: config.source,
@@ -28,7 +31,10 @@ export async function GET(req: NextRequest) {
     })
   } catch (error) {
     console.error('Get Unsplash config error:', error)
-    return jsonError(error instanceof Error ? error.message : '获取 Unsplash 配置失败', 500)
+    return jsonError(
+      error instanceof Error ? error.message : '获取 Unsplash 配置失败',
+      500,
+    )
   }
 }
 
@@ -40,8 +46,11 @@ export async function POST(req: NextRequest) {
   if (unauthorized) return unauthorized
 
   try {
-    const body = await parseJsonBody<{ accessKey?: string; clear?: boolean }>(req)
-    const accessKey = typeof body.accessKey === 'string' ? body.accessKey.trim() : ''
+    const body = await parseJsonBody<{ accessKey?: string; clear?: boolean }>(
+      req,
+    )
+    const accessKey =
+      typeof body.accessKey === 'string' ? body.accessKey.trim() : ''
 
     if (!accessKey && !body.clear) {
       return jsonError('Missing accessKey', 400)
@@ -53,7 +62,10 @@ export async function POST(req: NextRequest) {
       route.env as Record<string, unknown>,
     )
 
-    const config = await resolveUnsplashAccessKey(route.db, route.env as Record<string, unknown>)
+    const config = await resolveUnsplashAccessKey(
+      route.db,
+      route.env as Record<string, unknown>,
+    )
     return jsonOk({
       success: true,
       enabled: Boolean(config.accessKey),
@@ -62,6 +74,9 @@ export async function POST(req: NextRequest) {
     })
   } catch (error) {
     console.error('Save Unsplash config error:', error)
-    return jsonError(error instanceof Error ? error.message : '保存 Unsplash 配置失败', 500)
+    return jsonError(
+      error instanceof Error ? error.message : '保存 Unsplash 配置失败',
+      500,
+    )
   }
 }

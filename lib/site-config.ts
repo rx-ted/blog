@@ -14,7 +14,11 @@ function parseSiteUrl(value: string): URL | null {
 }
 
 function isLocalHostname(hostname: string): boolean {
-  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0'
+  return (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '0.0.0.0'
+  )
 }
 
 function isPlaceholderHostname(hostname: string): boolean {
@@ -38,7 +42,9 @@ export function getSiteUrl(): string {
     }
   }
 
-  return process.env.NODE_ENV === 'development' ? DEV_SITE_URL : DEFAULT_PRODUCTION_SITE_URL
+  return process.env.NODE_ENV === 'development'
+    ? DEV_SITE_URL
+    : DEFAULT_PRODUCTION_SITE_URL
 }
 
 export function getSiteUrlObject(): URL {

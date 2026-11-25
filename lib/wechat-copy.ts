@@ -11,8 +11,15 @@ import {
 import { renderVisualDiagramsInHtml } from './content-enhancers'
 import { renderMathElements } from './math-render'
 import { renderRubyAnnotations } from './ruby-render'
-import { rewriteWechatExportImageUrl, type WechatExportImageVariant } from './wechat-export-images'
-import { buildWechatExportCss, normalizeWechatExportHtml, type WechatExportStyleTokens } from './wechat-export-style'
+import {
+  rewriteWechatExportImageUrl,
+  type WechatExportImageVariant,
+} from './wechat-export-images'
+import {
+  buildWechatExportCss,
+  normalizeWechatExportHtml,
+  type WechatExportStyleTokens,
+} from './wechat-export-style'
 import {
   normalizeWechatExternalLinkFootnotes,
   normalizeWechatImageFigures,
@@ -20,7 +27,10 @@ import {
   normalizeWechatPublishingBlocks,
   normalizeWechatVideoPlaceholders,
 } from './wechat-publishing-enhancements'
-import { fetchWechatExportThemeConfig, getPreferredWechatExportThemeId } from './wechat-theme-client'
+import {
+  fetchWechatExportThemeConfig,
+  getPreferredWechatExportThemeId,
+} from './wechat-theme-client'
 import { getWechatExportTheme, type WechatExportTheme } from './wechat-themes'
 import {
   formatWechatOrderedListMarker,
@@ -98,7 +108,11 @@ function cleanAttributeValue(value: string) {
   return value.trim().replace(/^['"]|['"]$/g, '')
 }
 
-function readCssVar(style: CSSStyleDeclaration, name: string, fallback: string) {
+function readCssVar(
+  style: CSSStyleDeclaration,
+  name: string,
+  fallback: string,
+) {
   const value = style.getPropertyValue(name)
   return value ? cleanAttributeValue(value) : fallback
 }
@@ -106,7 +120,11 @@ function readCssVar(style: CSSStyleDeclaration, name: string, fallback: string) 
 function readWechatExportStyleTokens(): WechatExportStyleTokens {
   const rootStyle = window.getComputedStyle(document.documentElement)
   const bodyStyle = window.getComputedStyle(document.body)
-  const bodyFont = readCssVar(rootStyle, '--body-font', bodyStyle.fontFamily || 'Arial, Helvetica, sans-serif')
+  const bodyFont = readCssVar(
+    rootStyle,
+    '--body-font',
+    bodyStyle.fontFamily || 'Arial, Helvetica, sans-serif',
+  )
 
   return {
     background: readCssVar(rootStyle, '--background', '#f5f4ed'),
@@ -123,11 +141,27 @@ function readWechatExportStyleTokens(): WechatExportStyleTokens {
     articleHeadingColor: readCssVar(rootStyle, '--article-heading', '#17120d'),
     articleBodyColor: readCssVar(rootStyle, '--article-body', '#2b241c'),
     articleQuoteColor: readCssVar(rootStyle, '--article-quote', '#51473a'),
-    articleQuoteBorderColor: readCssVar(rootStyle, '--article-quote-border', '#cdb796'),
-    articleQuoteNestedBorderColor: readCssVar(rootStyle, '--article-quote-nested-border', '#b8a68a'),
-    articleQuoteNestedBackground: readCssVar(rootStyle, '--article-quote-nested-bg', 'rgba(0, 0, 0, 0.02)'),
+    articleQuoteBorderColor: readCssVar(
+      rootStyle,
+      '--article-quote-border',
+      '#cdb796',
+    ),
+    articleQuoteNestedBorderColor: readCssVar(
+      rootStyle,
+      '--article-quote-nested-border',
+      '#b8a68a',
+    ),
+    articleQuoteNestedBackground: readCssVar(
+      rootStyle,
+      '--article-quote-nested-bg',
+      'rgba(0, 0, 0, 0.02)',
+    ),
     bodyFontFamily: bodyFont,
-    monoFontFamily: readCssVar(rootStyle, '--font-geist-mono', '"SFMono-Regular", Consolas, monospace'),
+    monoFontFamily: readCssVar(
+      rootStyle,
+      '--font-geist-mono',
+      '"SFMono-Regular", Consolas, monospace',
+    ),
     titleFontFamily: readCssVar(
       rootStyle,
       '--article-heading-font',
@@ -188,7 +222,9 @@ function normalizeCodeLinesMarkup(code: HTMLElement) {
 }
 
 function normalizeVisualDiagramMarkup(root: ParentNode) {
-  for (const code of Array.from(root.querySelectorAll<HTMLElement>('pre > code'))) {
+  for (const code of Array.from(
+    root.querySelectorAll<HTMLElement>('pre > code'),
+  )) {
     const language = getCodeLanguage(code)
     const isMermaid = isMermaidLanguage(language)
     const isPlantUml = isPlantUmlLanguage(language)
@@ -199,14 +235,22 @@ function normalizeVisualDiagramMarkup(root: ParentNode) {
     if (!pre) continue
 
     const diagram = code.ownerDocument.createElement('section')
-    const label = isMermaid ? 'Mermaid' : isPlantUml ? 'PlantUML' : 'Infographic'
+    const label = isMermaid
+      ? 'Mermaid'
+      : isPlantUml
+        ? 'PlantUML'
+        : 'Infographic'
     diagram.className = isMermaid
       ? 'mermaid-diagram'
       : isPlantUml
         ? 'plantuml-diagram'
         : 'infographic-diagram'
     diagram.setAttribute(
-      isMermaid ? 'data-mermaid-code' : isPlantUml ? 'data-plantuml-code' : 'data-infographic-code',
+      isMermaid
+        ? 'data-mermaid-code'
+        : isPlantUml
+          ? 'data-plantuml-code'
+          : 'data-infographic-code',
       code.textContent || '',
     )
     diagram.textContent = `正在渲染 ${label}...`
@@ -217,8 +261,7 @@ function normalizeVisualDiagramMarkup(root: ParentNode) {
 function normalizeCodeBlockMarkup(root: ParentNode) {
   for (const pre of root.querySelectorAll<HTMLPreElement>('pre')) {
     const code = pre.querySelector<HTMLElement>('code')
-    if (!code)
-      continue
+    if (!code) continue
 
     pre.classList.add('code__pre')
 
@@ -238,7 +281,9 @@ function normalizeCodeBlockMarkup(root: ParentNode) {
   }
 }
 
-function isListElement(element: Element): element is HTMLUListElement | HTMLOListElement {
+function isListElement(
+  element: Element,
+): element is HTMLUListElement | HTMLOListElement {
   const tagName = element.tagName.toLowerCase()
   return tagName === 'ul' || tagName === 'ol'
 }
@@ -262,7 +307,9 @@ function getListDepth(list: Element) {
 }
 
 function getDirectListItems(list: Element) {
-  return Array.from(list.children).filter((child): child is HTMLLIElement => child.tagName.toLowerCase() === 'li')
+  return Array.from(list.children).filter(
+    (child): child is HTMLLIElement => child.tagName.toLowerCase() === 'li',
+  )
 }
 
 function isExistingListMarker(element: Element) {
@@ -273,22 +320,34 @@ function hasDirectListMarker(item: HTMLLIElement) {
   for (const child of Array.from(item.children)) {
     if (isExistingListMarker(child)) return true
     if (isListElement(child)) continue
-    if (child.firstElementChild && isExistingListMarker(child.firstElementChild)) return true
+    if (
+      child.firstElementChild &&
+      isExistingListMarker(child.firstElementChild)
+    )
+      return true
   }
   return false
 }
 
 function isTaskList(list: Element) {
-  return list.tagName.toLowerCase() === 'ul' && list.getAttribute('data-type') === 'taskList'
+  return (
+    list.tagName.toLowerCase() === 'ul' &&
+    list.getAttribute('data-type') === 'taskList'
+  )
 }
 
 function findTaskCheckbox(item: HTMLLIElement) {
   for (const child of Array.from(item.children)) {
     if (child.tagName.toLowerCase() === 'label') {
-      const input = child.querySelector<HTMLInputElement>('input[type="checkbox"]')
+      const input = child.querySelector<HTMLInputElement>(
+        'input[type="checkbox"]',
+      )
       if (input) return input
     }
-    if (child.tagName.toLowerCase() === 'input' && child.getAttribute('type') === 'checkbox') {
+    if (
+      child.tagName.toLowerCase() === 'input' &&
+      child.getAttribute('type') === 'checkbox'
+    ) {
       return child as HTMLInputElement
     }
   }
@@ -325,11 +384,16 @@ function removeDirectTaskControl(item: HTMLLIElement) {
 
 function hasMarkerContent(element: Element) {
   if (element.textContent?.replace(/\u00a0/g, ' ').trim()) return true
-  return Boolean(element.querySelector('img, video, audio, iframe, svg, math, table, pre, code'))
+  return Boolean(
+    element.querySelector(
+      'img, video, audio, iframe, svg, math, table, pre, code',
+    ),
+  )
 }
 
 function findFirstMarkerContentBlock(element: HTMLElement): HTMLElement | null {
-  if (element.tagName.toLowerCase() === 'p' && hasMarkerContent(element)) return element
+  if (element.tagName.toLowerCase() === 'p' && hasMarkerContent(element))
+    return element
 
   for (const child of Array.from(element.children)) {
     const tagName = child.tagName.toLowerCase()
@@ -337,7 +401,10 @@ function findFirstMarkerContentBlock(element: HTMLElement): HTMLElement | null {
     if (!hasMarkerContent(child)) continue
     if (tagName === 'p') return child as HTMLElement
     if (tagName === 'div' || tagName === 'section') {
-      return findFirstMarkerContentBlock(child as HTMLElement) || (child as HTMLElement)
+      return (
+        findFirstMarkerContentBlock(child as HTMLElement) ||
+        (child as HTMLElement)
+      )
     }
     return child as HTMLElement
   }
@@ -354,13 +421,14 @@ function findMarkerTarget(item: HTMLLIElement) {
     if (node.nodeType !== Node.ELEMENT_NODE) continue
 
     const element = node as HTMLElement
-    if (isListElement(element) || element.tagName.toLowerCase() === 'label') continue
+    if (isListElement(element) || element.tagName.toLowerCase() === 'label')
+      continue
     if (!hasMarkerContent(element)) continue
 
     if (
-      element.tagName.toLowerCase() === 'p'
-      || element.tagName.toLowerCase() === 'div'
-      || element.tagName.toLowerCase() === 'section'
+      element.tagName.toLowerCase() === 'p' ||
+      element.tagName.toLowerCase() === 'div' ||
+      element.tagName.toLowerCase() === 'section'
     ) {
       return findFirstMarkerContentBlock(element) || element
     }
@@ -371,7 +439,11 @@ function findMarkerTarget(item: HTMLLIElement) {
   return item
 }
 
-function prependListMarker(item: HTMLLIElement, marker: string, options: { task?: boolean } = {}) {
+function prependListMarker(
+  item: HTMLLIElement,
+  marker: string,
+  options: { task?: boolean } = {},
+) {
   if (hasDirectListMarker(item)) return
 
   const target = findMarkerTarget(item)
@@ -379,29 +451,37 @@ function prependListMarker(item: HTMLLIElement, marker: string, options: { task?
   markerElement.className = WECHAT_LIST_MARKER_CLASS
   markerElement.setAttribute('data-wechat-list-marker', 'true')
   markerElement.setAttribute('aria-hidden', 'true')
-  if (options.task) markerElement.setAttribute('data-wechat-task-marker', 'true')
+  if (options.task)
+    markerElement.setAttribute('data-wechat-task-marker', 'true')
   markerElement.textContent = marker
 
   target.insertBefore(markerElement, target.firstChild)
 }
 
-function normalizeWechatList(list: HTMLUListElement | HTMLOListElement, depth: number) {
+function normalizeWechatList(
+  list: HTMLUListElement | HTMLOListElement,
+  depth: number,
+) {
   const ordered = list.tagName.toLowerCase() === 'ol'
   const taskList = isTaskList(list)
   const orderedType = ordered ? list.getAttribute('type') || '1' : '1'
-  let counter = ordered ? readIntegerAttribute(list, 'start') ?? 1 : 1
+  let counter = ordered ? (readIntegerAttribute(list, 'start') ?? 1) : 1
 
-  list.setAttribute('data-wechat-list', ordered ? 'ordered' : taskList ? 'task' : 'unordered')
+  list.setAttribute(
+    'data-wechat-list',
+    ordered ? 'ordered' : taskList ? 'task' : 'unordered',
+  )
 
   for (const item of getDirectListItems(list)) {
     removeLeadingEmptyListItemBlocks(item)
 
     if (taskList) {
       const checkbox = findTaskCheckbox(item)
-      const checked = item.getAttribute('data-checked') === 'true'
-        || Boolean(checkbox?.checked)
-        || Boolean(checkbox?.hasAttribute('checked'))
-        || checkbox?.getAttribute('aria-checked') === 'true'
+      const checked =
+        item.getAttribute('data-checked') === 'true' ||
+        Boolean(checkbox?.checked) ||
+        Boolean(checkbox?.hasAttribute('checked')) ||
+        checkbox?.getAttribute('aria-checked') === 'true'
       removeDirectTaskControl(item)
       prependListMarker(item, checked ? '☑' : '☐', { task: true })
     } else if (ordered) {
@@ -416,8 +496,9 @@ function normalizeWechatList(list: HTMLUListElement | HTMLOListElement, depth: n
 }
 
 function normalizeWechatListMarkup(root: ParentNode) {
-  const lists = Array.from(root.querySelectorAll<HTMLUListElement | HTMLOListElement>('ul, ol'))
-    .filter((list) => !list.closest('pre, code, .code-snippet__fix'))
+  const lists = Array.from(
+    root.querySelectorAll<HTMLUListElement | HTMLOListElement>('ul, ol'),
+  ).filter((list) => !list.closest('pre, code, .code-snippet__fix'))
 
   for (const list of lists) {
     normalizeWechatList(list, getListDepth(list))
@@ -426,7 +507,8 @@ function normalizeWechatListMarkup(root: ParentNode) {
 
 function getMeaningfulChildNodes(element: Element) {
   return Array.from(element.childNodes).filter((node) => {
-    if (node.nodeType === Node.TEXT_NODE) return Boolean(node.textContent?.trim())
+    if (node.nodeType === Node.TEXT_NODE)
+      return Boolean(node.textContent?.trim())
     if (node.nodeType !== Node.ELEMENT_NODE) return true
     return (node as Element).tagName.toLowerCase() !== 'br'
   })
@@ -442,14 +524,19 @@ function isImageGridItem(node: Node): node is HTMLElement {
   if (tagName !== 'a') return false
 
   const children = getMeaningfulChildNodes(element)
-  return children.length === 1
-    && children[0].nodeType === Node.ELEMENT_NODE
-    && (children[0] as HTMLElement).tagName.toLowerCase() === 'img'
+  return (
+    children.length === 1 &&
+    children[0].nodeType === Node.ELEMENT_NODE &&
+    (children[0] as HTMLElement).tagName.toLowerCase() === 'img'
+  )
 }
 
 function getImageOnlyParagraphItems(paragraph: HTMLParagraphElement) {
   if (paragraph.closest('pre, code, .code-snippet__fix')) return null
-  if (paragraph.closest('.wechat-image-slider, [data-wechat-component="slider"]')) return null
+  if (
+    paragraph.closest('.wechat-image-slider, [data-wechat-component="slider"]')
+  )
+    return null
 
   const children = getMeaningfulChildNodes(paragraph)
   if (children.length === 0) return null
@@ -484,7 +571,9 @@ function createWechatImageGridTable(doc: Document, items: HTMLElement[]) {
 }
 
 function normalizeWechatImageGridMarkup(root: ParentNode) {
-  const paragraphs = Array.from(root.querySelectorAll<HTMLParagraphElement>('p'))
+  const paragraphs = Array.from(
+    root.querySelectorAll<HTMLParagraphElement>('p'),
+  )
   const processed = new Set<HTMLParagraphElement>()
 
   for (const paragraph of paragraphs) {
@@ -537,7 +626,9 @@ function getWechatTableColumnCount(table: HTMLTableElement) {
     const tagName = child.tagName.toLowerCase()
     if (tagName === 'tr') return [child]
     if (tagName === 'thead' || tagName === 'tbody' || tagName === 'tfoot') {
-      return Array.from(child.children).filter(row => row.tagName.toLowerCase() === 'tr')
+      return Array.from(child.children).filter(
+        (row) => row.tagName.toLowerCase() === 'tr',
+      )
     }
     return []
   })
@@ -570,27 +661,37 @@ function ensureWechatTableScrollContainer(table: HTMLTableElement) {
 }
 
 function normalizeWechatTableMarkup(root: ParentNode) {
-  for (const table of root.querySelectorAll<HTMLTableElement>('table:not(.wechat-image-grid)')) {
+  for (const table of root.querySelectorAll<HTMLTableElement>(
+    'table:not(.wechat-image-grid)',
+  )) {
     if (table.closest('pre, code, .code-snippet__fix')) continue
     table.setAttribute('data-wechat-table', 'true')
 
     const columnCount = getWechatTableColumnCount(table)
     if (columnCount > 0) {
       table.setAttribute('data-wechat-table-columns', String(columnCount))
-      table.classList.add(columnCount > 3 ? 'wechat-table-wide' : 'wechat-table-compact')
+      table.classList.add(
+        columnCount > 3 ? 'wechat-table-wide' : 'wechat-table-compact',
+      )
     }
 
     for (const cell of table.querySelectorAll<HTMLTableCellElement>('th, td')) {
-      const blockChildren = Array.from(cell.children).filter((child): child is HTMLElement => {
-        const tagName = child.tagName.toLowerCase()
-        if (child.querySelector('ul, ol, blockquote, table, pre')) return false
-        return tagName === 'p' || tagName === 'div'
-      })
+      const blockChildren = Array.from(cell.children).filter(
+        (child): child is HTMLElement => {
+          const tagName = child.tagName.toLowerCase()
+          if (child.querySelector('ul, ol, blockquote, table, pre'))
+            return false
+          return tagName === 'p' || tagName === 'div'
+        },
+      )
 
       blockChildren.forEach((child, index) => {
         replaceElementWithInlineSpan(child)
         if (index < blockChildren.length - 1) {
-          cell.insertBefore(cell.ownerDocument.createElement('br'), blockChildren[index + 1] ?? null)
+          cell.insertBefore(
+            cell.ownerDocument.createElement('br'),
+            blockChildren[index + 1] ?? null,
+          )
         }
       })
     }
@@ -620,7 +721,10 @@ function getWechatListKind(list: HTMLUListElement | HTMLOListElement) {
   return list.tagName.toLowerCase() === 'ol' ? 'ordered' : 'unordered'
 }
 
-function transferListItemAttributes(source: HTMLLIElement, target: HTMLElement) {
+function transferListItemAttributes(
+  source: HTMLLIElement,
+  target: HTMLElement,
+) {
   for (const attribute of Array.from(source.attributes)) {
     if (!attribute.name.startsWith('data-')) continue
     target.setAttribute(attribute.name, attribute.value)
@@ -628,7 +732,9 @@ function transferListItemAttributes(source: HTMLLIElement, target: HTMLElement) 
 }
 
 function normalizeWechatListContainers(root: ParentNode) {
-  const lists = Array.from(root.querySelectorAll<HTMLUListElement | HTMLOListElement>('ul, ol'))
+  const lists = Array.from(
+    root.querySelectorAll<HTMLUListElement | HTMLOListElement>('ul, ol'),
+  )
     .filter((list) => !list.closest('pre, code, .code-snippet__fix'))
     .sort((a, b) => getListDepth(b) - getListDepth(a))
 
@@ -660,17 +766,27 @@ function normalizeWechatListContainers(root: ParentNode) {
   }
 }
 
-function isWechatEmptyParagraph(element: Element | null): element is HTMLParagraphElement {
+function isWechatEmptyParagraph(
+  element: Element | null,
+): element is HTMLParagraphElement {
   if (!element || element.tagName.toLowerCase() !== 'p') return false
-  if (element.querySelector('img, video, audio, iframe, svg, math, table, pre, code')) return false
+  if (
+    element.querySelector(
+      'img, video, audio, iframe, svg, math, table, pre, code',
+    )
+  )
+    return false
 
   const text = (element.textContent || '').replace(/\u00a0/g, ' ').trim()
-  return element.getAttribute('data-wechat-empty') === 'true' || text.length === 0
+  return (
+    element.getAttribute('data-wechat-empty') === 'true' || text.length === 0
+  )
 }
 
 function removeEmptyParagraphsAroundWechatLists(root: ParentNode) {
-  const lists = Array.from(root.querySelectorAll<HTMLElement>('ul, ol, .wechat-list-block'))
-    .filter((list) => !list.closest('pre, code, .code-snippet__fix'))
+  const lists = Array.from(
+    root.querySelectorAll<HTMLElement>('ul, ol, .wechat-list-block'),
+  ).filter((list) => !list.closest('pre, code, .code-snippet__fix'))
 
   for (const list of lists) {
     let previous = list.previousElementSibling
@@ -699,10 +815,10 @@ function getMediaSource(element: Element) {
   }
 
   return (
-    element.getAttribute('src')
-    || element.querySelector('iframe')?.getAttribute('src')
-    || element.querySelector('source')?.getAttribute('src')
-    || ''
+    element.getAttribute('src') ||
+    element.querySelector('iframe')?.getAttribute('src') ||
+    element.querySelector('source')?.getAttribute('src') ||
+    ''
   )
 }
 
@@ -731,14 +847,17 @@ function createPdfMediaPlaceholder(
 
   const title = doc.createElement('strong')
   title.className = 'pdf-media-placeholder__title'
-  title.textContent = options.title?.trim() || (options.kind === 'video' ? '视频内容' : '嵌入内容')
+  title.textContent =
+    options.title?.trim() ||
+    (options.kind === 'video' ? '视频内容' : '嵌入内容')
   caption.appendChild(title)
 
   const description = doc.createElement('p')
   description.className = 'pdf-media-placeholder__description'
-  description.textContent = options.kind === 'video'
-    ? 'PDF 中无法直接播放视频，请打开下方链接查看。'
-    : 'PDF 中无法直接展示该嵌入内容，请打开下方链接查看。'
+  description.textContent =
+    options.kind === 'video'
+      ? 'PDF 中无法直接播放视频，请打开下方链接查看。'
+      : 'PDF 中无法直接展示该嵌入内容，请打开下方链接查看。'
   caption.appendChild(description)
 
   if (options.href) {
@@ -757,38 +876,53 @@ function createPdfMediaPlaceholder(
 }
 
 function replaceUnsupportedPdfEmbeds(doc: Document) {
-  for (const youtube of Array.from(doc.querySelectorAll<HTMLElement>('div[data-youtube-video]'))) {
+  for (const youtube of Array.from(
+    doc.querySelectorAll<HTMLElement>('div[data-youtube-video]'),
+  )) {
     const src = getMediaSource(youtube)
-    youtube.replaceWith(createPdfMediaPlaceholder(doc, {
-      href: src,
-      kind: 'video',
-      title: '嵌入视频',
-    }))
+    youtube.replaceWith(
+      createPdfMediaPlaceholder(doc, {
+        href: src,
+        kind: 'video',
+        title: '嵌入视频',
+      }),
+    )
   }
 
-  for (const video of Array.from(doc.querySelectorAll<HTMLVideoElement>('video'))) {
+  for (const video of Array.from(
+    doc.querySelectorAll<HTMLVideoElement>('video'),
+  )) {
     const src = getMediaSource(video)
     const title = video.getAttribute('title') || undefined
-    video.replaceWith(createPdfMediaPlaceholder(doc, {
-      href: src,
-      kind: 'video',
-      title,
-    }))
+    video.replaceWith(
+      createPdfMediaPlaceholder(doc, {
+        href: src,
+        kind: 'video',
+        title,
+      }),
+    )
   }
 
-  for (const iframe of Array.from(doc.querySelectorAll<HTMLIFrameElement>('iframe'))) {
+  for (const iframe of Array.from(
+    doc.querySelectorAll<HTMLIFrameElement>('iframe'),
+  )) {
     const src = getMediaSource(iframe)
-    iframe.replaceWith(createPdfMediaPlaceholder(doc, {
-      href: src,
-      kind: 'embed',
-      title: iframe.getAttribute('title') || '嵌入内容',
-    }))
+    iframe.replaceWith(
+      createPdfMediaPlaceholder(doc, {
+        href: src,
+        kind: 'embed',
+        title: iframe.getAttribute('title') || '嵌入内容',
+      }),
+    )
   }
 }
 
 function normalizeExportMarkup(html: string, mode: ExportMode = 'clipboard') {
   const parser = new DOMParser()
-  const doc = parser.parseFromString(normalizeWechatExportHtml(html), 'text/html')
+  const doc = parser.parseFromString(
+    normalizeWechatExportHtml(html),
+    'text/html',
+  )
   absolutizeUrls(doc, window.location.origin)
   normalizeMediaAttributes(doc)
   normalizeWechatPublishingBlocks(doc)
@@ -832,9 +966,13 @@ function parseCssColor(value: string) {
   const hex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(color)
   if (hex) {
     const raw = hex[1]
-    const full = raw.length === 3
-      ? raw.split('').map(char => `${char}${char}`).join('')
-      : raw
+    const full =
+      raw.length === 3
+        ? raw
+            .split('')
+            .map((char) => `${char}${char}`)
+            .join('')
+        : raw
     return {
       r: Number.parseInt(full.slice(0, 2), 16),
       g: Number.parseInt(full.slice(2, 4), 16),
@@ -853,10 +991,12 @@ function parseCssColor(value: string) {
 }
 
 function readBorderLeftColor(element: HTMLElement) {
-  return element.style.getPropertyValue('border-left-color')
-    || element.style.borderLeftColor
-    || element.style.borderColor
-    || ''
+  return (
+    element.style.getPropertyValue('border-left-color') ||
+    element.style.borderLeftColor ||
+    element.style.borderColor ||
+    ''
+  )
 }
 
 function getQuoteDepth(element: HTMLElement) {
@@ -870,11 +1010,15 @@ function getQuoteDepth(element: HTMLElement) {
 }
 
 function normalizeInlinedQuoteStyles(root: ParentNode) {
-  for (const quote of Array.from(root.querySelectorAll<HTMLElement>('blockquote'))) {
+  for (const quote of Array.from(
+    root.querySelectorAll<HTMLElement>('blockquote'),
+  )) {
     quote.style.borderTopLeftRadius = '0'
     quote.style.borderBottomLeftRadius = '0'
 
-    const parentQuote = quote.parentElement?.closest('blockquote') as HTMLElement | null
+    const parentQuote = quote.parentElement?.closest(
+      'blockquote',
+    ) as HTMLElement | null
     const sourceColor = parentQuote
       ? readBorderLeftColor(parentQuote)
       : readBorderLeftColor(quote)
@@ -910,7 +1054,12 @@ function inlineWechatExportHtml(fragment: string, css: string) {
   return normalizeInlinedWechatHtml(html)
 }
 
-function buildWechatArticleHtml(title: string, html: string, mode: ExportMode, options: WechatArticleExportOptions = {}) {
+function buildWechatArticleHtml(
+  title: string,
+  html: string,
+  mode: ExportMode,
+  options: WechatArticleExportOptions = {},
+) {
   const normalizedTitle = title.trim() || '无标题'
   const normalizedHtml = normalizeExportMarkup(html, mode)
   const css = buildWechatExportCss(readWechatExportStyleTokens(), options.theme)
@@ -922,15 +1071,26 @@ function buildWechatArticleHtml(title: string, html: string, mode: ExportMode, o
   }
 }
 
-function buildWechatClipboardHtml(title: string, html: string, options: WechatArticleExportOptions = {}) {
+function buildWechatClipboardHtml(
+  title: string,
+  html: string,
+  options: WechatArticleExportOptions = {},
+) {
   return buildWechatArticleHtml(title, html, 'clipboard', options)
 }
 
-function buildWechatPdfHtml(title: string, html: string, options: WechatArticleExportOptions = {}) {
+function buildWechatPdfHtml(
+  title: string,
+  html: string,
+  options: WechatArticleExportOptions = {},
+) {
   return buildWechatArticleHtml(title, html, 'pdf', options)
 }
 
-function rewriteBridgeImageUrl(input: string, variant: WechatExportImageVariant) {
+function rewriteBridgeImageUrl(
+  input: string,
+  variant: WechatExportImageVariant,
+) {
   return rewriteWechatExportImageUrl(input, window.location.origin, variant)
 }
 
@@ -946,7 +1106,11 @@ function rewriteBridgeArticleHtml(exportedHtml: string) {
   return doc.body.innerHTML
 }
 
-export function buildWechatPreviewArticleHtml(title: string, html: string, options: WechatArticleExportOptions = {}) {
+export function buildWechatPreviewArticleHtml(
+  title: string,
+  html: string,
+  options: WechatArticleExportOptions = {},
+) {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     return html
   }
@@ -954,12 +1118,21 @@ export function buildWechatPreviewArticleHtml(title: string, html: string, optio
   return buildWechatClipboardHtml(title, html, options).exportedHtml
 }
 
-export function buildWechatBridgeArticleExport(title: string, html: string, options: WechatArticleExportOptions = {}) {
+export function buildWechatBridgeArticleExport(
+  title: string,
+  html: string,
+  options: WechatArticleExportOptions = {},
+) {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     throw new Error('当前环境不支持公众号发布导出')
   }
 
-  const { exportedHtml, normalizedTitle } = buildWechatArticleHtml(title, html, 'bridge', options)
+  const { exportedHtml, normalizedTitle } = buildWechatArticleHtml(
+    title,
+    html,
+    'bridge',
+    options,
+  )
 
   return {
     normalizedTitle,
@@ -976,7 +1149,12 @@ export async function buildWechatBridgeArticleExportAsync(
     throw new Error('当前环境不支持公众号发布导出')
   }
 
-  const { exportedHtml, normalizedTitle } = buildWechatArticleHtml(title, html, 'bridge', options)
+  const { exportedHtml, normalizedTitle } = buildWechatArticleHtml(
+    title,
+    html,
+    'bridge',
+    options,
+  )
   const renderedHtml = await renderVisualDiagramsInHtml(exportedHtml)
 
   return {
@@ -1077,7 +1255,9 @@ async function convertImageToBase64(image: HTMLImageElement) {
   if (!src || /^data:/i.test(src)) return
 
   try {
-    const url = shouldRewriteUrl(src) ? new URL(src, window.location.origin).toString() : src
+    const url = shouldRewriteUrl(src)
+      ? new URL(src, window.location.origin).toString()
+      : src
     const response = await fetch(url, { mode: 'cors', cache: 'force-cache' })
     if (!response.ok) return
 
@@ -1093,7 +1273,11 @@ async function convertImageToBase64(image: HTMLImageElement) {
 
 async function inlineWechatImagesAsBase64(html: string) {
   const doc = new DOMParser().parseFromString(html, 'text/html')
-  await Promise.all(Array.from(doc.querySelectorAll<HTMLImageElement>('img')).map(convertImageToBase64))
+  await Promise.all(
+    Array.from(doc.querySelectorAll<HTMLImageElement>('img')).map(
+      convertImageToBase64,
+    ),
+  )
   return doc.body.innerHTML
 }
 
@@ -1127,31 +1311,48 @@ async function resolveClientExportTheme(options: WechatCopyOptions) {
   return getWechatExportTheme(config, themeId)
 }
 
-export async function copyAsWechatArticleFormat(title: string, html: string, options: WechatCopyOptions = {}) {
+export async function copyAsWechatArticleFormat(
+  title: string,
+  html: string,
+  options: WechatCopyOptions = {},
+) {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     throw new Error('当前环境不支持复制')
   }
 
   const theme = await resolveClientExportTheme(options)
-  const { exportedHtml, normalizedTitle } = await buildWechatBridgeArticleExportAsync(title, html, { theme })
-  const clipboardHtml = options.inlineImagesAsBase64 === false
-    ? exportedHtml
-    : await inlineWechatImagesAsBase64(exportedHtml)
-  const plainText = new DOMParser()
-    .parseFromString(clipboardHtml, 'text/html')
-    .body.textContent?.trim() || normalizedTitle
+  const { exportedHtml, normalizedTitle } =
+    await buildWechatBridgeArticleExportAsync(title, html, {
+      theme,
+    })
+  const clipboardHtml =
+    options.inlineImagesAsBase64 === false
+      ? exportedHtml
+      : await inlineWechatImagesAsBase64(exportedHtml)
+  const plainText =
+    new DOMParser()
+      .parseFromString(clipboardHtml, 'text/html')
+      .body.textContent?.trim() || normalizedTitle
 
   await writeClipboardHtml(clipboardHtml, plainText)
 }
 
-export async function downloadArticleAsWechatPng(title: string, html: string, options: WechatArticleExportOptions = {}) {
+export async function downloadArticleAsWechatPng(
+  title: string,
+  html: string,
+  options: WechatArticleExportOptions = {},
+) {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     throw new Error('当前环境不支持导出长图')
   }
 
   const { default: html2pdf } = await import('html2pdf.js')
 
-  const { exportedHtml, normalizedTitle } = buildWechatClipboardHtml(title, html, options)
+  const { exportedHtml, normalizedTitle } = buildWechatClipboardHtml(
+    title,
+    html,
+    options,
+  )
   const renderedHtml = await renderVisualDiagramsInHtml(exportedHtml)
   const container = document.createElement('div')
   container.style.position = 'fixed'
@@ -1177,7 +1378,10 @@ export async function downloadArticleAsWechatPng(title: string, html: string, op
         scrollY: 0,
       },
     }
-    const worker = html2pdf().set(pngOptions as never).from(container).toCanvas() as unknown as {
+    const worker = html2pdf()
+      .set(pngOptions as never)
+      .from(container)
+      .toCanvas() as unknown as {
       get: (key: 'canvas') => Promise<HTMLCanvasElement>
     }
     const canvas = await worker.get('canvas')
@@ -1188,14 +1392,22 @@ export async function downloadArticleAsWechatPng(title: string, html: string, op
   }
 }
 
-export async function downloadArticleAsPdf(title: string, html: string, options: WechatArticleExportOptions = {}) {
+export async function downloadArticleAsPdf(
+  title: string,
+  html: string,
+  options: WechatArticleExportOptions = {},
+) {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     throw new Error('当前环境不支持导出 PDF')
   }
 
   const { default: html2pdf } = await import('html2pdf.js')
 
-  const { exportedHtml, normalizedTitle } = buildWechatPdfHtml(title, html, options)
+  const { exportedHtml, normalizedTitle } = buildWechatPdfHtml(
+    title,
+    html,
+    options,
+  )
   const renderedHtml = await renderVisualDiagramsInHtml(exportedHtml)
   const pdfOptions = {
     margin: [16, 12, 16, 12],
@@ -1216,7 +1428,27 @@ export async function downloadArticleAsPdf(title: string, html: string, options:
     },
     pagebreak: {
       mode: ['css', 'legacy'],
-      avoid: ['img', 'pre', 'blockquote', 'table', 'figure', 'p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', '.wechat-callout', '.wechat-profile-card', '.wechat-qrcode-card', '.wechat-info-grid', '.wechat-image-slider', '.pdf-media-placeholder'],
+      avoid: [
+        'img',
+        'pre',
+        'blockquote',
+        'table',
+        'figure',
+        'p',
+        'li',
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
+        '.wechat-callout',
+        '.wechat-profile-card',
+        '.wechat-qrcode-card',
+        '.wechat-info-grid',
+        '.wechat-image-slider',
+        '.pdf-media-placeholder',
+      ],
     },
   }
 

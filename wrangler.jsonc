@@ -39,7 +39,8 @@
   // `npm run cf:init` 会把 database_id / bucket_name 等真实信息写入本地配置。
   "d1_databases": [
     {
-      "binding": "DB"
+      "binding": "DB",
+      "migrations_dir": "db/migrations"
     }
   ],
   "r2_buckets": [
@@ -73,7 +74,7 @@
     "NEXT_PUBLIC_SITE_URL": "https://your-domain.com",
     "AI_BASE_URL": "https://api.openai.com/v1",
     "AI_MODEL": "gpt-4o-mini",
-    "WORKERS_AI_MODEL": "@cf/meta/llama-3.1-8b-instruct",
+    "WORKERS_AI_MODEL": "@cf/meta/llama-3.1-8b-instruct"
 
     // 可选：Umami 统计。填入自己的值后取消注释。
     // "NEXT_PUBLIC_UMAMI_WEBSITE_ID": "",

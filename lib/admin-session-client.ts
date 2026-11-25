@@ -31,6 +31,7 @@ function hasAdminSessionHint() {
 
 function setAdminSessionHint(enabled: boolean) {
   if (typeof document === 'undefined') return
+  // biome-ignore lint/suspicious/noDocumentCookie: intentional lightweight session hint cookie
   document.cookie = enabled
     ? `${ADMIN_HINT_COOKIE_NAME}=1; path=/; max-age=${60 * 60 * 24 * 30}; samesite=lax`
     : `${ADMIN_HINT_COOKIE_NAME}=; path=/; max-age=0; samesite=lax`

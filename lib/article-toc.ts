@@ -19,7 +19,9 @@ type TiptapHeadingNode = {
 }
 
 type TiptapDocLike = {
-  descendants: (callback: (node: TiptapHeadingNode, pos: number) => boolean | void) => void
+  descendants: (
+    callback: (node: TiptapHeadingNode, pos: number) => boolean | undefined,
+  ) => void
 }
 
 const SECTION_LEVELS = new Set<ArticleTocLevel>([2, 3])
@@ -41,7 +43,9 @@ export function createTocAnchorId(title: string, index: number) {
   return `section-${normalized || 'heading'}-${index + 1}`
 }
 
-export function extractTocFromTiptapDoc(doc: TiptapDocLike | null | undefined): ArticleTocItem[] {
+export function extractTocFromTiptapDoc(
+  doc: TiptapDocLike | null | undefined,
+): ArticleTocItem[] {
   if (!doc) return []
 
   const items: ArticleTocItem[] = []
@@ -80,7 +84,9 @@ export function getAiSectionToc(items: ArticleTocItem[]) {
 export function formatTocItemForAi(item: ArticleTocItem | null | undefined) {
   if (!item) return ''
 
-  const sectionPrefix = Number.isInteger(item.sectionNumber) ? `${item.sectionNumber}. ` : ''
+  const sectionPrefix = Number.isInteger(item.sectionNumber)
+    ? `${item.sectionNumber}. `
+    : ''
   return `${sectionPrefix}H${item.level} ${item.title}`
 }
 
@@ -88,7 +94,5 @@ export function formatTocForAi(items: ArticleTocItem[]) {
   const sections = getAiSectionToc(items)
   if (sections.length === 0) return ''
 
-  return sections
-    .map(formatTocItemForAi)
-    .join('\n')
+  return sections.map(formatTocItemForAi).join('\n')
 }

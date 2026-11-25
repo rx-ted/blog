@@ -13,28 +13,38 @@ describe('ai-image workers ai compat image request', () => {
   })
 
   it('retries with multipart form data when the model requires multipart input', async () => {
-    const fetchMock = vi.fn()
-      .mockResolvedValueOnce(new Response(
-        JSON.stringify({ error: "required properties at '/' are 'multipart'" }),
-        {
-          status: 400,
-          headers: { 'content-type': 'application/json' },
-        },
-      ))
-      .mockResolvedValueOnce(new Response(
-        JSON.stringify({ image: Buffer.from('fake-image').toString('base64') }),
-        {
-          status: 200,
-          headers: { 'content-type': 'application/json' },
-        },
-      ))
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            error: "required properties at '/' are 'multipart'",
+          }),
+          {
+            status: 400,
+            headers: { 'content-type': 'application/json' },
+          },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            image: Buffer.from('fake-image').toString('base64'),
+          }),
+          {
+            status: 200,
+            headers: { 'content-type': 'application/json' },
+          },
+        ),
+      )
 
     vi.stubGlobal('fetch', fetchMock)
 
     const result = await runWorkersAiCompatImageRequest(
       {
         apiKey: 'test-key',
-        baseURL: 'https://api.cloudflare.com/client/v4/accounts/test-account/ai/v1',
+        baseURL:
+          'https://api.cloudflare.com/client/v4/accounts/test-account/ai/v1',
         model: '@cf/black-forest-labs/flux-2-dev',
       },
       {
@@ -65,20 +75,20 @@ describe('ai-image workers ai compat image request', () => {
   })
 
   it('returns the raw response when workers ai sends back an image stream', async () => {
-    const fetchMock = vi.fn().mockResolvedValueOnce(new Response(
-      new Uint8Array([0x89, 0x50, 0x4e, 0x47]),
-      {
+    const fetchMock = vi.fn().mockResolvedValueOnce(
+      new Response(new Uint8Array([0x89, 0x50, 0x4e, 0x47]), {
         status: 200,
         headers: { 'content-type': 'image/png' },
-      },
-    ))
+      }),
+    )
 
     vi.stubGlobal('fetch', fetchMock)
 
     const result = await runWorkersAiCompatImageRequest(
       {
         apiKey: 'test-key',
-        baseURL: 'https://api.cloudflare.com/client/v4/accounts/test-account/ai/v1',
+        baseURL:
+          'https://api.cloudflare.com/client/v4/accounts/test-account/ai/v1',
         model: '@cf/black-forest-labs/flux-2-dev',
       },
       {
@@ -113,9 +123,11 @@ describe('ai-image openai compatible request attempts', () => {
       model: 'gpt-image-2-beta',
       prompt: '生成章节配图',
     })
-    expect(attempts[1]).toEqual(expect.objectContaining({
-      size: '1792x1024',
-    }))
+    expect(attempts[1]).toEqual(
+      expect.objectContaining({
+        size: '1792x1024',
+      }),
+    )
   })
 
   it('keeps the richer OpenAI Images payload first for regular compatible providers', () => {
@@ -132,15 +144,17 @@ describe('ai-image openai compatible request attempts', () => {
       },
     )
 
-    expect(attempts[0]).toEqual(expect.objectContaining({
-      model: 'gpt-image-1',
-      prompt: '生成章节配图',
-      n: 1,
-      size: '1792x1024',
-      quality: 'high',
-      output_format: 'webp',
-      background: 'auto',
-    }))
+    expect(attempts[0]).toEqual(
+      expect.objectContaining({
+        model: 'gpt-image-1',
+        prompt: '生成章节配图',
+        n: 1,
+        size: '1792x1024',
+        quality: 'high',
+        output_format: 'webp',
+        background: 'auto',
+      }),
+    )
   })
 })
 
@@ -155,7 +169,9 @@ describe('ai-image prompt builder', () => {
       '2k',
     )
 
-    expect(shouldAllowReadableTextInGeneratedImage(undefined, '生成信息图')).toBe(true)
+    expect(
+      shouldAllowReadableTextInGeneratedImage(undefined, '生成信息图'),
+    ).toBe(true)
     expect(prompt).toContain('选中文本素材')
     expect(prompt).toContain('线索获取 18.6')
     expect(prompt).toContain('可以加入清晰可读的中文文字')
@@ -172,9 +188,13 @@ describe('ai-image prompt builder', () => {
       '1k',
     )
 
-    expect(shouldAllowReadableTextInGeneratedImage(undefined, '生成一张章节配图')).toBe(false)
+    expect(
+      shouldAllowReadableTextInGeneratedImage(undefined, '生成一张章节配图'),
+    ).toBe(false)
     expect(prompt).toContain('不要在图片中加入可读文字')
-    expect(prompt).toContain('文章主题参考（仅用于理解主题，不要作为画面文字）：触达率暴跌')
+    expect(prompt).toContain(
+      '文章主题参考（仅用于理解主题，不要作为画面文字）：触达率暴跌',
+    )
     expect(prompt).not.toContain('文章标题：触达率暴跌')
     expect(prompt).toContain('选中文本上下文')
   })
@@ -190,7 +210,12 @@ describe('ai-image prompt builder', () => {
       { strictUserPrompt: true },
     )
 
-    expect(shouldAllowReadableTextInGeneratedImage(undefined, '把下面内容做成一张商业分析卡片')).toBe(false)
+    expect(
+      shouldAllowReadableTextInGeneratedImage(
+        undefined,
+        '把下面内容做成一张商业分析卡片',
+      ),
+    ).toBe(false)
     expect(prompt).toContain('用户自定义要求优先级最高')
     expect(prompt).toContain('选中文本/输入素材')
     expect(prompt).toContain('收入增长 42%')

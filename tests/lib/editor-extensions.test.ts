@@ -1,4 +1,9 @@
-import { AllSelection, Selection, TextSelection, NodeSelection } from '@tiptap/pm/state'
+import {
+  AllSelection,
+  Selection,
+  TextSelection,
+  NodeSelection,
+} from '@tiptap/pm/state'
 import { Schema } from '@tiptap/pm/model'
 import { describe, expect, it } from 'vitest'
 import { shouldShowEditorBubble } from '@/lib/editor-bubble'
@@ -44,7 +49,9 @@ describe('editor-extensions helpers', () => {
   })
 
   it('detects markdown tables but ignores ordinary pipe text', () => {
-    expect(hasMarkdownTable('| 列1 | 列2 |\n| --- | --- |\n| 值1 | 值2 |')).toBe(true)
+    expect(
+      hasMarkdownTable('| 列1 | 列2 |\n| --- | --- |\n| 值1 | 值2 |'),
+    ).toBe(true)
     expect(hasMarkdownTable('普通文本 | 只是一个竖线，不是表格')).toBe(false)
   })
 
@@ -57,7 +64,12 @@ describe('editor-extensions helpers', () => {
     expect(createWechatCalloutContent('conclusion')).toEqual({
       type: 'wechatCallout',
       attrs: { kind: 'conclusion', title: '结论' },
-      content: [{ type: 'paragraph', content: [{ type: 'text', text: '这里写需要读者特别留意的信息。' }] }],
+      content: [
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: '这里写需要读者特别留意的信息。' }],
+        },
+      ],
     })
 
     expect(createWechatBadgeGroupContent(['AI', '公众号'])).toEqual({
@@ -65,7 +77,9 @@ describe('editor-extensions helpers', () => {
       attrs: { items: ['AI', '公众号'] },
     })
 
-    expect(createWechatInfoGridContent([{ label: '场景', value: '公众号' }])).toEqual({
+    expect(
+      createWechatInfoGridContent([{ label: '场景', value: '公众号' }]),
+    ).toEqual({
       type: 'wechatInfoGrid',
       attrs: { rows: [{ label: '场景', value: '公众号' }] },
     })

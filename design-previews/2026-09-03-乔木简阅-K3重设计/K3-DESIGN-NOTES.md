@@ -53,17 +53,17 @@ A 适合作为未来的"夜间模式"延伸；C 是次选，若品牌想更暖�
 
 **H2/H3 落地硬约束**：四方向的 H2/H3 全部是纯文本原生标签，样式只作用在 `h2` / `h3` 选择器自身（字体、字号、字重、颜色、实色背景、全边框或上下边框、padding、margin、圆角、display）。不需要也不允许导出器注入任何 `<span>`、编号、计数器或改写标题文本；不用伪元素，不用左侧竖线。下表可直接映射为 `buildEditorialCss` 中普通 h2/h3 的样式对象。
 
-| 元素 | A 夜航 | B 蓝图注 | C 橙页 | D 墨白 |
-| --- | --- | --- | --- | --- |
-| 底/文 | `#15181d` / `#d6d4cd` | `#fbfdfe` / `#25343f` | `#fdfcf8` / `#2c2620` | `#ffffff` / `#31312d` |
-| 主色 | 琥珀 `#f0a23c` | 深青 `#0f7285` | 工具橙 `#d35f0b` | 墨色 `#1b1b19` |
-| 辅助色 | 舱块 `#20252d`、灰 `#8d939e` | 发线 `#c3d9e0`、高亮 `#dff0f4` | 米块 `#f5eee1`、暖深棕 `#29221b` | 灰块 `#f2f2ee`、灰文 `#8f8f88` |
-| H2 | `display: table; padding-bottom: 6px; border-bottom: 3px solid 主色` 短线下划线，左对齐 | `padding-bottom: 10px; border-bottom: 1px solid 发线色` 通栏发线，左对齐 | `display: table; padding: 7px 13px; border-radius: 8px; background: 主色; color: #fff` 实块，左对齐 | `padding-top: 12px; border-top: 2px solid 墨色` + 22px 大字号 |
-| H3 | 主色文字 | 深青文字 + 微字距 | `display: table; padding: 5px 10px; border-radius: 6px; background: 米块色` 浅色小签 | `padding-top: 8px; border-top: 1px solid 浅灰` 顶部细线 |
-| strong | 主色 600 | 浅底高亮块 + 深色字 600 | 主色 600 | 墨色 600 + 2px 下划线 |
-| 引用 | 圆角深色块（无边线） | 上下 `border-top/bottom: 1px solid` 三明治 | 圆角米色块 | 直角浅灰块 |
-| 代码块 | 比底更深 `#0e1116`，三色点保留 | 浅色纸面 `#f2f8fa` + 1px 边框 | 暖深棕 `#29221b` | 浅灰直角块 |
-| 图注 | 灰字居中 | 灰字居中 | 灰字居中 | 灰字居中 |
+| 元素   | A 夜航                                                                                  | B 蓝图注                                                                 | C 橙页                                                                                              | D 墨白                                                        |
+| ------ | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| 底/文  | `#15181d` / `#d6d4cd`                                                                   | `#fbfdfe` / `#25343f`                                                    | `#fdfcf8` / `#2c2620`                                                                               | `#ffffff` / `#31312d`                                         |
+| 主色   | 琥珀 `#f0a23c`                                                                          | 深青 `#0f7285`                                                           | 工具橙 `#d35f0b`                                                                                    | 墨色 `#1b1b19`                                                |
+| 辅助色 | 舱块 `#20252d`、灰 `#8d939e`                                                            | 发线 `#c3d9e0`、高亮 `#dff0f4`                                           | 米块 `#f5eee1`、暖深棕 `#29221b`                                                                    | 灰块 `#f2f2ee`、灰文 `#8f8f88`                                |
+| H2     | `display: table; padding-bottom: 6px; border-bottom: 3px solid 主色` 短线下划线，左对齐 | `padding-bottom: 10px; border-bottom: 1px solid 发线色` 通栏发线，左对齐 | `display: table; padding: 7px 13px; border-radius: 8px; background: 主色; color: #fff` 实块，左对齐 | `padding-top: 12px; border-top: 2px solid 墨色` + 22px 大字号 |
+| H3     | 主色文字                                                                                | 深青文字 + 微字距                                                        | `display: table; padding: 5px 10px; border-radius: 6px; background: 米块色` 浅色小签                | `padding-top: 8px; border-top: 1px solid 浅灰` 顶部细线       |
+| strong | 主色 600                                                                                | 浅底高亮块 + 深色字 600                                                  | 主色 600                                                                                            | 墨色 600 + 2px 下划线                                         |
+| 引用   | 圆角深色块（无边线）                                                                    | 上下 `border-top/bottom: 1px solid` 三明治                               | 圆角米色块                                                                                          | 直角浅灰块                                                    |
+| 代码块 | 比底更深 `#0e1116`，三色点保留                                                          | 浅色纸面 `#f2f8fa` + 1px 边框                                            | 暖深棕 `#29221b`                                                                                    | 浅灰直角块                                                    |
+| 图注   | 灰字居中                                                                                | 灰字居中                                                                 | 灰字居中                                                                                            | 灰字居中                                                      |
 
 公共落地约束：`.wechat-export-article { padding: 20px 8px 32px }`；正文 16px / 1.8 / 字距 0；`a` 与 `code` 一律 `word-break: break-all; overflow-wrap: anywhere;` 保证长 URL 自动换行；列表 `::marker` 着色在无伪元素要求的场景降级为默认圆点也可接受。
 

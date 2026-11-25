@@ -10,7 +10,13 @@ interface InputModalProps {
   onCancel: () => void
 }
 
-export function InputModal({ open, title, placeholder, onConfirm, onCancel }: InputModalProps) {
+export function InputModal({
+  open,
+  title,
+  placeholder,
+  onConfirm,
+  onCancel,
+}: InputModalProps) {
   const [value, setValue] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -35,12 +41,19 @@ export function InputModal({ open, title, placeholder, onConfirm, onCancel }: In
   return (
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/30 px-4"
-      onClick={(e) => { if (e.target === e.currentTarget) onCancel() }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onCancel()
+      }}
     >
       <div className="w-full max-w-md rounded-xl bg-[var(--editor-panel)] p-5 shadow-xl">
-        <h3 className="text-sm font-semibold text-[var(--editor-ink)] mb-3">{title}</h3>
+        <h3 className="text-sm font-semibold text-[var(--editor-ink)] mb-3">
+          {title}
+        </h3>
         <form
-          onSubmit={(e) => { e.preventDefault(); handleSubmit() }}
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleSubmit()
+          }}
           className="flex flex-col gap-3"
         >
           <input

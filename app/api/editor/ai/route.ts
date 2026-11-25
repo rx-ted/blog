@@ -1,8 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/admin-auth'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { transformEditorSelectionStream, getAiRuntimeEnv } from '@/lib/ai'
-import { ensureAiConfigInfrastructure, resolveAiConfigSecret } from '@/lib/ai-provider-profiles'
+import {
+  ensureAiConfigInfrastructure,
+  resolveAiConfigSecret,
+} from '@/lib/ai-provider-profiles'
 
 export async function POST(req: NextRequest) {
   const env = await getAppCloudflareEnv()
@@ -47,16 +50,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '请输入指令' }, { status: 400 })
     }
   } else {
-    const row = await db.prepare(
-      'SELECT prompt, temperature, profile_id FROM ai_actions WHERE action_key = ? AND is_enabled = 1'
-    ).bind(action).first<{ prompt: string; temperature: number; profile_id: number | null }>()
+    const row = await db
+      .prepare(
+        'SELECT prompt, temperature, profile_id FROM ai_actions WHERE action_key = ? AND is_enabled = 1',
+      )
+      .bind(action)
+      .first<{
+        prompt: string
+        temperature: number
+        profile_id: number | null
+      }>()
 
     if (!row) {
       return NextResponse.json({ error: '不支持的 AI 操作' }, { status: 400 })
     }
     actionPrompt = row.prompt
     temperature = row.temperature
-    profileId = Number.isFinite(row.profile_id) ? Number(row.profile_id) : undefined
+    profileId = Number.isFinite(row.profile_id)
+      ? Number(row.profile_id)
+      : undefined
   }
 
   try {

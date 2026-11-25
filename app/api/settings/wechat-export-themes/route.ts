@@ -15,7 +15,10 @@ export async function GET() {
       })
     }
 
-    const rawConfig = await getSetting(env.DB, WECHAT_EXPORT_THEME_CONFIG_SETTING_KEY)
+    const rawConfig = await getSetting(
+      env.DB,
+      WECHAT_EXPORT_THEME_CONFIG_SETTING_KEY,
+    )
     return NextResponse.json(resolveWechatExportThemeConfig(rawConfig), {
       headers: { 'Cache-Control': 'no-store' },
     })

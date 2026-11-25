@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/admin-auth'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import {
@@ -17,7 +17,11 @@ import {
 
 type RawModelItem = RawWorkersAiModelItem
 
-function buildProviderErrorMessage(resStatus: number, resStatusText: string, rawBody: string): string {
+function buildProviderErrorMessage(
+  resStatus: number,
+  resStatusText: string,
+  rawBody: string,
+): string {
   try {
     if (rawBody) {
       const parsed = JSON.parse(rawBody) as {
@@ -48,7 +52,10 @@ function isSiliconFlowProvider(provider: string, baseUrl: string) {
 }
 
 function isWorkersAiProvider(provider: string, baseUrl: string) {
-  return provider === 'workers_ai' || /api\.cloudflare\.com\/client\/v4\/accounts\/[^/]+\/ai\//i.test(baseUrl)
+  return (
+    provider === 'workers_ai' ||
+    /api\.cloudflare\.com\/client\/v4\/accounts\/[^/]+\/ai\//i.test(baseUrl)
+  )
 }
 
 function extractModelItems(payload: unknown): RawModelItem[] {
@@ -77,10 +84,16 @@ function extractModelItems(payload: unknown): RawModelItem[] {
     candidate.result?.items,
   ]
 
-  return arrays.flatMap((value) => (Array.isArray(value) ? value as RawModelItem[] : []))
+  return arrays.flatMap((value) =>
+    Array.isArray(value) ? (value as RawModelItem[]) : [],
+  )
 }
 
-function filterCompatibleModels(items: RawModelItem[], provider: string, baseUrl: string) {
+function filterCompatibleModels(
+  items: RawModelItem[],
+  provider: string,
+  baseUrl: string,
+) {
   if (!isSiliconFlowProvider(provider, baseUrl)) return items
 
   const filtered = items.filter((item) => {
@@ -103,7 +116,8 @@ export async function GET(req: NextRequest) {
   if (!(await authenticateRequest(req, db))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  if (!db) return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
+  if (!db)
+    return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
 
   const secret = resolveAiConfigSecret(env)
   await ensureAiConfigInfrastructure(db, secret)
@@ -122,33 +136,40 @@ export async function GET(req: NextRequest) {
   } | null = null
 
   if (Number.isFinite(queryProfileId) && queryProfileId > 0) {
-    selectedProfile = await db.prepare(`
+    selectedProfile = await db
+      .prepare(`
       SELECT id, provider, base_url, api_key_encrypted
       FROM ai_provider_profiles
       WHERE id = ?
       LIMIT 1
-    `).bind(queryProfileId).first<{
-      id: number
-      provider: string
-      base_url: string
-      api_key_encrypted: string
-    }>()
+    `)
+      .bind(queryProfileId)
+      .first<{
+        id: number
+        provider: string
+        base_url: string
+        api_key_encrypted: string
+      }>()
   }
 
   const provider = queryProvider || selectedProfile?.provider || 'custom'
   const fallbackPreset = AI_PROVIDER_MAP[provider]
   const fallbackModels = fallbackPreset?.quickModels || []
 
-  const baseUrl = normalizeBaseUrl(queryBaseUrl || selectedProfile?.base_url || '')
+  const baseUrl = normalizeBaseUrl(
+    queryBaseUrl || selectedProfile?.base_url || '',
+  )
   const profileApiKey = selectedProfile?.api_key_encrypted
     ? await decryptApiKey(selectedProfile.api_key_encrypted, secret)
     : ''
   const apiKey = queryApiKey || profileApiKey || ''
-  const storedKeyUnavailable = !queryApiKey
-    && Boolean(selectedProfile?.api_key_encrypted?.trim())
-    && !profileApiKey
+  const storedKeyUnavailable =
+    !queryApiKey &&
+    Boolean(selectedProfile?.api_key_encrypted?.trim()) &&
+    !profileApiKey
 
-  if (!baseUrl) return NextResponse.json({ error: '缺少 base_url 参数' }, { status: 400 })
+  if (!baseUrl)
+    return NextResponse.json({ error: '缺少 base_url 参数' }, { status: 400 })
 
   if (!apiKey && provider !== 'openrouter') {
     const warning = storedKeyUnavailable
@@ -156,12 +177,15 @@ export async function GET(req: NextRequest) {
       : '未提供 API Key，返回预设模型列表'
     if (fallbackModels.length > 0) {
       return NextResponse.json({
-        models: fallbackModels.map(id => ({ id, name: id })),
+        models: fallbackModels.map((id) => ({ id, name: id })),
         source: 'preset',
         warning,
       })
     }
-    return NextResponse.json({ error: storedKeyUnavailable ? warning : '缺少 API Key' }, { status: 400 })
+    return NextResponse.json(
+      { error: storedKeyUnavailable ? warning : '缺少 API Key' },
+      { status: 400 },
+    )
   }
 
   try {
@@ -170,18 +194,27 @@ export async function GET(req: NextRequest) {
       if (!accountId || /<account_id>/i.test(accountId)) {
         if (fallbackModels.length > 0) {
           return NextResponse.json({
-            models: fallbackModels.map(id => ({ id, name: id })),
+            models: fallbackModels.map((id) => ({ id, name: id })),
             source: 'preset',
-            warning: 'Workers AI 需要把 Base URL 里的 <ACCOUNT_ID> 替换成真实 Cloudflare Account ID 后才能拉取完整模型列表',
+            warning:
+              'Workers AI 需要把 Base URL 里的 <ACCOUNT_ID> 替换成真实 Cloudflare Account ID 后才能拉取完整模型列表',
           })
         }
-        return NextResponse.json({ error: '请先在 Base URL 中填写真实的 Cloudflare Account ID' }, { status: 400 })
+        return NextResponse.json(
+          { error: '请先在 Base URL 中填写真实的 Cloudflare Account ID' },
+          { status: 400 },
+        )
       }
 
-      const models = await fetchWorkersAiModels(accountId, apiKey, 'text', fallbackModels)
+      const models = await fetchWorkersAiModels(
+        accountId,
+        apiKey,
+        'text',
+        fallbackModels,
+      )
       if (models.length === 0 && fallbackModels.length > 0) {
         return NextResponse.json({
-          models: fallbackModels.map(id => ({ id, name: id })),
+          models: fallbackModels.map((id) => ({ id, name: id })),
           source: 'preset',
           warning: 'Workers AI 接口返回为空，已回退预设模型',
         })
@@ -208,32 +241,43 @@ export async function GET(req: NextRequest) {
 
       if (!res.ok) {
         const rawBody = await res.text().catch(() => '')
-        warnings.push(buildProviderErrorMessage(res.status, res.statusText, rawBody))
+        warnings.push(
+          buildProviderErrorMessage(res.status, res.statusText, rawBody),
+        )
         continue
       }
 
       const data = await res.json().catch(() => null)
-      const items = filterCompatibleModels(extractModelItems(data), provider, baseUrl)
+      const items = filterCompatibleModels(
+        extractModelItems(data),
+        provider,
+        baseUrl,
+      )
       collectedItems.push(...items)
     }
 
-    const models = buildWorkersAiModelOptions(filterCompatibleModels(collectedItems, provider, baseUrl))
+    const models = buildWorkersAiModelOptions(
+      filterCompatibleModels(collectedItems, provider, baseUrl),
+    )
 
     if (models.length === 0 && warnings.length > 0) {
       const message = warnings[0]
       if (fallbackModels.length > 0) {
         return NextResponse.json({
-          models: fallbackModels.map(id => ({ id, name: id })),
+          models: fallbackModels.map((id) => ({ id, name: id })),
           source: 'preset',
           warning: `接口拉取失败，已回退预设：${message}`,
         })
       }
-      return NextResponse.json({ error: `获取模型列表失败：${message}` }, { status: 502 })
+      return NextResponse.json(
+        { error: `获取模型列表失败：${message}` },
+        { status: 502 },
+      )
     }
 
     if (models.length === 0 && fallbackModels.length > 0) {
       return NextResponse.json({
-        models: fallbackModels.map(id => ({ id, name: id })),
+        models: fallbackModels.map((id) => ({ id, name: id })),
         source: 'preset',
         warning: '接口返回为空，已回退预设模型',
       })
@@ -248,7 +292,7 @@ export async function GET(req: NextRequest) {
     const message = error instanceof Error ? error.message : '获取模型列表失败'
     if (fallbackModels.length > 0) {
       return NextResponse.json({
-        models: fallbackModels.map(id => ({ id, name: id })),
+        models: fallbackModels.map((id) => ({ id, name: id })),
         source: 'preset',
         warning: `网络异常，已回退预设：${message}`,
       })

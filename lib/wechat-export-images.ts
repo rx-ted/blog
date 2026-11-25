@@ -7,7 +7,10 @@ export function rewriteWechatExportImageUrl(
 ) {
   const url = new URL(input, baseUrl)
 
-  if (url.origin === new URL(baseUrl).origin && url.pathname.startsWith('/api/images/')) {
+  if (
+    url.origin === new URL(baseUrl).origin &&
+    url.pathname.startsWith('/api/images/')
+  ) {
     if (variant === 'content') {
       url.searchParams.set('w', '1280')
       url.searchParams.set('q', '82')

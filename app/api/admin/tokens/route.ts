@@ -1,11 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
-import { isAdminAuthenticated, COOKIE_NAME, generateApiToken } from '@/lib/admin-auth'
+import {
+  isAdminAuthenticated,
+  COOKIE_NAME,
+  generateApiToken,
+} from '@/lib/admin-auth'
 
 // 确保 api_tokens 表存在
 async function ensureTokensTable(db: D1Database) {
   try {
-    await db.prepare(`
+    await db
+      .prepare(`
       CREATE TABLE IF NOT EXISTS api_tokens (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         token TEXT UNIQUE NOT NULL,
@@ -14,8 +19,11 @@ async function ensureTokensTable(db: D1Database) {
         last_used_at INTEGER,
         is_active INTEGER DEFAULT 1
       )
-    `).run()
-  } catch { /* table already exists */ }
+    `)
+      .run()
+  } catch {
+    /* table already exists */
+  }
 }
 
 // Token 管理只允许 Cookie 认证（后台管理操作）
@@ -37,11 +45,10 @@ export async function GET(req: NextRequest) {
 
   await ensureTokensTable(env.DB)
 
-  const { results } = await env.DB
-    .prepare(`SELECT id, name, created_at, last_used_at, is_active,
+  const { results } =
+    await env.DB.prepare(`SELECT id, name, created_at, last_used_at, is_active,
               substr(token, 1, 10) || '...' as token_preview
-              FROM api_tokens ORDER BY created_at DESC`)
-    .all()
+              FROM api_tokens ORDER BY created_at DESC`).all()
 
   return NextResponse.json({ tokens: results })
 }
@@ -66,8 +73,7 @@ export async function POST(req: NextRequest) {
 
   const token = generateApiToken()
 
-  await env.DB
-    .prepare('INSERT INTO api_tokens (token, name) VALUES (?, ?)')
+  await env.DB.prepare('INSERT INTO api_tokens (token, name) VALUES (?, ?)')
     .bind(token, name.trim())
     .run()
 
@@ -91,10 +97,7 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: '缺少 Token ID' }, { status: 400 })
   }
 
-  await env.DB
-    .prepare('DELETE FROM api_tokens WHERE id = ?')
-    .bind(id)
-    .run()
+  await env.DB.prepare('DELETE FROM api_tokens WHERE id = ?').bind(id).run()
 
   return NextResponse.json({ success: true })
 }

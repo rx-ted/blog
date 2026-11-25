@@ -26,27 +26,26 @@ export interface WechatExportThemeCss {
 }
 
 function stripEditorOnlyBreaks(html: string) {
-  return html.replace(/\s*<br\b[^>]*class="[^"]*ProseMirror-trailingBreak[^"]*"[^>]*>\s*/gi, '')
+  return html.replace(
+    /\s*<br\b[^>]*class="[^"]*ProseMirror-trailingBreak[^"]*"[^>]*>\s*/gi,
+    '',
+  )
 }
 
 export function normalizeWechatExportHtml(html: string) {
   return stripEditorOnlyBreaks(html)
-    .replace(/<p(?:\s[^>]*)?>\s*(?:<br\b[^>]*>)?\s*<\/p>/gi, '<p data-wechat-empty="true">&nbsp;</p>')
-    .replace(/<p(?![^>]*data-wechat-empty="true")([^>]*)>\s*&nbsp;\s*<\/p>/gi, '<p$1 data-wechat-empty="true">&nbsp;</p>')
+    .replace(
+      /<p(?:\s[^>]*)?>\s*(?:<br\b[^>]*>)?\s*<\/p>/gi,
+      '<p data-wechat-empty="true">&nbsp;</p>',
+    )
+    .replace(
+      /<p(?![^>]*data-wechat-empty="true")([^>]*)>\s*&nbsp;\s*<\/p>/gi,
+      '<p$1 data-wechat-empty="true">&nbsp;</p>',
+    )
 }
 
 const KATEX_FONT_SIZE_STEPS = [
-  1,
-  1.2,
-  1.4,
-  1.6,
-  1.8,
-  2,
-  2.4,
-  2.88,
-  3.456,
-  4.148,
-  4.976,
+  1, 1.2, 1.4, 1.6, 1.8, 2, 2.4, 2.88, 3.456, 4.148, 4.976,
 ] as const
 
 function formatKatexEm(value: number) {
@@ -54,8 +53,8 @@ function formatKatexEm(value: number) {
 }
 
 function buildKatexSizingCss() {
-  return KATEX_FONT_SIZE_STEPS
-    .flatMap((resetSize, resetIndex) => KATEX_FONT_SIZE_STEPS.map((size, sizeIndex) => {
+  return KATEX_FONT_SIZE_STEPS.flatMap((resetSize, resetIndex) =>
+    KATEX_FONT_SIZE_STEPS.map((size, sizeIndex) => {
       const reset = resetIndex + 1
       const target = sizeIndex + 1
       const fontSize = formatKatexEm(size / resetSize)
@@ -64,11 +63,14 @@ function buildKatexSizingCss() {
 .wechat-export-content .katex .fontsize-ensurer.reset-size${reset}.size${target} {
   font-size: ${fontSize}em;
 }`
-    }))
-    .join('\n\n')
+    }),
+  ).join('\n\n')
 }
 
-export function buildWechatExportCss(tokens: WechatExportStyleTokens, theme?: WechatExportThemeCss | null) {
+export function buildWechatExportCss(
+  tokens: WechatExportStyleTokens,
+  theme?: WechatExportThemeCss | null,
+) {
   const baseCss = `
 .wechat-export-root {
   color: ${tokens.articleBodyColor};
@@ -1247,7 +1249,9 @@ ${buildKatexSizingCss()}
   // 中文 CJK 字体没有 800/900 真实字重，-webkit-text-stroke 在 iOS / 微信 WebKit 中
   // 稳定可见且克制；paint-order 让描边画在字形下层，避免笔画内缩。
   // 显式主题（NVIDIA/Apple/Claude 等）自带标题处理，不注入此规则。
-  const defaultOnlyCss = themeCss ? '' : `
+  const defaultOnlyCss = themeCss
+    ? ''
+    : `
 .wechat-export-content h1,
 .wechat-export-content h2,
 .wechat-export-content h3,

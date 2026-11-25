@@ -19,7 +19,8 @@ export default async function AdminProtectedLayout({
     redirect('/dashboard/login')
   }
 
-  const navCls = 'px-3 py-2 rounded-lg text-sm text-[var(--editor-muted)] hover:text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition-all duration-150 whitespace-nowrap'
+  const navCls =
+    'px-3 py-2 rounded-lg text-sm text-[var(--editor-muted)] hover:text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition-all duration-150 whitespace-nowrap'
 
   return (
     <div className="min-h-screen bg-[var(--background)] flex flex-col">
@@ -29,18 +30,31 @@ export default async function AdminProtectedLayout({
             <Link
               href="/"
               className="text-lg tracking-tight text-[var(--editor-ink)] hover:text-[var(--editor-accent)] transition-colors duration-200"
-              style={{ fontFamily: 'Georgia, "Noto Serif SC", serif', fontWeight: 500 }}
+              style={{
+                fontFamily: 'Georgia, "Noto Serif SC", serif',
+                fontWeight: 500,
+              }}
             >
               木羽博客
             </Link>
-            <span className="text-[var(--editor-line)] hidden sm:inline">/</span>
-            <span className="text-[var(--stone-gray)] hidden sm:inline">管理后台</span>
+            <span className="text-[var(--editor-line)] hidden sm:inline">
+              /
+            </span>
+            <span className="text-[var(--stone-gray)] hidden sm:inline">
+              管理后台
+            </span>
           </div>
 
           <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
-            <Link href="/dashboard/posts" className={navCls}>文章</Link>
-            <Link href="/dashboard/categories" className={navCls}>分类</Link>
-            <Link href="/dashboard/settings" className={navCls}>设置</Link>
+            <Link href="/dashboard/posts" className={navCls}>
+              文章
+            </Link>
+            <Link href="/dashboard/categories" className={navCls}>
+              分类
+            </Link>
+            <Link href="/dashboard/settings" className={navCls}>
+              设置
+            </Link>
             <div className="w-px h-4 bg-[var(--editor-line)] mx-2 hidden md:block" />
             <Link
               href="/editor"
@@ -62,7 +76,9 @@ export default async function AdminProtectedLayout({
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl w-full px-4 sm:px-6 py-8 flex-1">{children}</main>
+      <main className="mx-auto max-w-6xl w-full px-4 sm:px-6 py-8 flex-1">
+        {children}
+      </main>
 
       <AdminFooter />
     </div>

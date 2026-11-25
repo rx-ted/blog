@@ -7,24 +7,32 @@ import {
   MAX_COVER_TITLE_LENGTH,
 } from '@/lib/ai-post-generator/constants'
 import { truncateText } from '@/lib/ai-post-generator/parsers'
-import type { AiPostGeneratorRow, GeneratePostCoverInput } from '@/lib/ai-post-generator/types'
+import type {
+  AiPostGeneratorRow,
+  GeneratePostCoverInput,
+} from '@/lib/ai-post-generator/types'
 
 type ContextTarget = 'summary' | 'tags' | 'slug' | 'cover'
 
-export function buildContextBlock(input: {
-  title?: string
-  content?: string
-  category?: string
-  description?: string
-  tags?: string[]
-  currentSlug?: string
-}, target: ContextTarget = 'summary') {
+export function buildContextBlock(
+  input: {
+    title?: string
+    content?: string
+    category?: string
+    description?: string
+    tags?: string[]
+    currentSlug?: string
+  },
+  target: ContextTarget = 'summary',
+) {
   const sections: string[] = []
   const title = (input.title || '').trim()
   const description = (input.description || '').trim()
   const category = (input.category || '').trim()
   const content = (input.content || '').replace(/\s+/g, ' ').trim()
-  const tags = Array.isArray(input.tags) ? input.tags.map((tag) => tag.trim()).filter(Boolean) : []
+  const tags = Array.isArray(input.tags)
+    ? input.tags.map((tag) => tag.trim()).filter(Boolean)
+    : []
   const currentSlug = (input.currentSlug || '').trim()
 
   if (title) sections.push(`标题：${title}`)
@@ -32,7 +40,10 @@ export function buildContextBlock(input: {
 
   if (target === 'slug') {
     if (description) sections.push(`摘要参考：${description}`)
-    if (content) sections.push(`正文参考：${content.slice(0, Math.min(MAX_CONTEXT_LENGTH, 1200))}`)
+    if (content)
+      sections.push(
+        `正文参考：${content.slice(0, Math.min(MAX_CONTEXT_LENGTH, 1200))}`,
+      )
     return sections.join('\n')
   }
 
@@ -72,7 +83,10 @@ export function getNowPrefix() {
 
 export function sanitizeFilename(filename: string) {
   const trimmed = filename.trim().toLowerCase()
-  const safe = trimmed.replace(/[^a-z0-9._-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+  const safe = trimmed
+    .replace(/[^a-z0-9._-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
   return safe || 'image'
 }
 
@@ -82,11 +96,15 @@ export function buildAssetUrls(encodedKey: string, cloudflareEnabled: boolean) {
     raw: baseUrl,
     content: cloudflareEnabled ? `${baseUrl}?w=1600&q=85&format=webp` : baseUrl,
     thumb: cloudflareEnabled ? `${baseUrl}?w=960&q=82&format=webp` : baseUrl,
-    cover: cloudflareEnabled ? `${baseUrl}?w=1600&h=900&fit=cover&q=84&format=webp` : baseUrl,
+    cover: cloudflareEnabled
+      ? `${baseUrl}?w=1600&h=900&fit=cover&q=84&format=webp`
+      : baseUrl,
   }
 }
 
-function buildCoverHintPhrases(input: Omit<GeneratePostCoverInput, 'db' | 'images' | 'env'>) {
+function buildCoverHintPhrases(
+  input: Omit<GeneratePostCoverInput, 'db' | 'images' | 'env'>,
+) {
   const rawHints = [
     ...(Array.isArray(input.tags) ? input.tags : []),
     input.category || '',
@@ -94,19 +112,26 @@ function buildCoverHintPhrases(input: Omit<GeneratePostCoverInput, 'db' | 'image
     ...(input.description || '').split(/[：:，,、|《》“”"'（）()]/),
   ]
 
-  return Array.from(new Set(
-    rawHints
-      .map((item) => item.trim())
-      .filter((item) => item.length >= 2 && item.length <= 24),
-  ))
+  return Array.from(
+    new Set(
+      rawHints
+        .map((item) => item.trim())
+        .filter((item) => item.length >= 2 && item.length <= 24),
+    ),
+  )
 }
 
-function buildCoverContentBrief(input: Omit<GeneratePostCoverInput, 'db' | 'images' | 'env'>) {
-  const description = truncateText(input.description || '', MAX_COVER_DESCRIPTION_LENGTH)
+function buildCoverContentBrief(
+  input: Omit<GeneratePostCoverInput, 'db' | 'images' | 'env'>,
+) {
+  const description = truncateText(
+    input.description || '',
+    MAX_COVER_DESCRIPTION_LENGTH,
+  )
   const normalizedContent = (input.content || '').replace(/\r/g, '\n')
   const hints = buildCoverHintPhrases(input)
   const rawSentences = normalizedContent
-    .split(/(?<=[。！？!?\.])\s+|\n+/u)
+    .split(/(?<=[。！？!?.])\s+|\n+/u)
     .map((sentence) => sentence.replace(/\s+/g, ' ').trim())
     .filter(Boolean)
 
@@ -115,14 +140,24 @@ function buildCoverContentBrief(input: Omit<GeneratePostCoverInput, 'db' | 'imag
 
   for (const sentence of rawSentences.slice(0, 24)) {
     if (sentence.length < 12) continue
-    if (/^(本文|这篇文章|文章|作者|首先|其次|再次|最后|总之|总结来说)/.test(sentence)) continue
+    if (
+      /^(本文|这篇文章|文章|作者|首先|其次|再次|最后|总之|总结来说)/.test(
+        sentence,
+      )
+    )
+      continue
 
     const concise = truncateText(sentence, 120)
     if (!concise) continue
 
     const hasHint = hints.some((hint) => concise.includes(hint))
     const targetList = hasHint ? matched : fallback
-    if (targetList.some((item) => item === concise || item.includes(concise) || concise.includes(item))) {
+    if (
+      targetList.some(
+        (item) =>
+          item === concise || item.includes(concise) || concise.includes(item),
+      )
+    ) {
       continue
     }
 
@@ -135,7 +170,9 @@ function buildCoverContentBrief(input: Omit<GeneratePostCoverInput, 'db' | 'imag
 
   if (description) lines.push(`文章导语：${description}`)
   if (coreSentences.length > 0) {
-    lines.push(`文章核心信息：${truncateText(coreSentences.join('；'), MAX_COVER_BRIEF_LENGTH)}`)
+    lines.push(
+      `文章核心信息：${truncateText(coreSentences.join('；'), MAX_COVER_BRIEF_LENGTH)}`,
+    )
   }
 
   return lines
@@ -176,13 +213,21 @@ export function buildCoverPrompt(
 ) {
   const title = (input.title || '').trim()
   const category = (input.category || '').trim()
-  const tags = Array.isArray(input.tags) ? input.tags.map((tag) => tag.trim()).filter(Boolean) : []
+  const tags = Array.isArray(input.tags)
+    ? input.tags.map((tag) => tag.trim()).filter(Boolean)
+    : []
   const headSections: string[] = []
 
   if (generator.prompt.trim()) headSections.push(generator.prompt.trim())
-  if (title) headSections.push(`文章标题：${truncateText(title, MAX_COVER_TITLE_LENGTH)}`)
+  if (title)
+    headSections.push(
+      `文章标题：${truncateText(title, MAX_COVER_TITLE_LENGTH)}`,
+    )
   if (category) headSections.push(`分类：${truncateText(category, 48)}`)
-  if (tags.length > 0) headSections.push(`标签：${truncateText(tags.join('、'), MAX_COVER_TAGS_LENGTH)}`)
+  if (tags.length > 0)
+    headSections.push(
+      `标签：${truncateText(tags.join('、'), MAX_COVER_TAGS_LENGTH)}`,
+    )
   headSections.push(...buildCoverContentBrief(input))
 
   return joinPromptSectionsWithinLimit(

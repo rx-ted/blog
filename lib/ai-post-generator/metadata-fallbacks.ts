@@ -9,7 +9,10 @@ import {
 import { normalizePostSlug } from '@/lib/post-utils'
 import type { GeneratePostMetadataInput } from '@/lib/ai-post-generator/types'
 
-type MetadataFallbackInput = Omit<GeneratePostMetadataInput, 'target' | 'db' | 'env'> & {
+type MetadataFallbackInput = Omit<
+  GeneratePostMetadataInput,
+  'target' | 'db' | 'env'
+> & {
   resultText: string
   reasoningText?: string
 }
@@ -62,7 +65,11 @@ const GENERIC_TAGS = new Set([
   '实现',
 ])
 
-function collectMatches(value: string, pattern: RegExp, pick: (match: RegExpExecArray) => string) {
+function collectMatches(
+  value: string,
+  pattern: RegExp,
+  pick: (match: RegExpExecArray) => string,
+) {
   const matches: string[] = []
 
   for (const match of value.matchAll(pattern)) {
@@ -85,18 +92,22 @@ function extractSlugFromReasoning(reasoningText: string) {
   const normalized = reasoningText.trim()
   if (!normalized) return ''
 
-  const explicitJson = getLastNonEmpty(collectMatches(
-    normalized,
-    /"slug"\s*:\s*"([^"]+)"/gi,
-    (match) => match[1] || '',
-  ))
+  const explicitJson = getLastNonEmpty(
+    collectMatches(
+      normalized,
+      /"slug"\s*:\s*"([^"]+)"/gi,
+      (match) => match[1] || '',
+    ),
+  )
   if (explicitJson) return explicitJson
 
-  const explicitLine = getLastNonEmpty(collectMatches(
-    normalized,
-    /(?:^|\n)\s*(?:slug|final(?: answer| output)?|answer|output)\s*[:：-]\s*([^\n]+)/gi,
-    (match) => match[1] || '',
-  ))
+  const explicitLine = getLastNonEmpty(
+    collectMatches(
+      normalized,
+      /(?:^|\n)\s*(?:slug|final(?: answer| output)?|answer|output)\s*[:：-]\s*([^\n]+)/gi,
+      (match) => match[1] || '',
+    ),
+  )
   if (explicitLine) return explicitLine
 
   const parsed = parseJsonValue(normalized)
@@ -125,11 +136,13 @@ function extractTagsFromReasoning(reasoningText: string) {
     if (tags.length > 0) return tags
   }
 
-  const lineCandidate = getLastNonEmpty(collectMatches(
-    normalized,
-    /(?:^|\n)\s*(?:tags?|keywords?|labels?)\s*[:：-]\s*([^\n]+)/gi,
-    (match) => match[1] || '',
-  ))
+  const lineCandidate = getLastNonEmpty(
+    collectMatches(
+      normalized,
+      /(?:^|\n)\s*(?:tags?|keywords?|labels?)\s*[:：-]\s*([^\n]+)/gi,
+      (match) => match[1] || '',
+    ),
+  )
   if (lineCandidate) {
     const tags = normalizeTags(lineCandidate)
     if (tags.length > 0) return tags
@@ -145,7 +158,12 @@ function extractTagsFromReasoning(reasoningText: string) {
   return normalizeTags(tailLines)
 }
 
-function addUnique(candidates: string[], seen: Set<string>, value: string, maxLength = 24) {
+function addUnique(
+  candidates: string[],
+  seen: Set<string>,
+  value: string,
+  maxLength = 24,
+) {
   const normalized = value
     .trim()
     .replace(/\s+/g, ' ')
@@ -172,16 +190,20 @@ function collectEnglishTagCandidates(value: string) {
 function collectChineseTagCandidates(value: string) {
   return value
     .split(/[\n,，。！？!?:：;；、|｜/\\()（）【】《》"'“”‘’]+/)
-    .map((item) => item
-      .trim()
-      .replace(/\s+/g, ' ')
-      .replace(/^(?:讲清楚|聊聊|说说|解析|解读|关于|如何|为什么)\s*/u, '')
-      .trim())
+    .map((item) =>
+      item
+        .trim()
+        .replace(/\s+/g, ' ')
+        .replace(/^(?:讲清楚|聊聊|说说|解析|解读|关于|如何|为什么)\s*/u, '')
+        .trim(),
+    )
     .filter((item) => item.length >= 2 && item.length <= 16)
     .filter((item) => !GENERIC_TAGS.has(item))
 }
 
-function buildContextTags(input: Omit<MetadataFallbackInput, 'resultText' | 'reasoningText'>) {
+function buildContextTags(
+  input: Omit<MetadataFallbackInput, 'resultText' | 'reasoningText'>,
+) {
   const candidates: string[] = []
   const seen = new Set<string>()
 
@@ -198,12 +220,16 @@ function buildContextTags(input: Omit<MetadataFallbackInput, 'resultText' | 'rea
     for (const candidate of collectChineseTagCandidates(value)) {
       addUnique(candidates, seen, candidate)
     }
-    for (const candidate of collectChineseTagCandidates(value.replace(/[A-Za-z0-9.+/#-]+/g, ' '))) {
+    for (const candidate of collectChineseTagCandidates(
+      value.replace(/[A-Za-z0-9.+/#-]+/g, ' '),
+    )) {
       addUnique(candidates, seen, candidate)
     }
   }
 
-  for (const candidate of collectEnglishTagCandidates((input.content || '').slice(0, 1200))) {
+  for (const candidate of collectEnglishTagCandidates(
+    (input.content || '').slice(0, 1200),
+  )) {
     addUnique(candidates, seen, candidate)
     if (candidates.length >= MAX_TAGS) break
   }
@@ -267,7 +293,12 @@ export function resolveGeneratedTags(input: MetadataFallbackInput) {
 export function resolveGeneratedSlug(input: MetadataFallbackInput) {
   const parsed = parseJsonValue(input.resultText)
   const primary = normalizeGeneratedSlug(
-    extractGeneratedText(parsed, input.resultText, ['slug', 'text', 'result', 'content']),
+    extractGeneratedText(parsed, input.resultText, [
+      'slug',
+      'text',
+      'result',
+      'content',
+    ]),
     '',
   )
   if (primary) return primary
@@ -289,9 +320,11 @@ export function resolveGeneratedSlug(input: MetadataFallbackInput) {
   const preservedCurrentSlug = normalizePostSlug(input.currentSlug || '')
   if (preservedCurrentSlug) return preservedCurrentSlug
 
-  return normalizePostSlug(`post-${createStableSlugSeed(
-    input.title || '',
-    input.description || '',
-    (input.content || '').slice(0, 160),
-  )}`)
+  return normalizePostSlug(
+    `post-${createStableSlugSeed(
+      input.title || '',
+      input.description || '',
+      (input.content || '').slice(0, 160),
+    )}`,
+  )
 }

@@ -2,7 +2,7 @@
 // 密码存储在服务端，不暴露给客户端
 
 import { nanoid } from 'nanoid'
-import { NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 
 interface AdminAuthConfig {
@@ -68,7 +68,7 @@ export async function verifyPassword(password: string): Promise<boolean> {
 
 /** 从请求 cookie 中校验 admin 会话 */
 export async function isAdminAuthenticated(
-  cookieValue: string | undefined
+  cookieValue: string | undefined,
 ): Promise<boolean> {
   if (!cookieValue) return false
   const expected = await getSessionToken()
@@ -88,7 +88,10 @@ interface ApiTokenRow {
 }
 
 /** 验证 API Token（查询数据库，更新 last_used_at） */
-export async function verifyApiToken(db: D1Database, token: string): Promise<boolean> {
+export async function verifyApiToken(
+  db: D1Database,
+  token: string,
+): Promise<boolean> {
   if (!token || !token.startsWith('qm_')) return false
   try {
     const row = await db
@@ -97,7 +100,9 @@ export async function verifyApiToken(db: D1Database, token: string): Promise<boo
       .first<ApiTokenRow>()
     if (!row || !row.is_active) return false
     // 异步更新 last_used_at，不阻塞认证
-    db.prepare("UPDATE api_tokens SET last_used_at = strftime('%s', 'now') WHERE id = ?")
+    db.prepare(
+      "UPDATE api_tokens SET last_used_at = strftime('%s', 'now') WHERE id = ?",
+    )
       .bind(row.id)
       .run()
       .catch(() => {})
@@ -113,7 +118,7 @@ export async function verifyApiToken(db: D1Database, token: string): Promise<boo
  */
 export async function authenticateRequest(
   req: NextRequest,
-  db?: D1Database
+  db?: D1Database,
 ): Promise<boolean> {
   // 1. 先检查 Bearer Token
   const authHeader = req.headers.get('Authorization')

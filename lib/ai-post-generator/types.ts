@@ -1,5 +1,8 @@
 import type { GeneratedEditorImage } from '@/lib/ai-image'
-import type { AIImageAspectRatio, AIImageResolution } from '@/lib/ai-image-options'
+import type {
+  AIImageAspectRatio,
+  AIImageResolution,
+} from '@/lib/ai-image-options'
 
 export type AiPostGeneratorTarget = 'summary' | 'tags' | 'slug' | 'cover'
 export type AiPostGeneratorProviderMode = 'workers_ai' | 'profile'
@@ -14,7 +17,7 @@ export type ImageBucket = {
         cacheControl?: string
       }
       customMetadata?: Record<string, string>
-    }
+    },
   ) => Promise<void>
 }
 

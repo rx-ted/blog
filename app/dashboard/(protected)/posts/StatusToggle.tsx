@@ -59,7 +59,11 @@ export function StatusToggle({ slug, currentStatus }: StatusToggleProps) {
         onClose={() => setShowModal(false)}
         onConfirm={handleToggle}
         title={newStatus === 'published' ? '发布文章' : '改为草稿'}
-        description={newStatus === 'published' ? '确定要发布这篇文章吗？' : '确定要将这篇文章改为草稿吗？'}
+        description={
+          newStatus === 'published'
+            ? '确定要发布这篇文章吗？'
+            : '确定要将这篇文章改为草稿吗？'
+        }
         confirmText="确认"
         type="info"
       />

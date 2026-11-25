@@ -34,21 +34,30 @@ export function FrontPostAdminBoundary({
   const { authenticated } = useAdminSession()
   const [editing, setEditing] = useState(false)
 
-  const handleReadModeClick = useCallback((event: MouseEvent<HTMLDivElement>) => {
-    if (!authenticated || editing) return
-    if (event.defaultPrevented || event.button !== 0) return
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+  const handleReadModeClick = useCallback(
+    (event: MouseEvent<HTMLDivElement>) => {
+      if (!authenticated || editing) return
+      if (event.defaultPrevented || event.button !== 0) return
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+        return
 
-    const target = event.target
-    if (!(target instanceof HTMLElement)) return
-    if (target.closest('a, button, input, textarea, select, summary, label, video, audio')) return
+      const target = event.target
+      if (!(target instanceof HTMLElement)) return
+      if (
+        target.closest(
+          'a, button, input, textarea, select, summary, label, video, audio',
+        )
+      )
+        return
 
-    const trigger = target.closest<HTMLElement>('[data-admin-edit-trigger]')
-    if (!trigger) return
+      const trigger = target.closest<HTMLElement>('[data-admin-edit-trigger]')
+      if (!trigger) return
 
-    event.preventDefault()
-    setEditing(true)
-  }, [authenticated, editing])
+      event.preventDefault()
+      setEditing(true)
+    },
+    [authenticated, editing],
+  )
 
   if (authenticated && editing) {
     return (

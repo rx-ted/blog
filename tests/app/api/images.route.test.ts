@@ -13,11 +13,13 @@ import { GET } from '@/app/api/images/[...key]/route'
 
 const originalFetch = global.fetch
 
-function createStoredObject(overrides?: Partial<{
-  body: ReadableStream | null
-  httpEtag: string
-  size: number
-}>) {
+function createStoredObject(
+  overrides?: Partial<{
+    body: ReadableStream | null
+    httpEtag: string
+    size: number
+  }>,
+) {
   return {
     body: overrides?.body ?? null,
     httpEtag: overrides?.httpEtag ?? 'etag-1',
@@ -44,16 +46,24 @@ describe('/api/images/[...key] route', () => {
   it('returns 500 when image storage is not configured', async () => {
     mocks.getAppCloudflareEnv.mockResolvedValue({})
 
-    const response = await GET(createImageRequest('http://test.local/api/images/image/a.webp') as never, {
-      params: Promise.resolve({ key: ['image', 'a.webp'] }),
-    })
+    const response = await GET(
+      createImageRequest('http://test.local/api/images/image/a.webp') as never,
+      {
+        params: Promise.resolve({ key: ['image', 'a.webp'] }),
+      },
+    )
 
     expect(response.status).toBe(500)
-    await expect(response.text()).resolves.toBe('Image storage is not configured')
+    await expect(response.text()).resolves.toBe(
+      'Image storage is not configured',
+    )
   })
 
   it('serves transformed images through the Cloudflare image pipeline when enabled', async () => {
-    const head = vi.fn(async () => ({ size: 1024, httpMetadata: { contentType: 'image/webp' } }))
+    const head = vi.fn(async () => ({
+      size: 1024,
+      httpMetadata: { contentType: 'image/webp' },
+    }))
     const get = vi.fn(async () => createStoredObject())
     mocks.getAppCloudflareEnv.mockResolvedValue({
       IMAGES: { head, get },
@@ -66,11 +76,18 @@ describe('/api/images/[...key] route', () => {
         'Content-Type': 'image/webp',
       },
     })
-    global.fetch = vi.fn(async () => transformedResponse) as unknown as typeof fetch
+    global.fetch = vi.fn(
+      async () => transformedResponse,
+    ) as unknown as typeof fetch
 
-    const response = await GET(createImageRequest('http://test.local/api/images/image/a.webp?w=800&format=webp') as never, {
-      params: Promise.resolve({ key: ['image', 'a.webp'] }),
-    })
+    const response = await GET(
+      createImageRequest(
+        'http://test.local/api/images/image/a.webp?w=800&format=webp',
+      ) as never,
+      {
+        params: Promise.resolve({ key: ['image', 'a.webp'] }),
+      },
+    )
 
     expect(head).toHaveBeenCalledWith('image/a.webp')
     expect(global.fetch).toHaveBeenCalledWith(
@@ -85,22 +102,30 @@ describe('/api/images/[...key] route', () => {
       }),
     )
     expect(response.status).toBe(200)
-    expect(response.headers.get('cache-control')).toBe('public, max-age=31536000, immutable')
+    expect(response.headers.get('cache-control')).toBe(
+      'public, max-age=31536000, immutable',
+    )
     await expect(response.text()).resolves.toBe('transformed-body')
   })
 
   it('returns partial content for range requests', async () => {
-    const head = vi.fn(async () => ({ size: 4096, httpMetadata: { contentType: 'video/mp4' } }))
+    const head = vi.fn(async () => ({
+      size: 4096,
+      httpMetadata: { contentType: 'video/mp4' },
+    }))
     const get = vi.fn(async () => createStoredObject({ size: 4096 }))
     mocks.getAppCloudflareEnv.mockResolvedValue({
       IMAGES: { head, get },
     })
 
-    const response = await GET(createImageRequest('http://test.local/api/images/video/clip.mp4', {
-      headers: { Range: 'bytes=0-1023' },
-    }) as never, {
-      params: Promise.resolve({ key: ['video', 'clip.mp4'] }),
-    })
+    const response = await GET(
+      createImageRequest('http://test.local/api/images/video/clip.mp4', {
+        headers: { Range: 'bytes=0-1023' },
+      }) as never,
+      {
+        params: Promise.resolve({ key: ['video', 'clip.mp4'] }),
+      },
+    )
 
     expect(head).toHaveBeenCalledWith('video/clip.mp4')
     expect(get).toHaveBeenCalledWith('video/clip.mp4', {
@@ -112,17 +137,23 @@ describe('/api/images/[...key] route', () => {
   })
 
   it('rejects unsatisfiable range requests without reading the object body', async () => {
-    const head = vi.fn(async () => ({ size: 4096, httpMetadata: { contentType: 'video/mp4' } }))
+    const head = vi.fn(async () => ({
+      size: 4096,
+      httpMetadata: { contentType: 'video/mp4' },
+    }))
     const get = vi.fn(async () => createStoredObject({ size: 4096 }))
     mocks.getAppCloudflareEnv.mockResolvedValue({
       IMAGES: { head, get },
     })
 
-    const response = await GET(createImageRequest('http://test.local/api/images/video/clip.mp4', {
-      headers: { Range: 'bytes=5000-6000' },
-    }) as never, {
-      params: Promise.resolve({ key: ['video', 'clip.mp4'] }),
-    })
+    const response = await GET(
+      createImageRequest('http://test.local/api/images/video/clip.mp4', {
+        headers: { Range: 'bytes=5000-6000' },
+      }) as never,
+      {
+        params: Promise.resolve({ key: ['video', 'clip.mp4'] }),
+      },
+    )
 
     expect(response.status).toBe(416)
     expect(response.headers.get('Content-Range')).toBe('bytes */4096')
@@ -134,9 +165,14 @@ describe('/api/images/[...key] route', () => {
       IMAGES: { head: vi.fn(), get: vi.fn() },
     })
 
-    const response = await GET(createImageRequest('http://test.local/api/images/image/%E0%A4%A.webp') as never, {
-      params: Promise.resolve({ key: ['image', '%E0%A4%A.webp'] }),
-    })
+    const response = await GET(
+      createImageRequest(
+        'http://test.local/api/images/image/%E0%A4%A.webp',
+      ) as never,
+      {
+        params: Promise.resolve({ key: ['image', '%E0%A4%A.webp'] }),
+      },
+    )
 
     expect(response.status).toBe(400)
     await expect(response.text()).resolves.toBe('Bad image key')
@@ -149,9 +185,14 @@ describe('/api/images/[...key] route', () => {
       IMAGES: { get, head: vi.fn() },
     })
 
-    const response = await GET(createImageRequest('http://test.local/api/images/image/full.webp') as never, {
-      params: Promise.resolve({ key: ['image', 'full.webp'] }),
-    })
+    const response = await GET(
+      createImageRequest(
+        'http://test.local/api/images/image/full.webp',
+      ) as never,
+      {
+        params: Promise.resolve({ key: ['image', 'full.webp'] }),
+      },
+    )
 
     expect(response.status).toBe(200)
     expect(response.headers.get('etag')).toBe('etag-full')

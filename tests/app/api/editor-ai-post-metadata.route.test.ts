@@ -17,7 +17,8 @@ vi.mock('@/lib/cloudflare', () => ({
 }))
 
 vi.mock('@/lib/ai-post-generators', () => ({
-  ensureAiPostGeneratorInfrastructure: mocks.ensureAiPostGeneratorInfrastructure,
+  ensureAiPostGeneratorInfrastructure:
+    mocks.ensureAiPostGeneratorInfrastructure,
   generatePostMetadata: mocks.generatePostMetadata,
   generatePostCover: mocks.generatePostCover,
 }))
@@ -38,11 +39,13 @@ describe('/api/editor/ai-post-metadata route', () => {
   it('returns 401 when the request is not authenticated', async () => {
     mocks.authenticateRequest.mockResolvedValue(false)
 
-    const response = await POST(new Request('http://test.local/api/editor/ai-post-metadata', {
-      method: 'POST',
-      body: JSON.stringify({ target: 'summary', title: '标题' }),
-      headers: { 'Content-Type': 'application/json' },
-    }) as never)
+    const response = await POST(
+      new Request('http://test.local/api/editor/ai-post-metadata', {
+        method: 'POST',
+        body: JSON.stringify({ target: 'summary', title: '标题' }),
+        headers: { 'Content-Type': 'application/json' },
+      }) as never,
+    )
 
     expect(response.status).toBe(401)
     await expect(response.json()).resolves.toEqual({ error: 'Unauthorized' })
@@ -54,19 +57,21 @@ describe('/api/editor/ai-post-metadata route', () => {
       value: '生成后的摘要',
     })
 
-    const response = await POST(new Request('http://test.local/api/editor/ai-post-metadata', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        target: 'summary',
-        title: '  Ask AI 标题  ',
-        content: '  正文内容  ',
-        category: '  AI  ',
-        description: '  摘要  ',
-        tags: ['标签1', '标签2'],
-        currentSlug: '  current-slug  ',
-      }),
-    }) as never)
+    const response = await POST(
+      new Request('http://test.local/api/editor/ai-post-metadata', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          target: 'summary',
+          title: '  Ask AI 标题  ',
+          content: '  正文内容  ',
+          category: '  AI  ',
+          description: '  摘要  ',
+          tags: ['标签1', '标签2'],
+          currentSlug: '  current-slug  ',
+        }),
+      }) as never,
+    )
     const body = await response.json()
 
     expect(mocks.generatePostMetadata).toHaveBeenCalledWith({
@@ -95,14 +100,16 @@ describe('/api/editor/ai-post-metadata route', () => {
       DB: { kind: 'db' },
     })
 
-    const response = await POST(new Request('http://test.local/api/editor/ai-post-metadata', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        target: 'cover',
-        title: 'Ask AI 封面',
-      }),
-    }) as never)
+    const response = await POST(
+      new Request('http://test.local/api/editor/ai-post-metadata', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          target: 'cover',
+          title: 'Ask AI 封面',
+        }),
+      }) as never,
+    )
 
     expect(response.status).toBe(500)
     await expect(response.json()).resolves.toEqual({ error: '图片存储未配置' })

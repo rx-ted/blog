@@ -19,14 +19,18 @@ export async function GET(req: NextRequest) {
   if (unauthorized) return unauthorized
 
   try {
-    const { accessKey } = await resolveUnsplashAccessKey(route.db, route.env as Record<string, unknown>)
+    const { accessKey } = await resolveUnsplashAccessKey(
+      route.db,
+      route.env as Record<string, unknown>,
+    )
     if (!accessKey) {
       return jsonError('Unsplash API Key 未配置', 400)
     }
 
     const action = req.nextUrl.searchParams.get('action') || 'search'
     if (action === 'download') {
-      const downloadLocation = req.nextUrl.searchParams.get('downloadLocation') || ''
+      const downloadLocation =
+        req.nextUrl.searchParams.get('downloadLocation') || ''
       await trackUnsplashDownload(accessKey, downloadLocation)
       return jsonOk({ success: true })
     }
@@ -48,6 +52,9 @@ export async function GET(req: NextRequest) {
     return jsonOk(result)
   } catch (error) {
     console.error('Unsplash editor route error:', error)
-    return jsonError(error instanceof Error ? error.message : 'Unsplash 请求失败', 500)
+    return jsonError(
+      error instanceof Error ? error.message : 'Unsplash 请求失败',
+      500,
+    )
   }
 }

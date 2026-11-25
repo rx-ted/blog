@@ -1,7 +1,11 @@
 'use client'
 
 import { Node, mergeAttributes } from '@tiptap/core'
-import { ReactNodeViewRenderer, NodeViewWrapper, type ReactNodeViewProps } from '@tiptap/react'
+import {
+  ReactNodeViewRenderer,
+  NodeViewWrapper,
+  type ReactNodeViewProps,
+} from '@tiptap/react'
 import { useEffect, useRef, useCallback } from 'react'
 import { extractTweetId, renderTweetEmbed } from './twitter-widgets'
 
@@ -24,14 +28,19 @@ function TweetComponent(props: ReactNodeViewProps) {
     await renderTweetEmbed(containerRef.current, src)
   }, [tweetId, src])
 
-  useEffect(() => { renderTweet() }, [renderTweet])
+  useEffect(() => {
+    renderTweet()
+  }, [renderTweet])
 
   return (
     <NodeViewWrapper data-type="twitter" className="twitter-node-view">
       <div ref={containerRef} style={{ minHeight: 100 }}>
         {!tweetId && (
           <p style={{ color: '#999', fontSize: 14 }}>
-            无效的推文链接：<a href={src} target="_blank" rel="noopener noreferrer">{src}</a>
+            无效的推文链接：
+            <a href={src} target="_blank" rel="noopener noreferrer">
+              {src}
+            </a>
           </p>
         )}
       </div>
@@ -59,8 +68,19 @@ export const TwitterNode = Node.create({
   renderHTML({ HTMLAttributes }) {
     return [
       'div',
-      mergeAttributes({ 'data-twitter-src': HTMLAttributes.src }, HTMLAttributes),
-      ['a', { href: HTMLAttributes.src, target: '_blank', rel: 'noopener noreferrer' }, HTMLAttributes.src],
+      mergeAttributes(
+        { 'data-twitter-src': HTMLAttributes.src },
+        HTMLAttributes,
+      ),
+      [
+        'a',
+        {
+          href: HTMLAttributes.src,
+          target: '_blank',
+          rel: 'noopener noreferrer',
+        },
+        HTMLAttributes.src,
+      ],
     ]
   },
 
@@ -73,11 +93,11 @@ export const TwitterNode = Node.create({
       setTweet:
         (options: { src: string }) =>
         ({ commands }) => {
-        return commands.insertContent({
-          type: this.name,
-          attrs: { src: options.src },
-        })
-      },
+          return commands.insertContent({
+            type: this.name,
+            attrs: { src: options.src },
+          })
+        },
     }
   },
 })

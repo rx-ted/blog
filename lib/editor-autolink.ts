@@ -10,7 +10,8 @@ export interface EditorAutolinkMatch {
   text: string
 }
 
-const CJK_LINK_BOUNDARY = /[，。；：！？、…（）【】《》〈〉「」『』〔〕［］｛｝“”‘’]/u
+const CJK_LINK_BOUNDARY =
+  /[，。；：！？、…（）【】《》〈〉「」『』〔〕［］｛｝“”‘’]/u
 const editorAutolinkPluginKey = new PluginKey('editorCjkAutolink')
 
 function isCjkLinkBoundary(value: string | undefined) {
@@ -34,7 +35,10 @@ function isSelfDescribingLink(mark: Mark, text: string) {
   if (!href) return false
 
   const decodedHref = decodeHref(href)
-  return decodedHref === text || stripDefaultProtocol(decodedHref) === stripDefaultProtocol(text)
+  return (
+    decodedHref === text ||
+    stripDefaultProtocol(decodedHref) === stripDefaultProtocol(text)
+  )
 }
 
 interface LinkCoverageSegment {
@@ -59,10 +63,13 @@ function getLinkCoverage(
     const length = Math.max(0, segmentTo - segmentFrom)
     if (length === 0) return
 
-    const mark = node.marks.find(currentMark => currentMark.type === linkType)
+    const mark = node.marks.find((currentMark) => currentMark.type === linkType)
     if (!mark) return
 
-    segments.push({ mark, text: node.text.slice(segmentFrom - pos, segmentTo - pos) })
+    segments.push({
+      mark,
+      text: node.text.slice(segmentFrom - pos, segmentTo - pos),
+    })
     linkedLength += length
   })
 
@@ -110,16 +117,20 @@ function repairPartialAutolinks(
 
       const coverage = getLinkCoverage(doc, from, to, linkType)
       if (coverage.segments.length === 0 || coverage.fullyLinked) continue
-      const allTargetsMatch = coverage.segments.every(segment => linkTargetsMatch(segment.mark, match))
+      const allTargetsMatch = coverage.segments.every((segment) =>
+        linkTargetsMatch(segment.mark, match),
+      )
       // A pasted link whose visible text matches its own href was auto-generated from the
       // URL text, so it is safe to extend it to the full detected URL and update the href.
-      const allSelfDescribing = coverage.segments.every(segment =>
+      const allSelfDescribing = coverage.segments.every((segment) =>
         isSelfDescribingLink(segment.mark, segment.text),
       )
       if (!allTargetsMatch && !allSelfDescribing) continue
 
       const sourceMark = coverage.segments[0].mark
-      const href = allTargetsMatch ? String(sourceMark.attrs.href || match.href) : match.href
+      const href = allTargetsMatch
+        ? String(sourceMark.attrs.href || match.href)
+        : match.href
       tr.removeMark(from, to, linkType)
       tr.addMark(from, to, linkType.create({ ...sourceMark.attrs, href }))
       repairedRanges?.push({ from, to })
@@ -163,29 +174,53 @@ export function createEditorAutolinkPlugin(linkType: MarkType) {
   return new Plugin({
     key: editorAutolinkPluginKey,
     appendTransaction(transactions, _oldState, newState) {
-      if (!transactions.some(transaction => transaction.docChanged)) return null
-      if (transactions.some(transaction => transaction.getMeta(editorAutolinkPluginKey))) return null
-      if (transactions.some(transaction => transaction.getMeta('preventAutolink'))) return null
+      if (!transactions.some((transaction) => transaction.docChanged))
+        return null
+      if (
+        transactions.some((transaction) =>
+          transaction.getMeta(editorAutolinkPluginKey),
+        )
+      )
+        return null
+      if (
+        transactions.some((transaction) =>
+          transaction.getMeta('preventAutolink'),
+        )
+      )
+        return null
 
       const tr = newState.tr
       const repairedRanges: Array<{ from: number; to: number }> = []
-      let changed = repairPartialAutolinks(newState.doc, tr, linkType, repairedRanges)
+      let changed = repairPartialAutolinks(
+        newState.doc,
+        tr,
+        linkType,
+        repairedRanges,
+      )
 
       newState.doc.descendants((node, pos) => {
-        if (!node.isText || !node.text || node.marks.some(mark => mark.type.name === 'code')) {
+        if (
+          !node.isText ||
+          !node.text ||
+          node.marks.some((mark) => mark.type.name === 'code')
+        ) {
           return
         }
 
         // Mark edits don't move positions; skip nodes already rebuilt by the repair pass so
         // the trimming branch below cannot shrink the extended link back to its stale href.
-        if (repairedRanges.some(range => pos >= range.from && pos + node.nodeSize <= range.to)) {
+        if (
+          repairedRanges.some(
+            (range) => pos >= range.from && pos + node.nodeSize <= range.to,
+          )
+        ) {
           return
         }
 
         const matches = findEditorAutolinks(node.text)
         if (matches.length === 0) return
 
-        const existingLink = node.marks.find(mark => mark.type === linkType)
+        const existingLink = node.marks.find((mark) => mark.type === linkType)
         if (existingLink) {
           const [match] = matches
           if (
@@ -207,7 +242,11 @@ export function createEditorAutolinkPlugin(linkType: MarkType) {
 
         for (const match of matches) {
           if (!isCjkLinkBoundary(node.text[match.to])) continue
-          tr.addMark(pos + match.from, pos + match.to, linkType.create({ href: match.href }))
+          tr.addMark(
+            pos + match.from,
+            pos + match.to,
+            linkType.create({ href: match.href }),
+          )
           changed = true
         }
       })

@@ -1,5 +1,9 @@
 import { Node, mergeAttributes } from '@tiptap/core'
-import { ReactNodeViewRenderer, NodeViewWrapper, type NodeViewProps } from '@tiptap/react'
+import {
+  ReactNodeViewRenderer,
+  NodeViewWrapper,
+  type NodeViewProps,
+} from '@tiptap/react'
 import { ExternalLink, Play, VideoIcon, X } from 'lucide-react'
 import { useState } from 'react'
 
@@ -20,7 +24,12 @@ function getVideoLabel(src: string, title?: string) {
   const trimmedTitle = title?.trim()
   if (trimmedTitle) return trimmedTitle
 
-  const fallback = src.split('#')[0]?.split('?')[0]?.split('/').filter(Boolean).at(-1)
+  const fallback = src
+    .split('#')[0]
+    ?.split('?')[0]
+    ?.split('/')
+    .filter(Boolean)
+    .at(-1)
   if (!fallback) return '视频'
 
   try {
@@ -61,7 +70,10 @@ function VideoComponent({ node }: NodeViewProps) {
   }
 
   return (
-    <NodeViewWrapper data-type="video" className="video-wrapper video-node-view">
+    <NodeViewWrapper
+      data-type="video"
+      className="video-wrapper video-node-view"
+    >
       <div className="editor-video-card" contentEditable={false}>
         {previewOpen ? (
           <div className="editor-video-preview">
@@ -99,7 +111,9 @@ function VideoComponent({ node }: NodeViewProps) {
                 x-webkit-airplay="true"
                 className="editor-video-player"
                 preload="none"
-                onError={() => setPreviewState({ src, open: true, error: true })}
+                onError={() =>
+                  setPreviewState({ src, open: true, error: true })
+                }
               >
                 您的浏览器不支持视频播放
               </video>

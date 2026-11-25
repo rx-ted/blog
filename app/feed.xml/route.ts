@@ -30,15 +30,13 @@ export async function GET() {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
       // RSS needs html field; query directly to include it
-      const { results } = await env.DB
-        .prepare(
-          `SELECT slug, title, description, html, category, published_at
+      const { results } = await env.DB.prepare(
+        `SELECT slug, title, description, html, category, published_at
            FROM posts
            WHERE status = 'published' AND deleted_at IS NULL AND password IS NULL AND is_hidden = 0
            ORDER BY published_at DESC
-           LIMIT 50`
-        )
-        .all()
+           LIMIT 50`,
+      ).all()
       posts = results as unknown as RssPost[]
     }
   } catch {

@@ -1,7 +1,14 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { AlertCircle, CheckCircle2, Info, Loader2, RefreshCw, X } from 'lucide-react'
+import {
+  AlertCircle,
+  CheckCircle2,
+  Info,
+  Loader2,
+  RefreshCw,
+  X,
+} from 'lucide-react'
 import { useToast } from '@/components/Toast'
 import { WeChatThemeSelector } from '@/components/WeChatThemeSelector'
 import {
@@ -61,8 +68,10 @@ interface WeChatPublishModalProps {
   exportThemeId?: string
 }
 
-const fieldClassName = 'w-full rounded-xl border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--editor-ink)] outline-none transition focus:border-[var(--editor-accent)] focus:ring-2 focus:ring-[var(--editor-accent)]/10 disabled:cursor-not-allowed disabled:opacity-60'
-const labelClassName = 'block text-[11px] font-semibold tracking-wide text-[var(--editor-muted)]'
+const fieldClassName =
+  'w-full rounded-xl border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--editor-ink)] outline-none transition focus:border-[var(--editor-accent)] focus:ring-2 focus:ring-[var(--editor-accent)]/10 disabled:cursor-not-allowed disabled:opacity-60'
+const labelClassName =
+  'block text-[11px] font-semibold tracking-wide text-[var(--editor-muted)]'
 
 function PublishToggle({
   checked,
@@ -76,11 +85,13 @@ function PublishToggle({
   onChange: (checked: boolean) => void
 }) {
   return (
-    <label className={`group flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-sm transition ${
-      checked
-        ? 'border-[var(--editor-accent)]/40 bg-[var(--editor-accent)]/10 text-[var(--editor-ink)]'
-        : 'border-[var(--editor-line)] bg-[var(--background)] text-[var(--editor-muted)] hover:bg-[var(--editor-soft)]'
-    } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}>
+    <label
+      className={`group flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-sm transition ${
+        checked
+          ? 'border-[var(--editor-accent)]/40 bg-[var(--editor-accent)]/10 text-[var(--editor-ink)]'
+          : 'border-[var(--editor-line)] bg-[var(--background)] text-[var(--editor-muted)] hover:bg-[var(--editor-soft)]'
+      } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
+    >
       <span className="font-medium">{label}</span>
       <input
         type="checkbox"
@@ -126,17 +137,27 @@ export function WeChatPublishModal({
   const [sourceUrl, setSourceUrl] = useState(defaultSourceUrl)
   const [coverImageUrl, setCoverImageUrl] = useState(defaultCoverImageUrl)
   const [publishNow, setPublishNow] = useState(false)
-  const [needOpenComment, setNeedOpenComment] = useState(WECHAT_DEFAULT_NEED_OPEN_COMMENT)
-  const [onlyFansCanComment, setOnlyFansCanComment] = useState(WECHAT_DEFAULT_ONLY_FANS_CAN_COMMENT)
+  const [needOpenComment, setNeedOpenComment] = useState(
+    WECHAT_DEFAULT_NEED_OPEN_COMMENT,
+  )
+  const [onlyFansCanComment, setOnlyFansCanComment] = useState(
+    WECHAT_DEFAULT_ONLY_FANS_CAN_COMMENT,
+  )
   const [loadError, setLoadError] = useState('')
   const [checking, setChecking] = useState(false)
-  const [inspectResult, setInspectResult] = useState<WechatPublishInspectResult | null>(null)
-  const [themeConfig, setThemeConfig] = useState<WechatExportThemeConfig>(DEFAULT_WECHAT_EXPORT_THEME_CONFIG)
-  const [selectedThemeId, setSelectedThemeId] = useState(DEFAULT_WECHAT_EXPORT_THEME_CONFIG.defaultThemeId)
+  const [inspectResult, setInspectResult] =
+    useState<WechatPublishInspectResult | null>(null)
+  const [themeConfig, setThemeConfig] = useState<WechatExportThemeConfig>(
+    DEFAULT_WECHAT_EXPORT_THEME_CONFIG,
+  )
+  const [selectedThemeId, setSelectedThemeId] = useState(
+    DEFAULT_WECHAT_EXPORT_THEME_CONFIG.defaultThemeId,
+  )
 
-  const selectedTheme = useMemo(() => (
-    getWechatExportTheme(themeConfig, selectedThemeId)
-  ), [themeConfig, selectedThemeId])
+  const selectedTheme = useMemo(
+    () => getWechatExportTheme(themeConfig, selectedThemeId),
+    [themeConfig, selectedThemeId],
+  )
 
   const loadAccounts = async () => {
     setLoadingAccounts(true)
@@ -144,19 +165,23 @@ export function WeChatPublishModal({
 
     try {
       const res = await fetch('/api/admin/wechat-bridge/accounts')
-      const data = await res.json().catch(() => ({})) as { accounts?: BridgeAccount[]; error?: string }
+      const data = (await res.json().catch(() => ({}))) as {
+        accounts?: BridgeAccount[]
+        error?: string
+      }
       if (!res.ok) throw new Error(data.error || '加载公众号账号失败')
 
       const nextAccounts = data.accounts || []
       setAccounts(nextAccounts)
       setSelectedAccountId((current) => {
-        if (current && nextAccounts.some(account => account.id === current)) {
+        if (current && nextAccounts.some((account) => account.id === current)) {
           return current
         }
         return nextAccounts[0]?.id || ''
       })
     } catch (error) {
-      const message = error instanceof Error ? error.message : '加载公众号账号失败'
+      const message =
+        error instanceof Error ? error.message : '加载公众号账号失败'
       setAccounts([])
       setSelectedAccountId('')
       setLoadError(message)
@@ -169,7 +194,13 @@ export function WeChatPublishModal({
     if (!isOpen) return
 
     setAuthor(WECHAT_DEFAULT_AUTHOR)
-    setDigest(truncateWechatText(defaultDigest, WECHAT_DRAFT_DIGEST_MAX_CHARS, WECHAT_DRAFT_DIGEST_MAX_BYTES))
+    setDigest(
+      truncateWechatText(
+        defaultDigest,
+        WECHAT_DRAFT_DIGEST_MAX_CHARS,
+        WECHAT_DRAFT_DIGEST_MAX_BYTES,
+      ),
+    )
     setSourceUrl(defaultSourceUrl)
     setCoverImageUrl(defaultCoverImageUrl)
     setPublishNow(false)
@@ -179,17 +210,26 @@ export function WeChatPublishModal({
 
     void fetchWechatExportThemeConfig().then((nextConfig) => {
       setThemeConfig(nextConfig)
-      setSelectedThemeId(getPreferredWechatExportThemeId(nextConfig, exportThemeId))
+      setSelectedThemeId(
+        getPreferredWechatExportThemeId(nextConfig, exportThemeId),
+      )
     })
     void loadAccounts()
-  }, [isOpen, defaultDigest, defaultSourceUrl, defaultCoverImageUrl, exportThemeId])
+  }, [
+    isOpen,
+    defaultDigest,
+    defaultSourceUrl,
+    defaultCoverImageUrl,
+    exportThemeId,
+  ])
 
   if (!isOpen) return null
 
   const buildPublishPayload = async (): Promise<WechatPublishPayload> => {
-    const { normalizedTitle, exportedHtml } = await buildWechatBridgeArticleExportAsync(title, html, {
-      theme: selectedTheme,
-    })
+    const { normalizedTitle, exportedHtml } =
+      await buildWechatBridgeArticleExportAsync(title, html, {
+        theme: selectedTheme,
+      })
     const finalCoverUrl =
       buildWechatBridgeCoverImageUrl(coverImageUrl) ||
       buildWechatBridgeCoverImageUrl(defaultCoverImageUrl) ||
@@ -200,7 +240,11 @@ export function WeChatPublishModal({
       title: normalizedTitle,
       content_html: exportedHtml,
       author: author.trim(),
-      digest: truncateWechatText(digest, WECHAT_DRAFT_DIGEST_MAX_CHARS, WECHAT_DRAFT_DIGEST_MAX_BYTES),
+      digest: truncateWechatText(
+        digest,
+        WECHAT_DRAFT_DIGEST_MAX_CHARS,
+        WECHAT_DRAFT_DIGEST_MAX_BYTES,
+      ),
       content_source_url: sourceUrl.trim(),
       cover_image_url: finalCoverUrl,
       publish_now: publishNow,
@@ -218,11 +262,12 @@ export function WeChatPublishModal({
         dry_run: true,
       }),
     })
-    const data = await res.json().catch(() => ({})) as {
+    const data = (await res.json().catch(() => ({}))) as {
       error?: string
       inspect?: WechatPublishInspectResult
     }
-    if (!res.ok || !data.inspect) throw new Error(data.error || '发布前检查失败')
+    if (!res.ok || !data.inspect)
+      throw new Error(data.error || '发布前检查失败')
     setInspectResult(data.inspect)
     return data.inspect
   }
@@ -233,8 +278,10 @@ export function WeChatPublishModal({
     try {
       const payload = await buildPublishPayload()
       const inspect = await requestInspect(payload)
-      const hasErrors = inspect.checks.some(check => check.level === 'error')
-      const hasWarnings = inspect.checks.some(check => check.level === 'warning')
+      const hasErrors = inspect.checks.some((check) => check.level === 'error')
+      const hasWarnings = inspect.checks.some(
+        (check) => check.level === 'warning',
+      )
 
       if (hasErrors) {
         toast.error('发布前检查未通过')
@@ -261,7 +308,7 @@ export function WeChatPublishModal({
     try {
       const payload = await buildPublishPayload()
       const inspect = await requestInspect(payload)
-      const blocking = inspect.checks.filter(check => check.level === 'error')
+      const blocking = inspect.checks.filter((check) => check.level === 'error')
 
       if (blocking.length > 0) {
         toast.error(blocking[0]?.message || '发布前检查未通过')
@@ -274,7 +321,7 @@ export function WeChatPublishModal({
         body: JSON.stringify(payload),
       })
 
-      const data = await res.json().catch(() => ({})) as {
+      const data = (await res.json().catch(() => ({}))) as {
         error?: string
         media_id?: string
         publish_id?: string
@@ -290,24 +337,32 @@ export function WeChatPublishModal({
     }
   }
 
-  const checkErrors = inspectResult?.checks.filter(check => check.level === 'error') || []
-  const checkWarnings = inspectResult?.checks.filter(check => check.level === 'warning') || []
-  const checkInfos = inspectResult?.checks.filter(check => check.level === 'info') || []
-  const visibleChecks = inspectResult?.checks.filter(check => check.level !== 'info').slice(0, 4) || []
-  const checkStatus = checkErrors.length > 0
-    ? 'error'
-    : checkWarnings.length > 0
-      ? 'warning'
-      : inspectResult
-        ? 'ok'
-        : 'idle'
-  const checkStatusLabel = checkStatus === 'error'
-    ? '有阻断项'
-    : checkStatus === 'warning'
-      ? '有提醒'
-      : checkStatus === 'ok'
-        ? '已通过'
-        : '待检查'
+  const checkErrors =
+    inspectResult?.checks.filter((check) => check.level === 'error') || []
+  const checkWarnings =
+    inspectResult?.checks.filter((check) => check.level === 'warning') || []
+  const checkInfos =
+    inspectResult?.checks.filter((check) => check.level === 'info') || []
+  const visibleChecks =
+    inspectResult?.checks
+      .filter((check) => check.level !== 'info')
+      .slice(0, 4) || []
+  const checkStatus =
+    checkErrors.length > 0
+      ? 'error'
+      : checkWarnings.length > 0
+        ? 'warning'
+        : inspectResult
+          ? 'ok'
+          : 'idle'
+  const checkStatusLabel =
+    checkStatus === 'error'
+      ? '有阻断项'
+      : checkStatus === 'warning'
+        ? '有提醒'
+        : checkStatus === 'ok'
+          ? '已通过'
+          : '待检查'
 
   return (
     <div
@@ -319,8 +374,12 @@ export function WeChatPublishModal({
       <div className="flex max-h-[calc(100dvh-1rem)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)] shadow-[0_28px_90px_-32px_rgba(15,23,42,0.6)] sm:max-h-[min(92dvh,760px)]">
         <div className="flex shrink-0 items-center justify-between gap-4 border-b border-[var(--editor-line)] bg-[var(--background)]/70 px-4 py-3 sm:px-5">
           <div className="min-w-0">
-            <h3 className="truncate text-base font-semibold text-[var(--editor-ink)]">发布到公众号</h3>
-            <p className="mt-0.5 truncate text-xs text-[var(--editor-muted)]">{selectedTheme?.name || '公众号样式'} · {checkStatusLabel}</p>
+            <h3 className="truncate text-base font-semibold text-[var(--editor-ink)]">
+              发布到公众号
+            </h3>
+            <p className="mt-0.5 truncate text-xs text-[var(--editor-muted)]">
+              {selectedTheme?.name || '公众号样式'} · {checkStatusLabel}
+            </p>
           </div>
           <button
             type="button"
@@ -342,11 +401,15 @@ export function WeChatPublishModal({
                     <label className={labelClassName}>公众号账号</label>
                     <select
                       value={selectedAccountId}
-                      onChange={(event) => setSelectedAccountId(event.target.value)}
+                      onChange={(event) =>
+                        setSelectedAccountId(event.target.value)
+                      }
                       disabled={loadingAccounts || accounts.length === 0}
                       className={fieldClassName}
                     >
-                      {accounts.length === 0 && <option value="">暂无可用账号</option>}
+                      {accounts.length === 0 && (
+                        <option value="">暂无可用账号</option>
+                      )}
                       {accounts.map((account) => (
                         <option key={account.id} value={account.id}>
                           {account.name} · {account.id}
@@ -360,11 +423,15 @@ export function WeChatPublishModal({
                     disabled={loadingAccounts}
                     className="inline-flex h-[42px] items-center justify-center gap-2 rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] px-3 text-sm font-medium text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)] disabled:opacity-50 md:mt-[23px]"
                   >
-                    <RefreshCw className={`h-4 w-4 ${loadingAccounts ? 'animate-spin' : ''}`} />
+                    <RefreshCw
+                      className={`h-4 w-4 ${loadingAccounts ? 'animate-spin' : ''}`}
+                    />
                     刷新
                   </button>
                 </div>
-                {loadError && <p className="text-xs text-rose-600">{loadError}</p>}
+                {loadError && (
+                  <p className="text-xs text-rose-600">{loadError}</p>
+                )}
 
                 <div className="space-y-1.5">
                   <label className={labelClassName}>公众号样式</label>
@@ -412,11 +479,13 @@ export function WeChatPublishModal({
                   <textarea
                     value={digest}
                     onChange={(event) => {
-                      setDigest(truncateWechatText(
-                        event.target.value,
-                        WECHAT_DRAFT_DIGEST_MAX_CHARS,
-                        WECHAT_DRAFT_DIGEST_MAX_BYTES,
-                      ))
+                      setDigest(
+                        truncateWechatText(
+                          event.target.value,
+                          WECHAT_DRAFT_DIGEST_MAX_CHARS,
+                          WECHAT_DRAFT_DIGEST_MAX_BYTES,
+                        ),
+                      )
                     }}
                     maxLength={WECHAT_DRAFT_DIGEST_MAX_CHARS}
                     rows={2}
@@ -484,7 +553,9 @@ export function WeChatPublishModal({
                     disabled={checking || submitting}
                     className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] px-2.5 py-1.5 text-xs font-medium text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)] disabled:opacity-50"
                   >
-                    <RefreshCw className={`h-3.5 w-3.5 ${checking ? 'animate-spin' : ''}`} />
+                    <RefreshCw
+                      className={`h-3.5 w-3.5 ${checking ? 'animate-spin' : ''}`}
+                    />
                     检查
                   </button>
                 </div>
@@ -493,15 +564,21 @@ export function WeChatPublishModal({
                   <div className="space-y-3 text-xs text-[var(--editor-muted)]">
                     <div className="grid grid-cols-3 gap-2">
                       <span className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] px-2 py-2 text-center">
-                        <span className="block font-semibold text-[var(--editor-ink)]">{inspectResult.summary.image_count}</span>
+                        <span className="block font-semibold text-[var(--editor-ink)]">
+                          {inspectResult.summary.image_count}
+                        </span>
                         图片
                       </span>
                       <span className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] px-2 py-2 text-center">
-                        <span className="block font-semibold text-[var(--editor-ink)]">{inspectResult.summary.cover_ready ? 'OK' : '缺失'}</span>
+                        <span className="block font-semibold text-[var(--editor-ink)]">
+                          {inspectResult.summary.cover_ready ? 'OK' : '缺失'}
+                        </span>
                         封面
                       </span>
                       <span className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] px-2 py-2 text-center">
-                        <span className="block font-semibold text-[var(--editor-ink)]">{inspectResult.summary.estimated_upload_seconds}s</span>
+                        <span className="block font-semibold text-[var(--editor-ink)]">
+                          {inspectResult.summary.estimated_upload_seconds}s
+                        </span>
                         上传
                       </span>
                     </div>
@@ -521,12 +598,16 @@ export function WeChatPublishModal({
                         ))}
                       </ul>
                     ) : (
-                      <p className="rounded-lg bg-emerald-50 px-2 py-1.5 text-emerald-700">可以提交到公众号。</p>
+                      <p className="rounded-lg bg-emerald-50 px-2 py-1.5 text-emerald-700">
+                        可以提交到公众号。
+                      </p>
                     )}
                     {checkInfos.length > 0 && <p>提示 {checkInfos.length}</p>}
                   </div>
                 ) : (
-                  <p className="text-xs text-[var(--editor-muted)]">提交前会自动检查。</p>
+                  <p className="text-xs text-[var(--editor-muted)]">
+                    提交前会自动检查。
+                  </p>
                 )}
               </section>
             </aside>

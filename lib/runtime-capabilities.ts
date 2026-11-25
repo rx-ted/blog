@@ -32,10 +32,15 @@ export interface RuntimeCapabilities {
 }
 
 function readFlag(value: unknown): boolean {
-  return typeof value === 'string' && ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  return (
+    typeof value === 'string' &&
+    ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  )
 }
 
-export function detectRuntimeCapabilities(env?: Partial<CloudflareEnv> | null): RuntimeCapabilities {
+export function detectRuntimeCapabilities(
+  env?: Partial<CloudflareEnv> | null,
+): RuntimeCapabilities {
   const bindings = {
     d1: Boolean(env?.DB),
     cache: Boolean(env?.CACHE),
@@ -45,10 +50,14 @@ export function detectRuntimeCapabilities(env?: Partial<CloudflareEnv> | null): 
     vectorize: Boolean(env?.VECTOR_INDEX),
   }
 
-  const asyncJobsEnabled = bindings.queue && readFlag(env?.ENABLE_BACKGROUND_JOBS)
-  const workersAIEnabled = bindings.workersAI && readFlag(env?.ENABLE_WORKERS_AI)
-  const vectorizeEnabled = bindings.vectorize && readFlag(env?.ENABLE_VECTOR_SEARCH)
-  const cloudflareMediaEnabled = bindings.images && readFlag(env?.ENABLE_CF_IMAGE_PIPELINE)
+  const asyncJobsEnabled =
+    bindings.queue && readFlag(env?.ENABLE_BACKGROUND_JOBS)
+  const workersAIEnabled =
+    bindings.workersAI && readFlag(env?.ENABLE_WORKERS_AI)
+  const vectorizeEnabled =
+    bindings.vectorize && readFlag(env?.ENABLE_VECTOR_SEARCH)
+  const cloudflareMediaEnabled =
+    bindings.images && readFlag(env?.ENABLE_CF_IMAGE_PIPELINE)
 
   return {
     bindings,

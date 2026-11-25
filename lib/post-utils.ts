@@ -8,8 +8,7 @@ export function sanitizePostSlugInput(value: string): string {
 }
 
 export function normalizePostSlug(value: string): string {
-  return sanitizePostSlugInput(value)
-    .replace(/^[-_]+|[-_]+$/g, '')
+  return sanitizePostSlugInput(value).replace(/^[-_]+|[-_]+$/g, '')
 }
 
 export function buildAutoDescription(value: string, maxLength = 160): string {

@@ -1,5 +1,5 @@
 import { WeChatThemeSelector } from '@/components/WeChatThemeSelector'
-import type { WechatExportTheme, WechatExportThemeConfig } from '@/lib/wechat-themes'
+import type { WechatExportThemeConfig } from '@/lib/wechat-themes'
 
 interface NovelMobilePreviewProps {
   themeConfig: WechatExportThemeConfig
@@ -23,7 +23,11 @@ export function NovelMobilePreview({
   return (
     <section
       className="group relative hidden w-[430px] shrink-0 border-l border-[var(--editor-line)] bg-white lg:block"
-      style={{ position: 'sticky', top: '3.5rem', height: 'calc(100vh - 3.5rem)' }}
+      style={{
+        position: 'sticky',
+        top: '3.5rem',
+        height: 'calc(100vh - 3.5rem)',
+      }}
     >
       <div className="pointer-events-none absolute right-3 top-3 z-20 opacity-0 transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
         <WeChatThemeSelector
@@ -40,10 +44,17 @@ export function NovelMobilePreview({
       >
         {previewError ? (
           <div role="alert" className="text-center text-sm text-gray-500">
-            预览加载失败。<button type="button" className="ml-2 underline" onClick={onRetry}>重试</button>
+            预览加载失败。
+            <button type="button" className="ml-2 underline" onClick={onRetry}>
+              重试
+            </button>
           </div>
-        ) : !previewHtml && (
-          <div role="status" className="text-center text-sm text-gray-500">加载预览...</div>
+        ) : (
+          !previewHtml && (
+            <div role="status" className="text-center text-sm text-gray-500">
+              加载预览...
+            </div>
+          )
         )}
         <div
           className="mobile-preview-article mobile-wechat-preview mx-auto w-full max-w-[390px] overflow-hidden rounded-lg bg-white"

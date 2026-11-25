@@ -52,7 +52,10 @@ function unwrapGeneratedPayload(value: unknown): unknown {
   return current
 }
 
-function readObjectValue(record: Record<string, unknown>, keys: string[]): unknown {
+function readObjectValue(
+  record: Record<string, unknown>,
+  keys: string[],
+): unknown {
   for (const key of keys) {
     const value = record[key]
     if (value !== undefined && value !== null && value !== '') return value
@@ -71,14 +74,25 @@ export function extractGeneratedText(
   if (typeof payload === 'string') return payload.trim()
 
   if (Array.isArray(payload)) {
-    return payload.map((item) => String(item || '').trim()).filter(Boolean).join(', ').trim()
+    return payload
+      .map((item) => String(item || '').trim())
+      .filter(Boolean)
+      .join(', ')
+      .trim()
   }
 
   if (payload && typeof payload === 'object') {
-    const candidate = readObjectValue(payload as Record<string, unknown>, preferredKeys)
+    const candidate = readObjectValue(
+      payload as Record<string, unknown>,
+      preferredKeys,
+    )
     if (typeof candidate === 'string') return candidate.trim()
     if (Array.isArray(candidate)) {
-      return candidate.map((item) => String(item || '').trim()).filter(Boolean).join(', ').trim()
+      return candidate
+        .map((item) => String(item || '').trim())
+        .filter(Boolean)
+        .join(', ')
+        .trim()
     }
   }
 
@@ -120,10 +134,15 @@ export function extractGeneratedTags(parsed: unknown, fallbackText: string) {
   }
 
   if (payload && typeof payload === 'object') {
-    const candidate = readObjectValue(
-      payload as Record<string, unknown>,
-      ['tags', 'keywords', 'labels', 'topics', 'items', 'list', 'result'],
-    )
+    const candidate = readObjectValue(payload as Record<string, unknown>, [
+      'tags',
+      'keywords',
+      'labels',
+      'topics',
+      'items',
+      'list',
+      'result',
+    ])
     const normalized = normalizeTags(candidate)
     if (normalized.length > 0) return normalized
   }
@@ -140,7 +159,11 @@ function extractWorkersAiPayload(result: unknown): unknown {
     }
 
     if (payload.response !== undefined) return payload.response
-    if (payload.result && typeof payload.result === 'object' && 'response' in payload.result) {
+    if (
+      payload.result &&
+      typeof payload.result === 'object' &&
+      'response' in payload.result
+    ) {
       return (payload.result as { response?: unknown }).response
     }
     const firstChoice = payload.choices?.[0]?.message?.content
@@ -171,19 +194,21 @@ export function extractWorkersAiText(result: unknown): string {
 }
 
 export function getWorkersAiAssistantPayload(response: unknown) {
-  const choice = (response as {
-    choices?: Array<{
-      finish_reason?: string | null
-      stop_reason?: string | null
-      message?: {
-        content?: unknown
-        reasoning_content?: unknown
-        reasoning?: unknown
-        tool_calls?: unknown
-        function_call?: unknown
-      }
-    }>
-  })?.choices?.[0]
+  const choice = (
+    response as {
+      choices?: Array<{
+        finish_reason?: string | null
+        stop_reason?: string | null
+        message?: {
+          content?: unknown
+          reasoning_content?: unknown
+          reasoning?: unknown
+          tool_calls?: unknown
+          function_call?: unknown
+        }
+      }>
+    }
+  )?.choices?.[0]
 
   if (!choice) {
     return {
@@ -195,10 +220,14 @@ export function getWorkersAiAssistantPayload(response: unknown) {
 
   const message = choice.message || {}
   const content = coerceAssistantText(message.content)
-  const toolCallArguments = extractToolCallArguments(message.tool_calls ?? message.function_call)
+  const toolCallArguments = extractToolCallArguments(
+    message.tool_calls ?? message.function_call,
+  )
   return {
     content: content || toolCallArguments,
-    reasoning: coerceAssistantText(message.reasoning_content ?? message.reasoning),
+    reasoning: coerceAssistantText(
+      message.reasoning_content ?? message.reasoning,
+    ),
     finishReason: choice.finish_reason || choice.stop_reason || '',
   }
 }
@@ -220,7 +249,12 @@ function coerceAssistantText(value: unknown): string {
   }
   if (value && typeof value === 'object') {
     const record = value as Record<string, unknown>
-    const nested = record.text ?? record.content ?? record.value ?? record.arguments ?? record.output_text
+    const nested =
+      record.text ??
+      record.content ??
+      record.value ??
+      record.arguments ??
+      record.output_text
     if (nested !== undefined) {
       return coerceAssistantText(nested)
     }
@@ -242,36 +276,48 @@ function extractToolCallArguments(value: unknown): string {
     const record = value as Record<string, unknown>
     if (record.function && typeof record.function === 'object') {
       const functionRecord = record.function as Record<string, unknown>
-      const functionArgs = coerceAssistantText(functionRecord.arguments ?? functionRecord.content ?? functionRecord.text)
+      const functionArgs = coerceAssistantText(
+        functionRecord.arguments ??
+          functionRecord.content ??
+          functionRecord.text,
+      )
       if (functionArgs) return functionArgs
     }
 
-    const directArgs = coerceAssistantText(record.arguments ?? record.content ?? record.text)
+    const directArgs = coerceAssistantText(
+      record.arguments ?? record.content ?? record.text,
+    )
     if (directArgs) return directArgs
   }
   return ''
 }
 
 export function getExternalAssistantPayload(response: unknown) {
-  const choice = (response as {
-    choices?: Array<{
-      finish_reason?: string | null
-      message?: {
-        content?: unknown
-        reasoning_content?: unknown
-        reasoning?: unknown
-        tool_calls?: unknown
-        function_call?: unknown
-      }
-    }>
-  })?.choices?.[0]
+  const choice = (
+    response as {
+      choices?: Array<{
+        finish_reason?: string | null
+        message?: {
+          content?: unknown
+          reasoning_content?: unknown
+          reasoning?: unknown
+          tool_calls?: unknown
+          function_call?: unknown
+        }
+      }>
+    }
+  )?.choices?.[0]
 
   const message = choice?.message || {}
   const content = coerceAssistantText(message.content)
-  const toolCallArguments = extractToolCallArguments(message.tool_calls ?? message.function_call)
+  const toolCallArguments = extractToolCallArguments(
+    message.tool_calls ?? message.function_call,
+  )
   return {
     content: content || toolCallArguments,
-    reasoning: coerceAssistantText(message.reasoning_content ?? message.reasoning),
+    reasoning: coerceAssistantText(
+      message.reasoning_content ?? message.reasoning,
+    ),
     finishReason: choice?.finish_reason || '',
   }
 }
@@ -281,11 +327,17 @@ export function shouldRetryAssistantPayload(payload: {
   reasoning?: string
   finishReason?: string
 }) {
-  return !payload.content
-    && (!!payload.reasoning || payload.finishReason === 'length' || payload.finishReason === 'tool_calls')
+  return (
+    !payload.content &&
+    (!!payload.reasoning ||
+      payload.finishReason === 'length' ||
+      payload.finishReason === 'tool_calls')
+  )
 }
 
-export function buildPlainRetryInstruction(target: Exclude<AiPostGeneratorTarget, 'cover'>) {
+export function buildPlainRetryInstruction(
+  target: Exclude<AiPostGeneratorTarget, 'cover'>,
+) {
   if (target === 'summary') {
     return 'If JSON mode is unavailable, return only the final Chinese summary sentence. No JSON keys, no bullets, no quotes, and no reasoning.'
   }

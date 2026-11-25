@@ -7,7 +7,7 @@ Qiaomu Blog Open Source 的正式部署方式是 `OpenNext + Cloudflare Workers`
 ### 1. 安装依赖和环境变量
 
 ```bash
-npm install
+pnpm install
 cp .env.example .env.local
 ```
 
@@ -29,13 +29,13 @@ npx wrangler login
 ### 3. 初始化资源
 
 ```bash
-npm run cf:init -- --site-url=https://your-domain.com
+pnpm cf:init -- --site-url=https://your-domain.com
 ```
 
 如果还要启用公共缓存 KV：
 
 ```bash
-npm run cf:init -- --site-url=https://your-domain.com --with-kv
+pnpm cf:init -- --site-url=https://your-domain.com --with-kv
 ```
 
 这一步会生成本地的 `wrangler.local.jsonc`，并自动写入真实 D1 / R2 / KV 绑定。
@@ -57,15 +57,15 @@ npx wrangler secret put AI_API_KEY -c wrangler.local.jsonc
 ### 5. 生成类型并部署
 
 ```bash
-npm run cf-typegen
-npm run build
-npm run deploy
+pnpm cf:types
+pnpm build
+pnpm deploy
 ```
 
 ## 本地 Worker 预览
 
 ```bash
-npm run preview
+pnpm preview:local
 ```
 
 脚本会优先读取 `wrangler.local.jsonc`。模板仓库里的 `wrangler.jsonc` 不带真实资源绑定，不能直接拿来部署生产。
@@ -75,14 +75,14 @@ npm run preview
 网络访问不了 `*.workers.dev` 时，改用纯本地预览：
 
 ```bash
-npm run db:local:init    # 首次：写入 db/schema.sql 和种子数据到本地 D1
-npm run preview:local    # 所有绑定使用本地模拟，不再访问 Cloudflare
+pnpm cf:local:init    # 首次：写入 db/schema.sql 和种子数据到本地 D1
+pnpm preview:local    # 所有绑定使用本地模拟，不再访问 Cloudflare
 ```
 
-`db:local:init` 也可以拉取线上数据到本地：
+`cf:local:init` 也可以拉取线上数据到本地：
 
 ```bash
-npm run db:local:init -- --from-remote   # 会覆盖本地 D1 数据
+pnpm cf:local:init -- --from-remote   # 会覆盖本地 D1 数据
 ```
 
 本地 D1 数据保存在 `.wrangler/state/v3/d1`，删除或加 `--reset` 即可重建。
@@ -91,19 +91,19 @@ npm run db:local:init -- --from-remote   # 会覆盖本地 D1 数据
 
 ```bash
 git pull
-npm install
-npm run verify
-npm run deploy
+pnpm install
+pnpm verify
+pnpm deploy
 ```
 
 ## 常见问题
 
-### `npm run deploy` 报缺少 D1 或 R2
+### `pnpm deploy` 报缺少 D1 或 R2
 
 先执行：
 
 ```bash
-npm run cf:init -- --site-url=https://your-domain.com
+pnpm cf:init -- --site-url=https://your-domain.com
 ```
 
 ### 后台登录提示鉴权未配置完成

@@ -1,14 +1,21 @@
 'use client'
 
 import { InputRule, Node, mergeAttributes, nodeInputRule } from '@tiptap/core'
-import { ReactNodeViewRenderer, NodeViewWrapper, type ReactNodeViewProps } from '@tiptap/react'
+import {
+  ReactNodeViewRenderer,
+  NodeViewWrapper,
+  type ReactNodeViewProps,
+} from '@tiptap/react'
 import { useState, useEffect, useRef } from 'react'
 import katex from 'katex'
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     mathBlock: {
-      setMathBlock: (options: { latex?: string; displayMode?: boolean }) => ReturnType
+      setMathBlock: (options: {
+        latex?: string
+        displayMode?: boolean
+      }) => ReturnType
     }
     inlineMath: {
       setInlineMath: (options: { latex: string }) => ReturnType
@@ -92,7 +99,10 @@ function MathComponent(props: ReactNodeViewProps) {
       onClick={() => setEditing(true)}
       title="点击编辑公式"
     >
-      <div ref={renderRef} className={displayMode ? 'math-display' : 'math-inline'} />
+      <div
+        ref={renderRef}
+        className={displayMode ? 'math-display' : 'math-inline'}
+      />
     </NodeViewWrapper>
   )
 }
@@ -127,7 +137,11 @@ function InlineMathComponent(props: ReactNodeViewProps) {
 
   if (editing) {
     return (
-      <NodeViewWrapper as="span" className="math-inline-editing" data-type="inline-math">
+      <NodeViewWrapper
+        as="span"
+        className="math-inline-editing"
+        data-type="inline-math"
+      >
         <input
           ref={inputRef}
           defaultValue={latex}
@@ -176,11 +190,16 @@ export const MathNode = Node.create({
     return {
       latex: {
         default: '',
-        parseHTML: (element) => element.getAttribute('data-math-latex') || element.getAttribute('latex') || element.textContent || '',
+        parseHTML: (element) =>
+          element.getAttribute('data-math-latex') ||
+          element.getAttribute('latex') ||
+          element.textContent ||
+          '',
       },
       displayMode: {
         default: true,
-        parseHTML: (element) => element.getAttribute('data-display-mode') !== 'false',
+        parseHTML: (element) =>
+          element.getAttribute('data-display-mode') !== 'false',
       },
     }
   },
@@ -195,8 +214,12 @@ export const MathNode = Node.create({
     return [
       'div',
       mergeAttributes(
-        { 'data-math-latex': latex, 'data-display-mode': String(displayMode), class: 'math-block-wrapper' },
-        HTMLAttributes
+        {
+          'data-math-latex': latex,
+          'data-display-mode': String(displayMode),
+          class: 'math-block-wrapper',
+        },
+        HTMLAttributes,
       ),
       latex,
     ]
@@ -213,7 +236,10 @@ export const MathNode = Node.create({
         ({ commands }) => {
           return commands.insertContent({
             type: this.name,
-            attrs: { latex: options.latex ?? '', displayMode: options.displayMode ?? true },
+            attrs: {
+              latex: options.latex ?? '',
+              displayMode: options.displayMode ?? true,
+            },
           })
         },
     }
@@ -224,7 +250,10 @@ export const MathNode = Node.create({
       nodeInputRule({
         find: /^\$\$\s*([^$]+?)\s*\$\$$/,
         type: this.type,
-        getAttributes: match => ({ latex: match[1]?.trim() || '', displayMode: true }),
+        getAttributes: (match) => ({
+          latex: match[1]?.trim() || '',
+          displayMode: true,
+        }),
       }),
     ]
   },
@@ -241,7 +270,11 @@ export const InlineMathNode = Node.create({
     return {
       latex: {
         default: '',
-        parseHTML: (element) => element.getAttribute('data-math-latex') || element.getAttribute('latex') || element.textContent || '',
+        parseHTML: (element) =>
+          element.getAttribute('data-math-latex') ||
+          element.getAttribute('latex') ||
+          element.textContent ||
+          '',
       },
     }
   },
@@ -255,7 +288,11 @@ export const InlineMathNode = Node.create({
     return [
       'span',
       mergeAttributes(
-        { 'data-math-latex': latex, 'data-display-mode': 'false', class: 'math-inline-wrapper' },
+        {
+          'data-math-latex': latex,
+          'data-display-mode': 'false',
+          class: 'math-inline-wrapper',
+        },
         HTMLAttributes,
       ),
       latex,
@@ -270,10 +307,11 @@ export const InlineMathNode = Node.create({
     return {
       setInlineMath:
         (options: { latex: string }) =>
-        ({ commands }) => commands.insertContent({
-          type: this.name,
-          attrs: { latex: options.latex },
-        }),
+        ({ commands }) =>
+          commands.insertContent({
+            type: this.name,
+            attrs: { latex: options.latex },
+          }),
     }
   },
 
@@ -285,7 +323,12 @@ export const InlineMathNode = Node.create({
           const latex = match[1]?.trim()
           if (!latex) return
 
-          const before = state.doc.textBetween(Math.max(0, range.from - 1), range.from, '\0', '\0')
+          const before = state.doc.textBetween(
+            Math.max(0, range.from - 1),
+            range.from,
+            '\0',
+            '\0',
+          )
           if (before === '$') return
 
           const node = this.type.create({ latex })

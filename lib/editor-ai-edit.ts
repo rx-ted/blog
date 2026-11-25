@@ -67,7 +67,11 @@ function findMatchIndices(text: string, needle: string) {
   return indices
 }
 
-function getBoundaryPosition(positions: Array<number | null>, startIndex: number, endIndex: number) {
+function getBoundaryPosition(
+  positions: Array<number | null>,
+  startIndex: number,
+  endIndex: number,
+) {
   let from: number | null = null
   let to: number | null = null
 
@@ -106,9 +110,10 @@ export function resolveExactTextRangeInDoc(
   const matches = findMatchIndices(index.text, needle)
   if (matches.length === 0) return { status: 'not_found', matchCount: 0 }
 
-  const occurrence = Number.isInteger(options.occurrence) && Number(options.occurrence) > 0
-    ? Number(options.occurrence)
-    : null
+  const occurrence =
+    Number.isInteger(options.occurrence) && Number(options.occurrence) > 0
+      ? Number(options.occurrence)
+      : null
   const matchIndex = options.useLastMatch
     ? matches[matches.length - 1]
     : occurrence
@@ -121,7 +126,11 @@ export function resolveExactTextRangeInDoc(
     return { status: 'ambiguous', matchCount: matches.length }
   }
 
-  const boundary = getBoundaryPosition(index.positions, matchIndex, matchIndex + needle.length)
+  const boundary = getBoundaryPosition(
+    index.positions,
+    matchIndex,
+    matchIndex + needle.length,
+  )
   if (!boundary) return { status: 'not_found', matchCount: 0 }
 
   return {

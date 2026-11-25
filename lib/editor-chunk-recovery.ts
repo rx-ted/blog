@@ -5,11 +5,15 @@ export function getFailedEditorChunk(error: unknown): string | null {
   if (!(error instanceof Error) || error.name !== 'ChunkLoadError') return null
   const path = error.message.match(/Failed to load chunk (\/[^\s]+)/)?.[1]
   // Only cache same-site compiled scripts, never a URL supplied by article content.
-  return path && /^\/_next\/static\/chunks\/[A-Za-z0-9_.~-]+\.js$/.test(path) ? path : null
+  return path && /^\/_next\/static\/chunks\/[A-Za-z0-9_.~-]+\.js$/.test(path)
+    ? path
+    : null
 }
 
 export function resetEditorChunkRecovery() {
-  try { sessionStorage.removeItem(RECOVERY_KEY) } catch {}
+  try {
+    sessionStorage.removeItem(RECOVERY_KEY)
+  } catch {}
 }
 
 export async function recoverEditorChunk(error: unknown): Promise<boolean> {
@@ -28,8 +32,15 @@ export async function recoverEditorChunk(error: unknown): Promise<boolean> {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 20000)
     try {
-      const response = await fetch(path, { cache: 'reload', signal: controller.signal })
-      if (!response.ok || !/javascript/.test(response.headers.get('content-type') || '')) return false
+      const response = await fetch(path, {
+        cache: 'reload',
+        signal: controller.signal,
+      })
+      if (
+        !response.ok ||
+        !/javascript/.test(response.headers.get('content-type') || '')
+      )
+        return false
       // Headers alone do not prove a complete download (the original failure).
       const body = await response.arrayBuffer()
       if (body.byteLength === 0) return false

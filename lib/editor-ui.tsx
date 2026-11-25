@@ -16,7 +16,9 @@ import {
   TRIGGER_INPUT_MODAL_EVENT,
 } from '@/lib/editor-events'
 
-export function extractFilesFromClipboard(event: React.ClipboardEvent<HTMLElement>): File[] {
+export function extractFilesFromClipboard(
+  event: React.ClipboardEvent<HTMLElement>,
+): File[] {
   const files: File[] = []
   const items = event.clipboardData?.items
 
@@ -120,9 +122,11 @@ export function useEditorAuxiliaryModals({
   getDocumentText,
   getSelectionContext,
 }: UseEditorAuxiliaryModalsOptions) {
-  const [inputModal, setInputModal] = useState<EditorInputModalState>(CLOSED_INPUT_MODAL)
+  const [inputModal, setInputModal] =
+    useState<EditorInputModalState>(CLOSED_INPUT_MODAL)
   const [aiModal, setAiModal] = useState<EditorAiModalState>(CLOSED_AI_MODAL)
-  const [imageModal, setImageModal] = useState<EditorImageModalState>(CLOSED_IMAGE_MODAL)
+  const [imageModal, setImageModal] =
+    useState<EditorImageModalState>(CLOSED_IMAGE_MODAL)
 
   const closeAiModal = useCallback(() => {
     setAiModal(CLOSED_AI_MODAL)
@@ -143,37 +147,44 @@ export function useEditorAuxiliaryModals({
     setInputModal(CLOSED_INPUT_MODAL)
   }, [])
 
-  const openDocumentAIModal = useCallback((anchorEl?: HTMLElement | null) => {
-    const documentTitle = title.trim()
-    const documentText = getDocumentText().trim()
+  const openDocumentAIModal = useCallback(
+    (anchorEl?: HTMLElement | null) => {
+      const documentTitle = title.trim()
+      const documentText = getDocumentText().trim()
 
-    if (!documentTitle && !documentText) return
+      if (!documentTitle && !documentText) return
 
-    const rect = anchorEl?.getBoundingClientRect()
-    const fallbackLeft = typeof window !== 'undefined' ? window.innerWidth - 320 : 960
+      const rect = anchorEl?.getBoundingClientRect()
+      const fallbackLeft =
+        typeof window !== 'undefined' ? window.innerWidth - 320 : 960
 
-    setAiModal({
-      open: true,
-      selectedText: '',
-      position: rect
-        ? { top: rect.bottom + 8, left: rect.left + rect.width / 2 }
-        : { top: 72, left: fallbackLeft },
-      selectionRange: null,
-      initialContext: 'document',
-      documentTitle,
-      documentText,
-    })
-  }, [getDocumentText, title])
+      setAiModal({
+        open: true,
+        selectedText: '',
+        position: rect
+          ? { top: rect.bottom + 8, left: rect.left + rect.width / 2 }
+          : { top: 72, left: fallbackLeft },
+        selectionRange: null,
+        initialContext: 'document',
+        documentTitle,
+        documentText,
+      })
+    },
+    [getDocumentText, title],
+  )
 
-  const openDocumentImageModal = useCallback((mode: EditorImageModalState['mode'] = 'generate') => {
-    const { insertPos, selectedText } = getSelectionContext()
-    setImageModal({
-      open: true,
-      insertPos,
-      contextText: selectedText,
-      mode,
-    })
-  }, [getSelectionContext])
+  const openDocumentImageModal = useCallback(
+    (mode: EditorImageModalState['mode'] = 'generate') => {
+      const { insertPos, selectedText } = getSelectionContext()
+      setImageModal({
+        open: true,
+        insertPos,
+        contextText: selectedText,
+        mode,
+      })
+    },
+    [getSelectionContext],
+  )
 
   useEffect(() => {
     const handleInputModal = (event: Event) => {
@@ -239,8 +250,14 @@ export function useEditorAuxiliaryModals({
     return () => {
       window.removeEventListener(TRIGGER_INPUT_MODAL_EVENT, handleInputModal)
       window.removeEventListener(TRIGGER_AI_MODAL_EVENT, handleAiModal)
-      window.removeEventListener(TRIGGER_IMAGE_GENERATION_EVENT, handleImageModal)
-      window.removeEventListener(TRIGGER_COLLAGE_MODAL_EVENT, handleCollageModal)
+      window.removeEventListener(
+        TRIGGER_IMAGE_GENERATION_EVENT,
+        handleImageModal,
+      )
+      window.removeEventListener(
+        TRIGGER_COLLAGE_MODAL_EVENT,
+        handleCollageModal,
+      )
       window.removeEventListener(TRIGGER_IMAGE_TOOL_EVENT, handleImageTool)
     }
   }, [getDocumentText, getSelectionContext, title])

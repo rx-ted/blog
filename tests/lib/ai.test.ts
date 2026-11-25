@@ -18,7 +18,13 @@ vi.mock('openai', () => ({
 
 import { transformEditorSelectionStream } from '@/lib/ai'
 
-function buildStream(chunks: Array<{ content?: string; reasoning_content?: string; finish_reason?: string | null }>) {
+function buildStream(
+  chunks: Array<{
+    content?: string
+    reasoning_content?: string
+    finish_reason?: string | null
+  }>,
+) {
   return {
     async *[Symbol.asyncIterator]() {
       for (const chunk of chunks) {
@@ -26,8 +32,12 @@ function buildStream(chunks: Array<{ content?: string; reasoning_content?: strin
           choices: [
             {
               delta: {
-                ...(chunk.content !== undefined ? { content: chunk.content } : {}),
-                ...(chunk.reasoning_content !== undefined ? { reasoning_content: chunk.reasoning_content } : {}),
+                ...(chunk.content !== undefined
+                  ? { content: chunk.content }
+                  : {}),
+                ...(chunk.reasoning_content !== undefined
+                  ? { reasoning_content: chunk.reasoning_content }
+                  : {}),
               },
               finish_reason: chunk.finish_reason ?? null,
             },
@@ -78,14 +88,18 @@ describe('ai transformEditorSelectionStream', () => {
 
   it('retries when the provider streams reasoning only before the final answer', async () => {
     mocks.createCompletion
-      .mockResolvedValueOnce(buildStream([
-        { reasoning_content: '分析问题中', finish_reason: null },
-        { reasoning_content: '继续分析', finish_reason: 'length' },
-      ]))
-      .mockResolvedValueOnce(buildStream([
-        { content: '处理后的', finish_reason: null },
-        { content: '最终答案', finish_reason: 'stop' },
-      ]))
+      .mockResolvedValueOnce(
+        buildStream([
+          { reasoning_content: '分析问题中', finish_reason: null },
+          { reasoning_content: '继续分析', finish_reason: 'length' },
+        ]),
+      )
+      .mockResolvedValueOnce(
+        buildStream([
+          { content: '处理后的', finish_reason: null },
+          { content: '最终答案', finish_reason: 'stop' },
+        ]),
+      )
 
     const stream = await transformEditorSelectionStream('原始文本', 'custom', {
       customPrompt: '请润色这段文本',
@@ -101,10 +115,12 @@ describe('ai transformEditorSelectionStream', () => {
   })
 
   it('preserves streamed chunk boundaries for foreground rendering', async () => {
-    mocks.createCompletion.mockResolvedValueOnce(buildStream([
-      { content: '第一段', finish_reason: null },
-      { content: '第二段', finish_reason: 'stop' },
-    ]))
+    mocks.createCompletion.mockResolvedValueOnce(
+      buildStream([
+        { content: '第一段', finish_reason: null },
+        { content: '第二段', finish_reason: 'stop' },
+      ]),
+    )
 
     const stream = await transformEditorSelectionStream('原始文本', 'custom', {
       customPrompt: '直接输出',
@@ -115,7 +131,10 @@ describe('ai transformEditorSelectionStream', () => {
       },
     })
 
-    await expect(readStreamChunks(stream)).resolves.toEqual(['第一段', '第二段'])
+    await expect(readStreamChunks(stream)).resolves.toEqual([
+      '第一段',
+      '第二段',
+    ])
     expect(mocks.createCompletion).toHaveBeenCalledTimes(1)
   })
 })

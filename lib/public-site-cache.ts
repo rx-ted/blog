@@ -1,17 +1,19 @@
-import {
-  getPublicContentCacheNamespace,
-  getVersionedCached,
-} from '@/lib/cache'
+import { getPublicContentCacheNamespace, getVersionedCached } from '@/lib/cache'
 import { getSettings } from '@/lib/db'
 
 const PUBLIC_SITE_CACHE_TTL = 300
 
 function normalizeKeys(keys: string[]) {
-  return Array.from(new Set(keys.map((key) => key.trim()).filter(Boolean))).sort()
+  return Array.from(
+    new Set(keys.map((key) => key.trim()).filter(Boolean)),
+  ).sort()
 }
 
 function emptySettings(keys: string[]) {
-  return Object.fromEntries(keys.map((key) => [key, null])) as Record<string, string | null>
+  return Object.fromEntries(keys.map((key) => [key, null])) as Record<
+    string,
+    string | null
+  >
 }
 
 export async function getCachedPublicData<T>(

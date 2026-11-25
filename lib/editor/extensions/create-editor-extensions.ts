@@ -14,7 +14,12 @@ import {
 } from 'novel'
 import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight'
 import { common, createLowlight } from 'lowlight'
-import { Table, TableCell, TableHeader, TableRow } from '@tiptap/extension-table'
+import {
+  Table,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from '@tiptap/extension-table'
 import Youtube from '@tiptap/extension-youtube'
 import GlobalDragHandle from 'tiptap-extension-global-drag-handle'
 import AutoJoiner from 'tiptap-extension-auto-joiner'
@@ -22,13 +27,22 @@ import { Markdown } from 'tiptap-markdown'
 import { DOMParser as PMDOMParser, DOMSerializer } from '@tiptap/pm/model'
 import type { EditorView } from '@tiptap/pm/view'
 import { TwitterNode } from '@/lib/editor/nodes/embeds/twitter-extension'
-import { ResizableImage, type ResizableImageActionHandlers } from '@/lib/editor/nodes/image/resizable-image'
-import { InlineMathNode, MathNode } from '@/lib/editor/nodes/math/math-extension'
+import {
+  ResizableImage,
+  type ResizableImageActionHandlers,
+} from '@/lib/editor/nodes/image/resizable-image'
+import {
+  InlineMathNode,
+  MathNode,
+} from '@/lib/editor/nodes/math/math-extension'
 import { AudioNode } from '@/lib/editor/nodes/media/audio-extension'
 import { VideoNode } from '@/lib/editor/nodes/media/video-extension'
 import { EditorLink } from '@/lib/editor-link'
 import { hasMarkdownTable } from '@/lib/editor-utils'
-import { hasEditorMarkdownMath, renderMarkdownToEditorHtml } from '@/lib/markdown'
+import {
+  hasEditorMarkdownMath,
+  renderMarkdownToEditorHtml,
+} from '@/lib/markdown'
 import { shouldRunEditorCommandNavigation } from '@/lib/editor-keyboard'
 import {
   WechatBadgeGroupNode,
@@ -63,7 +77,9 @@ function shouldAbsolutizeCopiedUrl(value: string) {
 
 function absolutizeCopiedHtmlUrls(root: HTMLElement, baseUrl: string) {
   for (const [selector, attribute] of COPY_URL_ATTRIBUTES) {
-    for (const element of Array.from(root.querySelectorAll<HTMLElement>(selector))) {
+    for (const element of Array.from(
+      root.querySelectorAll<HTMLElement>(selector),
+    )) {
       const value = element.getAttribute(attribute)
       if (!value || !shouldAbsolutizeCopiedUrl(value)) continue
       element.setAttribute(attribute, new URL(value, baseUrl).toString())
@@ -79,7 +95,9 @@ function handleEditorCopy(view: EditorView, event: ClipboardEvent) {
   const slice = selection.content()
   const container = document.createElement('div')
   const serializer = DOMSerializer.fromSchema(state.schema)
-  container.appendChild(serializer.serializeFragment(slice.content, { document }))
+  container.appendChild(
+    serializer.serializeFragment(slice.content, { document }),
+  )
   absolutizeCopiedHtmlUrls(container, getEditorCopyBaseUrl())
 
   const html = container.innerHTML
@@ -87,7 +105,10 @@ function handleEditorCopy(view: EditorView, event: ClipboardEvent) {
 
   event.preventDefault()
   event.clipboardData.setData('text/html', html)
-  event.clipboardData.setData('text/plain', state.doc.textBetween(selection.from, selection.to, '\n\n'))
+  event.clipboardData.setData(
+    'text/plain',
+    state.doc.textBetween(selection.from, selection.to, '\n\n'),
+  )
   return true
 }
 
@@ -107,12 +128,21 @@ export function createEditorExtensions(options: EditorExtensionOptions = {}) {
     Color,
     HighlightExtension,
     CharacterCount,
-    ResizableImage.configure({ imageActions: options.imageActions ?? {} } as never),
+    ResizableImage.configure({
+      imageActions: options.imageActions ?? {},
+    } as never),
     TiptapUnderline,
-    EditorLink.configure({ openOnClick: false, autolink: true, linkOnPaste: true }),
+    EditorLink.configure({
+      openOnClick: false,
+      autolink: true,
+      linkOnPaste: true,
+    }),
     TaskList,
     TaskItem.configure({ nested: true }),
-    Table.configure({ resizable: false, HTMLAttributes: { class: 'tiptap-table' } }),
+    Table.configure({
+      resizable: false,
+      HTMLAttributes: { class: 'tiptap-table' },
+    }),
     TableRow,
     TableCell,
     TableHeader,
@@ -132,7 +162,11 @@ export function createEditorExtensions(options: EditorExtensionOptions = {}) {
     WechatBadgeGroupNode,
     WechatInfoGridNode,
     WechatImageSliderNode,
-    Markdown.configure({ html: true, transformPastedText: true, transformCopiedText: true }),
+    Markdown.configure({
+      html: true,
+      transformPastedText: true,
+      transformCopiedText: true,
+    }),
     GlobalDragHandle.configure({
       dragHandleWidth: 36,
       scrollTreshold: 100,
@@ -194,7 +228,8 @@ export function buildEditorProps(
     return collectFiles(files.length > 0 ? files : event.clipboardData?.files)
   }
 
-  const getDroppedFiles = (event: DragEvent) => collectFiles(event.dataTransfer?.files)
+  const getDroppedFiles = (event: DragEvent) =>
+    collectFiles(event.dataTransfer?.files)
 
   const uploadFn = onImageUpload
     ? createImageUpload({
@@ -212,13 +247,20 @@ export function buildEditorProps(
         if (onNonImageFile) {
           event.preventDefault()
           event.stopPropagation()
-          files.forEach((currentFile) => onNonImageFile(currentFile))
+          files.forEach((currentFile) => {
+            onNonImageFile(currentFile)
+          })
           return true
         }
 
         const [file] = files
 
-        if (files.length === 1 && file.type.startsWith('image/') && file.size <= 100 * 1024 * 1024 && uploadFn) {
+        if (
+          files.length === 1 &&
+          file.type.startsWith('image/') &&
+          file.size <= 100 * 1024 * 1024 &&
+          uploadFn
+        ) {
           if (handleImagePaste(view, event, uploadFn)) return true
         }
 
@@ -241,13 +283,14 @@ export function buildEditorProps(
       }
 
       const htmlContent = event.clipboardData?.getData('text/html') ?? ''
-      if (htmlContent && (
-        htmlContent.includes('<style') ||
-        htmlContent.includes('class=') ||
-        htmlContent.includes('mso-') ||
-        htmlContent.includes('data-') ||
-        /style\s*=\s*["'][^"']*["']/.test(htmlContent)
-      )) {
+      if (
+        htmlContent &&
+        (htmlContent.includes('<style') ||
+          htmlContent.includes('class=') ||
+          htmlContent.includes('mso-') ||
+          htmlContent.includes('data-') ||
+          /style\s*=\s*["'][^"']*["']/.test(htmlContent))
+      ) {
         event.preventDefault()
         const wrapper = document.createElement('div')
         wrapper.innerHTML = htmlContent
@@ -263,7 +306,9 @@ export function buildEditorProps(
           })
         })
 
-        wrapper.querySelectorAll('style').forEach((el) => el.remove())
+        wrapper.querySelectorAll('style').forEach((el) => {
+          el.remove()
+        })
 
         const { state, dispatch } = view
         const slice = PMDOMParser.fromSchema(state.schema).parseSlice(wrapper)
@@ -274,20 +319,32 @@ export function buildEditorProps(
 
       return false
     },
-    handleDrop: (view: EditorView, event: DragEvent, _slice: unknown, moved: boolean) => {
+    handleDrop: (
+      view: EditorView,
+      event: DragEvent,
+      _slice: unknown,
+      moved: boolean,
+    ) => {
       const files = getDroppedFiles(event)
       if (files.length === 0) return false
 
       if (onNonImageFile) {
         event.preventDefault()
         event.stopPropagation()
-        files.forEach((currentFile) => onNonImageFile(currentFile))
+        files.forEach((currentFile) => {
+          onNonImageFile(currentFile)
+        })
         return true
       }
 
       const [file] = files
 
-      if (files.length === 1 && file.type.startsWith('image/') && file.size <= 100 * 1024 * 1024 && uploadFn) {
+      if (
+        files.length === 1 &&
+        file.type.startsWith('image/') &&
+        file.size <= 100 * 1024 * 1024 &&
+        uploadFn
+      ) {
         if (handleImageDrop(view, event, moved, uploadFn)) return true
       }
 
@@ -300,20 +357,28 @@ export function buildEditorProps(
         if (onCompositionEnd) queueMicrotask(() => onCompositionEnd(view))
         return false
       },
-      keydown: (_view: unknown, event: KeyboardEvent) => handleEditorCommandNavigation(event),
-      copy: (view: EditorView, event: ClipboardEvent) => handleEditorCopy(view, event),
+      keydown: (_view: unknown, event: KeyboardEvent) =>
+        handleEditorCommandNavigation(event),
+      copy: (view: EditorView, event: ClipboardEvent) =>
+        handleEditorCopy(view, event),
       click: (_view: unknown, event: MouseEvent) => {
         if (event.metaKey || event.ctrlKey) {
           const target = event.target as HTMLElement
           const anchor = target.closest('a[href]')
           if (anchor) {
             event.preventDefault()
-            window.open((anchor as HTMLAnchorElement).href, '_blank', 'noopener')
+            window.open(
+              (anchor as HTMLAnchorElement).href,
+              '_blank',
+              'noopener',
+            )
           }
         }
       },
     },
-    attributes: { class: ['novel-prose', contentClassName].filter(Boolean).join(' ') },
+    attributes: {
+      class: ['novel-prose', contentClassName].filter(Boolean).join(' '),
+    },
   }
 }
 

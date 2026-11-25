@@ -1,9 +1,20 @@
 import { ensureSchema, type Database } from '@/lib/repositories/schema'
-import type { AiResearchJobRow, AiResearchResourceRow } from '@/lib/repositories/types'
+import type {
+  AiResearchJobRow,
+  AiResearchResourceRow,
+} from '@/lib/repositories/types'
 
-export type AiResearchResourceStatus = 'pending' | 'processing' | 'ready' | 'failed'
+export type AiResearchResourceStatus =
+  | 'pending'
+  | 'processing'
+  | 'ready'
+  | 'failed'
 export type AiResearchJobStatus = 'pending' | 'processing' | 'ready' | 'failed'
-export type AiResearchSourceType = 'webpage' | 'transcript' | 'x_post' | 'search_result'
+export type AiResearchSourceType =
+  | 'webpage'
+  | 'transcript'
+  | 'x_post'
+  | 'search_result'
 export type AiResearchLinkRole = 'source' | 'cited' | 'inserted'
 
 export type AiResearchResource = AiResearchResourceRow
@@ -151,7 +162,9 @@ export async function getAiResearchJobByTaskId(
 ): Promise<AiResearchJob | null> {
   await ensureSchema(db)
   return db
-    .prepare('SELECT * FROM ai_research_jobs WHERE provider = ? AND provider_task_id = ?')
+    .prepare(
+      'SELECT * FROM ai_research_jobs WHERE provider = ? AND provider_task_id = ?',
+    )
     .bind(provider, taskId.trim())
     .first<AiResearchJobRow>()
 }
@@ -163,7 +176,9 @@ export async function getAiResearchJobByNoteId(
 ): Promise<AiResearchJob | null> {
   await ensureSchema(db)
   return db
-    .prepare('SELECT * FROM ai_research_jobs WHERE provider = ? AND provider_note_id = ?')
+    .prepare(
+      'SELECT * FROM ai_research_jobs WHERE provider = ? AND provider_note_id = ?',
+    )
     .bind(provider, noteId.trim())
     .first<AiResearchJobRow>()
 }
@@ -177,12 +192,16 @@ export async function getLatestAiResearchJobForResource(
   const normalizedProvider = provider?.trim()
   if (normalizedProvider) {
     return db
-      .prepare('SELECT * FROM ai_research_jobs WHERE resource_id = ? AND provider = ? ORDER BY updated_at DESC, id DESC LIMIT 1')
+      .prepare(
+        'SELECT * FROM ai_research_jobs WHERE resource_id = ? AND provider = ? ORDER BY updated_at DESC, id DESC LIMIT 1',
+      )
       .bind(resourceId, normalizedProvider)
       .first<AiResearchJobRow>()
   }
   return db
-    .prepare('SELECT * FROM ai_research_jobs WHERE resource_id = ? ORDER BY updated_at DESC, id DESC LIMIT 1')
+    .prepare(
+      'SELECT * FROM ai_research_jobs WHERE resource_id = ? ORDER BY updated_at DESC, id DESC LIMIT 1',
+    )
     .bind(resourceId)
     .first<AiResearchJobRow>()
 }
@@ -285,12 +304,6 @@ export async function linkAiResearchResource(
       )
       VALUES (?, ?, ?, ?, ?)`,
     )
-    .bind(
-      input.resourceId,
-      sessionId,
-      postId,
-      slug,
-      input.role || 'source',
-    )
+    .bind(input.resourceId, sessionId, postId, slug, input.role || 'source')
     .run()
 }

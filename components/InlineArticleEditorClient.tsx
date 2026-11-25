@@ -3,11 +3,14 @@
 import dynamic from 'next/dynamic'
 
 const InlineArticleEditor = dynamic(
-  () => import('@/components/InlineArticleEditor').then(m => ({ default: m.InlineArticleEditor })),
+  () =>
+    import('@/components/InlineArticleEditor').then((m) => ({
+      default: m.InlineArticleEditor,
+    })),
   {
     ssr: false,
     loading: () => <div className="prose prose-lg max-w-none" />,
-  }
+  },
 )
 
 export function InlineArticleEditorClient(props: {

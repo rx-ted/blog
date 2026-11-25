@@ -2,7 +2,10 @@
 
 import Link from 'next/link'
 import { useState, useRef, useEffect } from 'react'
-import { refreshAdminSession, useAdminSession } from '@/lib/admin-session-client'
+import {
+  refreshAdminSession,
+  useAdminSession,
+} from '@/lib/admin-session-client'
 
 export function SiteFooter() {
   const [open, setOpen] = useState(false)
@@ -68,7 +71,16 @@ export function SiteFooter() {
                 title="写新文章"
                 className="inline-flex items-center gap-1 hover:text-[var(--editor-accent)] transition-colors duration-150"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M12 20h9" />
                   <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
                 </svg>
@@ -94,7 +106,9 @@ export function SiteFooter() {
           onClick={(e) => e.target === e.currentTarget && setOpen(false)}
         >
           <div className="bg-[var(--editor-panel)] rounded-xl shadow-xl p-4 sm:p-6 w-full max-w-[90vw] sm:max-w-xs border border-[var(--editor-line)]">
-            <h2 className="text-sm font-semibold text-[var(--editor-ink)] mb-4">进入管理后台</h2>
+            <h2 className="text-sm font-semibold text-[var(--editor-ink)] mb-4">
+              进入管理后台
+            </h2>
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               <input
                 ref={inputRef}

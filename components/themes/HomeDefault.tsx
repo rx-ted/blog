@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { SiteHeader } from '@/components/SiteHeader'
 import { SiteFooter } from '@/components/SiteFooter'
 import { Pagination } from '@/components/Pagination'
@@ -23,6 +24,8 @@ export function HomeDefault({
   totalPages,
   categorySlugMap,
 }: HomeProps) {
+  const router = useRouter()
+
   return (
     <div className="min-h-full flex flex-col bg-[var(--background)]">
       <SiteHeader
@@ -34,7 +37,9 @@ export function HomeDefault({
         {posts.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-[var(--editor-muted)] mb-3">还没有文章</p>
-            <p className="text-sm text-[var(--stone-gray)]">开始写作，记录思考</p>
+            <p className="text-sm text-[var(--stone-gray)]">
+              开始写作，记录思考
+            </p>
           </div>
         ) : (
           <>
@@ -43,7 +48,9 @@ export function HomeDefault({
                 <article
                   key={post.slug}
                   className="group border-t border-[var(--editor-line)] first:border-t-0"
-                  style={{ animation: `fadeInUp 0.4s ease-out ${index * 0.05}s both` }}
+                  style={{
+                    animation: `fadeInUp 0.4s ease-out ${index * 0.05}s both`,
+                  }}
                 >
                   <Link
                     href={`/${post.slug}`}
@@ -52,17 +59,46 @@ export function HomeDefault({
                     <div>
                       <h2
                         className="text-xl sm:text-2xl font-bold text-[var(--editor-ink)] leading-snug mb-2 group-hover:text-[var(--editor-accent)] transition-colors duration-200 flex items-center gap-2"
-                        style={{ fontFamily: 'Georgia, "Noto Serif SC", serif' }}
+                        style={{
+                          fontFamily: 'Georgia, "Noto Serif SC", serif',
+                        }}
                       >
                         {post.title}
                         {post.password && (
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--editor-muted)] flex-shrink-0">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="text-[var(--editor-muted)] flex-shrink-0"
+                          >
+                            <rect
+                              x="3"
+                              y="11"
+                              width="18"
+                              height="11"
+                              rx="2"
+                              ry="2"
+                            ></rect>
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                           </svg>
                         )}
                         {post.is_pinned === 1 && (
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--editor-accent)] flex-shrink-0">
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="text-[var(--editor-accent)] flex-shrink-0"
+                          >
                             <line x1="12" y1="17" x2="12" y2="22"></line>
                             <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path>
                           </svg>
@@ -81,12 +117,25 @@ export function HomeDefault({
                             {(() => {
                               const slug = categorySlugMap[post.category]
                               return slug ? (
-                                <Link
-                                  href={`/category/${slug}`}
-                                  className="px-2 py-0.5 rounded-full bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] font-medium border border-[var(--editor-accent)]/15 hover:bg-[var(--editor-accent)]/12 transition-colors"
+                                <span
+                                  role="link"
+                                  tabIndex={0}
+                                  className="px-2 py-0.5 rounded-full bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] font-medium border border-[var(--editor-accent)]/15 hover:bg-[var(--editor-accent)]/12 transition-colors cursor-pointer"
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    router.push(`/category/${slug}`)
+                                  }}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                      e.preventDefault()
+                                      e.stopPropagation()
+                                      router.push(`/category/${slug}`)
+                                    }
+                                  }}
                                 >
                                   {post.category}
-                                </Link>
+                                </span>
                               ) : (
                                 <span className="px-2 py-0.5 rounded-full bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] font-medium border border-[var(--editor-accent)]/15">
                                   {post.category}
@@ -101,7 +150,11 @@ export function HomeDefault({
                 </article>
               ))}
             </div>
-            <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/" />
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              basePath="/"
+            />
           </>
         )}
       </main>

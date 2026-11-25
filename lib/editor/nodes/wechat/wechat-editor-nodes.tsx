@@ -10,7 +10,15 @@ import {
 import { Plus, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
-export type WechatCalloutKind = 'note' | 'warning' | 'conclusion' | 'tip' | 'info' | 'danger' | 'success' | 'quote'
+export type WechatCalloutKind =
+  | 'note'
+  | 'warning'
+  | 'conclusion'
+  | 'tip'
+  | 'info'
+  | 'danger'
+  | 'success'
+  | 'quote'
 
 export type WechatInfoGridRow = {
   label: string
@@ -37,7 +45,10 @@ const DEFAULT_INFO_ROWS: WechatInfoGridRow[] = [
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     wechatCallout: {
-      setWechatCallout: (options?: { kind?: WechatCalloutKind; title?: string }) => ReturnType
+      setWechatCallout: (options?: {
+        kind?: WechatCalloutKind
+        title?: string
+      }) => ReturnType
     }
     wechatProfile: {
       setWechatProfile: (options?: { title?: string }) => ReturnType
@@ -49,7 +60,9 @@ declare module '@tiptap/core' {
       setWechatBadgeGroup: (options?: { items?: string[] }) => ReturnType
     }
     wechatInfoGrid: {
-      setWechatInfoGrid: (options?: { rows?: WechatInfoGridRow[] }) => ReturnType
+      setWechatInfoGrid: (options?: {
+        rows?: WechatInfoGridRow[]
+      }) => ReturnType
     }
     wechatImageSlider: {
       setWechatImageSlider: (options?: { title?: string }) => ReturnType
@@ -64,11 +77,14 @@ function textParagraph(text: string) {
   }
 }
 
-function emptyParagraph() {
+function _emptyParagraph() {
   return { type: 'paragraph' }
 }
 
-export function createWechatCalloutContent(kind: WechatCalloutKind = 'note', title?: string) {
+export function createWechatCalloutContent(
+  kind: WechatCalloutKind = 'note',
+  title?: string,
+) {
   return {
     type: 'wechatCallout',
     attrs: {
@@ -118,15 +134,17 @@ export function createWechatImageSliderContent(title = '') {
 }
 
 function normalizeCalloutKind(value: unknown): WechatCalloutKind {
-  const kind = String(value || '').trim().toLowerCase()
+  const kind = String(value || '')
+    .trim()
+    .toLowerCase()
   if (
-    kind === 'warning'
-    || kind === 'conclusion'
-    || kind === 'tip'
-    || kind === 'info'
-    || kind === 'danger'
-    || kind === 'success'
-    || kind === 'quote'
+    kind === 'warning' ||
+    kind === 'conclusion' ||
+    kind === 'tip' ||
+    kind === 'info' ||
+    kind === 'danger' ||
+    kind === 'success' ||
+    kind === 'quote'
   ) {
     return kind
   }
@@ -134,10 +152,10 @@ function normalizeCalloutKind(value: unknown): WechatCalloutKind {
 }
 
 function normalizeBadgeItems(value: unknown): string[] {
-  const items = Array.isArray(value) ? value : String(value || '').split(/[,，、\n]/)
-  const normalized = items
-    .map(item => String(item).trim())
-    .filter(Boolean)
+  const items = Array.isArray(value)
+    ? value
+    : String(value || '').split(/[,，、\n]/)
+  const normalized = items.map((item) => String(item).trim()).filter(Boolean)
   return normalized.length > 0 ? normalized : DEFAULT_BADGES
 }
 
@@ -163,7 +181,7 @@ function normalizeRows(value: unknown): WechatInfoGridRow[] {
 
 function parseBadgeItems(element: HTMLElement) {
   const badgeItems = Array.from(element.querySelectorAll('.wechat-badge'))
-    .map(item => item.textContent?.trim() || '')
+    .map((item) => item.textContent?.trim() || '')
     .filter(Boolean)
 
   if (badgeItems.length > 0) return badgeItems
@@ -171,16 +189,20 @@ function parseBadgeItems(element: HTMLElement) {
 }
 
 function parseInfoRows(element: HTMLElement) {
-  const cardRows = Array.from(element.querySelectorAll('.wechat-info-card')).map((card) => ({
-    label: card.querySelector('.wechat-info-label')?.textContent?.trim() || '信息',
-    value: card.querySelector('.wechat-info-value')?.textContent?.trim() || '',
-  })).filter(row => row.value)
+  const cardRows = Array.from(element.querySelectorAll('.wechat-info-card'))
+    .map((card) => ({
+      label:
+        card.querySelector('.wechat-info-label')?.textContent?.trim() || '信息',
+      value:
+        card.querySelector('.wechat-info-value')?.textContent?.trim() || '',
+    }))
+    .filter((row) => row.value)
 
   if (cardRows.length > 0) return cardRows
 
   const lines = (element.textContent || '')
     .split('\n')
-    .map(line => line.trim())
+    .map((line) => line.trim())
     .filter(Boolean)
 
   const rows = lines.map((line) => {
@@ -207,11 +229,21 @@ function parseInfoRows(element: HTMLElement) {
 }
 
 function getTitle(element: HTMLElement, selector: string, fallback: string) {
-  return element.getAttribute('data-title') || element.querySelector(selector)?.textContent?.trim() || fallback
+  return (
+    element.getAttribute('data-title') ||
+    element.querySelector(selector)?.textContent?.trim() ||
+    fallback
+  )
 }
 
 function removeNodeViewControls(attributes: Record<string, unknown>) {
-  const { items: _items, rows: _rows, kind: _kind, title: _title, ...rest } = attributes
+  const {
+    items: _items,
+    rows: _rows,
+    kind: _kind,
+    title: _title,
+    ...rest
+  } = attributes
   return rest
 }
 
@@ -317,15 +349,23 @@ function WechatImageSliderView(props: NodeViewProps) {
   )
 }
 
-function WechatBadgeGroupView({ node, selected, updateAttributes }: NodeViewProps) {
+function WechatBadgeGroupView({
+  node,
+  selected,
+  updateAttributes,
+}: NodeViewProps) {
   const items = normalizeBadgeItems(node.attrs.items)
   const [draft, setDraft] = useState(items.join('，'))
 
   return (
-    <NodeViewWrapper className={`wechat-editor-node wechat-badge-group ${selected ? 'wechat-editor-node-selected' : ''}`}>
+    <NodeViewWrapper
+      className={`wechat-editor-node wechat-badge-group ${selected ? 'wechat-editor-node-selected' : ''}`}
+    >
       <div className="wechat-badge-preview" contentEditable={false}>
-        {items.map(item => (
-          <span key={item} className="wechat-badge">{item}</span>
+        {items.map((item) => (
+          <span key={item} className="wechat-badge">
+            {item}
+          </span>
         ))}
       </div>
       <textarea
@@ -341,11 +381,17 @@ function WechatBadgeGroupView({ node, selected, updateAttributes }: NodeViewProp
   )
 }
 
-function WechatInfoGridView({ node, selected, updateAttributes }: NodeViewProps) {
+function WechatInfoGridView({
+  node,
+  selected,
+  updateAttributes,
+}: NodeViewProps) {
   const rows = useMemo(() => normalizeRows(node.attrs.rows), [node.attrs.rows])
 
   const updateRow = (index: number, nextRow: WechatInfoGridRow) => {
-    const nextRows = rows.map((row, rowIndex) => (rowIndex === index ? nextRow : row))
+    const nextRows = rows.map((row, rowIndex) =>
+      rowIndex === index ? nextRow : row,
+    )
     updateAttributes({ rows: normalizeRows(nextRows) })
   }
 
@@ -359,7 +405,9 @@ function WechatInfoGridView({ node, selected, updateAttributes }: NodeViewProps)
   }
 
   return (
-    <NodeViewWrapper className={`wechat-editor-node wechat-info-grid-editor ${selected ? 'wechat-editor-node-selected' : ''}`}>
+    <NodeViewWrapper
+      className={`wechat-editor-node wechat-info-grid-editor ${selected ? 'wechat-editor-node-selected' : ''}`}
+    >
       <div className="wechat-info-grid" contentEditable={false}>
         {rows.map((row, index) => (
           <section key={`${row.label}-${index}`} className="wechat-info-card">
@@ -367,13 +415,17 @@ function WechatInfoGridView({ node, selected, updateAttributes }: NodeViewProps)
               value={row.label}
               aria-label="信息标题"
               className="wechat-info-label wechat-info-input"
-              onChange={(event) => updateRow(index, { ...row, label: event.target.value })}
+              onChange={(event) =>
+                updateRow(index, { ...row, label: event.target.value })
+              }
             />
             <input
               value={row.value}
               aria-label="信息内容"
               className="wechat-info-value wechat-info-input"
-              onChange={(event) => updateRow(index, { ...row, value: event.target.value })}
+              onChange={(event) =>
+                updateRow(index, { ...row, value: event.target.value })
+              }
             />
             <button
               type="button"
@@ -412,19 +464,30 @@ export const WechatCalloutNode = Node.create({
     return {
       kind: {
         default: 'note',
-        parseHTML: element => normalizeCalloutKind(element.getAttribute('data-wechat-callout')),
-        renderHTML: attributes => ({ 'data-wechat-callout': normalizeCalloutKind(attributes.kind) }),
+        parseHTML: (element) =>
+          normalizeCalloutKind(element.getAttribute('data-wechat-callout')),
+        renderHTML: (attributes) => ({
+          'data-wechat-callout': normalizeCalloutKind(attributes.kind),
+        }),
       },
       title: {
         default: '提示',
-        parseHTML: element => getTitle(element as HTMLElement, '.wechat-callout-title', '提示'),
-        renderHTML: attributes => ({ 'data-title': String(attributes.title || '提示') }),
+        parseHTML: (element) =>
+          getTitle(element as HTMLElement, '.wechat-callout-title', '提示'),
+        renderHTML: (attributes) => ({
+          'data-title': String(attributes.title || '提示'),
+        }),
       },
     }
   },
 
   parseHTML() {
-    return [{ tag: 'section[data-wechat-callout]', contentElement: '.wechat-callout-body' }]
+    return [
+      {
+        tag: 'section[data-wechat-callout]',
+        contentElement: '.wechat-callout-body',
+      },
+    ]
   },
 
   renderHTML({ HTMLAttributes }) {
@@ -440,7 +503,11 @@ export const WechatCalloutNode = Node.create({
         'data-title': title,
       }),
       ['p', { class: 'wechat-callout-title' }, title],
-      ['section', { class: 'wechat-callout-body', 'data-wechat-callout-body': 'true' }, 0],
+      [
+        'section',
+        { class: 'wechat-callout-body', 'data-wechat-callout-body': 'true' },
+        0,
+      ],
     ]
   },
 
@@ -452,7 +519,10 @@ export const WechatCalloutNode = Node.create({
     return {
       setWechatCallout:
         (options = {}) =>
-        ({ commands }) => commands.insertContent(createWechatCalloutContent(options.kind, options.title)),
+        ({ commands }) =>
+          commands.insertContent(
+            createWechatCalloutContent(options.kind, options.title),
+          ),
     }
   },
 })
@@ -469,14 +539,22 @@ export const WechatProfileNode = Node.create({
     return {
       title: {
         default: 'rx-ted',
-        parseHTML: element => getTitle(element as HTMLElement, '.wechat-profile-name', 'rx-ted'),
-        renderHTML: attributes => ({ 'data-title': String(attributes.title || 'rx-ted') }),
+        parseHTML: (element) =>
+          getTitle(element as HTMLElement, '.wechat-profile-name', 'rx-ted'),
+        renderHTML: (attributes) => ({
+          'data-title': String(attributes.title || 'rx-ted'),
+        }),
       },
     }
   },
 
   parseHTML() {
-    return [{ tag: 'section[data-wechat-component="profile"]', contentElement: '.wechat-profile-body' }]
+    return [
+      {
+        tag: 'section[data-wechat-component="profile"]',
+        contentElement: '.wechat-profile-body',
+      },
+    ]
   },
 
   renderHTML({ HTMLAttributes }) {
@@ -485,9 +563,17 @@ export const WechatProfileNode = Node.create({
 
     return [
       'section',
-      mergeAttributes(attrs, { class: 'wechat-profile-card', 'data-wechat-component': 'profile', 'data-title': title }),
+      mergeAttributes(attrs, {
+        class: 'wechat-profile-card',
+        'data-wechat-component': 'profile',
+        'data-title': title,
+      }),
       ['p', { class: 'wechat-profile-name' }, title],
-      ['section', { class: 'wechat-profile-body', 'data-wechat-component-body': 'true' }, 0],
+      [
+        'section',
+        { class: 'wechat-profile-body', 'data-wechat-component-body': 'true' },
+        0,
+      ],
     ]
   },
 
@@ -499,7 +585,8 @@ export const WechatProfileNode = Node.create({
     return {
       setWechatProfile:
         (options = {}) =>
-        ({ commands }) => commands.insertContent(createWechatProfileContent(options.title)),
+        ({ commands }) =>
+          commands.insertContent(createWechatProfileContent(options.title)),
     }
   },
 })
@@ -516,14 +603,26 @@ export const WechatQRCodeNode = Node.create({
     return {
       title: {
         default: '关注公众号',
-        parseHTML: element => getTitle(element as HTMLElement, '.wechat-qrcode-title', '关注公众号'),
-        renderHTML: attributes => ({ 'data-title': String(attributes.title || '关注公众号') }),
+        parseHTML: (element) =>
+          getTitle(
+            element as HTMLElement,
+            '.wechat-qrcode-title',
+            '关注公众号',
+          ),
+        renderHTML: (attributes) => ({
+          'data-title': String(attributes.title || '关注公众号'),
+        }),
       },
     }
   },
 
   parseHTML() {
-    return [{ tag: 'section[data-wechat-component="qrcode"]', contentElement: '.wechat-qrcode-body' }]
+    return [
+      {
+        tag: 'section[data-wechat-component="qrcode"]',
+        contentElement: '.wechat-qrcode-body',
+      },
+    ]
   },
 
   renderHTML({ HTMLAttributes }) {
@@ -532,9 +631,17 @@ export const WechatQRCodeNode = Node.create({
 
     return [
       'section',
-      mergeAttributes(attrs, { class: 'wechat-qrcode-card', 'data-wechat-component': 'qrcode', 'data-title': title }),
+      mergeAttributes(attrs, {
+        class: 'wechat-qrcode-card',
+        'data-wechat-component': 'qrcode',
+        'data-title': title,
+      }),
       ['p', { class: 'wechat-qrcode-title' }, title],
-      ['section', { class: 'wechat-qrcode-body', 'data-wechat-component-body': 'true' }, 0],
+      [
+        'section',
+        { class: 'wechat-qrcode-body', 'data-wechat-component-body': 'true' },
+        0,
+      ],
     ]
   },
 
@@ -546,7 +653,8 @@ export const WechatQRCodeNode = Node.create({
     return {
       setWechatQRCode:
         (options = {}) =>
-        ({ commands }) => commands.insertContent(createWechatQRCodeContent(options.title)),
+        ({ commands }) =>
+          commands.insertContent(createWechatQRCodeContent(options.title)),
     }
   },
 })
@@ -561,7 +669,7 @@ export const WechatBadgeGroupNode = Node.create({
     return {
       items: {
         default: DEFAULT_BADGES,
-        parseHTML: element => parseBadgeItems(element as HTMLElement),
+        parseHTML: (element) => parseBadgeItems(element as HTMLElement),
         renderHTML: () => ({}),
       },
     }
@@ -576,8 +684,11 @@ export const WechatBadgeGroupNode = Node.create({
     const attrs = removeNodeViewControls(HTMLAttributes)
     return [
       'section',
-      mergeAttributes(attrs, { class: 'wechat-badge-group', 'data-wechat-component': 'badges' }),
-      ...items.map(item => ['span', { class: 'wechat-badge' }, item]),
+      mergeAttributes(attrs, {
+        class: 'wechat-badge-group',
+        'data-wechat-component': 'badges',
+      }),
+      ...items.map((item) => ['span', { class: 'wechat-badge' }, item]),
     ]
   },
 
@@ -589,7 +700,8 @@ export const WechatBadgeGroupNode = Node.create({
     return {
       setWechatBadgeGroup:
         (options = {}) =>
-        ({ commands }) => commands.insertContent(createWechatBadgeGroupContent(options.items)),
+        ({ commands }) =>
+          commands.insertContent(createWechatBadgeGroupContent(options.items)),
     }
   },
 })
@@ -604,7 +716,7 @@ export const WechatInfoGridNode = Node.create({
     return {
       rows: {
         default: DEFAULT_INFO_ROWS,
-        parseHTML: element => parseInfoRows(element as HTMLElement),
+        parseHTML: (element) => parseInfoRows(element as HTMLElement),
         renderHTML: () => ({}),
       },
     }
@@ -619,8 +731,11 @@ export const WechatInfoGridNode = Node.create({
     const attrs = removeNodeViewControls(HTMLAttributes)
     return [
       'section',
-      mergeAttributes(attrs, { class: 'wechat-info-grid', 'data-wechat-component': 'grid' }),
-      ...rows.map(row => [
+      mergeAttributes(attrs, {
+        class: 'wechat-info-grid',
+        'data-wechat-component': 'grid',
+      }),
+      ...rows.map((row) => [
         'section',
         { class: 'wechat-info-card' },
         ['span', { class: 'wechat-info-label' }, row.label],
@@ -637,7 +752,8 @@ export const WechatInfoGridNode = Node.create({
     return {
       setWechatInfoGrid:
         (options = {}) =>
-        ({ commands }) => commands.insertContent(createWechatInfoGridContent(options.rows)),
+        ({ commands }) =>
+          commands.insertContent(createWechatInfoGridContent(options.rows)),
     }
   },
 })
@@ -654,26 +770,47 @@ export const WechatImageSliderNode = Node.create({
     return {
       title: {
         default: '',
-        parseHTML: element => getTitle(element as HTMLElement, '.wechat-image-slider-title', ''),
-        renderHTML: attributes => ({ 'data-title': String(attributes.title || '') }),
+        parseHTML: (element) =>
+          getTitle(element as HTMLElement, '.wechat-image-slider-title', ''),
+        renderHTML: (attributes) => ({
+          'data-title': String(attributes.title || ''),
+        }),
       },
     }
   },
 
   parseHTML() {
-    return [{ tag: 'section[data-wechat-component="slider"]', contentElement: '.wechat-image-slider-track' }]
+    return [
+      {
+        tag: 'section[data-wechat-component="slider"]',
+        contentElement: '.wechat-image-slider-track',
+      },
+    ]
   },
 
   renderHTML({ HTMLAttributes }) {
     const title = String(HTMLAttributes.title || '')
     const attrs = removeNodeViewControls(HTMLAttributes)
-    const titleNode = title ? [['p', { class: 'wechat-image-slider-title' }, title]] : []
+    const titleNode = title
+      ? [['p', { class: 'wechat-image-slider-title' }, title]]
+      : []
 
     return [
       'section',
-      mergeAttributes(attrs, { class: 'wechat-image-slider', 'data-wechat-component': 'slider', 'data-title': title }),
+      mergeAttributes(attrs, {
+        class: 'wechat-image-slider',
+        'data-wechat-component': 'slider',
+        'data-title': title,
+      }),
       ...titleNode,
-      ['section', { class: 'wechat-image-slider-track', 'data-wechat-slider-track': 'true' }, 0],
+      [
+        'section',
+        {
+          class: 'wechat-image-slider-track',
+          'data-wechat-slider-track': 'true',
+        },
+        0,
+      ],
       ['p', { class: 'wechat-image-slider-hint' }, '左右滑动看更多'],
     ]
   },
@@ -686,7 +823,8 @@ export const WechatImageSliderNode = Node.create({
     return {
       setWechatImageSlider:
         (options = {}) =>
-        ({ commands }) => commands.insertContent(createWechatImageSliderContent(options.title)),
+        ({ commands }) =>
+          commands.insertContent(createWechatImageSliderContent(options.title)),
     }
   },
 })

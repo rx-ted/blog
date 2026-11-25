@@ -2,7 +2,20 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Eye, Link2, Edit, Pin, PinOff, EyeOff, Eye as EyeIcon, Lock, Unlock, Check, FileText, Trash2 } from 'lucide-react'
+import {
+  Eye,
+  Link2,
+  Edit,
+  Pin,
+  PinOff,
+  EyeOff,
+  Eye as EyeIcon,
+  Lock,
+  Unlock,
+  Check,
+  FileText,
+  Trash2,
+} from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/Toast'
 import { Modal } from '@/components/Modal'
@@ -19,7 +32,9 @@ interface PostRowProps {
 function formatDate(ts: number) {
   const date = new Date(ts * 1000)
   const now = new Date()
-  const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
+  const diffDays = Math.floor(
+    (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24),
+  )
 
   if (diffDays === 0) return '今天'
   if (diffDays === 1) return '昨天'
@@ -227,7 +242,9 @@ export function PostRow({ post, categories }: PostRowProps) {
   const handlePermanentDelete = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`/api/admin/posts/${post.slug}`, { method: 'DELETE' })
+      const res = await fetch(`/api/admin/posts/${post.slug}`, {
+        method: 'DELETE',
+      })
 
       let data: { success?: boolean; error?: string }
       try {
@@ -267,10 +284,16 @@ export function PostRow({ post, categories }: PostRowProps) {
               post.status === 'published'
                 ? 'bg-emerald-500'
                 : post.status === 'deleted'
-                ? 'bg-gray-400'
-                : 'bg-amber-500'
+                  ? 'bg-gray-400'
+                  : 'bg-amber-500'
             }`}
-            title={post.status === 'published' ? '已发布' : post.status === 'deleted' ? '已删除' : '草稿'}
+            title={
+              post.status === 'published'
+                ? '已发布'
+                : post.status === 'deleted'
+                  ? '已删除'
+                  : '草稿'
+            }
           />
           {/* 图标行 */}
           <div className="flex items-center gap-1">
@@ -437,14 +460,20 @@ export function PostRow({ post, categories }: PostRowProps) {
                 post.status === 'published'
                   ? 'bg-emerald-500'
                   : post.status === 'deleted'
-                  ? 'bg-gray-400'
-                  : 'bg-amber-500'
+                    ? 'bg-gray-400'
+                    : 'bg-amber-500'
               }`}
             />
             <div className="flex flex-col gap-0.5">
-              {post.is_pinned === 1 && <Pin className="w-3 h-3 text-[var(--editor-accent)]" />}
-              {post.password && <Lock className="w-3 h-3 text-[var(--stone-gray)]" />}
-              {post.is_hidden === 1 && <EyeOff className="w-3 h-3 text-[var(--stone-gray)]" />}
+              {post.is_pinned === 1 && (
+                <Pin className="w-3 h-3 text-[var(--editor-accent)]" />
+              )}
+              {post.password && (
+                <Lock className="w-3 h-3 text-[var(--stone-gray)]" />
+              )}
+              {post.is_hidden === 1 && (
+                <EyeOff className="w-3 h-3 text-[var(--stone-gray)]" />
+              )}
             </div>
           </div>
 
@@ -475,7 +504,9 @@ export function PostRow({ post, categories }: PostRowProps) {
             />
           </div>
           <span>·</span>
-          <span className="tabular-nums">{post.view_count.toLocaleString()} 次</span>
+          <span className="tabular-nums">
+            {post.view_count.toLocaleString()} 次
+          </span>
           <span>·</span>
           <span>{formatDate(post.published_at)}</span>
         </div>
@@ -502,28 +533,72 @@ export function PostRow({ post, categories }: PostRowProps) {
             </>
           ) : (
             <>
-              <button onClick={handleView} className="p-1.5 rounded hover:bg-[var(--editor-soft)] transition-colors">
+              <button
+                onClick={handleView}
+                className="p-1.5 rounded hover:bg-[var(--editor-soft)] transition-colors"
+              >
                 <Eye className="w-4 h-4 text-[var(--stone-gray)]" />
               </button>
-              <button onClick={handleCopyLink} className="p-1.5 rounded hover:bg-[var(--editor-soft)] transition-colors">
+              <button
+                onClick={handleCopyLink}
+                className="p-1.5 rounded hover:bg-[var(--editor-soft)] transition-colors"
+              >
                 <Link2 className="w-4 h-4 text-[var(--stone-gray)]" />
               </button>
-              <Link href={`/editor?edit=${post.slug}`} className="p-1.5 rounded hover:bg-[var(--editor-soft)] transition-colors">
+              <Link
+                href={`/editor?edit=${post.slug}`}
+                className="p-1.5 rounded hover:bg-[var(--editor-soft)] transition-colors"
+              >
                 <Edit className="w-4 h-4 text-[var(--stone-gray)]" />
               </Link>
-              <button onClick={() => setShowPinModal(true)} disabled={loading} className="p-1.5 rounded hover:bg-[var(--editor-soft)] transition-colors disabled:opacity-50">
-                {post.is_pinned === 1 ? <PinOff className="w-4 h-4 text-[var(--editor-accent)]" /> : <Pin className="w-4 h-4 text-[var(--stone-gray)]" />}
+              <button
+                onClick={() => setShowPinModal(true)}
+                disabled={loading}
+                className="p-1.5 rounded hover:bg-[var(--editor-soft)] transition-colors disabled:opacity-50"
+              >
+                {post.is_pinned === 1 ? (
+                  <PinOff className="w-4 h-4 text-[var(--editor-accent)]" />
+                ) : (
+                  <Pin className="w-4 h-4 text-[var(--stone-gray)]" />
+                )}
               </button>
-              <button onClick={() => setShowHiddenModal(true)} disabled={loading} className="p-1.5 rounded hover:bg-[var(--editor-soft)] transition-colors disabled:opacity-50">
-                {post.is_hidden === 1 ? <EyeOff className="w-4 h-4 text-[var(--stone-gray)]" /> : <EyeIcon className="w-4 h-4 text-[var(--stone-gray)]" />}
+              <button
+                onClick={() => setShowHiddenModal(true)}
+                disabled={loading}
+                className="p-1.5 rounded hover:bg-[var(--editor-soft)] transition-colors disabled:opacity-50"
+              >
+                {post.is_hidden === 1 ? (
+                  <EyeOff className="w-4 h-4 text-[var(--stone-gray)]" />
+                ) : (
+                  <EyeIcon className="w-4 h-4 text-[var(--stone-gray)]" />
+                )}
               </button>
-              <button onClick={() => setShowPasswordModal(true)} className="p-1.5 rounded hover:bg-[var(--editor-soft)] transition-colors">
-                {post.password ? <Lock className="w-4 h-4 text-[var(--editor-accent)]" /> : <Unlock className="w-4 h-4 text-[var(--stone-gray)]" />}
+              <button
+                onClick={() => setShowPasswordModal(true)}
+                className="p-1.5 rounded hover:bg-[var(--editor-soft)] transition-colors"
+              >
+                {post.password ? (
+                  <Lock className="w-4 h-4 text-[var(--editor-accent)]" />
+                ) : (
+                  <Unlock className="w-4 h-4 text-[var(--stone-gray)]" />
+                )}
               </button>
-              <button onClick={() => setShowStatusModal(true)} disabled={loading} className="p-1.5 rounded hover:bg-[var(--editor-soft)] transition-colors disabled:opacity-50">
-                {post.status === 'published' ? <FileText className="w-4 h-4 text-amber-500" /> : <Check className="w-4 h-4 text-emerald-600" />}
+              <button
+                onClick={() => setShowStatusModal(true)}
+                disabled={loading}
+                className="p-1.5 rounded hover:bg-[var(--editor-soft)] transition-colors disabled:opacity-50"
+              >
+                {post.status === 'published' ? (
+                  <FileText className="w-4 h-4 text-amber-500" />
+                ) : (
+                  <Check className="w-4 h-4 text-emerald-600" />
+                )}
               </button>
-              <button onClick={() => setShowDeleteModal(true)} disabled={loading} className="p-1.5 rounded hover:bg-[var(--editor-soft)] transition-colors disabled:opacity-50">
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                disabled={loading}
+                className="p-1.5 rounded hover:bg-[var(--editor-soft)] transition-colors disabled:opacity-50"
+              >
                 <Trash2 className="w-4 h-4 text-rose-500" />
               </button>
             </>
@@ -548,7 +623,11 @@ export function PostRow({ post, categories }: PostRowProps) {
         onClose={() => setShowPinModal(false)}
         onConfirm={handlePinToggle}
         title={post.is_pinned === 1 ? '取消置顶' : '置顶文章'}
-        description={post.is_pinned === 1 ? '确定要取消置顶吗？' : '置顶后文章将显示在列表顶部。'}
+        description={
+          post.is_pinned === 1
+            ? '确定要取消置顶吗？'
+            : '置顶后文章将显示在列表顶部。'
+        }
         confirmText="确认"
         type="info"
       />

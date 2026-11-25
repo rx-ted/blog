@@ -15,7 +15,7 @@ declare global {
             align?: 'left' | 'center' | 'right'
             conversation?: 'all' | 'none'
             dnt?: boolean
-          }
+          },
         ) => Promise<HTMLElement>
       }
     }
@@ -78,10 +78,14 @@ export async function renderTweetEmbed(container: HTMLElement, src: string) {
 }
 
 export async function enhanceTwitterEmbeds(root: Document | Element) {
-  const embeds = Array.from(root.querySelectorAll<HTMLElement>('div[data-twitter-src]'))
-  await Promise.all(embeds.map(async (container) => {
-    const src = container.getAttribute('data-twitter-src')
-    if (!src) return
-    await renderTweetEmbed(container, src)
-  }))
+  const embeds = Array.from(
+    root.querySelectorAll<HTMLElement>('div[data-twitter-src]'),
+  )
+  await Promise.all(
+    embeds.map(async (container) => {
+      const src = container.getAttribute('data-twitter-src')
+      if (!src) return
+      await renderTweetEmbed(container, src)
+    }),
+  )
 }

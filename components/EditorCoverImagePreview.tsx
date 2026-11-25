@@ -8,7 +8,11 @@ interface EditorCoverImagePreviewProps {
   onUpload: () => void
 }
 
-export function EditorCoverImagePreview({ src, onRemove, onUpload }: EditorCoverImagePreviewProps) {
+export function EditorCoverImagePreview({
+  src,
+  onRemove,
+  onUpload,
+}: EditorCoverImagePreviewProps) {
   return (
     <div
       className="group relative overflow-hidden rounded-md border border-[var(--editor-line)]"

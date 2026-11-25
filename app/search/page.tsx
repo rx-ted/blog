@@ -49,7 +49,9 @@ export default async function SearchPage({
     console.error('Search page error:', e)
   }
 
-  const categorySlugMap = new Map(categories.map((category) => [category.name, category.slug]))
+  const categorySlugMap = new Map(
+    categories.map((category) => [category.name, category.slug]),
+  )
 
   return (
     <div className="min-h-full flex flex-col bg-[var(--background)]">
@@ -78,7 +80,17 @@ export default async function SearchPage({
         {query && posts.length === 0 ? (
           <div className="text-center py-20">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--editor-soft)] flex items-center justify-center">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--stone-gray)]">
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-[var(--stone-gray)]"
+              >
                 <circle cx="11" cy="11" r="8"></circle>
                 <path d="m21 21-4.35-4.35"></path>
               </svg>
@@ -93,7 +105,7 @@ export default async function SearchPage({
                 key={post.slug}
                 className="group border-t border-[var(--editor-line)] first:border-t-0"
                 style={{
-                  animation: `fadeInUp 0.4s ease-out ${index * 0.05}s both`
+                  animation: `fadeInUp 0.4s ease-out ${index * 0.05}s both`,
                 }}
               >
                 <Link
@@ -109,13 +121,40 @@ export default async function SearchPage({
                     >
                       {post.title}
                       {post.password && (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--editor-muted)] flex-shrink-0">
-                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="text-[var(--editor-muted)] flex-shrink-0"
+                        >
+                          <rect
+                            x="3"
+                            y="11"
+                            width="18"
+                            height="11"
+                            rx="2"
+                            ry="2"
+                          ></rect>
                           <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                         </svg>
                       )}
                       {post.is_pinned === 1 && (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--editor-accent)] flex-shrink-0">
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="text-[var(--editor-accent)] flex-shrink-0"
+                        >
                           <line x1="12" y1="17" x2="12" y2="22"></line>
                           <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path>
                         </svg>
@@ -132,7 +171,9 @@ export default async function SearchPage({
                         <>
                           <span aria-hidden>·</span>
                           {(() => {
-                            const categorySlug = post.category ? categorySlugMap.get(post.category) : null
+                            const categorySlug = post.category
+                              ? categorySlugMap.get(post.category)
+                              : null
                             return categorySlug ? (
                               <Link
                                 href={`/category/${categorySlug}`}
@@ -146,8 +187,8 @@ export default async function SearchPage({
                               </span>
                             )
                           })()}
-                          </>
-                        )}
+                        </>
+                      )}
                     </div>
                   </div>
                 </Link>

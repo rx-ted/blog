@@ -9,8 +9,12 @@ import {
 
 describe('editor ai chat sessions', () => {
   it('builds article-scoped storage keys', () => {
-    expect(buildEditorAiChatStorageKey('post:42')).toBe('qmblog:editor-ai-chat-sessions:v2:post%3A42')
-    expect(buildEditorAiChatStorageKey(' slug:hello world ')).toBe('qmblog:editor-ai-chat-sessions:v2:slug%3Ahello%20world')
+    expect(buildEditorAiChatStorageKey('post:42')).toBe(
+      'qmblog:editor-ai-chat-sessions:v2:post%3A42',
+    )
+    expect(buildEditorAiChatStorageKey(' slug:hello world ')).toBe(
+      'qmblog:editor-ai-chat-sessions:v2:slug%3Ahello%20world',
+    )
   })
 
   it('normalizes empty document keys to a draft fallback', () => {
@@ -69,10 +73,18 @@ describe('editor ai chat sessions', () => {
       },
     ]
 
-    expect(collectAppliedToolCallIdsFromMessages(messages)).toEqual(['image-1', 'image-stream-result', 'insert-1'])
+    expect(collectAppliedToolCallIdsFromMessages(messages)).toEqual([
+      'image-1',
+      'image-stream-result',
+      'insert-1',
+    ])
   })
 
   it('dedupes stored and inferred tool call ids', () => {
-    expect(mergeToolCallIds(['a', 'b', 'a'], ['b', 'c'], ['', null])).toEqual(['a', 'b', 'c'])
+    expect(mergeToolCallIds(['a', 'b', 'a'], ['b', 'c'], ['', null])).toEqual([
+      'a',
+      'b',
+      'c',
+    ])
   })
 })

@@ -1,25 +1,30 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/admin-auth'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import {
   ensureAiImageConfigInfrastructure,
   resolveAiImageProfileConfig,
 } from '@/lib/ai-image-config'
+import { AI_IMAGE_PROVIDER_MAP } from '@/lib/ai-image-provider-presets'
 import {
-  AI_IMAGE_PROVIDER_MAP,
-} from '@/lib/ai-image-provider-presets'
-import { normalizeBaseUrl, resolveAiConfigSecret } from '@/lib/ai-provider-profiles'
+  normalizeBaseUrl,
+  resolveAiConfigSecret,
+} from '@/lib/ai-provider-profiles'
 
 type RawModelItem =
   | string
   | {
-    id?: string
-    name?: string
-    model?: string
-    slug?: string
-  }
+      id?: string
+      name?: string
+      model?: string
+      slug?: string
+    }
 
-function buildProviderErrorMessage(resStatus: number, resStatusText: string, rawBody: string): string {
+function buildProviderErrorMessage(
+  resStatus: number,
+  resStatusText: string,
+  rawBody: string,
+): string {
   try {
     if (rawBody) {
       const parsed = JSON.parse(rawBody) as {
@@ -55,8 +60,9 @@ function extractModelItems(payload: unknown): RawModelItem[] {
     items?: unknown
   }
 
-  return [candidate.data, candidate.models, candidate.items]
-    .flatMap((value) => (Array.isArray(value) ? value as RawModelItem[] : []))
+  return [candidate.data, candidate.models, candidate.items].flatMap((value) =>
+    Array.isArray(value) ? (value as RawModelItem[]) : [],
+  )
 }
 
 function buildModels(items: RawModelItem[]) {
@@ -68,7 +74,13 @@ function buildModels(items: RawModelItem[]) {
       continue
     }
     if (!item || typeof item !== 'object') continue
-    const maybeId = (item.id || item.model || item.slug || item.name || '').trim()
+    const maybeId = (
+      item.id ||
+      item.model ||
+      item.slug ||
+      item.name ||
+      ''
+    ).trim()
     if (maybeId) ids.add(maybeId)
   }
 
@@ -83,7 +95,8 @@ export async function GET(req: NextRequest) {
   if (!(await authenticateRequest(req, db))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  if (!db) return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
+  if (!db)
+    return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
 
   await ensureAiImageConfigInfrastructure(db)
 
@@ -94,31 +107,46 @@ export async function GET(req: NextRequest) {
   const queryProfileId = Number(requestUrl.searchParams.get('profile_id') || '')
 
   const secret = resolveAiConfigSecret(env)
-  const rawSelectedProfile = Number.isFinite(queryProfileId) && queryProfileId > 0
-    ? await db.prepare(`
+  const rawSelectedProfile =
+    Number.isFinite(queryProfileId) && queryProfileId > 0
+      ? await db
+          .prepare(`
       SELECT id, provider, base_url, api_key_encrypted
       FROM ai_image_provider_profiles
       WHERE id = ?
       LIMIT 1
-    `).bind(queryProfileId).first<{
-      id: number
-      provider: string
-      base_url: string
-      api_key_encrypted: string
-    }>()
-    : null
-  const selectedProfile = Number.isFinite(queryProfileId) && queryProfileId > 0
-    ? await resolveAiImageProfileConfig(db, secret, queryProfileId)
-    : null
+    `)
+          .bind(queryProfileId)
+          .first<{
+            id: number
+            provider: string
+            base_url: string
+            api_key_encrypted: string
+          }>()
+      : null
+  const selectedProfile =
+    Number.isFinite(queryProfileId) && queryProfileId > 0
+      ? await resolveAiImageProfileConfig(db, secret, queryProfileId)
+      : null
 
-  const provider = queryProvider || selectedProfile?.provider || rawSelectedProfile?.provider || 'custom'
+  const provider =
+    queryProvider ||
+    selectedProfile?.provider ||
+    rawSelectedProfile?.provider ||
+    'custom'
   const fallbackPreset = AI_IMAGE_PROVIDER_MAP[provider]
   const fallbackModels = fallbackPreset?.quickModels || []
-  const baseUrl = normalizeBaseUrl(queryBaseUrl || selectedProfile?.base_url || rawSelectedProfile?.base_url || '')
+  const baseUrl = normalizeBaseUrl(
+    queryBaseUrl ||
+      selectedProfile?.base_url ||
+      rawSelectedProfile?.base_url ||
+      '',
+  )
   const apiKey = queryApiKey || selectedProfile?.api_key || ''
-  const storedKeyUnavailable = !queryApiKey
-    && Boolean(rawSelectedProfile?.api_key_encrypted?.trim())
-    && !selectedProfile?.api_key
+  const storedKeyUnavailable =
+    !queryApiKey &&
+    Boolean(rawSelectedProfile?.api_key_encrypted?.trim()) &&
+    !selectedProfile?.api_key
 
   if (!baseUrl) {
     return NextResponse.json({ error: '缺少 base_url 参数' }, { status: 400 })
@@ -135,7 +163,10 @@ export async function GET(req: NextRequest) {
         warning,
       })
     }
-    return NextResponse.json({ error: storedKeyUnavailable ? warning : '缺少 API Key' }, { status: 400 })
+    return NextResponse.json(
+      { error: storedKeyUnavailable ? warning : '缺少 API Key' },
+      { status: 400 },
+    )
   }
 
   try {
@@ -148,7 +179,11 @@ export async function GET(req: NextRequest) {
 
     if (!res.ok) {
       const rawBody = await res.text().catch(() => '')
-      const message = buildProviderErrorMessage(res.status, res.statusText, rawBody)
+      const message = buildProviderErrorMessage(
+        res.status,
+        res.statusText,
+        rawBody,
+      )
       if (fallbackModels.length > 0) {
         return NextResponse.json({
           models: fallbackModels.map((id) => ({ id, name: id })),
@@ -156,7 +191,10 @@ export async function GET(req: NextRequest) {
           warning: `接口拉取失败，已回退预设：${message}`,
         })
       }
-      return NextResponse.json({ error: `获取模型列表失败：${message}` }, { status: 502 })
+      return NextResponse.json(
+        { error: `获取模型列表失败：${message}` },
+        { status: 502 },
+      )
     }
 
     const data = await res.json().catch(() => null)

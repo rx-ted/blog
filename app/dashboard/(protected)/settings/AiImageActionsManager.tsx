@@ -51,7 +51,9 @@ export function AiImageActionsManager() {
   const [actions, setActions] = useState<AiImageAction[]>([])
   const [profiles, setProfiles] = useState<AiImageProfile[]>([])
   const [loading, setLoading] = useState(true)
-  const [editAction, setEditAction] = useState<Partial<AiImageAction> | null>(null)
+  const [editAction, setEditAction] = useState<Partial<AiImageAction> | null>(
+    null,
+  )
   const [isNew, setIsNew] = useState(false)
   const [saving, setSaving] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<AiImageAction | null>(null)
@@ -70,12 +72,16 @@ export function AiImageActionsManager() {
       ])
 
       if (actionsRes.ok) {
-        const actionData = await actionsRes.json() as { actions: AiImageAction[] }
+        const actionData = (await actionsRes.json()) as {
+          actions: AiImageAction[]
+        }
         setActions(actionData.actions || [])
       }
 
       if (profilesRes.ok) {
-        const profileData = await profilesRes.json() as { profiles: AiImageProfile[] }
+        const profileData = (await profilesRes.json()) as {
+          profiles: AiImageProfile[]
+        }
         setProfiles(profileData.profiles || [])
       }
     } finally {
@@ -96,7 +102,11 @@ export function AiImageActionsManager() {
   const handleSave = async () => {
     if (!editAction) return
 
-    if (!editAction.action_key?.trim() || !editAction.label?.trim() || !editAction.prompt?.trim()) {
+    if (
+      !editAction.action_key?.trim() ||
+      !editAction.label?.trim() ||
+      !editAction.prompt?.trim()
+    ) {
       toast.error('请填写所有必填字段')
       return
     }
@@ -112,7 +122,9 @@ export function AiImageActionsManager() {
         prompt: editAction.prompt?.trim(),
         aspect_ratio: editAction.aspect_ratio || 'auto',
         resolution: editAction.resolution || 'auto',
-        profile_id: Number.isFinite(editAction.profile_id) ? Number(editAction.profile_id) : null,
+        profile_id: Number.isFinite(editAction.profile_id)
+          ? Number(editAction.profile_id)
+          : null,
       }
 
       if (isNew) {
@@ -121,16 +133,19 @@ export function AiImageActionsManager() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         })
-        const data = await res.json().catch(() => ({})) as { error?: string }
+        const data = (await res.json().catch(() => ({}))) as { error?: string }
         if (!res.ok) throw new Error(data.error || '创建失败')
         toast.success('图片提示已创建')
       } else {
-        const res = await fetch(`/api/admin/ai-image-actions/${editAction.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        })
-        const data = await res.json().catch(() => ({})) as { error?: string }
+        const res = await fetch(
+          `/api/admin/ai-image-actions/${editAction.id}`,
+          {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          },
+        )
+        const data = (await res.json().catch(() => ({}))) as { error?: string }
         if (!res.ok) throw new Error(data.error || '保存失败')
         toast.success('图片提示已更新')
       }
@@ -149,8 +164,13 @@ export function AiImageActionsManager() {
     if (!deleteTarget) return
 
     try {
-      const res = await fetch(`/api/admin/ai-image-actions/${deleteTarget.id}`, { method: 'DELETE' })
-      const data = await res.json().catch(() => ({})) as { error?: string }
+      const res = await fetch(
+        `/api/admin/ai-image-actions/${deleteTarget.id}`,
+        {
+          method: 'DELETE',
+        },
+      )
+      const data = (await res.json().catch(() => ({}))) as { error?: string }
       if (!res.ok) throw new Error(data.error || '删除失败')
       toast.success('图片提示已删除')
       setDeleteTarget(null)
@@ -189,8 +209,14 @@ export function AiImageActionsManager() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items: [
-            { id: nextActions[index].id, sort_order: nextActions[index].sort_order },
-            { id: nextActions[swapIndex].id, sort_order: nextActions[swapIndex].sort_order },
+            {
+              id: nextActions[index].id,
+              sort_order: nextActions[index].sort_order,
+            },
+            {
+              id: nextActions[swapIndex].id,
+              sort_order: nextActions[swapIndex].sort_order,
+            },
           ],
         }),
       })
@@ -202,18 +228,29 @@ export function AiImageActionsManager() {
   }
 
   if (loading) {
-    return <div className="py-8 text-center text-sm text-[var(--editor-muted)]">加载中…</div>
+    return (
+      <div className="py-8 text-center text-sm text-[var(--editor-muted)]">
+        加载中…
+      </div>
+    )
   }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-[var(--editor-ink)]">图片快捷提示</h3>
+        <h3 className="text-base font-semibold text-[var(--editor-ink)]">
+          图片快捷提示
+        </h3>
         <button
           type="button"
           onClick={() => {
-            const defaultProfile = profiles.find((profile) => profile.is_default === 1)
-            setEditAction({ ...emptyAction, profile_id: defaultProfile?.id ?? null })
+            const defaultProfile = profiles.find(
+              (profile) => profile.is_default === 1,
+            )
+            setEditAction({
+              ...emptyAction,
+              profile_id: defaultProfile?.id ?? null,
+            })
             setIsNew(true)
           }}
           className="rounded-lg bg-[var(--editor-accent)] px-3 py-1.5 text-sm font-semibold text-white transition hover:brightness-105"
@@ -226,20 +263,41 @@ export function AiImageActionsManager() {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-[var(--editor-soft)] text-left">
-              <th className="w-16 px-3 py-2 font-medium text-[var(--editor-muted)]">排序</th>
-              <th className="px-3 py-2 font-medium text-[var(--editor-muted)]">标识</th>
-              <th className="px-3 py-2 font-medium text-[var(--editor-muted)]">名称</th>
-              <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] sm:table-cell">描述</th>
-              <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] md:table-cell">比例</th>
-              <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] md:table-cell">分辨率</th>
-              <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] lg:table-cell">模型配置</th>
-              <th className="w-16 px-3 py-2 text-center font-medium text-[var(--editor-muted)]">启用</th>
-              <th className="w-24 px-3 py-2 text-right font-medium text-[var(--editor-muted)]">操作</th>
+              <th className="w-16 px-3 py-2 font-medium text-[var(--editor-muted)]">
+                排序
+              </th>
+              <th className="px-3 py-2 font-medium text-[var(--editor-muted)]">
+                标识
+              </th>
+              <th className="px-3 py-2 font-medium text-[var(--editor-muted)]">
+                名称
+              </th>
+              <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] sm:table-cell">
+                描述
+              </th>
+              <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] md:table-cell">
+                比例
+              </th>
+              <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] md:table-cell">
+                分辨率
+              </th>
+              <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] lg:table-cell">
+                模型配置
+              </th>
+              <th className="w-16 px-3 py-2 text-center font-medium text-[var(--editor-muted)]">
+                启用
+              </th>
+              <th className="w-24 px-3 py-2 text-right font-medium text-[var(--editor-muted)]">
+                操作
+              </th>
             </tr>
           </thead>
           <tbody>
             {actions.map((action, index) => (
-              <tr key={action.id} className="border-t border-[var(--editor-line)] hover:bg-[var(--editor-panel)]">
+              <tr
+                key={action.id}
+                className="border-t border-[var(--editor-line)] hover:bg-[var(--editor-panel)]"
+              >
                 <td className="px-3 py-2">
                   <div className="flex gap-0.5">
                     <button
@@ -260,18 +318,34 @@ export function AiImageActionsManager() {
                     </button>
                   </div>
                 </td>
-                <td className="px-3 py-2 font-mono text-xs text-[var(--editor-muted)]">{action.action_key}</td>
-                <td className="px-3 py-2 font-medium text-[var(--editor-ink)]">{action.label}</td>
-                <td className="hidden px-3 py-2 text-[var(--editor-muted)] sm:table-cell">{action.description}</td>
-                <td className="hidden px-3 py-2 text-xs text-[var(--editor-muted)] md:table-cell">{getAiImageAspectRatioLabel(action.aspect_ratio)}</td>
-                <td className="hidden px-3 py-2 text-xs text-[var(--editor-muted)] md:table-cell">{getAiImageResolutionLabel(action.resolution)}</td>
-                <td className="hidden px-3 py-2 text-xs text-[var(--editor-muted)] lg:table-cell">{getProfileName(action.profile_id)}</td>
+                <td className="px-3 py-2 font-mono text-xs text-[var(--editor-muted)]">
+                  {action.action_key}
+                </td>
+                <td className="px-3 py-2 font-medium text-[var(--editor-ink)]">
+                  {action.label}
+                </td>
+                <td className="hidden px-3 py-2 text-[var(--editor-muted)] sm:table-cell">
+                  {action.description}
+                </td>
+                <td className="hidden px-3 py-2 text-xs text-[var(--editor-muted)] md:table-cell">
+                  {getAiImageAspectRatioLabel(action.aspect_ratio)}
+                </td>
+                <td className="hidden px-3 py-2 text-xs text-[var(--editor-muted)] md:table-cell">
+                  {getAiImageResolutionLabel(action.resolution)}
+                </td>
+                <td className="hidden px-3 py-2 text-xs text-[var(--editor-muted)] lg:table-cell">
+                  {getProfileName(action.profile_id)}
+                </td>
                 <td className="px-3 py-2 text-center">
                   <button
                     type="button"
                     onClick={() => toggleEnabled(action)}
                     className={`inline-block h-4 w-4 rounded-full transition ${action.is_enabled ? 'bg-emerald-500' : 'bg-[var(--editor-line)]'}`}
-                    title={action.is_enabled ? '已启用（点击禁用）' : '已禁用（点击启用）'}
+                    title={
+                      action.is_enabled
+                        ? '已启用（点击禁用）'
+                        : '已禁用（点击启用）'
+                    }
                   />
                 </td>
                 <td className="px-3 py-2 text-right">
@@ -300,7 +374,10 @@ export function AiImageActionsManager() {
       </div>
 
       {editAction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4" onClick={() => setEditAction(null)}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4"
+          onClick={() => setEditAction(null)}
+        >
           <div
             className="flex max-h-[calc(100dvh-2rem)] w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] shadow-xl"
             onClick={(event) => event.stopPropagation()}
@@ -314,32 +391,50 @@ export function AiImageActionsManager() {
             <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-4">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">提示标识 *</label>
+                  <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">
+                    提示标识 *
+                  </label>
                   <input
                     type="text"
                     value={editAction.action_key || ''}
-                    onChange={(event) => setEditAction({ ...editAction, action_key: event.target.value })}
+                    onChange={(event) =>
+                      setEditAction({
+                        ...editAction,
+                        action_key: event.target.value,
+                      })
+                    }
                     className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">名称 *</label>
+                  <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">
+                    名称 *
+                  </label>
                   <input
                     type="text"
                     value={editAction.label || ''}
-                    onChange={(event) => setEditAction({ ...editAction, label: event.target.value })}
+                    onChange={(event) =>
+                      setEditAction({
+                        ...editAction,
+                        label: event.target.value,
+                      })
+                    }
                     className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">风格提示词 *</label>
+                <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">
+                  风格提示词 *
+                </label>
                 <textarea
                   rows={5}
                   value={editAction.prompt || ''}
-                  onChange={(event) => setEditAction({ ...editAction, prompt: event.target.value })}
+                  onChange={(event) =>
+                    setEditAction({ ...editAction, prompt: event.target.value })
+                  }
                   className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
                 />
                 <div className="mt-1 text-xs text-[var(--editor-muted)]">
@@ -349,13 +444,20 @@ export function AiImageActionsManager() {
 
               <div className="space-y-2 rounded-xl border border-[var(--editor-line)] bg-[var(--editor-soft)]/60 p-3">
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-[var(--editor-ink)]">图片比例</label>
+                  <label className="mb-2 block text-sm font-medium text-[var(--editor-ink)]">
+                    图片比例
+                  </label>
                   <div className="flex flex-wrap gap-2">
                     {AI_IMAGE_ASPECT_RATIO_OPTIONS.map((option) => (
                       <button
                         key={option.value}
                         type="button"
-                        onClick={() => setEditAction({ ...editAction, aspect_ratio: option.value })}
+                        onClick={() =>
+                          setEditAction({
+                            ...editAction,
+                            aspect_ratio: option.value,
+                          })
+                        }
                         className={`rounded-full border px-3 py-1.5 text-sm transition ${
                           (editAction.aspect_ratio || 'auto') === option.value
                             ? 'border-[var(--editor-accent)] bg-[var(--editor-accent)]/10 text-[var(--editor-accent)]'
@@ -370,19 +472,30 @@ export function AiImageActionsManager() {
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">分辨率</label>
+                    <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">
+                      分辨率
+                    </label>
                     <select
                       value={editAction.resolution || 'auto'}
-                      onChange={(event) => setEditAction({ ...editAction, resolution: event.target.value as AIImageResolution })}
+                      onChange={(event) =>
+                        setEditAction({
+                          ...editAction,
+                          resolution: event.target.value as AIImageResolution,
+                        })
+                      }
                       className="w-full rounded-lg border border-[var(--editor-line)] bg-white px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
                     >
                       {AI_IMAGE_RESOLUTION_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>{option.label}</option>
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">模型配置</label>
+                    <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">
+                      模型配置
+                    </label>
                     <Dropdown
                       options={[
                         { value: '', label: '未绑定' },
@@ -393,7 +506,10 @@ export function AiImageActionsManager() {
                       ]}
                       value={String(editAction.profile_id ?? '')}
                       onChange={(value) => {
-                        setEditAction({ ...editAction, profile_id: value ? Number(value) : null })
+                        setEditAction({
+                          ...editAction,
+                          profile_id: value ? Number(value) : null,
+                        })
                       }}
                       placeholder="搜索并选择模型配置"
                     />

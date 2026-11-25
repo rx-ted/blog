@@ -1,6 +1,16 @@
 import type { NextRequest } from 'next/server'
-import { ensureAuthenticatedRequest, getRouteEnvWithDb, jsonError, jsonOk, parseJsonBody } from '@/lib/server/route-helpers'
-import { fetchWechatBridgeJson, getWechatBridgeConfig, type WechatBridgeAccount } from '@/lib/wechat-bridge-config'
+import {
+  ensureAuthenticatedRequest,
+  getRouteEnvWithDb,
+  jsonError,
+  jsonOk,
+  parseJsonBody,
+} from '@/lib/server/route-helpers'
+import {
+  fetchWechatBridgeJson,
+  getWechatBridgeConfig,
+  type WechatBridgeAccount,
+} from '@/lib/wechat-bridge-config'
 import { normalizeBaseUrl } from '@/lib/ai-provider-profiles'
 
 interface BridgeTestBody {
@@ -26,8 +36,13 @@ export async function POST(req: NextRequest) {
     }
 
     const bridge = { base_url: baseUrl, token }
-    const health = await fetchWechatBridgeJson<{ ok?: boolean; service?: string }>(bridge, '/health')
-    const accountsResponse = await fetchWechatBridgeJson<{ accounts?: WechatBridgeAccount[] }>(bridge, '/v1/accounts')
+    const health = await fetchWechatBridgeJson<{
+      ok?: boolean
+      service?: string
+    }>(bridge, '/health')
+    const accountsResponse = await fetchWechatBridgeJson<{
+      accounts?: WechatBridgeAccount[]
+    }>(bridge, '/v1/accounts')
 
     return jsonOk({
       success: true,
@@ -35,6 +50,9 @@ export async function POST(req: NextRequest) {
       accounts: accountsResponse.accounts || [],
     })
   } catch (error) {
-    return jsonError(error instanceof Error ? error.message : '测试 bridge 连接失败', 500)
+    return jsonError(
+      error instanceof Error ? error.message : '测试 bridge 连接失败',
+      500,
+    )
   }
 }

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/admin-auth'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import {
@@ -18,7 +18,7 @@ type ImageBucket = {
         cacheControl?: string
       }
       customMetadata?: Record<string, string>
-    }
+    },
   ) => Promise<void>
 }
 
@@ -33,7 +33,10 @@ interface RequestBody {
 }
 
 function isValidTarget(value: unknown): value is AiPostGeneratorTarget {
-  return typeof value === 'string' && ['summary', 'tags', 'slug', 'cover'].includes(value)
+  return (
+    typeof value === 'string' &&
+    ['summary', 'tags', 'slug', 'cover'].includes(value)
+  )
 }
 
 export async function POST(req: NextRequest) {
@@ -58,7 +61,10 @@ export async function POST(req: NextRequest) {
   }
 
   if (!isValidTarget(body.target)) {
-    return NextResponse.json({ error: '缺少有效的 target 参数' }, { status: 400 })
+    return NextResponse.json(
+      { error: '缺少有效的 target 参数' },
+      { status: 400 },
+    )
   }
 
   const title = (body.title || '').trim()

@@ -16,7 +16,7 @@ const schema = new Schema({
     link: {
       attrs: { href: {} },
       inclusive: false,
-      toDOM: mark => ['a', { href: mark.attrs.href }, 0],
+      toDOM: (mark) => ['a', { href: mark.attrs.href }, 0],
     },
   },
 })
@@ -35,7 +35,7 @@ function readTextMarks(state: EditorState) {
   const parts: Array<{ text: string; href: string | null }> = []
   state.doc.descendants((node) => {
     if (!node.isText || !node.text) return
-    const link = node.marks.find(mark => mark.type === schema.marks.link)
+    const link = node.marks.find((mark) => mark.type === schema.marks.link)
     parts.push({ text: node.text, href: link ? String(link.attrs.href) : null })
   })
   return parts
@@ -43,7 +43,9 @@ function readTextMarks(state: EditorState) {
 
 describe('editor CJK autolink', () => {
   it('stops a detected URL before Chinese sentence punctuation', () => {
-    expect(findEditorAutolinks('https://m9xh7f7fzm.coze.site/，只能转开头部分')).toEqual([
+    expect(
+      findEditorAutolinks('https://m9xh7f7fzm.coze.site/，只能转开头部分'),
+    ).toEqual([
       {
         from: 0,
         to: 29,
@@ -56,11 +58,17 @@ describe('editor CJK autolink', () => {
   it('creates the link as soon as a Chinese comma is typed', () => {
     const initialState = createState('https://m9xh7f7fzm.coze.site/')
     const result = initialState.applyTransaction(
-      initialState.tr.insertText('，只能转开头部分', initialState.doc.content.size - 1),
+      initialState.tr.insertText(
+        '，只能转开头部分',
+        initialState.doc.content.size - 1,
+      ),
     )
 
     expect(readTextMarks(result.state)).toEqual([
-      { text: 'https://m9xh7f7fzm.coze.site/', href: 'https://m9xh7f7fzm.coze.site/' },
+      {
+        text: 'https://m9xh7f7fzm.coze.site/',
+        href: 'https://m9xh7f7fzm.coze.site/',
+      },
       { text: '，只能转开头部分', href: null },
     ])
   })
@@ -90,33 +98,41 @@ describe('editor CJK autolink', () => {
       plugins: [createEditorAutolinkPlugin(schema.marks.link)],
     })
     const result = initialState.applyTransaction(
-      initialState.tr.insertText('只能转开头部分', initialState.doc.content.size - 1),
+      initialState.tr.insertText(
+        '只能转开头部分',
+        initialState.doc.content.size - 1,
+      ),
     )
 
     expect(readTextMarks(result.state)).toEqual([
-      { text: 'https://m9xh7f7fzm.coze.site/', href: 'https://m9xh7f7fzm.coze.site/' },
+      {
+        text: 'https://m9xh7f7fzm.coze.site/',
+        href: 'https://m9xh7f7fzm.coze.site/',
+      },
       { text: '，只能转开头部分', href: null },
     ])
   })
 
-  it.each([
-    'https://drum.qiaomu.ai/',
-    'https://tune.qiaomu.ai/',
-  ])('repairs a rich-text paste that links only the protocol in %s', (href) => {
-    const partialLink = schema.marks.link.create({ href })
-    const pastedParagraph = schema.node('paragraph', null, [
-      schema.text('https://', [partialLink]),
-      schema.text(href.slice('https://'.length)),
-    ])
-    const initialState = createState()
-    const result = initialState.applyTransaction(
-      initialState.tr.replaceWith(0, initialState.doc.content.size, pastedParagraph),
-    )
+  it.each(['https://drum.qiaomu.ai/', 'https://tune.qiaomu.ai/'])(
+    'repairs a rich-text paste that links only the protocol in %s',
+    (href) => {
+      const partialLink = schema.marks.link.create({ href })
+      const pastedParagraph = schema.node('paragraph', null, [
+        schema.text('https://', [partialLink]),
+        schema.text(href.slice('https://'.length)),
+      ])
+      const initialState = createState()
+      const result = initialState.applyTransaction(
+        initialState.tr.replaceWith(
+          0,
+          initialState.doc.content.size,
+          pastedParagraph,
+        ),
+      )
 
-    expect(readTextMarks(result.state)).toEqual([
-      { text: href, href },
-    ])
-  })
+      expect(readTextMarks(result.state)).toEqual([{ text: href, href }])
+    },
+  )
 
   it('repairs a qwenwork.host rich-text paste that links only a self-describing prefix', () => {
     const fullUrl = 'https://qs8at4hf.qwenwork.host/'
@@ -128,7 +144,11 @@ describe('editor CJK autolink', () => {
     ])
     const initialState = createState()
     const result = initialState.applyTransaction(
-      initialState.tr.replaceWith(0, initialState.doc.content.size, pastedParagraph),
+      initialState.tr.replaceWith(
+        0,
+        initialState.doc.content.size,
+        pastedParagraph,
+      ),
     )
 
     expect(readTextMarks(result.state)).toEqual([
@@ -137,14 +157,20 @@ describe('editor CJK autolink', () => {
   })
 
   it('preserves a manual link whose URL-like visible text points elsewhere', () => {
-    const partialLink = schema.marks.link.create({ href: 'https://elsewhere.example/' })
+    const partialLink = schema.marks.link.create({
+      href: 'https://elsewhere.example/',
+    })
     const pastedParagraph = schema.node('paragraph', null, [
       schema.text('https://qs8at4hf.', [partialLink]),
       schema.text('qwenwork.host/'),
     ])
     const initialState = createState()
     const result = initialState.applyTransaction(
-      initialState.tr.replaceWith(0, initialState.doc.content.size, pastedParagraph),
+      initialState.tr.replaceWith(
+        0,
+        initialState.doc.content.size,
+        pastedParagraph,
+      ),
     )
 
     expect(readTextMarks(result.state)).toEqual([
@@ -161,7 +187,11 @@ describe('editor CJK autolink', () => {
     ])
     const initialState = createState()
     const result = initialState.applyTransaction(
-      initialState.tr.replaceWith(0, initialState.doc.content.size, pastedParagraph),
+      initialState.tr.replaceWith(
+        0,
+        initialState.doc.content.size,
+        pastedParagraph,
+      ),
     )
 
     expect(readTextMarks(result.state)).toEqual([
@@ -170,14 +200,20 @@ describe('editor CJK autolink', () => {
   })
 
   it('preserves a partial manual link that intentionally points elsewhere', () => {
-    const partialLink = schema.marks.link.create({ href: 'https://elsewhere.example/' })
+    const partialLink = schema.marks.link.create({
+      href: 'https://elsewhere.example/',
+    })
     const pastedParagraph = schema.node('paragraph', null, [
       schema.text('https://', [partialLink]),
       schema.text('drum.qiaomu.ai/'),
     ])
     const initialState = createState()
     const result = initialState.applyTransaction(
-      initialState.tr.replaceWith(0, initialState.doc.content.size, pastedParagraph),
+      initialState.tr.replaceWith(
+        0,
+        initialState.doc.content.size,
+        pastedParagraph,
+      ),
     )
 
     expect(readTextMarks(result.state)).toEqual([
@@ -187,7 +223,9 @@ describe('editor CJK autolink', () => {
   })
 
   it('keeps Chinese characters inside a URL path until punctuation', () => {
-    expect(findEditorAutolinks('https://example.com/中文路径，后文')[0]).toMatchObject({
+    expect(
+      findEditorAutolinks('https://example.com/中文路径，后文')[0],
+    ).toMatchObject({
       href: 'https://example.com/中文路径',
       text: 'https://example.com/中文路径',
     })
@@ -196,7 +234,9 @@ describe('editor CJK autolink', () => {
   it('respects an explicit unlink command', () => {
     const link = schema.marks.link.create({ href: 'https://example.com/' })
     const doc = schema.node('doc', null, [
-      schema.node('paragraph', null, [schema.text('https://example.com/', [link])]),
+      schema.node('paragraph', null, [
+        schema.text('https://example.com/', [link]),
+      ]),
     ])
     const initialState = EditorState.create({
       schema,
@@ -214,7 +254,11 @@ describe('editor CJK autolink', () => {
   })
 
   it('recognizes multiple links separated by Chinese punctuation without spaces', () => {
-    expect(findEditorAutolinks('先看https://one.example/，再看https://two.example/。')).toEqual([
+    expect(
+      findEditorAutolinks(
+        '先看https://one.example/，再看https://two.example/。',
+      ),
+    ).toEqual([
       {
         from: 2,
         to: 22,

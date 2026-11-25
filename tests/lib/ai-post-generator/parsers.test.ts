@@ -17,7 +17,16 @@ describe('ai-post-generator/parsers', () => {
     const tags = extractGeneratedTags(
       {
         result: {
-          tags: ['AI', '#AI', ' 测试 ', '测试', '工程', '产品', '写作', '多余标签'],
+          tags: [
+            'AI',
+            '#AI',
+            ' 测试 ',
+            '测试',
+            '工程',
+            '产品',
+            '写作',
+            '多余标签',
+          ],
         },
       },
       '',
@@ -37,7 +46,10 @@ describe('ai-post-generator/parsers', () => {
   })
 
   it('normalizes generated slugs into lowercase kebab case', () => {
-    const slug = normalizeGeneratedSlug('slug: AI_Editing & Prompt Design!!', '')
+    const slug = normalizeGeneratedSlug(
+      'slug: AI_Editing & Prompt Design!!',
+      '',
+    )
 
     expect(slug).toBe('ai-editing-and-prompt-design')
   })

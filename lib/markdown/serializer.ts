@@ -32,7 +32,10 @@ function getTurndownService() {
   return turndownService
 }
 
-function resolveRange(editor: EditorInstance, range?: { from: number; to: number } | null) {
+function resolveRange(
+  editor: EditorInstance,
+  range?: { from: number; to: number } | null,
+) {
   const maxPos = Math.max(1, editor.state.doc.content.size)
   const clamp = (pos: number) => Math.min(Math.max(1, pos), maxPos)
 
@@ -62,10 +65,17 @@ export function replaceEditorRangeWithMarkdown(
 
   const nextRange = resolveRange(editor, range)
   const slice = createMarkdownSlice(editor, normalized)
-  const selection = TextSelection.create(editor.view.state.doc, nextRange.from, nextRange.to)
+  const selection = TextSelection.create(
+    editor.view.state.doc,
+    nextRange.from,
+    nextRange.to,
+  )
 
   editor.commands.focus()
-  const tr = editor.view.state.tr.setSelection(selection).replaceSelection(slice).scrollIntoView()
+  const tr = editor.view.state.tr
+    .setSelection(selection)
+    .replaceSelection(slice)
+    .scrollIntoView()
   editor.view.dispatch(tr)
   return true
 }

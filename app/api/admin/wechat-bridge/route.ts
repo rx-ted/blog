@@ -1,6 +1,15 @@
 import type { NextRequest } from 'next/server'
-import { ensureAuthenticatedRequest, getRouteEnvWithDb, jsonError, jsonOk, parseJsonBody } from '@/lib/server/route-helpers'
-import { getWechatBridgePublicConfig, saveWechatBridgeConfig } from '@/lib/wechat-bridge-config'
+import {
+  ensureAuthenticatedRequest,
+  getRouteEnvWithDb,
+  jsonError,
+  jsonOk,
+  parseJsonBody,
+} from '@/lib/server/route-helpers'
+import {
+  getWechatBridgePublicConfig,
+  saveWechatBridgeConfig,
+} from '@/lib/wechat-bridge-config'
 
 interface SaveWechatBridgeBody {
   enabled?: boolean
@@ -42,6 +51,9 @@ export async function PUT(req: NextRequest) {
 
     return jsonOk({ success: true, config })
   } catch (error) {
-    return jsonError(error instanceof Error ? error.message : '保存 bridge 配置失败', 500)
+    return jsonError(
+      error instanceof Error ? error.message : '保存 bridge 配置失败',
+      500,
+    )
   }
 }

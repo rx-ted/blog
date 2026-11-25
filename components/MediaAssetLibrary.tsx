@@ -2,7 +2,14 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Check, Image as ImageIcon, Loader2, RotateCw, Search, X } from 'lucide-react'
+import {
+  Check,
+  Image as ImageIcon,
+  Loader2,
+  RotateCw,
+  Search,
+  X,
+} from 'lucide-react'
 import { useToast } from '@/components/Toast'
 
 export interface MediaAssetLibraryItem {
@@ -92,7 +99,7 @@ export function MediaAssetLibrary({
       const response = await fetch(`/api/editor/media-assets?${queryString}`, {
         credentials: 'include',
       })
-      const data = await response.json().catch(() => ({})) as {
+      const data = (await response.json().catch(() => ({}))) as {
         assets?: MediaAssetLibraryItem[]
         error?: string
       }
@@ -168,7 +175,11 @@ export function MediaAssetLibrary({
             title="刷新图库"
             aria-label="刷新图库"
           >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RotateCw className="h-4 w-4" />}
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RotateCw className="h-4 w-4" />
+            )}
           </button>
         </div>
 
@@ -206,14 +217,21 @@ export function MediaAssetLibrary({
           </div>
         ) : assets.length === 0 ? (
           <div className="flex min-h-[320px] items-center justify-center rounded-2xl border border-dashed border-[var(--editor-line)] bg-white/40">
-            {debouncedQuery.trim()
-              ? <div className="text-sm text-[var(--editor-muted)]">没有匹配的图片</div>
-              : <ImageIcon className="h-11 w-11 text-[var(--editor-muted)] opacity-50" />}
+            {debouncedQuery.trim() ? (
+              <div className="text-sm text-[var(--editor-muted)]">
+                没有匹配的图片
+              </div>
+            ) : (
+              <ImageIcon className="h-11 w-11 text-[var(--editor-muted)] opacity-50" />
+            )}
           </div>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {assets.map((asset) => (
-              <div key={asset.id} className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-white">
+              <div
+                key={asset.id}
+                className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-white"
+              >
                 <img
                   src={getPreviewUrl(asset)}
                   alt={asset.alt || '图库图片'}
@@ -225,9 +243,19 @@ export function MediaAssetLibrary({
                     {asset.alt || asset.prompt || '未命名图片'}
                   </div>
                   <div className="flex flex-wrap gap-1.5 text-[11px] text-[var(--editor-muted)]">
-                    <span className="rounded-full bg-[var(--editor-soft)] px-2 py-0.5">{getSourceLabel(asset.source)}</span>
-                    {asset.aspect_ratio ? <span className="rounded-full bg-[var(--editor-soft)] px-2 py-0.5">{asset.aspect_ratio}</span> : null}
-                    {asset.current_post_link_count > 0 ? <span className="rounded-full bg-[var(--editor-accent)]/10 px-2 py-0.5 text-[var(--editor-accent)]">当前文章</span> : null}
+                    <span className="rounded-full bg-[var(--editor-soft)] px-2 py-0.5">
+                      {getSourceLabel(asset.source)}
+                    </span>
+                    {asset.aspect_ratio ? (
+                      <span className="rounded-full bg-[var(--editor-soft)] px-2 py-0.5">
+                        {asset.aspect_ratio}
+                      </span>
+                    ) : null}
+                    {asset.current_post_link_count > 0 ? (
+                      <span className="rounded-full bg-[var(--editor-accent)]/10 px-2 py-0.5 text-[var(--editor-accent)]">
+                        当前文章
+                      </span>
+                    ) : null}
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-[11px] text-[var(--editor-muted)]">

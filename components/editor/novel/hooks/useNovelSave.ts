@@ -2,8 +2,17 @@ import { useCallback } from 'react'
 import type { EditorInstance } from 'novel'
 import { generatePassword } from '@/lib/password'
 import { renderMarkdownToEditorHtml } from '@/lib/editor-markdown'
-import { createEditorDraftDocumentKey, type DraftMetaState, type PublishStatus, type SaveFeedback, type SaveState } from '@/components/editor/shared'
-import { buildEditorAutosaveSnapshot, resolveEditorSaveMetadata } from '@/components/editor/shared/utils/autosave'
+import {
+  createEditorDraftDocumentKey,
+  type DraftMetaState,
+  type PublishStatus,
+  type SaveFeedback,
+  type SaveState,
+} from '@/components/editor/shared'
+import {
+  buildEditorAutosaveSnapshot,
+  resolveEditorSaveMetadata,
+} from '@/components/editor/shared/utils/autosave'
 
 interface UseNovelSaveOptions {
   editorRef: React.RefObject<EditorInstance | null>
@@ -29,7 +38,11 @@ interface UseNovelSaveOptions {
   clearAutosaveTimers: () => void
   abortAutosaveRequest: () => void
   patchMetadata: (metaOverrides?: Partial<DraftMetaState>) => void
-  syncPersistedSlug: (persistedSlug: string, previousSlug: string | null, forceVisibleSync?: boolean) => void
+  syncPersistedSlug: (
+    persistedSlug: string,
+    previousSlug: string | null,
+    forceVisibleSync?: boolean,
+  ) => void
   resetMetadata: () => void
   setTitle: (title: string) => void
   setDescription: React.Dispatch<React.SetStateAction<string>>
@@ -46,23 +59,65 @@ interface UseNovelSaveOptions {
   setReferenceImageTarget: React.Dispatch<React.SetStateAction<any>>
   setCropImageTarget: React.Dispatch<React.SetStateAction<any>>
   setSourceMarkdown: React.Dispatch<React.SetStateAction<string>>
-  setEditorViewMode: React.Dispatch<React.SetStateAction<'wysiwyg' | 'source' | 'preview'>>
+  setEditorViewMode: React.Dispatch<
+    React.SetStateAction<'wysiwyg' | 'source' | 'preview'>
+  >
 }
 
 export function useNovelSave({
-  editorRef, title, slug, description, category, tags, coverImage, publishStatus, editSlug, postId,
-  initialPassword, editorViewModeRef, sourceMarkdownRef, latestTitleRef, latestMetaRef, titleRef,
-  draftAiDocumentKeyRef, lastAutosaveSnapshotRef, skipNextEditorUpdateRef, lastContentModeRef,
-  clearAutosaveTimers, abortAutosaveRequest, patchMetadata, syncPersistedSlug, resetMetadata,
-  setTitle, setDescription, setCharCount, setPublishStatus, setPreviewHtml, setPublishPanelOpen,
-  setWechatPublishOpen, setSaving, setPendingMetadataTargets, setFeedback, setSaveState, setLastSavedAt,
-  setReferenceImageTarget, setCropImageTarget, setSourceMarkdown, setEditorViewMode,
+  editorRef,
+  title,
+  slug,
+  description,
+  category,
+  tags,
+  coverImage,
+  publishStatus,
+  editSlug,
+  postId,
+  initialPassword,
+  editorViewModeRef,
+  sourceMarkdownRef,
+  latestTitleRef,
+  latestMetaRef,
+  titleRef,
+  draftAiDocumentKeyRef,
+  lastAutosaveSnapshotRef,
+  skipNextEditorUpdateRef,
+  lastContentModeRef,
+  clearAutosaveTimers,
+  abortAutosaveRequest,
+  patchMetadata,
+  syncPersistedSlug,
+  resetMetadata,
+  setTitle,
+  setDescription,
+  setCharCount,
+  setPublishStatus,
+  setPreviewHtml,
+  setPublishPanelOpen,
+  setWechatPublishOpen,
+  setSaving,
+  setPendingMetadataTargets,
+  setFeedback,
+  setSaveState,
+  setLastSavedAt,
+  setReferenceImageTarget,
+  setCropImageTarget,
+  setSourceMarkdown,
+  setEditorViewMode,
 }: UseNovelSaveOptions) {
   const handleSave = useCallback(async () => {
     const editor = editorRef.current
     const normalizedTitle = title.trim()
-    if (!normalizedTitle) { setFeedback({ type: 'error', message: '先把文章标题写上。' }); return }
-    if (!editor) { setFeedback({ type: 'error', message: '编辑器还没准备好。' }); return }
+    if (!normalizedTitle) {
+      setFeedback({ type: 'error', message: '先把文章标题写上。' })
+      return
+    }
+    if (!editor) {
+      setFeedback({ type: 'error', message: '编辑器还没准备好。' })
+      return
+    }
 
     let content = editor.getText({ blockSeparator: '\n\n' }).trim()
     let html = editor.getHTML()
@@ -70,26 +125,38 @@ export function useNovelSave({
       const markdown = sourceMarkdownRef.current || ''
       html = markdown.trim() ? renderMarkdownToEditorHtml(markdown) : ''
       if (typeof window !== 'undefined') {
-        const parsed = new DOMParser().parseFromString(html || '<p></p>', 'text/html')
-        content = parsed.body.textContent?.replace(/\s+/g, ' ').trim() || markdown.trim()
+        const parsed = new DOMParser().parseFromString(
+          html || '<p></p>',
+          'text/html',
+        )
+        content =
+          parsed.body.textContent?.replace(/\s+/g, ' ').trim() ||
+          markdown.trim()
       } else {
         content = markdown.trim()
       }
     }
 
     const hasContent = content || /<(img|video|audio|iframe)\b/i.test(html)
-    if (!hasContent) { setFeedback({ type: 'error', message: '正文还是空的。' }); return }
-    const { normalizedSlug, normalizedDescription } = resolveEditorSaveMetadata({
-      title,
-      slug,
-      description,
-      fallbackContent: content,
-    })
+    if (!hasContent) {
+      setFeedback({ type: 'error', message: '正文还是空的。' })
+      return
+    }
+    const { normalizedSlug, normalizedDescription } = resolveEditorSaveMetadata(
+      {
+        title,
+        slug,
+        description,
+        fallbackContent: content,
+      },
+    )
 
     clearAutosaveTimers()
     abortAutosaveRequest()
 
-    setSaving(true); setSaveState('saving'); setFeedback(null)
+    setSaving(true)
+    setSaveState('saving')
+    setFeedback(null)
 
     try {
       const currentPostId = latestMetaRef.current.postId ?? postId
@@ -98,11 +165,23 @@ export function useNovelSave({
       const url = isEdit ? `/api/admin/posts/${currentEditSlug}` : '/api/posts'
       const method = isEdit ? 'PUT' : 'POST'
 
-      let statusFields: { status: string; is_hidden: number; password?: string | null }
+      let statusFields: {
+        status: string
+        is_hidden: number
+        password?: string | null
+      }
       if (publishStatus === 'encrypted') {
-        statusFields = { status: 'published', is_hidden: 0, password: initialPassword || generatePassword() }
+        statusFields = {
+          status: 'published',
+          is_hidden: 0,
+          password: initialPassword || generatePassword(),
+        }
       } else {
-        const m = { public: { status: 'published', is_hidden: 0, password: null }, draft: { status: 'draft', is_hidden: 0, password: null }, unlisted: { status: 'published', is_hidden: 1, password: null } }
+        const m = {
+          public: { status: 'published', is_hidden: 0, password: null },
+          draft: { status: 'draft', is_hidden: 0, password: null },
+          unlisted: { status: 'published', is_hidden: 1, password: null },
+        }
         statusFields = m[publishStatus as 'public' | 'draft' | 'unlisted']
       }
 
@@ -112,9 +191,14 @@ export function useNovelSave({
         body: JSON.stringify({
           id: currentPostId ?? undefined,
           slug: normalizedSlug || (isEdit ? currentEditSlug : undefined),
-          title: normalizedTitle, content, html, category,
+          title: normalizedTitle,
+          content,
+          html,
+          category,
           ...statusFields,
-          tags, description: normalizedDescription, cover_image: coverImage || null,
+          tags,
+          description: normalizedDescription,
+          cover_image: coverImage || null,
         }),
       })
       const result = (await response.json()) as {
@@ -123,14 +207,18 @@ export function useNovelSave({
         slug?: string
         error?: string
       }
-      if (!response.ok || !result.success) throw new Error(result.error || '保存失败')
+      if (!response.ok || !result.success)
+        throw new Error(result.error || '保存失败')
 
       if (typeof result.id === 'number') {
         patchMetadata({ postId: result.id })
       }
-      const persistedSlug: string | null = typeof result.slug === 'string'
-        ? result.slug
-        : (isEdit ? currentEditSlug : null)
+      const persistedSlug: string | null =
+        typeof result.slug === 'string'
+          ? result.slug
+          : isEdit
+            ? currentEditSlug
+            : null
       const snapshot = buildEditorAutosaveSnapshot({
         currentSlug: persistedSlug,
         nextSlug: persistedSlug || '',
@@ -164,7 +252,12 @@ export function useNovelSave({
         if (!description && normalizedDescription) {
           setDescription(normalizedDescription)
         }
-        const msgs = { public: '已发布', draft: '草稿已保存', encrypted: '已发布（加密）', unlisted: '已发布（链接访问）' }
+        const msgs = {
+          public: '已发布',
+          draft: '草稿已保存',
+          encrypted: '已发布（加密）',
+          unlisted: '已发布（链接访问）',
+        }
         setFeedback({
           type: 'success',
           message: `${msgs[publishStatus]}`,
@@ -180,11 +273,42 @@ export function useNovelSave({
       setPublishPanelOpen(false)
     } catch (error) {
       setSaveState('error')
-      setFeedback({ type: 'error', message: error instanceof Error ? error.message : '保存失败' })
+      setFeedback({
+        type: 'error',
+        message: error instanceof Error ? error.message : '保存失败',
+      })
     } finally {
       setSaving(false)
     }
-  }, [abortAutosaveRequest, category, clearAutosaveTimers, coverImage, description, editSlug, editorRef, editorViewModeRef, initialPassword, lastAutosaveSnapshotRef, latestMetaRef, latestTitleRef, patchMetadata, postId, publishStatus, setDescription, setFeedback, setLastSavedAt, setPublishPanelOpen, setSaveState, setSaving, setTitle, slug, sourceMarkdownRef, syncPersistedSlug, tags, title])
+  }, [
+    abortAutosaveRequest,
+    category,
+    clearAutosaveTimers,
+    coverImage,
+    description,
+    editSlug,
+    editorRef,
+    editorViewModeRef,
+    initialPassword,
+    lastAutosaveSnapshotRef,
+    latestMetaRef,
+    latestTitleRef,
+    patchMetadata,
+    postId,
+    publishStatus,
+    setDescription,
+    setFeedback,
+    setLastSavedAt,
+    setPublishPanelOpen,
+    setSaveState,
+    setSaving,
+    setTitle,
+    slug,
+    sourceMarkdownRef,
+    syncPersistedSlug,
+    tags,
+    title,
+  ])
 
   const handleStartNewArticle = useCallback(() => {
     clearAutosaveTimers()
@@ -219,7 +343,35 @@ export function useNovelSave({
     editor?.commands.clearContent()
     window.history.replaceState({}, '', '/editor?new=1')
     window.requestAnimationFrame(() => titleRef.current?.focus())
-  }, [abortAutosaveRequest, clearAutosaveTimers, draftAiDocumentKeyRef, editorRef, editorViewModeRef, lastAutosaveSnapshotRef, lastContentModeRef, latestTitleRef, resetMetadata, setCharCount, setCropImageTarget, setEditorViewMode, setFeedback, setLastSavedAt, setPendingMetadataTargets, setPreviewHtml, setPublishPanelOpen, setPublishStatus, setReferenceImageTarget, setSaveState, setSaving, setSourceMarkdown, setTitle, setWechatPublishOpen, skipNextEditorUpdateRef, sourceMarkdownRef, titleRef])
+  }, [
+    abortAutosaveRequest,
+    clearAutosaveTimers,
+    draftAiDocumentKeyRef,
+    editorRef,
+    editorViewModeRef,
+    lastAutosaveSnapshotRef,
+    lastContentModeRef,
+    latestTitleRef,
+    resetMetadata,
+    setCharCount,
+    setCropImageTarget,
+    setEditorViewMode,
+    setFeedback,
+    setLastSavedAt,
+    setPendingMetadataTargets,
+    setPreviewHtml,
+    setPublishPanelOpen,
+    setPublishStatus,
+    setReferenceImageTarget,
+    setSaveState,
+    setSaving,
+    setSourceMarkdown,
+    setTitle,
+    setWechatPublishOpen,
+    skipNextEditorUpdateRef,
+    sourceMarkdownRef,
+    titleRef,
+  ])
 
   return { handleSave, handleStartNewArticle }
 }

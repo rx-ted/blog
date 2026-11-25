@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# TODO(Ben): 远程资源初始化/改写/删除等运维命令暂不完整实现，后续统一纳入 cf:*。
+
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -31,7 +33,7 @@ for arg in "$@"; do
       ;;
     *)
       echo "Unknown argument: ${arg}" >&2
-      echo "Usage: npm run cf:init -- [--with-kv] [--site-url=https://your-domain.com] [--db-name=qiaomu-blog-db] [--r2-name=qiaomu-blog-images] [--kv-name=qiaomu-blog-cache]" >&2
+      echo "Usage: pnpm cf:init -- [--with-kv] [--site-url=https://your-domain.com] [--db-name=qiaomu-blog-db] [--r2-name=qiaomu-blog-images] [--kv-name=qiaomu-blog-cache]" >&2
       exit 1
       ;;
   esac
@@ -40,7 +42,7 @@ done
 cd "${REPO_ROOT}"
 
 if ! npx wrangler whoami >/dev/null 2>&1; then
-  echo "❌ 未登录 Cloudflare，请先运行: npx wrangler login"
+  echo "❌ 未登录 Cloudflare，请先运行: pnpm exec wrangler login"
   exit 1
 fi
 
@@ -94,6 +96,6 @@ cat <<EOF
      npx wrangler secret put AI_CONFIG_ENCRYPTION_SECRET -c ${LOCAL_CONFIG_PATH}
      npx wrangler secret put AI_API_KEY -c ${LOCAL_CONFIG_PATH}   # 如果你要启用 AI
   3. 首次初始化已写入默认主题、字体和导航
-  4. 生成类型: npm run cf-typegen
-  5. 部署: npm run deploy
+  4. 生成类型: pnpm cf:types
+  5. 部署: pnpm deploy
 EOF

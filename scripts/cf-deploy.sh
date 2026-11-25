@@ -4,7 +4,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-CONFIG_PATH="$(bash "${SCRIPT_DIR}/cf-config.sh")"
+CONFIG_PATH="$(bash "${SCRIPT_DIR}/cf-config.sh" prod)"
 
 cd "${REPO_ROOT}"
 

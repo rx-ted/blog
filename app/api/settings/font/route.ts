@@ -14,7 +14,11 @@ export async function GET() {
     const font = settings.body_font || ''
     return NextResponse.json(
       { font },
-      { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' } }
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        },
+      },
     )
   } catch {
     return NextResponse.json({ font: '' })

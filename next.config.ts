@@ -1,9 +1,11 @@
-import { resolve } from "node:path";
-import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
-import type { NextConfig } from "next";
-import { PHASE_PRODUCTION_BUILD } from "next/constants";
+import { existsSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare'
+import type { NextConfig } from 'next'
+import { PHASE_PRODUCTION_BUILD } from 'next/constants'
 
-const DISABLE_CLOUDFLARE_CONTEXT_DURING_BUILD = "QMBLOG_DISABLE_CLOUDFLARE_CONTEXT_DURING_BUILD";
+const DISABLE_CLOUDFLARE_CONTEXT_DURING_BUILD =
+  'QMBLOG_DISABLE_CLOUDFLARE_CONTEXT_DURING_BUILD'
 
 const nextConfig: NextConfig = {
   // 图片优化（Cloudflare 有自己的优化）
@@ -23,19 +25,29 @@ const nextConfig: NextConfig = {
     workerThreads: false,
     cpus: 1,
   },
-};
+}
+
+const resolveDevWranglerConfig = () => {
+  const localConfig = resolve(process.cwd(), 'wrangler.local.jsonc')
+  if (existsSync(localConfig)) return localConfig
+  const prodConfig = resolve(process.cwd(), 'wrangler.prod.jsonc')
+  if (existsSync(prodConfig)) return prodConfig
+  return resolve(process.cwd(), 'wrangler.jsonc')
+}
 
 const createNextConfig = (phase: string) => {
-  const isProductionBuild = phase === PHASE_PRODUCTION_BUILD;
+  const isProductionBuild = phase === PHASE_PRODUCTION_BUILD
   if (isProductionBuild) {
-    process.env[DISABLE_CLOUDFLARE_CONTEXT_DURING_BUILD] = "true";
+    process.env[DISABLE_CLOUDFLARE_CONTEXT_DURING_BUILD] = 'true'
   }
 
   void initOpenNextCloudflareForDev({
-    remoteBindings: !isProductionBuild && process.env.NEXT_DEV_REMOTE_BINDINGS === "true",
-  });
+    configPath: resolveDevWranglerConfig(),
+    remoteBindings:
+      !isProductionBuild && process.env.NEXT_DEV_REMOTE_BINDINGS === 'true',
+  })
 
-  return nextConfig;
-};
+  return nextConfig
+}
 
-export default createNextConfig;
+export default createNextConfig

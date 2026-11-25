@@ -6,7 +6,11 @@ interface PaginationProps {
   basePath: string
 }
 
-export function Pagination({ currentPage, totalPages, basePath }: PaginationProps) {
+export function Pagination({
+  currentPage,
+  totalPages,
+  basePath,
+}: PaginationProps) {
   if (totalPages <= 1) return null
 
   const pages: (number | '...')[] = []
@@ -19,10 +23,15 @@ export function Pagination({ currentPage, totalPages, basePath }: PaginationProp
   }
 
   const href = (page: number) =>
-    page === 1 ? basePath : `${basePath}${basePath.includes('?') ? '&' : '?'}page=${page}`
+    page === 1
+      ? basePath
+      : `${basePath}${basePath.includes('?') ? '&' : '?'}page=${page}`
 
   return (
-    <nav className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mt-12" aria-label="分页导航">
+    <nav
+      className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mt-12"
+      aria-label="分页导航"
+    >
       {currentPage > 1 && (
         <Link
           href={href(currentPage - 1)}
@@ -49,7 +58,7 @@ export function Pagination({ currentPage, totalPages, basePath }: PaginationProp
           >
             {p}
           </Link>
-        )
+        ),
       )}
 
       {currentPage < totalPages && (
@@ -63,4 +72,3 @@ export function Pagination({ currentPage, totalPages, basePath }: PaginationProp
     </nav>
   )
 }
-

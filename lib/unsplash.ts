@@ -43,9 +43,10 @@ export type UnsplashSearchResponse = {
 }
 
 export function getEnvUnsplashAccessKey(env?: Record<string, unknown>) {
-  const envKey = typeof env?.UNSPLASH_ACCESS_KEY === 'string'
-    ? env.UNSPLASH_ACCESS_KEY
-    : process.env.UNSPLASH_ACCESS_KEY
+  const envKey =
+    typeof env?.UNSPLASH_ACCESS_KEY === 'string'
+      ? env.UNSPLASH_ACCESS_KEY
+      : process.env.UNSPLASH_ACCESS_KEY
   return (envKey || '').trim()
 }
 
@@ -90,13 +91,19 @@ function clampPage(value: number) {
   return Math.max(1, Math.floor(value))
 }
 
-export function mapUnsplashPhotoToLibraryItem(photo: UnsplashPhoto): OpenImageLibraryItem | null {
+export function mapUnsplashPhotoToLibraryItem(
+  photo: UnsplashPhoto,
+): OpenImageLibraryItem | null {
   const src = photo.urls?.regular || ''
   const thumbnail = photo.urls?.small || photo.urls?.thumb || src
   if (!photo.id || !src || !thumbnail) return null
 
   const photographer = photo.user?.name || photo.user?.username || 'Unsplash'
-  const title = (photo.alt_description || photo.description || 'Unsplash 图片').trim()
+  const title = (
+    photo.alt_description ||
+    photo.description ||
+    'Unsplash 图片'
+  ).trim()
 
   return {
     id: `unsplash-${photo.id}`,
@@ -145,10 +152,12 @@ export async function searchUnsplashPhotos({
 
   const rawBody = await response.text().catch(() => '')
   if (!response.ok) {
-    throw new Error(parseUnsplashError(response.status, response.statusText, rawBody))
+    throw new Error(
+      parseUnsplashError(response.status, response.statusText, rawBody),
+    )
   }
 
-  const parsed = rawBody ? JSON.parse(rawBody) as UnsplashSearchResponse : {}
+  const parsed = rawBody ? (JSON.parse(rawBody) as UnsplashSearchResponse) : {}
   const items = (parsed.results || [])
     .map(mapUnsplashPhotoToLibraryItem)
     .filter((item): item is OpenImageLibraryItem => Boolean(item))
@@ -164,15 +173,20 @@ export async function searchUnsplashPhotos({
 export function isValidUnsplashDownloadLocation(input: string) {
   try {
     const url = new URL(input)
-    return url.protocol === 'https:'
-      && url.hostname === 'api.unsplash.com'
-      && /^\/photos\/[^/]+\/download$/.test(url.pathname)
+    return (
+      url.protocol === 'https:' &&
+      url.hostname === 'api.unsplash.com' &&
+      /^\/photos\/[^/]+\/download$/.test(url.pathname)
+    )
   } catch {
     return false
   }
 }
 
-export async function trackUnsplashDownload(accessKey: string, downloadLocation: string) {
+export async function trackUnsplashDownload(
+  accessKey: string,
+  downloadLocation: string,
+) {
   const normalizedLocation = downloadLocation.trim()
   if (!isValidUnsplashDownloadLocation(normalizedLocation)) {
     throw new Error('无效的 Unsplash 下载统计地址')
@@ -191,13 +205,21 @@ export async function trackUnsplashDownload(accessKey: string, downloadLocation:
 
   if (!response.ok) {
     const rawBody = await response.text().catch(() => '')
-    throw new Error(parseUnsplashError(response.status, response.statusText, rawBody))
+    throw new Error(
+      parseUnsplashError(response.status, response.statusText, rawBody),
+    )
   }
 }
 
-function parseUnsplashError(status: number, statusText: string, rawBody: string) {
+function parseUnsplashError(
+  status: number,
+  statusText: string,
+  rawBody: string,
+) {
   try {
-    const parsed = rawBody ? JSON.parse(rawBody) as { errors?: string[]; error?: string } : null
+    const parsed = rawBody
+      ? (JSON.parse(rawBody) as { errors?: string[]; error?: string })
+      : null
     if (Array.isArray(parsed?.errors) && parsed.errors.length > 0) {
       return parsed.errors.join(', ')
     }

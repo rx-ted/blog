@@ -1,6 +1,12 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  type ReactNode,
+} from 'react'
 import { X } from 'lucide-react'
 
 interface Toast {
@@ -30,21 +36,24 @@ export function useToast() {
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
 
-  const addToast = useCallback((message: string, type: Toast['type'], duration = 3000) => {
-    const id = Math.random().toString(36).substring(2, 9)
-    const toast: Toast = { id, message, type, duration }
+  const addToast = useCallback(
+    (message: string, type: Toast['type'], duration = 3000) => {
+      const id = Math.random().toString(36).substring(2, 9)
+      const toast: Toast = { id, message, type, duration }
 
-    setToasts(prev => [...prev, toast])
+      setToasts((prev) => [...prev, toast])
 
-    if (duration > 0) {
-      setTimeout(() => {
-        setToasts(prev => prev.filter(t => t.id !== id))
-      }, duration)
-    }
-  }, [])
+      if (duration > 0) {
+        setTimeout(() => {
+          setToasts((prev) => prev.filter((t) => t.id !== id))
+        }, duration)
+      }
+    },
+    [],
+  )
 
   const removeToast = useCallback((id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id))
+    setToasts((prev) => prev.filter((t) => t.id !== id))
   }, [])
 
   const value: ToastContextValue = {
@@ -58,8 +67,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={value}>
       {children}
       <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
-        {toasts.map(toast => (
-          <ToastItem key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
+        {toasts.map((toast) => (
+          <ToastItem
+            key={toast.id}
+            toast={toast}
+            onClose={() => removeToast(toast.id)}
+          />
         ))}
       </div>
     </ToastContext.Provider>

@@ -43,7 +43,10 @@ function parseStoredConfig(raw: string | null): StoredWechatBridgeConfig {
   }
 }
 
-function buildPublicConfig(stored: StoredWechatBridgeConfig, token: string): WechatBridgePublicConfig {
+function buildPublicConfig(
+  stored: StoredWechatBridgeConfig,
+  token: string,
+): WechatBridgePublicConfig {
   const baseUrl = normalizeBaseUrl(stored.base_url || '')
   const enabled = Boolean(stored.enabled)
   const hasToken = Boolean(token.trim() || stored.token_encrypted?.trim())
@@ -60,7 +63,9 @@ export async function getWechatBridgeConfig(
   db: D1Database,
   env?: Record<string, unknown>,
 ): Promise<WechatBridgeConfig> {
-  const stored = parseStoredConfig(await getSetting(db, WECHAT_BRIDGE_SETTING_KEY))
+  const stored = parseStoredConfig(
+    await getSetting(db, WECHAT_BRIDGE_SETTING_KEY),
+  )
   const secret = resolveAiConfigSecret(env)
   const token = stored.token_encrypted
     ? await decryptApiKey(stored.token_encrypted, secret)
@@ -94,7 +99,9 @@ export async function saveWechatBridgeConfig(
     token?: string
   },
 ): Promise<WechatBridgePublicConfig> {
-  const existing = parseStoredConfig(await getSetting(db, WECHAT_BRIDGE_SETTING_KEY))
+  const existing = parseStoredConfig(
+    await getSetting(db, WECHAT_BRIDGE_SETTING_KEY),
+  )
   const secret = resolveAiConfigSecret(env)
   const normalizedBaseUrl =
     input.base_url !== undefined
@@ -119,7 +126,9 @@ export async function saveWechatBridgeConfig(
   return buildPublicConfig(stored, nextToken || '')
 }
 
-export function assertWechatBridgeReady(config: WechatBridgeConfig): WechatBridgeConfig {
+export function assertWechatBridgeReady(
+  config: WechatBridgeConfig,
+): WechatBridgeConfig {
   if (!config.enabled) {
     throw new Error('WeChat bridge 未启用')
   }
@@ -164,7 +173,11 @@ export async function fetchWechatBridgeJson<T>(
   const response = await fetch(buildBridgeUrl(config.base_url, path), {
     ...init,
     headers,
-    signal: init.signal ?? (typeof AbortSignal.timeout === 'function' ? AbortSignal.timeout(20000) : undefined),
+    signal:
+      init.signal ??
+      (typeof AbortSignal.timeout === 'function'
+        ? AbortSignal.timeout(20000)
+        : undefined),
   })
 
   const rawText = await response.text().catch(() => '')
@@ -179,9 +192,10 @@ export async function fetchWechatBridgeJson<T>(
   }
 
   if (!response.ok) {
-    const fallback = typeof payload === 'string' && payload.trim()
-      ? payload.trim()
-      : `Bridge request failed: HTTP ${response.status}`
+    const fallback =
+      typeof payload === 'string' && payload.trim()
+        ? payload.trim()
+        : `Bridge request failed: HTTP ${response.status}`
     throw new Error(pickBridgeErrorMessage(payload, fallback))
   }
 

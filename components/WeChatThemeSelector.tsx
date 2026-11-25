@@ -20,12 +20,14 @@ function cn(...classes: Array<string | false | null | undefined>) {
 }
 
 function isHexColor(value: string) {
-  return /^#[0-9a-f]{3}(?:[0-9a-f]{1})?(?:[0-9a-f]{2})?(?:[0-9a-f]{2})?$/i.test(value)
+  return /^#[0-9a-f]{3}(?:[0-9a-f]{1})?(?:[0-9a-f]{2})?(?:[0-9a-f]{2})?$/i.test(
+    value,
+  )
 }
 
 function getThemeSwatches(theme?: WechatExportTheme) {
   const swatches = (theme?.swatches || [])
-    .map(color => color.trim())
+    .map((color) => color.trim())
     .filter(isHexColor)
     .slice(0, 6)
 
@@ -78,16 +80,18 @@ export function WeChatThemeSelector({
   const rootRef = useRef<HTMLDivElement | null>(null)
   const searchRef = useRef<HTMLInputElement | null>(null)
 
-  const selectedTheme = useMemo(() => (
-    themes.find(theme => theme.id === value) || themes[0]
-  ), [themes, value])
+  const selectedTheme = useMemo(
+    () => themes.find((theme) => theme.id === value) || themes[0],
+    [themes, value],
+  )
 
   const filteredThemes = useMemo(() => {
     const keyword = query.trim().toLowerCase()
     if (!keyword) return themes
 
     return themes.filter((theme) => {
-      const haystack = `${theme.name} ${theme.description} ${theme.id}`.toLowerCase()
+      const haystack =
+        `${theme.name} ${theme.description} ${theme.id}`.toLowerCase()
       return haystack.includes(keyword)
     })
   }, [query, themes])
@@ -126,7 +130,7 @@ export function WeChatThemeSelector({
 
   const handleToggleOpen = () => {
     if (!open) setQuery('')
-    setOpen(current => !current)
+    setOpen((current) => !current)
   }
 
   const selectedName = selectedTheme?.name || '公众号样式'
@@ -135,7 +139,10 @@ export function WeChatThemeSelector({
     : `${themes.length} 个样式`
 
   return (
-    <div ref={rootRef} className={cn('relative', variant === 'field' && 'w-full', className)}>
+    <div
+      ref={rootRef}
+      className={cn('relative', variant === 'field' && 'w-full', className)}
+    >
       <button
         type="button"
         disabled={disabled || themes.length === 0}
@@ -161,10 +168,12 @@ export function WeChatThemeSelector({
             </span>
             <span className="flex shrink-0 items-center gap-2">
               <WeChatThemeSwatchStrip theme={selectedTheme} compact />
-              <ChevronDown className={cn(
-                'h-4 w-4 text-[var(--editor-muted)] transition-transform',
-                open && 'rotate-180',
-              )} />
+              <ChevronDown
+                className={cn(
+                  'h-4 w-4 text-[var(--editor-muted)] transition-transform',
+                  open && 'rotate-180',
+                )}
+              />
             </span>
           </>
         )}
@@ -183,14 +192,24 @@ export function WeChatThemeSelector({
           <div className="border-b border-[var(--editor-line)] bg-[var(--background)]/70 p-3">
             <div className="mb-3 flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-[11px] font-semibold tracking-wide text-[var(--editor-muted)]">当前样式</p>
-                <p className="mt-0.5 truncate text-sm font-semibold text-[var(--editor-ink)]">{selectedName}</p>
+                <p className="text-[11px] font-semibold tracking-wide text-[var(--editor-muted)]">
+                  当前样式
+                </p>
+                <p className="mt-0.5 truncate text-sm font-semibold text-[var(--editor-ink)]">
+                  {selectedName}
+                </p>
               </div>
-              <WeChatThemeSwatchStrip theme={selectedTheme} className="h-3 w-24 rounded-md" />
+              <WeChatThemeSwatchStrip
+                theme={selectedTheme}
+                className="h-3 w-24 rounded-md"
+              />
             </div>
 
             <div className="flex items-center gap-2 rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]">
-              <Search className="h-4 w-4 shrink-0 text-[var(--editor-muted)]" aria-hidden="true" />
+              <Search
+                className="h-4 w-4 shrink-0 text-[var(--editor-muted)]"
+                aria-hidden="true"
+              />
               <input
                 ref={searchRef}
                 type="text"
@@ -215,13 +234,24 @@ export function WeChatThemeSelector({
           </div>
 
           <div className="flex items-center justify-between border-b border-[var(--editor-line)] px-3 py-2">
-            <span className="text-xs font-medium text-[var(--editor-muted)]">{resultLabel}</span>
+            <span className="text-xs font-medium text-[var(--editor-muted)]">
+              {resultLabel}
+            </span>
             <span className="h-1.5 w-20 overflow-hidden rounded-full bg-[var(--editor-soft)]">
-              {selectedTheme && <WeChatThemeSwatchStrip theme={selectedTheme} className="h-full w-full rounded-full border-0" />}
+              {selectedTheme && (
+                <WeChatThemeSwatchStrip
+                  theme={selectedTheme}
+                  className="h-full w-full rounded-full border-0"
+                />
+              )}
             </span>
           </div>
 
-          <div role="listbox" aria-label="公众号样式" className="max-h-[min(56vh,360px)] overflow-y-auto py-2">
+          <div
+            role="listbox"
+            aria-label="公众号样式"
+            className="max-h-[min(56vh,360px)] overflow-y-auto py-2"
+          >
             {filteredThemes.length === 0 ? (
               <div className="px-5 py-8 text-center text-sm text-[var(--editor-muted)]">
                 没有匹配样式
@@ -238,7 +268,9 @@ export function WeChatThemeSelector({
                     onClick={() => handleSelect(theme.id)}
                     className={cn(
                       'mx-2 grid w-[calc(100%-1rem)] grid-cols-[3px_minmax(0,1fr)_auto] items-stretch gap-3 rounded-xl px-2 py-2.5 text-left transition active:scale-[0.99]',
-                      selected ? 'bg-[var(--editor-accent)]/10' : 'hover:bg-[var(--editor-soft)]',
+                      selected
+                        ? 'bg-[var(--editor-accent)]/10'
+                        : 'hover:bg-[var(--editor-soft)]',
                     )}
                   >
                     <span
@@ -260,9 +292,14 @@ export function WeChatThemeSelector({
                       <span className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-[var(--editor-muted)]">
                         {theme.description || theme.id}
                       </span>
-                      <WeChatThemeSwatchStrip theme={theme} className="mt-2 h-2 w-28 rounded-md" />
+                      <WeChatThemeSwatchStrip
+                        theme={theme}
+                        className="mt-2 h-2 w-28 rounded-md"
+                      />
                     </span>
-                    {selected && <Check className="mt-0.5 h-4 w-4 text-[var(--editor-accent)]" />}
+                    {selected && (
+                      <Check className="mt-0.5 h-4 w-4 text-[var(--editor-accent)]" />
+                    )}
                   </button>
                 )
               })

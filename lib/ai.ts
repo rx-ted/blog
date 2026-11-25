@@ -71,11 +71,20 @@ type ResolvedConfig =
     }
 
 function readFlag(value: unknown): boolean {
-  return typeof value === 'string' && ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  return (
+    typeof value === 'string' &&
+    ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  )
 }
 
 function resolveWorkersAiModel(env?: AIEnv): string {
-  return (env?.WORKERS_AI_MODEL || env?.AI_MODEL || DEFAULT_WORKERS_AI_MODEL).trim() || DEFAULT_WORKERS_AI_MODEL
+  return (
+    (
+      env?.WORKERS_AI_MODEL ||
+      env?.AI_MODEL ||
+      DEFAULT_WORKERS_AI_MODEL
+    ).trim() || DEFAULT_WORKERS_AI_MODEL
+  )
 }
 
 function getDisabledConfig(reason: string): ResolvedConfig {
@@ -95,7 +104,10 @@ function resolveEnv(env?: AIEnv): ResolvedConfig {
     return {
       strategy: 'external-provider',
       apiKey: externalApiKey,
-      baseURL: env?.AI_BASE_URL || process.env.AI_BASE_URL || DEFAULT_EXTERNAL_BASE_URL,
+      baseURL:
+        env?.AI_BASE_URL ||
+        process.env.AI_BASE_URL ||
+        DEFAULT_EXTERNAL_BASE_URL,
       model: env?.AI_MODEL || process.env.AI_MODEL || DEFAULT_EXTERNAL_MODEL,
       provider: 'env',
       providerName: '环境变量',
@@ -105,7 +117,10 @@ function resolveEnv(env?: AIEnv): ResolvedConfig {
     }
   }
 
-  if (env?.WORKERS_AI && readFlag(env?.ENABLE_WORKERS_AI || process.env.ENABLE_WORKERS_AI)) {
+  if (
+    env?.WORKERS_AI &&
+    readFlag(env?.ENABLE_WORKERS_AI || process.env.ENABLE_WORKERS_AI)
+  ) {
     return {
       strategy: 'workers-ai',
       binding: env.WORKERS_AI,
@@ -115,31 +130,42 @@ function resolveEnv(env?: AIEnv): ResolvedConfig {
     }
   }
 
-  return getDisabledConfig('当前部署未配置 AI 供应商。可配置外部 API Key，或开启 Workers AI。')
+  return getDisabledConfig(
+    '当前部署未配置 AI 供应商。可配置外部 API Key，或开启 Workers AI。',
+  )
 }
 
 export function getAiRuntimeEnv(env?: Partial<CloudflareEnv> | null): AIEnv {
   return {
-    AI_API_KEY: (env as Record<string, string | undefined> | null | undefined)?.AI_API_KEY || process.env.AI_API_KEY,
-    AI_BASE_URL: (env as Record<string, string | undefined> | null | undefined)?.AI_BASE_URL || process.env.AI_BASE_URL,
-    AI_MODEL: (env as Record<string, string | undefined> | null | undefined)?.AI_MODEL || process.env.AI_MODEL,
+    AI_API_KEY:
+      (env as Record<string, string | undefined> | null | undefined)
+        ?.AI_API_KEY || process.env.AI_API_KEY,
+    AI_BASE_URL:
+      (env as Record<string, string | undefined> | null | undefined)
+        ?.AI_BASE_URL || process.env.AI_BASE_URL,
+    AI_MODEL:
+      (env as Record<string, string | undefined> | null | undefined)
+        ?.AI_MODEL || process.env.AI_MODEL,
     WORKERS_AI: env?.WORKERS_AI,
     WORKERS_AI_MODEL:
-      (env as Record<string, string | undefined> | null | undefined)?.WORKERS_AI_MODEL ||
-      process.env.WORKERS_AI_MODEL,
+      (env as Record<string, string | undefined> | null | undefined)
+        ?.WORKERS_AI_MODEL || process.env.WORKERS_AI_MODEL,
     ENABLE_WORKERS_AI:
-      (env as Record<string, string | undefined> | null | undefined)?.ENABLE_WORKERS_AI ||
-      process.env.ENABLE_WORKERS_AI,
+      (env as Record<string, string | undefined> | null | undefined)
+        ?.ENABLE_WORKERS_AI || process.env.ENABLE_WORKERS_AI,
     AI_CONFIG_ENCRYPTION_SECRET:
-      (env as Record<string, string | undefined> | null | undefined)?.AI_CONFIG_ENCRYPTION_SECRET ||
+      (env as Record<string, string | undefined> | null | undefined)
+        ?.AI_CONFIG_ENCRYPTION_SECRET ||
       process.env.AI_CONFIG_ENCRYPTION_SECRET,
     ADMIN_TOKEN_SALT:
-      (env as Record<string, string | undefined> | null | undefined)?.ADMIN_TOKEN_SALT ||
-      process.env.ADMIN_TOKEN_SALT,
+      (env as Record<string, string | undefined> | null | undefined)
+        ?.ADMIN_TOKEN_SALT || process.env.ADMIN_TOKEN_SALT,
   }
 }
 
-function getClientFromConfig(config: Extract<ResolvedConfig, { strategy: 'external-provider' }>) {
+function getClientFromConfig(
+  config: Extract<ResolvedConfig, { strategy: 'external-provider' }>,
+) {
   return new OpenAI({ apiKey: config.apiKey, baseURL: config.baseURL })
 }
 
@@ -152,7 +178,11 @@ function extractWorkersAiPayload(result: unknown): unknown {
     }
 
     if (payload.response !== undefined) return payload.response
-    if (payload.result && typeof payload.result === 'object' && 'response' in payload.result) {
+    if (
+      payload.result &&
+      typeof payload.result === 'object' &&
+      'response' in payload.result
+    ) {
       return (payload.result as { response?: unknown }).response
     }
     const firstChoice = payload.choices?.[0]?.message?.content
@@ -225,13 +255,12 @@ function throwIfAborted(signal?: AbortSignal) {
 function coerceStreamText(value: unknown): string {
   if (typeof value === 'string') return value
   if (Array.isArray(value)) {
-    return value
-      .map((item) => coerceStreamText(item))
-      .join('')
+    return value.map((item) => coerceStreamText(item)).join('')
   }
   if (value && typeof value === 'object') {
     const record = value as Record<string, unknown>
-    const nested = record.text ?? record.content ?? record.value ?? record.output_text
+    const nested =
+      record.text ?? record.content ?? record.value ?? record.output_text
     if (nested !== undefined) {
       return coerceStreamText(nested)
     }
@@ -239,12 +268,14 @@ function coerceStreamText(value: unknown): string {
   return ''
 }
 
-function isReadableStreamLike(value: unknown): value is ReadableStream<Uint8Array> {
+function isReadableStreamLike(
+  value: unknown,
+): value is ReadableStream<Uint8Array> {
   return Boolean(
-    value
-    && typeof value === 'object'
-    && 'getReader' in value
-    && typeof (value as ReadableStream<Uint8Array>).getReader === 'function',
+    value &&
+      typeof value === 'object' &&
+      'getReader' in value &&
+      typeof (value as ReadableStream<Uint8Array>).getReader === 'function',
   )
 }
 
@@ -324,7 +355,9 @@ async function pipeCompletionChunks(
     const choice = chunk.choices?.[0]
     const delta = choice?.delta || {}
     const nextContent = coerceStreamText(delta.content)
-    const nextReasoning = coerceStreamText(delta.reasoning_content ?? delta.reasoning)
+    const nextReasoning = coerceStreamText(
+      delta.reasoning_content ?? delta.reasoning,
+    )
 
     if (nextContent) {
       content += nextContent
@@ -349,8 +382,12 @@ async function pipeCompletionChunks(
 }
 
 function createStreamingTextStream(
-  startPrimaryStream: (signal: AbortSignal) => Promise<AsyncIterable<CompletionStreamChunk>>,
-  startRetryStream: ((signal: AbortSignal) => Promise<AsyncIterable<CompletionStreamChunk>>) | null,
+  startPrimaryStream: (
+    signal: AbortSignal,
+  ) => Promise<AsyncIterable<CompletionStreamChunk>>,
+  startRetryStream:
+    | ((signal: AbortSignal) => Promise<AsyncIterable<CompletionStreamChunk>>)
+    | null,
   signal?: AbortSignal,
 ) {
   const upstreamAbortController = new AbortController()
@@ -369,7 +406,11 @@ function createStreamingTextStream(
           upstreamAbortController.signal,
         )
 
-        if (!primary.content && startRetryStream && shouldRetryAssistantPayload(primary)) {
+        if (
+          !primary.content &&
+          startRetryStream &&
+          shouldRetryAssistantPayload(primary)
+        ) {
           await pipeCompletionChunks(
             await startRetryStream(upstreamAbortController.signal),
             controller,
@@ -415,53 +456,70 @@ function parseJsonObject(text: string): Record<string, unknown> | null {
   if (!text.trim()) return null
   try {
     const parsed = JSON.parse(text)
-    return parsed && typeof parsed === 'object' ? parsed as Record<string, unknown> : null
+    return parsed && typeof parsed === 'object'
+      ? (parsed as Record<string, unknown>)
+      : null
   } catch {
     return null
   }
 }
 
 /** 优先读数据库后台配置，环境变量降级 */
-export async function resolveConfig(env?: AIEnv, db?: D1Database, profileId?: number): Promise<ResolvedConfig> {
+export async function resolveConfig(
+  env?: AIEnv,
+  db?: D1Database,
+  profileId?: number,
+): Promise<ResolvedConfig> {
   if (db) {
     try {
-      const secret = resolveAiConfigSecret(env as Record<string, unknown> | undefined)
+      const secret = resolveAiConfigSecret(
+        env as Record<string, unknown> | undefined,
+      )
       await ensureAiConfigInfrastructure(db, secret)
 
-      const selected = Number.isFinite(profileId) && Number(profileId) > 0
-        ? await db.prepare(`
+      const selected =
+        Number.isFinite(profileId) && Number(profileId) > 0
+          ? await db
+              .prepare(`
             SELECT provider, provider_name, provider_type, base_url, model, temperature, max_tokens, api_key_encrypted
             FROM ai_provider_profiles
             WHERE id = ?
             LIMIT 1
-          `).bind(Number(profileId)).first<{
-            provider: string
-            provider_name: string
-            provider_type: string
-            base_url: string
-            model: string
-            temperature: number
-            max_tokens: number
-            api_key_encrypted: string
-          }>()
-        : await db.prepare(`
+          `)
+              .bind(Number(profileId))
+              .first<{
+                provider: string
+                provider_name: string
+                provider_type: string
+                base_url: string
+                model: string
+                temperature: number
+                max_tokens: number
+                api_key_encrypted: string
+              }>()
+          : await db
+              .prepare(`
             SELECT provider, provider_name, provider_type, base_url, model, temperature, max_tokens, api_key_encrypted
             FROM ai_provider_profiles
             ORDER BY is_default DESC, id ASC
             LIMIT 1
-          `).first<{
-            provider: string
-            provider_name: string
-            provider_type: string
-            base_url: string
-            model: string
-            temperature: number
-            max_tokens: number
-            api_key_encrypted: string
-          }>()
+          `)
+              .first<{
+                provider: string
+                provider_name: string
+                provider_type: string
+                base_url: string
+                model: string
+                temperature: number
+                max_tokens: number
+                api_key_encrypted: string
+              }>()
 
       if (selected?.base_url && selected.model) {
-        const key = await decryptApiKey(selected.api_key_encrypted || '', secret)
+        const key = await decryptApiKey(
+          selected.api_key_encrypted || '',
+          secret,
+        )
         if (key) {
           return {
             strategy: 'external-provider',
@@ -478,8 +536,16 @@ export async function resolveConfig(env?: AIEnv, db?: D1Database, profileId?: nu
       }
 
       const [providerRow, keyRow] = await Promise.all([
-        db.prepare("SELECT value FROM site_settings WHERE key = 'ai_provider_config'").first<{ value: string }>(),
-        db.prepare("SELECT value FROM site_settings WHERE key = 'ai_provider_api_key'").first<{ value: string }>(),
+        db
+          .prepare(
+            "SELECT value FROM site_settings WHERE key = 'ai_provider_config'",
+          )
+          .first<{ value: string }>(),
+        db
+          .prepare(
+            "SELECT value FROM site_settings WHERE key = 'ai_provider_api_key'",
+          )
+          .first<{ value: string }>(),
       ])
 
       if (providerRow?.value && keyRow?.value) {
@@ -544,7 +610,8 @@ export async function transformEditorSelectionStream(
 
   if (action === 'custom') {
     if (!options.customPrompt?.trim()) throw new Error('请输入指令')
-    systemPrompt = '你是专业的写作助手。用户给你一段文字和一个处理指令，请严格按指令处理并直接返回结果，不要添加任何说明或解释。'
+    systemPrompt =
+      '你是专业的写作助手。用户给你一段文字和一个处理指令，请严格按指令处理并直接返回结果，不要添加任何说明或解释。'
     temperature = config.temperature
   } else if (options.actionPrompt) {
     systemPrompt = options.actionPrompt
@@ -553,22 +620,23 @@ export async function transformEditorSelectionStream(
     throw new Error('无效操作')
   }
 
-  const userContent = action === 'custom'
-    ? `指令：${options.customPrompt}\n\n文字内容：\n${trimmed}`
-    : trimmed
+  const userContent =
+    action === 'custom'
+      ? `指令：${options.customPrompt}\n\n文字内容：\n${trimmed}`
+      : trimmed
 
   const messages = [
     { role: 'system' as const, content: systemPrompt },
     { role: 'user' as const, content: userContent },
   ]
-  const retryMessages = messages.map((message, index) => (
+  const retryMessages = messages.map((message, index) =>
     index === 0
       ? {
           ...message,
           content: `${message.content}\n\nDo not output reasoning, thinking, or analysis. Return only the final answer.`,
         }
-      : message
-  ))
+      : message,
+  )
 
   if (config.strategy === 'workers-ai') {
     const startWorkersAiStream = async (
@@ -634,25 +702,30 @@ export async function transformEditorSelectionStream(
       nextMaxTokens: number,
       signal?: AbortSignal,
     ) => {
-      const response = await fetch(`${normalizeBaseUrl(config.baseURL)}/chat/completions`, {
-        method: 'POST',
-        signal,
-        headers: {
-          Authorization: `Bearer ${config.apiKey}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${normalizeBaseUrl(config.baseURL)}/chat/completions`,
+        {
+          method: 'POST',
+          signal,
+          headers: {
+            Authorization: `Bearer ${config.apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: config.model,
+            messages: nextMessages,
+            temperature,
+            max_tokens: nextMaxTokens,
+            stream: true,
+          }),
         },
-        body: JSON.stringify({
-          model: config.model,
-          messages: nextMessages,
-          temperature,
-          max_tokens: nextMaxTokens,
-          stream: true,
-        }),
-      })
+      )
 
       if (!response.ok) {
         const rawBody = await response.text().catch(() => '')
-        throw new Error(rawBody.trim() || `AI 请求失败：HTTP ${response.status}`)
+        throw new Error(
+          rawBody.trim() || `AI 请求失败：HTTP ${response.status}`,
+        )
       }
 
       if (!response.body) throw new Error('AI 未返回可读流')
@@ -661,20 +734,23 @@ export async function transformEditorSelectionStream(
 
     return createStreamingTextStream(
       (signal) => runCompatRequest(messages, config.maxTokens, signal),
-      (signal) => runCompatRequest(
-        retryMessages,
-        Math.min(Math.max(config.maxTokens * 3, 512), 2048),
-        signal,
-      ),
+      (signal) =>
+        runCompatRequest(
+          retryMessages,
+          Math.min(Math.max(config.maxTokens * 3, 512), 2048),
+          signal,
+        ),
       options.signal,
     )
   }
 
-  if (isAnthropicCompatibleConfig({
-    provider: config.provider,
-    providerName: config.providerName,
-    providerType: config.providerType,
-  })) {
+  if (
+    isAnthropicCompatibleConfig({
+      provider: config.provider,
+      providerName: config.providerName,
+      providerType: config.providerType,
+    })
+  ) {
     const primary = await runAnthropicCompatibleText({
       apiKey: config.apiKey,
       baseURL: config.baseURL,
@@ -702,20 +778,28 @@ export async function transformEditorSelectionStream(
 
   const client = getClientFromConfig(config)
   return createStreamingTextStream(
-    (signal) => client.chat.completions.create({
-      model: config.model,
-      messages,
-      temperature,
-      max_tokens: config.maxTokens,
-      stream: true,
-    }, { signal }),
-    (signal) => client.chat.completions.create({
-      model: config.model,
-      messages: retryMessages,
-      temperature,
-      max_tokens: Math.min(Math.max(config.maxTokens * 3, 512), 2048),
-      stream: true,
-    }, { signal }),
+    (signal) =>
+      client.chat.completions.create(
+        {
+          model: config.model,
+          messages,
+          temperature,
+          max_tokens: config.maxTokens,
+          stream: true,
+        },
+        { signal },
+      ),
+    (signal) =>
+      client.chat.completions.create(
+        {
+          model: config.model,
+          messages: retryMessages,
+          temperature,
+          max_tokens: Math.min(Math.max(config.maxTokens * 3, 512), 2048),
+          stream: true,
+        },
+        { signal },
+      ),
     options.signal,
   )
 }
@@ -765,11 +849,13 @@ export async function processPost(
           messages,
           { type: 'json_object' },
         )
-      } else if (isAnthropicCompatibleConfig({
-        provider: resolved.provider,
-        providerName: resolved.providerName,
-        providerType: resolved.providerType,
-      })) {
+      } else if (
+        isAnthropicCompatibleConfig({
+          provider: resolved.provider,
+          providerName: resolved.providerName,
+          providerType: resolved.providerType,
+        })
+      ) {
         const response = await runAnthropicCompatibleText({
           apiKey: resolved.apiKey,
           baseURL: resolved.baseURL,
@@ -804,19 +890,29 @@ export async function processPost(
       const result = parseJsonObject(resultText) || {}
 
       return {
-        category: typeof result.category === 'string' && result.category.trim() ? result.category : '技术',
+        category:
+          typeof result.category === 'string' && result.category.trim()
+            ? result.category
+            : '技术',
         description:
           typeof result.description === 'string' && result.description.trim()
             ? result.description
             : buildAutoDescription(content),
-        tags: Array.isArray(result.tags) ? result.tags.map((item) => String(item)).filter(Boolean) : [],
+        tags: Array.isArray(result.tags)
+          ? result.tags.map((item) => String(item)).filter(Boolean)
+          : [],
       }
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error))
-      console.error(`AI processing error (attempt ${attempt + 1}/${retries + 1}):`, lastError)
+      console.error(
+        `AI processing error (attempt ${attempt + 1}/${retries + 1}):`,
+        lastError,
+      )
 
       if (attempt < retries) {
-        await new Promise((resolve) => setTimeout(resolve, 1000 * (attempt + 1)))
+        await new Promise((resolve) =>
+          setTimeout(resolve, 1000 * (attempt + 1)),
+        )
       }
     }
   }

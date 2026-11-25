@@ -1,45 +1,41 @@
-import { Modal, App, Setting, requestUrl } from "obsidian";
-import type QmblogPublisher from "./main";
+import { Modal, type App, Setting, requestUrl } from 'obsidian'
+import type QmblogPublisher from './main'
 
 interface CategoryItem {
-  name: string;
-  slug: string;
-  post_count: number;
+  name: string
+  slug: string
+  post_count: number
 }
 
 export interface PublishOptions {
-  title: string;
-  category: string;
-  status: "draft" | "published";
+  title: string
+  category: string
+  status: 'draft' | 'published'
 }
 
 export interface PublishResult {
-  success: boolean;
-  slug?: string;
-  uploadedCount: number;
-  failedCount: number;
-  totalFiles: number;
-  error?: string;
+  success: boolean
+  slug?: string
+  uploadedCount: number
+  failedCount: number
+  totalFiles: number
+  error?: string
 }
 
-type ProgressCallback = (message: string) => void;
+type ProgressCallback = (message: string) => void
 
 export class PublishModal extends Modal {
-  private plugin: QmblogPublisher;
-  private defaultTitle: string;
+  private plugin: QmblogPublisher
   private onPublish: (
     options: PublishOptions,
-    onProgress: ProgressCallback
-  ) => Promise<PublishResult>;
+    onProgress: ProgressCallback,
+  ) => Promise<PublishResult>
 
   // Form state
-  private titleValue: string;
-  private categoryValue: string = "";
-  private statusValue: "draft" | "published" = "draft";
-  private categories: CategoryItem[] = [];
-
-  // For retry
-  private lastResult: PublishResult | null = null;
+  private titleValue: string
+  private categoryValue: string = ''
+  private statusValue: 'draft' | 'published' = 'draft'
+  private categories: CategoryItem[] = []
 
   constructor(
     app: App,
@@ -47,52 +43,52 @@ export class PublishModal extends Modal {
     defaultTitle: string,
     onPublish: (
       options: PublishOptions,
-      onProgress: ProgressCallback
-    ) => Promise<PublishResult>
+      onProgress: ProgressCallback,
+    ) => Promise<PublishResult>,
   ) {
-    super(app);
-    this.plugin = plugin;
-    this.defaultTitle = defaultTitle;
-    this.titleValue = defaultTitle;
-    this.onPublish = onPublish;
+    super(app)
+    this.plugin = plugin
+    this.defaultTitle = defaultTitle
+    this.titleValue = defaultTitle
+    this.onPublish = onPublish
   }
 
   async onOpen() {
-    const { contentEl, modalEl } = this;
-    modalEl.addClass("qmblog-publish-modal");
-    this.injectStyles();
+    const { contentEl, modalEl } = this
+    modalEl.addClass('qmblog-publish-modal')
+    this.injectStyles()
 
-    contentEl.empty();
-    contentEl.createEl("h2", { text: "发布到 Qiaomu Blog" });
+    contentEl.empty()
+    contentEl.createEl('h2', { text: '发布到 Qiaomu Blog' })
 
     const loadingEl = contentEl.createDiv({
-      cls: "qmblog-center-view",
-    });
-    loadingEl.createDiv({ cls: "qmblog-spinner" });
+      cls: 'qmblog-center-view',
+    })
+    loadingEl.createDiv({ cls: 'qmblog-spinner' })
     loadingEl.createDiv({
-      text: "正在加载分类...",
-      cls: "qmblog-center-text",
-    });
+      text: '正在加载分类...',
+      cls: 'qmblog-center-text',
+    })
 
     try {
-      this.categories = await this.fetchCategories();
+      this.categories = await this.fetchCategories()
     } catch (e) {
-      console.error("Failed to fetch categories:", e);
+      console.error('Failed to fetch categories:', e)
     }
 
-    this.renderForm();
+    this.renderForm()
   }
 
   onClose() {
-    this.contentEl.empty();
+    this.contentEl.empty()
   }
 
   private injectStyles() {
-    const styleId = "qmblog-modal-styles";
-    if (document.getElementById(styleId)) return;
+    const styleId = 'qmblog-modal-styles'
+    if (document.getElementById(styleId)) return
 
-    const style = document.createElement("style");
-    style.id = styleId;
+    const style = document.createElement('style')
+    style.id = styleId
     style.textContent = `
       .qmblog-publish-modal {
         width: 520px;
@@ -151,8 +147,8 @@ export class PublishModal extends Modal {
         color: var(--text-muted);
         font-size: var(--font-ui-smaller);
       }
-    `;
-    document.head.appendChild(style);
+    `
+    document.head.appendChild(style)
   }
 
   private async fetchCategories(): Promise<CategoryItem[]> {
@@ -161,88 +157,78 @@ export class PublishModal extends Modal {
       headers: {
         Authorization: `Bearer ${this.plugin.settings.apiToken}`,
       },
-    });
-    const data = response.json as { categories: CategoryItem[] };
-    return data.categories || [];
+    })
+    const data = response.json as { categories: CategoryItem[] }
+    return data.categories || []
   }
 
   // ─── Form View ───────────────────────────────────────────
 
   private renderForm() {
-    const { contentEl } = this;
-    contentEl.empty();
+    const { contentEl } = this
+    contentEl.empty()
 
-    contentEl.createEl("h2", { text: "发布到 Qiaomu Blog" });
+    contentEl.createEl('h2', { text: '发布到 Qiaomu Blog' })
 
     // Title
-    new Setting(contentEl)
-      .setName("文章标题")
-      .addText((text) => {
-        text
-          .setValue(this.titleValue)
-          .onChange((v) => {
-            this.titleValue = v;
-          });
-        text.inputEl.style.width = "100%";
-        text.inputEl.addEventListener("keydown", (e: KeyboardEvent) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            this.handlePublish();
-          }
-        });
-      });
+    new Setting(contentEl).setName('文章标题').addText((text) => {
+      text.setValue(this.titleValue).onChange((v) => {
+        this.titleValue = v
+      })
+      text.inputEl.style.width = '100%'
+      text.inputEl.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter') {
+          e.preventDefault()
+          this.handlePublish()
+        }
+      })
+    })
 
     // Category
-    new Setting(contentEl)
-      .setName("分类")
-      .addDropdown((dd) => {
-        dd.addOption("", "未分类");
-        for (const cat of this.categories) {
-          dd.addOption(cat.name, `${cat.name} (${cat.post_count})`);
-        }
-        dd.setValue(this.categoryValue);
-        dd.onChange((v) => {
-          this.categoryValue = v;
-        });
-      });
+    new Setting(contentEl).setName('分类').addDropdown((dd) => {
+      dd.addOption('', '未分类')
+      for (const cat of this.categories) {
+        dd.addOption(cat.name, `${cat.name} (${cat.post_count})`)
+      }
+      dd.setValue(this.categoryValue)
+      dd.onChange((v) => {
+        this.categoryValue = v
+      })
+    })
 
     // Status
-    new Setting(contentEl)
-      .setName("发布状态")
-      .addDropdown((dd) => {
-        dd.addOption("draft", "草稿");
-        dd.addOption("published", "直接发布");
-        dd.setValue(this.statusValue);
-        dd.onChange((v) => {
-          this.statusValue = v as "draft" | "published";
-        });
-      });
+    new Setting(contentEl).setName('发布状态').addDropdown((dd) => {
+      dd.addOption('draft', '草稿')
+      dd.addOption('published', '直接发布')
+      dd.setValue(this.statusValue)
+      dd.onChange((v) => {
+        this.statusValue = v as 'draft' | 'published'
+      })
+    })
 
     // Buttons
     new Setting(contentEl)
       .addButton((btn) =>
         btn
-          .setButtonText("发布")
+          .setButtonText('发布')
           .setCta()
-          .onClick(() => this.handlePublish())
+          .onClick(() => this.handlePublish()),
       )
-      .addButton((btn) =>
-        btn.setButtonText("取消").onClick(() => this.close())
-      );
+      .addButton((btn) => btn.setButtonText('取消').onClick(() => this.close()))
   }
 
   // ─── Publish Handler ─────────────────────────────────────
 
   private async handlePublish() {
     if (!this.titleValue.trim()) {
-      return;
+      return
     }
 
-    this.renderProgress("正在准备...");
+    this.renderProgress('正在准备...')
 
     const onProgress = (message: string) => {
-      this.updateProgressText(message);
-    };
+      this.updateProgressText(message)
+    }
 
     try {
       const result = await this.onPublish(
@@ -251,77 +237,77 @@ export class PublishModal extends Modal {
           category: this.categoryValue,
           status: this.statusValue,
         },
-        onProgress
-      );
+        onProgress,
+      )
 
       if (result.success) {
-        this.lastResult = result;
-        this.renderSuccess(result);
+        this.lastResult = result
+        this.renderSuccess(result)
       } else {
-        this.renderError(result.error || "未知错误");
+        this.renderError(result.error || '未知错误')
       }
     } catch (e) {
-      this.renderError(e instanceof Error ? e.message : String(e));
+      this.renderError(e instanceof Error ? e.message : String(e))
     }
   }
 
   // ─── Progress View ───────────────────────────────────────
 
-  private progressTextEl: HTMLElement | null = null;
+  private progressTextEl: HTMLElement | null = null
 
   private renderProgress(message: string) {
-    const { contentEl } = this;
-    contentEl.empty();
+    const { contentEl } = this
+    contentEl.empty()
 
-    contentEl.createEl("h2", { text: "发布到 Qiaomu Blog" });
+    contentEl.createEl('h2', { text: '发布到 Qiaomu Blog' })
 
-    const wrapper = contentEl.createDiv({ cls: "qmblog-center-view" });
-    wrapper.createDiv({ cls: "qmblog-spinner" });
+    const wrapper = contentEl.createDiv({ cls: 'qmblog-center-view' })
+    wrapper.createDiv({ cls: 'qmblog-spinner' })
 
     this.progressTextEl = wrapper.createDiv({
       text: message,
-      cls: "qmblog-center-text",
-    });
+      cls: 'qmblog-center-text',
+    })
   }
 
   private updateProgressText(message: string) {
     if (this.progressTextEl) {
-      this.progressTextEl.setText(message);
+      this.progressTextEl.setText(message)
     }
   }
 
   // ─── Success View ────────────────────────────────────────
 
   private renderSuccess(result: PublishResult) {
-    const { contentEl } = this;
-    contentEl.empty();
+    const { contentEl } = this
+    contentEl.empty()
 
-    const wrapper = contentEl.createDiv({ cls: "qmblog-center-view" });
+    const wrapper = contentEl.createDiv({ cls: 'qmblog-center-view' })
 
-    wrapper.createDiv({ cls: "qmblog-result-icon", text: "\u2713" });
+    wrapper.createDiv({ cls: 'qmblog-result-icon', text: '\u2713' })
 
-    const heading = wrapper.createEl("h3", {
-      text: "发布成功",
-      cls: "qmblog-result-heading",
-    });
-    heading.style.color = "var(--color-green)";
+    const heading = wrapper.createEl('h3', {
+      text: '发布成功',
+      cls: 'qmblog-result-heading',
+    })
+    heading.style.color = 'var(--color-green)'
 
     // Title callout
     const callout = wrapper.createDiv({
-      cls: "qmblog-callout-box qmblog-callout-success",
-    });
+      cls: 'qmblog-callout-box qmblog-callout-success',
+    })
     callout.createDiv({
       text: this.titleValue,
-      attr: { style: "font-weight: 600;" },
-    });
+      attr: { style: 'font-weight: 600;' },
+    })
 
     // Upload stats
     if (result.totalFiles > 0) {
-      let statsText = `${result.uploadedCount} 个文件上传成功`;
+      let statsText = `${result.uploadedCount} 个文件上传成功`
       if (result.failedCount > 0) {
-        statsText += `，${result.failedCount} 个失败`;
+        statsText += `，${result.failedCount} 个失败`
       }
-      wrapper.createDiv({ cls: "qmblog-stats-line", text: statsText });
+      wrapper.createDiv({ cls: 'qmblog-stats-line', text: statsText })
     }
 
     // Action buttons
@@ -329,62 +315,60 @@ export class PublishModal extends Modal {
       new Setting(wrapper)
         .addButton((btn) =>
           btn
-            .setButtonText("在浏览器中编辑")
+            .setButtonText('在浏览器中编辑')
             .setCta()
             .onClick(() => {
               window.open(
                 `${this.plugin.settings.apiUrl}/editor?edit=${result.slug}`,
-                "_blank"
-              );
-            })
+                '_blank',
+              )
+            }),
         )
         .addButton((btn) =>
-          btn.setButtonText("查看文章").onClick(() => {
+          btn.setButtonText('查看文章').onClick(() => {
             window.open(
               `${this.plugin.settings.apiUrl}/${result.slug}`,
-              "_blank"
-            );
-          })
-        );
+              '_blank',
+            )
+          }),
+        )
     }
 
     new Setting(wrapper).addButton((btn) =>
-      btn.setButtonText("关闭").onClick(() => this.close())
-    );
+      btn.setButtonText('关闭').onClick(() => this.close()),
+    )
   }
 
   // ─── Error View ──────────────────────────────────────────
 
   private renderError(errorMsg: string) {
-    const { contentEl } = this;
-    contentEl.empty();
+    const { contentEl } = this
+    contentEl.empty()
 
-    const wrapper = contentEl.createDiv({ cls: "qmblog-center-view" });
+    const wrapper = contentEl.createDiv({ cls: 'qmblog-center-view' })
 
-    wrapper.createDiv({ cls: "qmblog-result-icon", text: "\u2717" });
+    wrapper.createDiv({ cls: 'qmblog-result-icon', text: '\u2717' })
 
-    const heading = wrapper.createEl("h3", {
-      text: "发布失败",
-      cls: "qmblog-result-heading",
-    });
-    heading.style.color = "var(--color-red)";
+    const heading = wrapper.createEl('h3', {
+      text: '发布失败',
+      cls: 'qmblog-result-heading',
+    })
+    heading.style.color = 'var(--color-red)'
 
     // Error callout
     const callout = wrapper.createDiv({
-      cls: "qmblog-callout-box qmblog-callout-error",
-    });
-    callout.setText(errorMsg);
+      cls: 'qmblog-callout-box qmblog-callout-error',
+    })
+    callout.setText(errorMsg)
 
     // Retry + Close
     new Setting(wrapper)
       .addButton((btn) =>
         btn
-          .setButtonText("重试")
+          .setButtonText('重试')
           .setCta()
-          .onClick(() => this.renderForm())
+          .onClick(() => this.renderForm()),
       )
-      .addButton((btn) =>
-        btn.setButtonText("关闭").onClick(() => this.close())
-      );
+      .addButton((btn) => btn.setButtonText('关闭').onClick(() => this.close()))
   }
 }

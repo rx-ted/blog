@@ -24,11 +24,15 @@ export function UnsplashManager() {
   const loadConfig = async () => {
     try {
       const res = await fetch('/api/admin/unsplash')
-      const data = await res.json().catch(() => ({})) as UnsplashConfigResponse
+      const data = (await res
+        .json()
+        .catch(() => ({}))) as UnsplashConfigResponse
       if (!res.ok) throw new Error(data.error || '加载失败')
       setConfig(data)
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : '加载 Unsplash 配置失败')
+      toast.error(
+        error instanceof Error ? error.message : '加载 Unsplash 配置失败',
+      )
     } finally {
       setLoading(false)
     }
@@ -36,7 +40,7 @@ export function UnsplashManager() {
 
   useEffect(() => {
     void loadConfig()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const saveConfig = async () => {
@@ -52,13 +56,17 @@ export function UnsplashManager() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ accessKey: accessKey.trim() }),
       })
-      const data = await res.json().catch(() => ({})) as UnsplashConfigResponse
+      const data = (await res
+        .json()
+        .catch(() => ({}))) as UnsplashConfigResponse
       if (!res.ok) throw new Error(data.error || '保存失败')
       setConfig(data)
       setAccessKey('')
       toast.success('Unsplash 配置已保存')
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : '保存 Unsplash 配置失败')
+      toast.error(
+        error instanceof Error ? error.message : '保存 Unsplash 配置失败',
+      )
     } finally {
       setSaving(false)
     }
@@ -72,33 +80,44 @@ export function UnsplashManager() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ clear: true }),
       })
-      const data = await res.json().catch(() => ({})) as UnsplashConfigResponse
+      const data = (await res
+        .json()
+        .catch(() => ({}))) as UnsplashConfigResponse
       if (!res.ok) throw new Error(data.error || '清除失败')
       setConfig(data)
       setAccessKey('')
       toast.success('Unsplash 配置已清除')
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : '清除 Unsplash 配置失败')
+      toast.error(
+        error instanceof Error ? error.message : '清除 Unsplash 配置失败',
+      )
     } finally {
       setSaving(false)
     }
   }
 
   if (loading) {
-    return <div className="py-8 text-center text-sm text-[var(--editor-muted)]">加载中…</div>
+    return (
+      <div className="py-8 text-center text-sm text-[var(--editor-muted)]">
+        加载中…
+      </div>
+    )
   }
 
-  const sourceLabel = config.source === 'env'
-    ? '环境变量'
-    : config.source === 'settings'
-      ? '后台配置'
-      : '未配置'
+  const sourceLabel =
+    config.source === 'env'
+      ? '环境变量'
+      : config.source === 'settings'
+        ? '后台配置'
+        : '未配置'
 
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h3 className="text-base font-semibold text-[var(--editor-ink)]">Unsplash 图库</h3>
+          <h3 className="text-base font-semibold text-[var(--editor-ink)]">
+            Unsplash 图库
+          </h3>
           <div className="mt-1 text-sm text-[var(--editor-muted)]">
             当前：{config.enabled ? `已启用 · ${sourceLabel}` : '未启用'}
           </div>

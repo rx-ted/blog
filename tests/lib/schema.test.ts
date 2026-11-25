@@ -24,13 +24,10 @@ describe('ensureSchema', () => {
     const { ensureSchema } = await import('@/lib/repositories/schema')
     const { db, runs } = createSchemaDb()
 
-    await Promise.all([
-      ensureSchema(db),
-      ensureSchema(db),
-      ensureSchema(db),
-    ])
+    await Promise.all([ensureSchema(db), ensureSchema(db), ensureSchema(db)])
 
-    const passwordColumnRuns = () => runs.filter((sql) => sql === 'ALTER TABLE posts ADD COLUMN password TEXT')
+    const passwordColumnRuns = () =>
+      runs.filter((sql) => sql === 'ALTER TABLE posts ADD COLUMN password TEXT')
     expect(passwordColumnRuns()).toHaveLength(1)
 
     await ensureSchema(db)

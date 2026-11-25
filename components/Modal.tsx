@@ -6,7 +6,7 @@ import { X } from 'lucide-react'
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
-  onConfirm?: () => void | boolean | Promise<void | boolean>
+  onConfirm?: () => undefined | boolean | Promise<undefined | boolean>
   title: string
   description?: string
   confirmText?: string
@@ -97,9 +97,7 @@ export function Modal({
         {/* Body */}
         {description && (
           <div className="px-6 pb-6">
-            <p className="text-sm text-[var(--editor-muted)]">
-              {description}
-            </p>
+            <p className="text-sm text-[var(--editor-muted)]">{description}</p>
           </div>
         )}
 

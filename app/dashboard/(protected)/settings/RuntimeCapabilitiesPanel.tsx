@@ -30,14 +30,26 @@ function FeatureBadge({ enabled }: { enabled: boolean }) {
   )
 }
 
-export function RuntimeCapabilitiesPanel({ capabilities }: { capabilities: RuntimeCapabilities }) {
+export function RuntimeCapabilitiesPanel({
+  capabilities,
+}: {
+  capabilities: RuntimeCapabilities
+}) {
   const bindingItems = [
     { key: 'd1', label: 'D1', active: capabilities.bindings.d1 },
     { key: 'cache', label: 'KV Cache', active: capabilities.bindings.cache },
     { key: 'images', label: 'R2 Images', active: capabilities.bindings.images },
     { key: 'queue', label: 'Queues', active: capabilities.bindings.queue },
-    { key: 'workersAI', label: 'Workers AI', active: capabilities.bindings.workersAI },
-    { key: 'vectorize', label: 'Vectorize', active: capabilities.bindings.vectorize },
+    {
+      key: 'workersAI',
+      label: 'Workers AI',
+      active: capabilities.bindings.workersAI,
+    },
+    {
+      key: 'vectorize',
+      label: 'Vectorize',
+      active: capabilities.bindings.vectorize,
+    },
   ]
 
   const featureItems = [
@@ -74,11 +86,18 @@ export function RuntimeCapabilitiesPanel({ capabilities }: { capabilities: Runti
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-4">
-        <div className="mb-3 text-sm font-semibold text-[var(--editor-ink)]">运行时绑定探测</div>
+        <div className="mb-3 text-sm font-semibold text-[var(--editor-ink)]">
+          运行时绑定探测
+        </div>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {bindingItems.map((item) => (
-            <div key={item.key} className="flex items-center justify-between rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2">
-              <span className="text-sm text-[var(--editor-ink)]">{item.label}</span>
+            <div
+              key={item.key}
+              className="flex items-center justify-between rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2"
+            >
+              <span className="text-sm text-[var(--editor-ink)]">
+                {item.label}
+              </span>
               <StatusBadge active={item.active} />
             </div>
           ))}
@@ -86,23 +105,35 @@ export function RuntimeCapabilitiesPanel({ capabilities }: { capabilities: Runti
       </div>
 
       <div className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-4">
-        <div className="mb-3 text-sm font-semibold text-[var(--editor-ink)]">增强能力与回退策略</div>
+        <div className="mb-3 text-sm font-semibold text-[var(--editor-ink)]">
+          增强能力与回退策略
+        </div>
         <div className="space-y-3">
           {featureItems.map((item) => (
-            <div key={item.key} className="rounded-lg border border-[var(--editor-line)] bg-[var(--background)] p-3">
+            <div
+              key={item.key}
+              className="rounded-lg border border-[var(--editor-line)] bg-[var(--background)] p-3"
+            >
               <div className="flex items-center justify-between gap-3">
-                <div className="text-sm font-medium text-[var(--editor-ink)]">{item.label}</div>
+                <div className="text-sm font-medium text-[var(--editor-ink)]">
+                  {item.label}
+                </div>
                 <FeatureBadge enabled={item.enabled} />
               </div>
-              <div className="mt-1 text-xs text-[var(--editor-muted)]">当前策略：`{item.strategy}`</div>
-              <div className="mt-2 text-sm text-[var(--editor-muted)]">{item.note}</div>
+              <div className="mt-1 text-xs text-[var(--editor-muted)]">
+                当前策略：`{item.strategy}`
+              </div>
+              <div className="mt-2 text-sm text-[var(--editor-muted)]">
+                {item.note}
+              </div>
             </div>
           ))}
         </div>
       </div>
 
       <div className="rounded-lg border border-dashed border-[var(--editor-line)] bg-[var(--background)] px-4 py-3 text-sm text-[var(--editor-muted)]">
-        开源部署建议：默认只要求 `D1 + R2` 即可运行，`Queues / Workers AI / Vectorize` 都应作为可选增强，通过环境变量显式开启。
+        开源部署建议：默认只要求 `D1 + R2` 即可运行，`Queues / Workers AI /
+        Vectorize` 都应作为可选增强，通过环境变量显式开启。
       </div>
     </div>
   )

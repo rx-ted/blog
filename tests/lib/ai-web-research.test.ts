@@ -1,9 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import {
-  fetchPageMarkdown,
-  searchWeb,
-} from '@/lib/ai-web-research'
+import { fetchPageMarkdown, searchWeb } from '@/lib/ai-web-research'
 
 describe('ai web research helpers', () => {
   it('returns a clear error when web research is disabled', async () => {
@@ -25,14 +22,26 @@ describe('ai web research helpers', () => {
   })
 
   it('normalizes PipeLLM search results and clamps limit', async () => {
-    const fetcher = vi.fn().mockResolvedValue(new Response(JSON.stringify({
-      data: {
-        organic: [
-          { title: 'One', link: 'https://example.com/one', snippet: 'First' },
-          { title: 'Two', url: 'https://example.com/two', description: 'Second' },
-        ],
-      },
-    })))
+    const fetcher = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: {
+            organic: [
+              {
+                title: 'One',
+                link: 'https://example.com/one',
+                snippet: 'First',
+              },
+              {
+                title: 'Two',
+                url: 'https://example.com/two',
+                description: 'Second',
+              },
+            ],
+          },
+        }),
+      ),
+    )
 
     const result = await searchWeb({
       query: '  OpenAI skills  ',
@@ -97,7 +106,9 @@ describe('ai web research helpers', () => {
     })
 
     expect(fetcher).toHaveBeenCalledTimes(1)
-    expect(String(fetcher.mock.calls[0]?.[0])).toBe('https://r.jina.ai/https://example.com/article')
+    expect(String(fetcher.mock.calls[0]?.[0])).toBe(
+      'https://r.jina.ai/https://example.com/article',
+    )
     expect(result).toMatchObject({
       status: 'success',
       url: 'https://example.com/article',
@@ -110,7 +121,8 @@ describe('ai web research helpers', () => {
 
   it('falls back to Defuddle and truncates long markdown', async () => {
     const longMarkdown = `# Defuddle Article\n\n${'素材内容\n'.repeat(2000)}`
-    const fetcher = vi.fn()
+    const fetcher = vi
+      .fn()
       .mockResolvedValueOnce(new Response('Access Denied'))
       .mockResolvedValueOnce(new Response(longMarkdown))
 
@@ -122,7 +134,9 @@ describe('ai web research helpers', () => {
     })
 
     expect(fetcher).toHaveBeenCalledTimes(2)
-    expect(String(fetcher.mock.calls[1]?.[0])).toBe('https://defuddle.md/https://example.com/article')
+    expect(String(fetcher.mock.calls[1]?.[0])).toBe(
+      'https://defuddle.md/https://example.com/article',
+    )
     expect(result.status).toBe('success')
     if (result.status === 'success') {
       expect(result.source).toBe('defuddle')
@@ -145,7 +159,8 @@ describe('ai web research helpers', () => {
       '',
       'It has enough substance to use as writing material.',
     ].join('\n')
-    const fetcher = vi.fn()
+    const fetcher = vi
+      .fn()
       .mockResolvedValueOnce(new Response('Access Denied'))
       .mockResolvedValueOnce(new Response('rate limited', { status: 429 }))
       .mockResolvedValueOnce(new Response(curlMarkdown))
@@ -157,9 +172,15 @@ describe('ai web research helpers', () => {
     })
 
     expect(fetcher).toHaveBeenCalledTimes(3)
-    expect(String(fetcher.mock.calls[0]?.[0])).toBe('https://r.jina.ai/https://www.paulgraham.com/field.html')
-    expect(String(fetcher.mock.calls[1]?.[0])).toBe('https://defuddle.md/https://www.paulgraham.com/field.html')
-    expect(String(fetcher.mock.calls[2]?.[0])).toBe('https://curl.md/https://www.paulgraham.com/field.html')
+    expect(String(fetcher.mock.calls[0]?.[0])).toBe(
+      'https://r.jina.ai/https://www.paulgraham.com/field.html',
+    )
+    expect(String(fetcher.mock.calls[1]?.[0])).toBe(
+      'https://defuddle.md/https://www.paulgraham.com/field.html',
+    )
+    expect(String(fetcher.mock.calls[2]?.[0])).toBe(
+      'https://curl.md/https://www.paulgraham.com/field.html',
+    )
     expect(result.status).toBe('success')
     if (result.status === 'success') {
       expect(result.source).toBe('curlmd')
@@ -169,39 +190,48 @@ describe('ai web research helpers', () => {
   })
 
   it('uses FXTwitter first for X status URLs', async () => {
-    const fetcher = vi.fn()
-      .mockResolvedValueOnce(new Response(JSON.stringify({
-        code: 200,
-        tweet: {
-          url: 'https://x.com/yangyi/status/2048212793116201138',
-          text: 'https://t.co/KXR0QAH2UD',
-          author: {
-            name: 'Yangyi',
-            screen_name: 'yangyi',
-          },
-          raw_text: {
-            text: '完整推文文本 https://t.co/KXR0QAH2UD',
-          },
-          likes: 136,
-          retweets: 23,
-          replies: 20,
-          bookmarks: 296,
-          views: 49958,
-          created_at: 'Sun Apr 26 01:29:18 +0000 2026',
-          article: {
-            title: 'Agent IM与Agent OS | AI时代的流量入口',
-            preview_text: 'Agent IM的思考起源',
-            content: {
-              blocks: [
-                { type: 'header-one', text: 'Agent IM的思考起源' },
-                { type: 'unstyled', text: '从25年4月我就一直在思考一个以task来驱动的人与Agent进行通讯的IM形态' },
-                { type: 'unstyled', text: '这个形态类似Telegram' },
-                { type: 'unstyled', text: '在这个Telegram中，人和人，人和Agent，Agent和Agent，都应该可以进行相互通讯' },
-              ],
+    const fetcher = vi.fn().mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          code: 200,
+          tweet: {
+            url: 'https://x.com/yangyi/status/2048212793116201138',
+            text: 'https://t.co/KXR0QAH2UD',
+            author: {
+              name: 'Yangyi',
+              screen_name: 'yangyi',
+            },
+            raw_text: {
+              text: '完整推文文本 https://t.co/KXR0QAH2UD',
+            },
+            likes: 136,
+            retweets: 23,
+            replies: 20,
+            bookmarks: 296,
+            views: 49958,
+            created_at: 'Sun Apr 26 01:29:18 +0000 2026',
+            article: {
+              title: 'Agent IM与Agent OS | AI时代的流量入口',
+              preview_text: 'Agent IM的思考起源',
+              content: {
+                blocks: [
+                  { type: 'header-one', text: 'Agent IM的思考起源' },
+                  {
+                    type: 'unstyled',
+                    text: '从25年4月我就一直在思考一个以task来驱动的人与Agent进行通讯的IM形态',
+                  },
+                  { type: 'unstyled', text: '这个形态类似Telegram' },
+                  {
+                    type: 'unstyled',
+                    text: '在这个Telegram中，人和人，人和Agent，Agent和Agent，都应该可以进行相互通讯',
+                  },
+                ],
+              },
             },
           },
-        },
-      })))
+        }),
+      ),
+    )
 
     const result = await fetchPageMarkdown({
       url: 'https://x.com/yangyi/status/2048212793116201138',
@@ -210,7 +240,9 @@ describe('ai web research helpers', () => {
     })
 
     expect(fetcher).toHaveBeenCalledTimes(1)
-    expect(String(fetcher.mock.calls[0]?.[0])).toBe('https://api.fxtwitter.com/yangyi/status/2048212793116201138')
+    expect(String(fetcher.mock.calls[0]?.[0])).toBe(
+      'https://api.fxtwitter.com/yangyi/status/2048212793116201138',
+    )
     expect(result.status).toBe('success')
     if (result.status === 'success') {
       expect(result.source).toBe('fxtwitter')
@@ -235,10 +267,15 @@ describe('ai web research helpers', () => {
       '',
       '试着解读Youtube视频和arXiv论文，效果惊艳。',
     ].join('\n')
-    const fetcher = vi.fn()
+    const fetcher = vi
+      .fn()
       .mockResolvedValueOnce(new Response('not found', { status: 404 }))
       .mockResolvedValueOnce(new Response('not found', { status: 404 }))
-      .mockResolvedValueOnce(new Response('Don’t miss what’s happening\n\nPeople on X are the first to know.'))
+      .mockResolvedValueOnce(
+        new Response(
+          'Don’t miss what’s happening\n\nPeople on X are the first to know.',
+        ),
+      )
       .mockResolvedValueOnce(new Response(defuddleMarkdown))
 
     const result = await fetchPageMarkdown({
@@ -248,10 +285,18 @@ describe('ai web research helpers', () => {
     })
 
     expect(fetcher).toHaveBeenCalledTimes(4)
-    expect(String(fetcher.mock.calls[0]?.[0])).toBe('https://api.fxtwitter.com/vista8/status/2054593456547438613')
-    expect(String(fetcher.mock.calls[1]?.[0])).toBe('https://api.vxtwitter.com/vista8/status/2054593456547438613')
-    expect(String(fetcher.mock.calls[2]?.[0])).toBe('https://r.jina.ai/https://x.com/vista8/status/2054593456547438613')
-    expect(String(fetcher.mock.calls[3]?.[0])).toBe('https://defuddle.md/https://x.com/vista8/status/2054593456547438613')
+    expect(String(fetcher.mock.calls[0]?.[0])).toBe(
+      'https://api.fxtwitter.com/vista8/status/2054593456547438613',
+    )
+    expect(String(fetcher.mock.calls[1]?.[0])).toBe(
+      'https://api.vxtwitter.com/vista8/status/2054593456547438613',
+    )
+    expect(String(fetcher.mock.calls[2]?.[0])).toBe(
+      'https://r.jina.ai/https://x.com/vista8/status/2054593456547438613',
+    )
+    expect(String(fetcher.mock.calls[3]?.[0])).toBe(
+      'https://defuddle.md/https://x.com/vista8/status/2054593456547438613',
+    )
     expect(result.status).toBe('success')
     if (result.status === 'success') {
       expect(result.source).toBe('defuddle')

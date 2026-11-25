@@ -19,8 +19,15 @@ interface ImageToolModalProps {
   postId?: number | null
   slug?: string | null
   onClose: () => void
-  onInsertImage: (imageUrl: string, alt: string, placementMode?: 'insert' | 'replace') => void
-  onInsertCollage: (file: File, insertPos: number | null) => Promise<void> | void
+  onInsertImage: (
+    imageUrl: string,
+    alt: string,
+    placementMode?: 'insert' | 'replace',
+  ) => void
+  onInsertCollage: (
+    file: File,
+    insertPos: number | null,
+  ) => Promise<void> | void
 }
 
 export function ImageToolModal({
@@ -72,7 +79,9 @@ export function ImageToolModal({
         <div className="flex h-[calc(100vh-1rem)] w-full max-w-[1180px] flex-col overflow-hidden rounded-[24px] border border-[var(--editor-line)] bg-[var(--editor-panel)] shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:h-[min(860px,calc(100vh-2rem))]">
           <div className="flex items-center justify-between gap-3 border-b border-[var(--editor-line)] px-4 py-3 sm:px-5">
             <div className="min-w-0">
-              <div className="text-base font-semibold text-[var(--editor-ink)]">图片工具</div>
+              <div className="text-base font-semibold text-[var(--editor-ink)]">
+                图片工具
+              </div>
             </div>
 
             <div className="flex items-center gap-1 rounded-full bg-[var(--editor-soft)] p-1">
@@ -157,7 +166,9 @@ export function ImageToolModal({
                 active={activeMode === 'library'}
                 postId={postId}
                 slug={slug}
-                onInsert={(asset) => onInsertImage(asset.url, asset.alt || '图片')}
+                onInsert={(asset) =>
+                  onInsertImage(asset.url, asset.alt || '图片')
+                }
               />
             </div>
           </div>

@@ -34,7 +34,7 @@ function buildSeed(input: string | CoverSeedInput) {
 function hashSeed(seed: string) {
   let hash = 0
   for (const char of seed) {
-    hash = ((hash * 33) + char.charCodeAt(0)) >>> 0
+    hash = (hash * 33 + char.charCodeAt(0)) >>> 0
   }
   return hash
 }
@@ -61,10 +61,16 @@ export function resolvePostCoverImage(
   input: CoverImageInput,
   options: { baseUrl?: string } = {},
 ) {
-  const explicitCover = absolutizeSiteAssetUrl(normalizeSeedValue(input.cover_image), options.baseUrl)
+  const explicitCover = absolutizeSiteAssetUrl(
+    normalizeSeedValue(input.cover_image),
+    options.baseUrl,
+  )
   if (explicitCover) return explicitCover
 
-  return absolutizeSiteAssetUrl(pickDefaultPostCoverPath(input), options.baseUrl)
+  return absolutizeSiteAssetUrl(
+    pickDefaultPostCoverPath(input),
+    options.baseUrl,
+  )
 }
 
 export function resolveDefaultSiteCoverImage(baseUrl?: string) {

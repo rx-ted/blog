@@ -5,7 +5,11 @@ import { useState, useRef, useEffect, useSyncExternalStore } from 'react'
 import { Menu, X, ChevronDown } from 'lucide-react'
 import { SearchEntry } from './SearchEntry'
 import { ThemeDropdown } from '@/components/ThemeDropdown'
-import { getClientThemePreference, subscribeToThemeChange, type Theme } from '@/lib/appearance'
+import {
+  getClientThemePreference,
+  subscribeToThemeChange,
+  type Theme,
+} from '@/lib/appearance'
 import type { SiteCategoryLink, SiteNavLink } from '@/lib/site'
 
 export type NavLink = SiteNavLink
@@ -26,7 +30,11 @@ const defaultNavLinks: NavLink[] = [
 
 function getIssueInfo() {
   const now = new Date()
-  return { vol: now.getFullYear() - 2023, month: now.getMonth() + 1, year: now.getFullYear() }
+  return {
+    vol: now.getFullYear() - 2023,
+    month: now.getMonth() + 1,
+    year: now.getFullYear(),
+  }
 }
 
 export function SiteHeader({
@@ -49,17 +57,21 @@ export function SiteHeader({
   // 点击外部关闭分类下拉
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (categoryRef.current && !categoryRef.current.contains(e.target as Node)) {
+      if (
+        categoryRef.current &&
+        !categoryRef.current.contains(e.target as Node)
+      ) {
         setCategoryOpen(false)
       }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
-  const activeCategory = categories.find(c => c.slug === activeCategorySlug)
+  const activeCategory = categories.find((c) => c.slug === activeCategorySlug)
 
   const renderLink = (link: NavLink, onClick?: () => void) => {
-    const className = "text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors duration-150"
+    const className =
+      'text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors duration-150'
 
     if (link.openInNewTab || link.url.startsWith('http')) {
       return (
@@ -95,10 +107,23 @@ export function SiteHeader({
         <Link
           href="/"
           className="flex items-center gap-2 flex-shrink-0 text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors duration-200"
-          style={{ fontFamily: '"JetBrains Mono", ui-monospace, monospace', fontSize: 13 }}
+          style={{
+            fontFamily: '"JetBrains Mono", ui-monospace, monospace',
+            fontSize: 13,
+          }}
           suppressHydrationWarning
         >
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4ade80', display: 'inline-block', boxShadow: '0 0 8px #4ade80', flexShrink: 0 }} />
+          <span
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              background: '#4ade80',
+              display: 'inline-block',
+              boxShadow: '0 0 8px #4ade80',
+              flexShrink: 0,
+            }}
+          />
           <span style={{ color: 'var(--editor-muted)' }}>qiaomu@blog:~$</span>
           <span style={{ color: 'var(--editor-ink)' }}>./home</span>
         </Link>
@@ -108,15 +133,27 @@ export function SiteHeader({
     if (theme === 'editorial') {
       const { vol, month, year } = getIssueInfo()
       return (
-        <div className="flex items-baseline gap-4 flex-shrink-0" suppressHydrationWarning>
+        <div
+          className="flex items-baseline gap-4 flex-shrink-0"
+          suppressHydrationWarning
+        >
           <Link
             href="/"
             className="text-lg tracking-tight text-[var(--editor-ink)] hover:text-[var(--editor-accent)] transition-colors duration-200 font-bold"
-            style={{ fontFamily: 'var(--logo-font, "Noto Serif SC", Georgia, serif)' }}
+            style={{
+              fontFamily: 'var(--logo-font, "Noto Serif SC", Georgia, serif)',
+            }}
           >
             木羽博客
           </Link>
-          <span style={{ fontFamily: '"JetBrains Mono", ui-monospace, monospace', fontSize: 11, letterSpacing: '0.15em', color: 'var(--editor-muted)' }}>
+          <span
+            style={{
+              fontFamily: '"JetBrains Mono", ui-monospace, monospace',
+              fontSize: 11,
+              letterSpacing: '0.15em',
+              color: 'var(--editor-muted)',
+            }}
+          >
             VOL.{vol} · {year}年{month}月
           </span>
         </div>
@@ -127,7 +164,9 @@ export function SiteHeader({
       <Link
         href="/"
         className="text-lg tracking-tight text-[var(--editor-ink)] hover:text-[var(--editor-accent)] transition-colors duration-200 flex-shrink-0 font-bold"
-        style={{ fontFamily: 'var(--logo-font, Georgia, "Noto Serif SC", serif)' }}
+        style={{
+          fontFamily: 'var(--logo-font, Georgia, "Noto Serif SC", serif)',
+        }}
       >
         木羽博客
       </Link>
@@ -135,7 +174,9 @@ export function SiteHeader({
   }
 
   return (
-    <header className={`site-header ${stickyOnMobile ? 'sticky' : 'sm:sticky'} top-0 z-40 border-b border-[var(--editor-line)] bg-[var(--background)]/95 backdrop-blur-sm`}>
+    <header
+      className={`site-header ${stickyOnMobile ? 'sticky' : 'sm:sticky'} top-0 z-40 border-b border-[var(--editor-line)] bg-[var(--background)]/95 backdrop-blur-sm`}
+    >
       <div className="site-header-inner mx-auto max-w-3xl px-4 sm:px-6">
         <div className="h-14 flex items-center justify-between gap-4">
           {renderLogo()}
@@ -154,7 +195,9 @@ export function SiteHeader({
                   }`}
                 >
                   {activeCategory?.name || '分类'}
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-150 ${categoryOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 transition-transform duration-150 ${categoryOpen ? 'rotate-180' : ''}`}
+                  />
                 </button>
 
                 {categoryOpen && (
@@ -170,7 +213,7 @@ export function SiteHeader({
                     >
                       全部文章
                     </Link>
-                    {categories.map(cat => (
+                    {categories.map((cat) => (
                       <Link
                         key={cat.slug}
                         href={`/category/${cat.slug}`}
@@ -189,7 +232,7 @@ export function SiteHeader({
               </div>
             )}
 
-            {links.map(link => renderLink(link))}
+            {links.map((link) => renderLink(link))}
             <ThemeDropdown initialTheme={initialTheme} />
             <SearchEntry />
           </nav>
@@ -202,7 +245,11 @@ export function SiteHeader({
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={mobileMenuOpen ? '关闭菜单' : '打开菜单'}
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
             </button>
           </div>
         </div>
@@ -250,8 +297,11 @@ export function SiteHeader({
           )}
 
           <nav className="flex flex-col text-sm">
-            {links.map(link => (
-              <div key={link.label} className="px-4 py-3 border-b border-[var(--editor-line)]">
+            {links.map((link) => (
+              <div
+                key={link.label}
+                className="px-4 py-3 border-b border-[var(--editor-line)]"
+              >
                 {renderLink(link, () => setMobileMenuOpen(false))}
               </div>
             ))}

@@ -15,7 +15,9 @@ export interface UseEditorMetadataOptions {
   markDirty?: (metaOverrides?: Partial<DraftMetaState>) => void
 }
 
-export function createEmptyDraftMetaState(initialData?: EditorMetadataInitialData): DraftMetaState {
+export function createEmptyDraftMetaState(
+  initialData?: EditorMetadataInitialData,
+): DraftMetaState {
   return {
     postId: initialData?.id ?? null,
     editSlug: initialData?.slug ?? null,
@@ -27,9 +29,14 @@ export function createEmptyDraftMetaState(initialData?: EditorMetadataInitialDat
   }
 }
 
-export function useEditorMetadata({ initialData, markDirty }: UseEditorMetadataOptions = {}) {
+export function useEditorMetadata({
+  initialData,
+  markDirty,
+}: UseEditorMetadataOptions = {}) {
   const [postId, setPostId] = useState<number | null>(initialData?.id ?? null)
-  const [editSlug, setEditSlug] = useState<string | null>(initialData?.slug ?? null)
+  const [editSlug, setEditSlug] = useState<string | null>(
+    initialData?.slug ?? null,
+  )
   const [slug, setSlug] = useState(initialData?.slug || '')
   const [category, setCategory] = useState(initialData?.category || '未分类')
   const [tags, setTags] = useState<string[]>(initialData?.tags || [])
@@ -38,7 +45,9 @@ export function useEditorMetadata({ initialData, markDirty }: UseEditorMetadataO
   const [coverImage, setCoverImage] = useState(initialData?.cover_image || '')
 
   const slugInputFocusedRef = useRef(false)
-  const latestMetaRef = useRef<DraftMetaState>(createEmptyDraftMetaState(initialData))
+  const latestMetaRef = useRef<DraftMetaState>(
+    createEmptyDraftMetaState(initialData),
+  )
 
   useEffect(() => {
     latestMetaRef.current = {
@@ -52,62 +61,85 @@ export function useEditorMetadata({ initialData, markDirty }: UseEditorMetadataO
     }
   }, [postId, editSlug, slug, category, tags, description, coverImage])
 
-  const patchMetadata = useCallback((metaOverrides?: Partial<DraftMetaState>) => {
-    if (!metaOverrides || Object.keys(metaOverrides).length === 0) return
+  const patchMetadata = useCallback(
+    (metaOverrides?: Partial<DraftMetaState>) => {
+      if (!metaOverrides || Object.keys(metaOverrides).length === 0) return
 
-    latestMetaRef.current = {
-      ...latestMetaRef.current,
-      ...metaOverrides,
-    }
+      latestMetaRef.current = {
+        ...latestMetaRef.current,
+        ...metaOverrides,
+      }
 
-    if (metaOverrides.postId !== undefined) setPostId(metaOverrides.postId)
-    if (metaOverrides.editSlug !== undefined) setEditSlug(metaOverrides.editSlug)
-    if (metaOverrides.slug !== undefined) setSlug(metaOverrides.slug)
-    if (metaOverrides.category !== undefined) setCategory(metaOverrides.category)
-    if (metaOverrides.tags !== undefined) setTags(metaOverrides.tags)
-    if (metaOverrides.description !== undefined) setDescription(metaOverrides.description)
-    if (metaOverrides.coverImage !== undefined) setCoverImage(metaOverrides.coverImage)
-  }, [])
+      if (metaOverrides.postId !== undefined) setPostId(metaOverrides.postId)
+      if (metaOverrides.editSlug !== undefined)
+        setEditSlug(metaOverrides.editSlug)
+      if (metaOverrides.slug !== undefined) setSlug(metaOverrides.slug)
+      if (metaOverrides.category !== undefined)
+        setCategory(metaOverrides.category)
+      if (metaOverrides.tags !== undefined) setTags(metaOverrides.tags)
+      if (metaOverrides.description !== undefined)
+        setDescription(metaOverrides.description)
+      if (metaOverrides.coverImage !== undefined)
+        setCoverImage(metaOverrides.coverImage)
+    },
+    [],
+  )
 
-  const syncPersistedSlug = useCallback((
-    persistedSlug: string,
-    previousSlug: string | null,
-    forceVisibleSync = false,
-  ) => {
-    const shouldSyncVisibleSlug = forceVisibleSync
-      || !slugInputFocusedRef.current
-      || latestMetaRef.current.slug === persistedSlug
+  const syncPersistedSlug = useCallback(
+    (
+      persistedSlug: string,
+      previousSlug: string | null,
+      forceVisibleSync = false,
+    ) => {
+      const shouldSyncVisibleSlug =
+        forceVisibleSync ||
+        !slugInputFocusedRef.current ||
+        latestMetaRef.current.slug === persistedSlug
 
-    latestMetaRef.current = {
-      ...latestMetaRef.current,
-      editSlug: persistedSlug,
-      slug: shouldSyncVisibleSlug ? persistedSlug : latestMetaRef.current.slug,
-    }
+      latestMetaRef.current = {
+        ...latestMetaRef.current,
+        editSlug: persistedSlug,
+        slug: shouldSyncVisibleSlug
+          ? persistedSlug
+          : latestMetaRef.current.slug,
+      }
 
-    setEditSlug(persistedSlug)
-    if (shouldSyncVisibleSlug) {
-      setSlug(persistedSlug)
-    }
+      setEditSlug(persistedSlug)
+      if (shouldSyncVisibleSlug) {
+        setSlug(persistedSlug)
+      }
 
-    if (persistedSlug !== previousSlug && typeof window !== 'undefined') {
-      window.history.replaceState({}, '', `/editor?edit=${encodeURIComponent(persistedSlug)}`)
-    }
-  }, [])
+      if (persistedSlug !== previousSlug && typeof window !== 'undefined') {
+        window.history.replaceState(
+          {},
+          '',
+          `/editor?edit=${encodeURIComponent(persistedSlug)}`,
+        )
+      }
+    },
+    [],
+  )
 
-  const addTag = useCallback((value: string) => {
-    const t = value.trim().slice(0, 20)
-    if (!t || tags.includes(t) || tags.length >= 10) return
-    const nextTags = [...tags, t]
-    setTags(nextTags)
-    setTagInput('')
-    markDirty?.({ tags: nextTags })
-  }, [markDirty, tags])
+  const addTag = useCallback(
+    (value: string) => {
+      const t = value.trim().slice(0, 20)
+      if (!t || tags.includes(t) || tags.length >= 10) return
+      const nextTags = [...tags, t]
+      setTags(nextTags)
+      setTagInput('')
+      markDirty?.({ tags: nextTags })
+    },
+    [markDirty, tags],
+  )
 
-  const removeTag = useCallback((idx: number) => {
-    const nextTags = tags.filter((_, i) => i !== idx)
-    setTags(nextTags)
-    markDirty?.({ tags: nextTags })
-  }, [markDirty, tags])
+  const removeTag = useCallback(
+    (idx: number) => {
+      const nextTags = tags.filter((_, i) => i !== idx)
+      setTags(nextTags)
+      markDirty?.({ tags: nextTags })
+    },
+    [markDirty, tags],
+  )
 
   const resetMetadata = useCallback(() => {
     const emptyMeta = createEmptyDraftMetaState()

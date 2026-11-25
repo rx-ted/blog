@@ -55,4 +55,7 @@ export const AI_IMAGE_PROVIDER_MAP = Object.fromEntries(
   AI_IMAGE_PROVIDER_PRESETS.map((preset) => [preset.id, preset]),
 ) as Record<string, AIImageProviderPreset>
 
-export const AI_IMAGE_PROVIDER_CATEGORIES: AIImageProviderCategory[] = ['官方', '自定义兼容']
+export const AI_IMAGE_PROVIDER_CATEGORIES: AIImageProviderCategory[] = [
+  '官方',
+  '自定义兼容',
+]

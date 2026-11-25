@@ -111,8 +111,11 @@ const DEFAULT_IMAGE_ACTIONS: DefaultImageActionSeed[] = [
   },
 ]
 
-export async function ensureAiImageProviderProfilesTable(db: D1Database): Promise<void> {
-  await db.prepare(`
+export async function ensureAiImageProviderProfilesTable(
+  db: D1Database,
+): Promise<void> {
+  await db
+    .prepare(`
     CREATE TABLE IF NOT EXISTS ai_image_provider_profiles (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -129,11 +132,13 @@ export async function ensureAiImageProviderProfilesTable(db: D1Database): Promis
       created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
       updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
     )
-  `).run()
+  `)
+    .run()
 }
 
 async function ensureAiImageActionsTable(db: D1Database): Promise<void> {
-  await db.prepare(`
+  await db
+    .prepare(`
     CREATE TABLE IF NOT EXISTS ai_image_actions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       action_key TEXT UNIQUE NOT NULL,
@@ -151,98 +156,146 @@ async function ensureAiImageActionsTable(db: D1Database): Promise<void> {
       created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
       updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
     )
-  `).run()
+  `)
+    .run()
 
-  const tableInfo = await db.prepare('PRAGMA table_info(ai_image_actions)').all<{ name: string }>()
-  const columns = new Set((tableInfo.results || []).map((column) => column.name))
+  const tableInfo = await db
+    .prepare('PRAGMA table_info(ai_image_actions)')
+    .all<{ name: string }>()
+  const columns = new Set(
+    (tableInfo.results || []).map((column) => column.name),
+  )
   const hadAspectRatioColumn = columns.has('aspect_ratio')
   const hadResolutionColumn = columns.has('resolution')
 
   if (!columns.has('aspect_ratio')) {
-    await db.prepare("ALTER TABLE ai_image_actions ADD COLUMN aspect_ratio TEXT NOT NULL DEFAULT 'auto'").run()
+    await db
+      .prepare(
+        "ALTER TABLE ai_image_actions ADD COLUMN aspect_ratio TEXT NOT NULL DEFAULT 'auto'",
+      )
+      .run()
   }
   if (!columns.has('resolution')) {
-    await db.prepare("ALTER TABLE ai_image_actions ADD COLUMN resolution TEXT NOT NULL DEFAULT 'auto'").run()
+    await db
+      .prepare(
+        "ALTER TABLE ai_image_actions ADD COLUMN resolution TEXT NOT NULL DEFAULT 'auto'",
+      )
+      .run()
   }
 
   if (!columns.has('size')) {
-    await db.prepare("ALTER TABLE ai_image_actions ADD COLUMN size TEXT NOT NULL DEFAULT 'auto'").run()
+    await db
+      .prepare(
+        "ALTER TABLE ai_image_actions ADD COLUMN size TEXT NOT NULL DEFAULT 'auto'",
+      )
+      .run()
   }
   if (!columns.has('quality')) {
-    await db.prepare("ALTER TABLE ai_image_actions ADD COLUMN quality TEXT NOT NULL DEFAULT 'auto'").run()
+    await db
+      .prepare(
+        "ALTER TABLE ai_image_actions ADD COLUMN quality TEXT NOT NULL DEFAULT 'auto'",
+      )
+      .run()
   }
   if (!columns.has('profile_id')) {
-    await db.prepare('ALTER TABLE ai_image_actions ADD COLUMN profile_id INTEGER').run()
+    await db
+      .prepare('ALTER TABLE ai_image_actions ADD COLUMN profile_id INTEGER')
+      .run()
   }
 
   if (!hadAspectRatioColumn || !hadResolutionColumn) {
-    const { results } = await db.prepare(`
+    const { results } = await db
+      .prepare(`
       SELECT id, action_key, size, quality
       FROM ai_image_actions
-    `).all<Pick<AIImageActionRow, 'id' | 'action_key' | 'size' | 'quality'>>()
+    `)
+      .all<Pick<AIImageActionRow, 'id' | 'action_key' | 'size' | 'quality'>>()
 
     for (const row of results || []) {
-      const seeded = DEFAULT_IMAGE_ACTIONS.find((item) => item.action_key === row.action_key)
-      const aspectRatio = seeded?.aspect_ratio || inferAspectRatioFromLegacySize(row.size)
-      const resolution = seeded?.resolution || inferResolutionFromLegacyQuality(row.quality)
+      const seeded = DEFAULT_IMAGE_ACTIONS.find(
+        (item) => item.action_key === row.action_key,
+      )
+      const aspectRatio =
+        seeded?.aspect_ratio || inferAspectRatioFromLegacySize(row.size)
+      const resolution =
+        seeded?.resolution || inferResolutionFromLegacyQuality(row.quality)
 
-      await db.prepare(`
+      await db
+        .prepare(`
         UPDATE ai_image_actions
         SET aspect_ratio = ?, resolution = ?, updated_at = strftime('%s', 'now')
         WHERE id = ?
-      `).bind(aspectRatio, resolution, row.id).run()
+      `)
+        .bind(aspectRatio, resolution, row.id)
+        .run()
     }
   }
 
-  const countRow = await db.prepare('SELECT COUNT(*) as count FROM ai_image_actions').first<{ count: number }>()
+  const countRow = await db
+    .prepare('SELECT COUNT(*) as count FROM ai_image_actions')
+    .first<{ count: number }>()
   if ((countRow?.count ?? 0) > 0) return
 
   for (const seed of DEFAULT_IMAGE_ACTIONS) {
-    await db.prepare(`
+    await db
+      .prepare(`
       INSERT INTO ai_image_actions (
         action_key, label, description, prompt, aspect_ratio, resolution, size, quality, sort_order, is_builtin
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
-    `).bind(
-      seed.action_key,
-      seed.label,
-      seed.description,
-      seed.prompt,
-      seed.aspect_ratio,
-      seed.resolution,
-      deriveLegacySizeFromAspectRatio(seed.aspect_ratio, seed.size),
-      deriveLegacyQualityFromResolution(seed.resolution, seed.quality),
-      seed.sort_order,
-    ).run()
+    `)
+      .bind(
+        seed.action_key,
+        seed.label,
+        seed.description,
+        seed.prompt,
+        seed.aspect_ratio,
+        seed.resolution,
+        deriveLegacySizeFromAspectRatio(seed.aspect_ratio, seed.size),
+        deriveLegacyQualityFromResolution(seed.resolution, seed.quality),
+        seed.sort_order,
+      )
+      .run()
   }
 }
 
 export function getDefaultImageActionSeed(actionKey?: string) {
   if (!actionKey) return null
-  return DEFAULT_IMAGE_ACTIONS.find((seed) => seed.action_key === actionKey) || null
+  return (
+    DEFAULT_IMAGE_ACTIONS.find((seed) => seed.action_key === actionKey) || null
+  )
 }
 
-export async function ensureDefaultImageProfileId(db: D1Database): Promise<number | null> {
-  const defaultRow = await db.prepare(`
+export async function ensureDefaultImageProfileId(
+  db: D1Database,
+): Promise<number | null> {
+  const defaultRow = await db
+    .prepare(`
     SELECT id FROM ai_image_provider_profiles
     WHERE is_default = 1
     ORDER BY id ASC
     LIMIT 1
-  `).first<{ id: number }>()
+  `)
+    .first<{ id: number }>()
   if (defaultRow?.id) return defaultRow.id
 
-  const firstRow = await db.prepare(`
+  const firstRow = await db
+    .prepare(`
     SELECT id FROM ai_image_provider_profiles
     ORDER BY id ASC
     LIMIT 1
-  `).first<{ id: number }>()
+  `)
+    .first<{ id: number }>()
   if (!firstRow?.id) return null
 
   await db.prepare('UPDATE ai_image_provider_profiles SET is_default = 0').run()
-  await db.prepare(`
+  await db
+    .prepare(`
     UPDATE ai_image_provider_profiles
     SET is_default = 1, updated_at = strftime('%s', 'now')
     WHERE id = ?
-  `).bind(firstRow.id).run()
+  `)
+    .bind(firstRow.id)
+    .run()
 
   return firstRow.id
 }
@@ -255,11 +308,14 @@ export async function ensureAiImageConfigInfrastructure(
 
   const defaultProfileId = await ensureDefaultImageProfileId(db)
   if (defaultProfileId) {
-    await db.prepare(`
+    await db
+      .prepare(`
       UPDATE ai_image_actions
       SET profile_id = ?
       WHERE profile_id IS NULL
-    `).bind(defaultProfileId).run()
+    `)
+      .bind(defaultProfileId)
+      .run()
   }
 }
 
@@ -283,19 +339,25 @@ export async function resolveAiImageProfileConfig(
 } | null> {
   await ensureAiImageConfigInfrastructure(db)
 
-  const selected = Number.isFinite(profileId) && Number(profileId) > 0
-    ? await db.prepare(`
+  const selected =
+    Number.isFinite(profileId) && Number(profileId) > 0
+      ? await db
+          .prepare(`
         SELECT *
         FROM ai_image_provider_profiles
         WHERE id = ?
         LIMIT 1
-      `).bind(Number(profileId)).first<AIImageProviderProfileRow>()
-    : await db.prepare(`
+      `)
+          .bind(Number(profileId))
+          .first<AIImageProviderProfileRow>()
+      : await db
+          .prepare(`
         SELECT *
         FROM ai_image_provider_profiles
         ORDER BY is_default DESC, id ASC
         LIMIT 1
-      `).first<AIImageProviderProfileRow>()
+      `)
+          .first<AIImageProviderProfileRow>()
 
   if (!selected?.base_url || !selected.model) return null
 

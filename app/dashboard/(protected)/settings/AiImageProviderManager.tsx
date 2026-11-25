@@ -72,16 +72,23 @@ export function AiImageProviderManager() {
   const [loadingModels, setLoadingModels] = useState(false)
 
   const [models, setModels] = useState<Array<{ id: string; name: string }>>([])
-  const [modelsSource, setModelsSource] = useState<'provider' | 'preset' | null>(null)
+  const [modelsSource, setModelsSource] = useState<
+    'provider' | 'preset' | null
+  >(null)
   const [modelsWarning, setModelsWarning] = useState('')
   const [templateModalOpen, setTemplateModalOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<ProviderProfile | null>(null)
 
   const groupedPresets = useMemo(
-    () => AI_IMAGE_PROVIDER_CATEGORIES.map((category) => ({
-      category,
-      presets: AI_IMAGE_PROVIDER_PRESETS.filter((preset) => preset.category === category),
-    })).filter((group) => group.presets.length > 0) as ProviderTemplateGroup[],
+    () =>
+      AI_IMAGE_PROVIDER_CATEGORIES.map((category) => ({
+        category,
+        presets: AI_IMAGE_PROVIDER_PRESETS.filter(
+          (preset) => preset.category === category,
+        ),
+      })).filter(
+        (group) => group.presets.length > 0,
+      ) as ProviderTemplateGroup[],
     [],
   )
 
@@ -93,9 +100,16 @@ export function AiImageProviderManager() {
     try {
       const res = await fetch('/api/admin/ai-image-provider')
       if (!res.ok) throw new Error('加载失败')
-      const data = (await res.json()) as { profiles: ProviderProfile[]; default_profile_id?: number | null }
+      const data = (await res.json()) as {
+        profiles: ProviderProfile[]
+        default_profile_id?: number | null
+      }
       setProfiles(data.profiles || [])
-      setDefaultProfileId(typeof data.default_profile_id === 'number' ? data.default_profile_id : null)
+      setDefaultProfileId(
+        typeof data.default_profile_id === 'number'
+          ? data.default_profile_id
+          : null,
+      )
     } catch {
       toast.error('加载图片模型配置失败')
     } finally {
@@ -105,7 +119,7 @@ export function AiImageProviderManager() {
 
   useEffect(() => {
     void loadProfiles()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const openCreate = () => {
@@ -176,7 +190,9 @@ export function AiImageProviderManager() {
       if (editing.id) params.set('profile_id', String(editing.id))
       if (editing.api_key.trim()) params.set('api_key', editing.api_key.trim())
 
-      const res = await fetch(`/api/admin/ai-image-provider/models?${params.toString()}`)
+      const res = await fetch(
+        `/api/admin/ai-image-provider/models?${params.toString()}`,
+      )
       const data = (await res.json()) as ModelsResponse
       if (!res.ok) {
         throw new Error(data.error || '获取模型列表失败')
@@ -189,10 +205,15 @@ export function AiImageProviderManager() {
 
       if (nextModels.length > 0) {
         if (!editing.model.trim()) {
-          setEditing((current) => current ? { ...current, model: nextModels[0].id } : current)
+          setEditing((current) =>
+            current ? { ...current, model: nextModels[0].id } : current,
+          )
         }
         if (data.source === 'preset') {
-          toast.warning(data.warning || `接口不可用，已回退 ${nextModels.length} 个预设模型`)
+          toast.warning(
+            data.warning ||
+              `接口不可用，已回退 ${nextModels.length} 个预设模型`,
+          )
         } else if (data.warning) {
           toast.warning(data.warning)
         } else {
@@ -202,7 +223,8 @@ export function AiImageProviderManager() {
         toast.warning('未获取到模型列表')
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : '获取模型列表失败'
+      const message =
+        error instanceof Error ? error.message : '获取模型列表失败'
       toast.error(message)
       setModels([])
       setModelsSource(null)
@@ -215,7 +237,11 @@ export function AiImageProviderManager() {
   const handleSave = async () => {
     if (!editing) return
 
-    if (!editing.name.trim() || !editing.base_url.trim() || !editing.model.trim()) {
+    if (
+      !editing.name.trim() ||
+      !editing.base_url.trim() ||
+      !editing.model.trim()
+    ) {
       toast.error('请填写名称、Base URL、模型')
       return
     }
@@ -244,7 +270,7 @@ export function AiImageProviderManager() {
         body: JSON.stringify(payload),
       })
 
-      const data = await res.json().catch(() => ({})) as { error?: string }
+      const data = (await res.json().catch(() => ({}))) as { error?: string }
       if (!res.ok) throw new Error(data.error || '保存失败')
 
       toast.success('图片模型配置已保存')
@@ -266,7 +292,7 @@ export function AiImageProviderManager() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: deleteTarget.id }),
       })
-      const data = await res.json().catch(() => ({})) as { error?: string }
+      const data = (await res.json().catch(() => ({}))) as { error?: string }
       if (!res.ok) throw new Error(data.error || '删除失败')
       toast.success('图片模型配置已删除')
       setDeleteTarget(null)
@@ -296,7 +322,7 @@ export function AiImageProviderManager() {
           is_default: true,
         }),
       })
-      const data = await res.json().catch(() => ({})) as { error?: string }
+      const data = (await res.json().catch(() => ({}))) as { error?: string }
       if (!res.ok) throw new Error(data.error || '设置默认失败')
 
       toast.success('已设为默认图片模型')
@@ -311,13 +337,19 @@ export function AiImageProviderManager() {
   }
 
   if (loading) {
-    return <div className="py-8 text-center text-sm text-[var(--editor-muted)]">加载中…</div>
+    return (
+      <div className="py-8 text-center text-sm text-[var(--editor-muted)]">
+        加载中…
+      </div>
+    )
   }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-[var(--editor-ink)]">图片模型配置</h3>
+        <h3 className="text-base font-semibold text-[var(--editor-ink)]">
+          图片模型配置
+        </h3>
         <button
           type="button"
           onClick={openCreate}
@@ -340,7 +372,7 @@ export function AiImageProviderManager() {
         <ProviderDialog
           title={editing.id ? '编辑图片模型' : '新增图片模型'}
           onClose={() => setEditing(null)}
-          headerAction={(
+          headerAction={
             <button
               type="button"
               onClick={() => setTemplateModalOpen(true)}
@@ -348,7 +380,7 @@ export function AiImageProviderManager() {
             >
               快捷模板
             </button>
-          )}
+          }
         >
           <ProviderBasicFields
             editing={editing}
@@ -364,12 +396,14 @@ export function AiImageProviderManager() {
 
           <div className="mt-3">
             <label className="inline-flex items-center gap-2 text-sm text-[var(--editor-ink)]">
-                <input
-                  type="checkbox"
-                  checked={editing.is_default}
-                  onChange={(event) => updateEditing({ is_default: event.target.checked })}
-                />
-                设为默认配置
+              <input
+                type="checkbox"
+                checked={editing.is_default}
+                onChange={(event) =>
+                  updateEditing({ is_default: event.target.checked })
+                }
+              />
+              设为默认配置
             </label>
           </div>
 

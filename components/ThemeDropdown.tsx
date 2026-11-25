@@ -15,7 +15,9 @@ export type { Theme }
 
 export function dispatchThemeChange(theme: Theme) {
   if (typeof window === 'undefined') return
-  window.dispatchEvent(new CustomEvent(THEME_CHANGE_EVENT, { detail: { theme } }))
+  window.dispatchEvent(
+    new CustomEvent(THEME_CHANGE_EVENT, { detail: { theme } }),
+  )
 }
 
 interface ThemeDropdownProps {
@@ -126,7 +128,7 @@ export function ThemeDropdown({
             ...dropdownStyle,
           }}
         >
-          {THEME_OPTIONS.map(t => {
+          {THEME_OPTIONS.map((t) => {
             const active = theme === t.id
             return (
               <button
@@ -140,7 +142,9 @@ export function ThemeDropdown({
                   borderRadius: 5,
                   border: 'none',
                   background: active ? 'var(--editor-accent)' : 'transparent',
-                  color: active ? 'var(--editor-accent-ink)' : 'var(--editor-ink)',
+                  color: active
+                    ? 'var(--editor-accent-ink)'
+                    : 'var(--editor-ink)',
                   cursor: 'pointer',
                   font: 'inherit',
                   fontSize: 13,
@@ -149,11 +153,15 @@ export function ThemeDropdown({
                   ...itemStyle,
                   ...(active ? activeItemStyle : {}),
                 }}
-                onMouseEnter={e => {
-                  if (!active) (e.currentTarget as HTMLButtonElement).style.background = 'var(--editor-panel)'
+                onMouseEnter={(e) => {
+                  if (!active)
+                    (e.currentTarget as HTMLButtonElement).style.background =
+                      'var(--editor-panel)'
                 }}
-                onMouseLeave={e => {
-                  if (!active) (e.currentTarget as HTMLButtonElement).style.background = 'transparent'
+                onMouseLeave={(e) => {
+                  if (!active)
+                    (e.currentTarget as HTMLButtonElement).style.background =
+                      'transparent'
                 }}
               >
                 {t.label}

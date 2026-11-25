@@ -51,7 +51,11 @@ function htmlToMarkdown(title: string, html: string) {
 }
 
 function htmlToPlainText(html: string) {
-  return new DOMParser().parseFromString(html, 'text/html').body.textContent?.trim() || ''
+  return (
+    new DOMParser()
+      .parseFromString(html, 'text/html')
+      .body.textContent?.trim() || ''
+  )
 }
 
 function escapeHtml(value: string) {
@@ -68,7 +72,11 @@ async function copyTextToClipboard(text: string) {
 }
 
 async function copyHtmlToClipboard(html: string, plainText: string) {
-  if (window.isSecureContext && navigator.clipboard?.write && typeof ClipboardItem !== 'undefined') {
+  if (
+    window.isSecureContext &&
+    navigator.clipboard?.write &&
+    typeof ClipboardItem !== 'undefined'
+  ) {
     await navigator.clipboard.write([
       new ClipboardItem({
         'text/html': new Blob([html], { type: 'text/html' }),
@@ -82,7 +90,9 @@ async function copyHtmlToClipboard(html: string, plainText: string) {
 }
 
 export function downloadMarkdownFromHtml(title: string, html: string) {
-  const blob = new Blob([htmlToMarkdown(title, html)], { type: 'text/markdown;charset=utf-8' })
+  const blob = new Blob([htmlToMarkdown(title, html)], {
+    type: 'text/markdown;charset=utf-8',
+  })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
@@ -191,14 +201,22 @@ export function CopyFormatDropdown({
           <button
             type="button"
             role="menuitem"
-            onClick={() => runCopy(
-              async (currentTitle, currentHtml) => {
-                const { copyAsWechatArticleFormat } = await import('@/lib/wechat-copy')
-                await copyAsWechatArticleFormat(currentTitle, currentHtml, wechatOptions)
-              },
-              '已复制公众号格式',
-              '复制公众号格式失败',
-            )}
+            onClick={() =>
+              runCopy(
+                async (currentTitle, currentHtml) => {
+                  const { copyAsWechatArticleFormat } = await import(
+                    '@/lib/wechat-copy'
+                  )
+                  await copyAsWechatArticleFormat(
+                    currentTitle,
+                    currentHtml,
+                    wechatOptions,
+                  )
+                },
+                '已复制公众号格式',
+                '复制公众号格式失败',
+              )
+            }
             className="block w-full rounded px-3 py-2 text-left text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)]"
           >
             复制为公众号格式
@@ -206,7 +224,13 @@ export function CopyFormatDropdown({
           <button
             type="button"
             role="menuitem"
-            onClick={() => runCopy(copyMarkdownFromHtml, '已复制 Markdown', '复制 Markdown 失败')}
+            onClick={() =>
+              runCopy(
+                copyMarkdownFromHtml,
+                '已复制 Markdown',
+                '复制 Markdown 失败',
+              )
+            }
             className="block w-full rounded px-3 py-2 text-left text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)]"
           >
             复制为 Markdown
@@ -214,7 +238,9 @@ export function CopyFormatDropdown({
           <button
             type="button"
             role="menuitem"
-            onClick={() => runCopy(copyHtmlFromHtml, '已复制 HTML', '复制 HTML 失败')}
+            onClick={() =>
+              runCopy(copyHtmlFromHtml, '已复制 HTML', '复制 HTML 失败')
+            }
             className="block w-full rounded px-3 py-2 text-left text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)]"
           >
             复制为 HTML
@@ -254,7 +280,10 @@ export function DownloadMarkdown({
   const handleDownloadWechatPng = async () => {
     try {
       const { downloadArticleAsWechatPng } = await import('@/lib/wechat-copy')
-      await downloadArticleAsWechatPng(getTitle?.() || title, getHtml?.() || html)
+      await downloadArticleAsWechatPng(
+        getTitle?.() || title,
+        getHtml?.() || html,
+      )
     } catch (error) {
       toast.error(error instanceof Error ? error.message : '导出公众号长图失败')
     }
@@ -267,13 +296,27 @@ export function DownloadMarkdown({
         title="下载 Markdown"
         className="inline-flex items-center justify-center rounded p-1 text-[var(--stone-gray)] hover:text-[var(--editor-accent)] hover:bg-[var(--editor-accent)]/8 transition-colors"
       >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
           <polyline points="7 10 12 15 17 10" />
           <line x1="12" y1="15" x2="12" y2="3" />
         </svg>
       </button>
-      <CopyFormatDropdown title={title} html={html} getTitle={getTitle} getHtml={getHtml} />
+      <CopyFormatDropdown
+        title={title}
+        html={html}
+        getTitle={getTitle}
+        getHtml={getHtml}
+      />
       <button
         onClick={handleDownloadWechatPng}
         title="下载公众号长图"

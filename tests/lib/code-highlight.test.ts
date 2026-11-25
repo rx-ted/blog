@@ -18,12 +18,16 @@ describe('code highlight helpers', () => {
   })
 
   it('builds plain single-color code lines without hljs syntax spans', () => {
-    const html = buildPlainCodeLinesHtml('const a = 1\nif (a < 2) {\n  console.log("a & b")\n}')
+    const html = buildPlainCodeLinesHtml(
+      'const a = 1\nif (a < 2) {\n  console.log("a & b")\n}',
+    )
 
     expect(html).not.toContain('hljs-')
     expect(html).not.toContain('<span class="hljs')
     expect((html.match(/class="wechat-code-row"/g) || []).length).toBe(4)
-    expect((html.match(/class="wechat-code-line-number"/g) || []).length).toBe(4)
+    expect((html.match(/class="wechat-code-line-number"/g) || []).length).toBe(
+      4,
+    )
     expect((html.match(/class="wechat-code-line"/g) || []).length).toBe(4)
     expect(html).toContain('aria-hidden="true">1</span>')
     expect(html).toContain('const a = 1')

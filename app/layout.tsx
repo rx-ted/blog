@@ -1,39 +1,64 @@
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import Script from "next/script";
-import "./globals.css";
-import { GlobalShortcuts } from "@/components/GlobalShortcuts";
-import { ToastProvider } from "@/components/Toast";
-import { CustomJsInjector } from "@/components/CustomJsInjector";
-import { FONT_CONFIG, THEME_OPTIONS, THEME_STORAGE_KEY, normalizeTheme } from "@/lib/appearance";
-import { getAppCloudflareEnv } from "@/lib/cloudflare";
-import { resolveDefaultSiteCoverImage } from "@/lib/default-cover-images";
-import { getPublicSettings } from "@/lib/public-site-cache";
-import { getSiteUrl, getSiteUrlObject } from "@/lib/site-config";
+import type { Metadata } from 'next'
+import localFont from 'next/font/local'
+import Script from 'next/script'
+import './globals.css'
+import { GlobalShortcuts } from '@/components/GlobalShortcuts'
+import { ToastProvider } from '@/components/Toast'
+import { CustomJsInjector } from '@/components/CustomJsInjector'
+import {
+  FONT_CONFIG,
+  THEME_OPTIONS,
+  THEME_STORAGE_KEY,
+  normalizeTheme,
+} from '@/lib/appearance'
+import { getAppCloudflareEnv } from '@/lib/cloudflare'
+import { resolveDefaultSiteCoverImage } from '@/lib/default-cover-images'
+import { getPublicSettings } from '@/lib/public-site-cache'
+import { getSiteUrl, getSiteUrlObject } from '@/lib/site-config'
 
 const geistSans = localFont({
   src: [
-    { path: "./fonts/geist/Geist-Regular.ttf", weight: "400", style: "normal" },
-    { path: "./fonts/geist/Geist-Medium.ttf", weight: "500", style: "normal" },
-    { path: "./fonts/geist/Geist-SemiBold.ttf", weight: "600", style: "normal" },
-    { path: "./fonts/geist/Geist-Bold.ttf", weight: "700", style: "normal" },
+    { path: './fonts/geist/Geist-Regular.ttf', weight: '400', style: 'normal' },
+    { path: './fonts/geist/Geist-Medium.ttf', weight: '500', style: 'normal' },
+    {
+      path: './fonts/geist/Geist-SemiBold.ttf',
+      weight: '600',
+      style: 'normal',
+    },
+    { path: './fonts/geist/Geist-Bold.ttf', weight: '700', style: 'normal' },
   ],
-  variable: "--font-geist-sans",
-  display: "swap",
-  fallback: ["system-ui", "Arial", "Helvetica", "sans-serif"],
-});
+  variable: '--font-geist-sans',
+  display: 'swap',
+  fallback: ['system-ui', 'Arial', 'Helvetica', 'sans-serif'],
+})
 
 const geistMono = localFont({
   src: [
-    { path: "./fonts/geist/GeistMono-Regular.ttf", weight: "400", style: "normal" },
-    { path: "./fonts/geist/GeistMono-Medium.ttf", weight: "500", style: "normal" },
-    { path: "./fonts/geist/GeistMono-SemiBold.ttf", weight: "600", style: "normal" },
-    { path: "./fonts/geist/GeistMono-Bold.ttf", weight: "700", style: "normal" },
+    {
+      path: './fonts/geist/GeistMono-Regular.ttf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: './fonts/geist/GeistMono-Medium.ttf',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: './fonts/geist/GeistMono-SemiBold.ttf',
+      weight: '600',
+      style: 'normal',
+    },
+    {
+      path: './fonts/geist/GeistMono-Bold.ttf',
+      weight: '700',
+      style: 'normal',
+    },
   ],
-  variable: "--font-geist-mono",
-  display: "swap",
-  fallback: ["SFMono-Regular", "Consolas", "Monaco", "monospace"],
-});
+  variable: '--font-geist-mono',
+  display: 'swap',
+  fallback: ['SFMono-Regular', 'Consolas', 'Monaco', 'monospace'],
+})
 
 const SITE_URL = getSiteUrl()
 const DEFAULT_SITE_OG_IMAGE = resolveDefaultSiteCoverImage(SITE_URL)
@@ -71,7 +96,8 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: '木羽博客',
     title: '木羽博客',
-    description: '记录思考，分享所学，留住当下。技术、生活、读书笔记的数字花园。',
+    description:
+      '记录思考，分享所学，留住当下。技术、生活、读书笔记的数字花园。',
     images: [
       {
         url: DEFAULT_SITE_OG_IMAGE,
@@ -86,15 +112,16 @@ export const metadata: Metadata = {
     site: '@xxxx',
     creator: '@xxx',
     title: 'rx-ted',
-    description: '记录思考，分享所学，留住当下。技术、生活、读书笔记的数字花园。',
+    description:
+      '记录思考，分享所学，留住当下。技术、生活、读书笔记的数字花园。',
     images: [DEFAULT_SITE_OG_IMAGE],
   },
-};
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   let customJs = ''
   let bodyFont = ''
@@ -104,11 +131,17 @@ export default async function RootLayout({
   let umamiDomains = optionalEnv(process.env.NEXT_PUBLIC_UMAMI_DOMAINS)
   try {
     const env = await getAppCloudflareEnv()
-    umamiWebsiteId = optionalEnv(env?.NEXT_PUBLIC_UMAMI_WEBSITE_ID) || umamiWebsiteId
-    umamiScriptUrl = optionalEnv(env?.NEXT_PUBLIC_UMAMI_SCRIPT_URL) || umamiScriptUrl
+    umamiWebsiteId =
+      optionalEnv(env?.NEXT_PUBLIC_UMAMI_WEBSITE_ID) || umamiWebsiteId
+    umamiScriptUrl =
+      optionalEnv(env?.NEXT_PUBLIC_UMAMI_SCRIPT_URL) || umamiScriptUrl
     umamiDomains = optionalEnv(env?.NEXT_PUBLIC_UMAMI_DOMAINS) || umamiDomains
     if (env?.DB) {
-      const settings = await getPublicSettings(env, ['custom_js', 'body_font', 'default_theme'])
+      const settings = await getPublicSettings(env, [
+        'custom_js',
+        'body_font',
+        'default_theme',
+      ])
       customJs = settings.custom_js || ''
       bodyFont = settings.body_font || ''
       defaultTheme = normalizeTheme(settings.default_theme)
@@ -171,7 +204,11 @@ export default async function RootLayout({
       <head>
         {font?.link && <link rel="stylesheet" href={font.link} />}
         {font && (
-          <style dangerouslySetInnerHTML={{ __html: `:root { --body-font: ${font.family}; }` }} />
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `:root { --body-font: ${font.family}; }`,
+            }}
+          />
         )}
         <script dangerouslySetInnerHTML={{ __html: appearanceApplyScript }} />
       </head>
@@ -192,5 +229,5 @@ export default async function RootLayout({
         {customJs && <CustomJsInjector code={customJs} />}
       </body>
     </html>
-  );
+  )
 }

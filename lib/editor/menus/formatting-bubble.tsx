@@ -1,6 +1,6 @@
 'use client'
 
-import { EditorBubble, EditorInstance, useEditor } from 'novel'
+import { EditorBubble, type EditorInstance, useEditor } from 'novel'
 import { useEffect, useState } from 'react'
 import {
   AlignLeft,
@@ -117,7 +117,9 @@ function BubblePanelButton({
     >
       <span className="flex h-4 w-4 items-center justify-center">{icon}</span>
       <span>{label}</span>
-      {active ? <Check className="ml-auto h-3.5 w-3.5 text-[var(--editor-accent)]" /> : null}
+      {active ? (
+        <Check className="ml-auto h-3.5 w-3.5 text-[var(--editor-accent)]" />
+      ) : null}
     </button>
   )
 }
@@ -186,7 +188,8 @@ const TEXT_OPTIONS: Array<{
     label: '引用',
     icon: <Quote className="h-4 w-4" />,
     isActive: (editor) => editor.isActive('blockquote'),
-    apply: (editor) => editor.chain().focus().setParagraph().toggleBlockquote().run(),
+    apply: (editor) =>
+      editor.chain().focus().setParagraph().toggleBlockquote().run(),
   },
   {
     id: 'codeBlock',
@@ -229,7 +232,8 @@ export function FormattingBubble() {
     if (!editor) return
 
     const onSelectionUpdate = () => {
-      const href = (editor.getAttributes('link').href as string | undefined) ?? ''
+      const href =
+        (editor.getAttributes('link').href as string | undefined) ?? ''
       setLinkValue(href)
       setMode('main')
       setColorTarget('text')
@@ -265,7 +269,7 @@ export function FormattingBubble() {
           position,
           selectionRange: { from, to },
         },
-      })
+      }),
     )
 
     setTimeout(() => {
@@ -280,12 +284,15 @@ export function FormattingBubble() {
     if (!selectedText) return
 
     window.dispatchEvent(
-      new CustomEvent<TriggerImageGenerationDetail>(TRIGGER_IMAGE_GENERATION_EVENT, {
-        detail: {
-          insertPos: to,
-          selectedText,
+      new CustomEvent<TriggerImageGenerationDetail>(
+        TRIGGER_IMAGE_GENERATION_EVENT,
+        {
+          detail: {
+            insertPos: to,
+            selectedText,
+          },
         },
-      }),
+      ),
     )
 
     setTimeout(() => {
@@ -322,18 +329,25 @@ export function FormattingBubble() {
   }
 
   const currentTextOption = TEXT_OPTIONS.find((o) => o.isActive(editor))
-  const currentColor = (editor.getAttributes('textStyle').color as string | undefined) ?? ''
-  const currentHighlight = (editor.getAttributes('highlight').color as string | undefined) ?? ''
+  const currentColor =
+    (editor.getAttributes('textStyle').color as string | undefined) ?? ''
+  const currentHighlight =
+    (editor.getAttributes('highlight').color as string | undefined) ?? ''
   const colorOptions = colorTarget === 'text' ? TEXT_COLORS : BG_COLORS
-  const activeColorValue = colorTarget === 'text' ? currentColor : currentHighlight
+  const activeColorValue =
+    colorTarget === 'text' ? currentColor : currentHighlight
 
-  const toggleMode = (next: BubbleMode) => setMode((prev) => (prev === next ? 'main' : next))
+  const toggleMode = (next: BubbleMode) =>
+    setMode((prev) => (prev === next ? 'main' : next))
 
   return (
     <EditorBubble
       tippyOptions={{ placement: 'top', interactive: true, maxWidth: 'none' }}
       shouldShow={({ editor: currentEditor }) => {
-        return shouldShowEditorBubble(currentEditor.state.selection, currentEditor.isEditable)
+        return shouldShowEditorBubble(
+          currentEditor.state.selection,
+          currentEditor.isEditable,
+        )
       }}
       className="overflow-hidden rounded-xl border border-[var(--editor-line)] bg-white shadow-[0_12px_30px_rgba(37,32,24,0.12)]"
     >
@@ -352,7 +366,10 @@ export function FormattingBubble() {
           <ImagePlus className="h-4 w-4" />
         </BubbleIconButton>
 
-        <BubbleIconButton label="整理选中文案排版" onClick={formatSelectedCopywriting}>
+        <BubbleIconButton
+          label="整理选中文案排版"
+          onClick={formatSelectedCopywriting}
+        >
           <span className="text-sm font-semibold">排</span>
         </BubbleIconButton>
 
@@ -363,7 +380,9 @@ export function FormattingBubble() {
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => toggleMode('text')}
           className={`inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm transition ${
-            mode === 'text' ? 'bg-[var(--editor-soft)]' : 'hover:bg-[var(--editor-soft)]'
+            mode === 'text'
+              ? 'bg-[var(--editor-soft)]'
+              : 'hover:bg-[var(--editor-soft)]'
           }`}
         >
           <span className="text-[var(--editor-muted)]">
@@ -391,13 +410,25 @@ export function FormattingBubble() {
 
         <div className="mx-0.5 h-5 w-px bg-[var(--editor-line)]" />
 
-        <BubbleIconButton active={editor.isActive('bold')} label="粗体 (Cmd+B)" onClick={() => editor.chain().focus().toggleBold().run()}>
+        <BubbleIconButton
+          active={editor.isActive('bold')}
+          label="粗体 (Cmd+B)"
+          onClick={() => editor.chain().focus().toggleBold().run()}
+        >
           <strong>B</strong>
         </BubbleIconButton>
-        <BubbleIconButton active={editor.isActive('underline')} label="下划线 (Cmd+U)" onClick={() => editor.chain().focus().toggleUnderline().run()}>
+        <BubbleIconButton
+          active={editor.isActive('underline')}
+          label="下划线 (Cmd+U)"
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+        >
           <span className="underline">U</span>
         </BubbleIconButton>
-        <BubbleIconButton active={editor.isActive('highlight')} label="高亮" onClick={() => editor.chain().focus().toggleHighlight().run()}>
+        <BubbleIconButton
+          active={editor.isActive('highlight')}
+          label="高亮"
+          onClick={() => editor.chain().focus().toggleHighlight().run()}
+        >
           <Highlighter className="h-4 w-4" />
         </BubbleIconButton>
 
@@ -406,14 +437,21 @@ export function FormattingBubble() {
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => toggleMode('more')}
           className={`inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm transition ${
-            mode === 'more' ? 'bg-[var(--editor-soft)]' : 'hover:bg-[var(--editor-soft)]'
+            mode === 'more'
+              ? 'bg-[var(--editor-soft)]'
+              : 'hover:bg-[var(--editor-soft)]'
           }`}
           title="更多"
         >
           <MoreHorizontal className="h-4 w-4 text-[var(--editor-muted)]" />
         </button>
 
-        <BubbleIconButton label="清除格式" onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}>
+        <BubbleIconButton
+          label="清除格式"
+          onClick={() =>
+            editor.chain().focus().clearNodes().unsetAllMarks().run()
+          }
+        >
           <RemoveFormatting className="h-4 w-4" />
         </BubbleIconButton>
       </div>
@@ -427,13 +465,18 @@ export function FormattingBubble() {
                   key={option.id}
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => { option.apply(editor); setMode('main') }}
+                  onClick={() => {
+                    option.apply(editor)
+                    setMode('main')
+                  }}
                   className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition hover:bg-[var(--editor-soft)]"
                 >
                   <span className="flex h-5 w-5 items-center justify-center text-[var(--editor-muted)]">
                     {option.icon}
                   </span>
-                  <span className="flex-1 text-left text-[var(--editor-ink)]">{option.label}</span>
+                  <span className="flex-1 text-left text-[var(--editor-ink)]">
+                    {option.label}
+                  </span>
                   {option.isActive(editor) && (
                     <Check className="h-4 w-4 text-[var(--editor-accent)]" />
                   )}
@@ -449,7 +492,12 @@ export function FormattingBubble() {
                 onChange={(e) => setLinkValue(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && linkValue.trim()) {
-                    editor.chain().focus().extendMarkRange('link').setLink({ href: normalizeUrl(linkValue.trim()) }).run()
+                    editor
+                      .chain()
+                      .focus()
+                      .extendMarkRange('link')
+                      .setLink({ href: normalizeUrl(linkValue.trim()) })
+                      .run()
                     setMode('main')
                   }
                 }}
@@ -460,7 +508,12 @@ export function FormattingBubble() {
               <div className="flex items-center justify-between gap-2">
                 <BubbleActionButton
                   onClick={() => {
-                    editor.chain().focus().extendMarkRange('link').unsetLink().run()
+                    editor
+                      .chain()
+                      .focus()
+                      .extendMarkRange('link')
+                      .unsetLink()
+                      .run()
                     setLinkValue('')
                     setMode('main')
                   }}
@@ -474,7 +527,12 @@ export function FormattingBubble() {
                   tone="primary"
                   onClick={() => {
                     if (!linkValue.trim()) return
-                    editor.chain().focus().extendMarkRange('link').setLink({ href: normalizeUrl(linkValue.trim()) }).run()
+                    editor
+                      .chain()
+                      .focus()
+                      .extendMarkRange('link')
+                      .setLink({ href: normalizeUrl(linkValue.trim()) })
+                      .run()
                     setMode('main')
                   }}
                 >
@@ -518,9 +576,11 @@ export function FormattingBubble() {
 
               <div className="mt-3 grid grid-cols-4 gap-2">
                 {colorOptions.map((colorOption) => {
-                  const isActive = colorOption.value === ''
-                    ? !activeColorValue
-                    : activeColorValue?.toLowerCase() === colorOption.value.toLowerCase()
+                  const isActive =
+                    colorOption.value === ''
+                      ? !activeColorValue
+                      : activeColorValue?.toLowerCase() ===
+                        colorOption.value.toLowerCase()
 
                   return (
                     <button
@@ -550,15 +610,19 @@ export function FormattingBubble() {
                     >
                       <span
                         className="flex h-7 w-7 items-center justify-center rounded-lg border border-black/10 text-xs font-bold"
-                        style={colorTarget === 'text'
-                          ? {
-                              color: colorOption.value || 'var(--editor-ink)',
-                              background: colorOption.value ? `${colorOption.value}18` : 'white',
-                            }
-                          : {
-                              background: colorOption.value || 'white',
-                              color: 'var(--editor-ink)',
-                            }}
+                        style={
+                          colorTarget === 'text'
+                            ? {
+                                color: colorOption.value || 'var(--editor-ink)',
+                                background: colorOption.value
+                                  ? `${colorOption.value}18`
+                                  : 'white',
+                              }
+                            : {
+                                background: colorOption.value || 'white',
+                                color: 'var(--editor-ink)',
+                              }
+                        }
                       >
                         A
                       </span>
@@ -643,7 +707,9 @@ export function FormattingBubble() {
                 <button
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => { void cutSelectedText() }}
+                  onClick={() => {
+                    void cutSelectedText()
+                  }}
                   className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)]"
                 >
                   <Scissors className="h-4 w-4" />
@@ -663,18 +729,23 @@ export function FormattingBubble() {
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
                     setMode('main')
-                    window.dispatchEvent(new CustomEvent<InputModalDetail>(TRIGGER_INPUT_MODAL_EVENT, {
-                      detail: {
-                        title: '插入 LaTeX 数学公式',
-                        placeholder: 'E = mc^2',
-                        callback: (latex) => {
-                          editor.commands.insertContent({
-                            type: 'mathBlock',
-                            attrs: { latex, displayMode: true },
-                          })
+                    window.dispatchEvent(
+                      new CustomEvent<InputModalDetail>(
+                        TRIGGER_INPUT_MODAL_EVENT,
+                        {
+                          detail: {
+                            title: '插入 LaTeX 数学公式',
+                            placeholder: 'E = mc^2',
+                            callback: (latex) => {
+                              editor.commands.insertContent({
+                                type: 'mathBlock',
+                                attrs: { latex, displayMode: true },
+                              })
+                            },
+                          },
                         },
-                      },
-                    }))
+                      ),
+                    )
                   }}
                   className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)]"
                 >
@@ -705,13 +776,15 @@ export function EditorFooter({ saveStatus }: { saveStatus: DraftSaveStatus }) {
       <span className="rounded-full bg-[var(--editor-soft)] px-2.5 py-1 text-[11px] tabular-nums text-[var(--stone-gray)]">
         {chars.toLocaleString()} 字
       </span>
-      <span className={`rounded-full px-2.5 py-1 text-[11px] transition-opacity duration-300 ${
-        saveStatus === 'idle' ? 'opacity-0' : 'opacity-100'
-      } ${
-        saveStatus === 'saving'
-          ? 'bg-[var(--editor-soft)] text-[var(--stone-gray)]'
-          : 'bg-emerald-50 text-emerald-600'
-      }`}>
+      <span
+        className={`rounded-full px-2.5 py-1 text-[11px] transition-opacity duration-300 ${
+          saveStatus === 'idle' ? 'opacity-0' : 'opacity-100'
+        } ${
+          saveStatus === 'saving'
+            ? 'bg-[var(--editor-soft)] text-[var(--stone-gray)]'
+            : 'bg-emerald-50 text-emerald-600'
+        }`}
+      >
         {saveStatus === 'saving' ? '正在保存…' : '已保存'}
       </span>
     </div>

@@ -35,7 +35,7 @@ export function ThemeSwitcher({ theme, onThemeChange }: ThemeSwitcherProps) {
         userSelect: 'none',
       }}
     >
-      {THEMES.map(t => {
+      {THEMES.map((t) => {
         const active = theme === t.id
         return (
           <button
@@ -60,15 +60,19 @@ export function ThemeSwitcher({ theme, onThemeChange }: ThemeSwitcherProps) {
               whiteSpace: 'nowrap',
             }}
           >
-            <span style={{
-              fontSize: 9,
-              fontFamily: '"JetBrains Mono", ui-monospace, monospace',
-              opacity: active ? 0.5 : 0.35,
-              padding: '1px 4px',
-              borderRadius: 3,
-              background: active ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)',
-              letterSpacing: '0.04em',
-            }}>
+            <span
+              style={{
+                fontSize: 9,
+                fontFamily: '"JetBrains Mono", ui-monospace, monospace',
+                opacity: active ? 0.5 : 0.35,
+                padding: '1px 4px',
+                borderRadius: 3,
+                background: active
+                  ? 'rgba(0,0,0,0.08)'
+                  : 'rgba(255,255,255,0.08)',
+                letterSpacing: '0.04em',
+              }}
+            >
               {t.short}
             </span>
             {t.label}

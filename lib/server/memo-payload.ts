@@ -27,30 +27,48 @@ export function htmlToPlainText(html: string) {
     .trim()
 }
 
-export function parseMemoWritePayload(body: unknown): { ok: true; input: MemoWriteInput } | { ok: false; error: string } {
-  if (!body || typeof body !== 'object') return { ok: false, error: '请求体必须是 JSON 对象' }
+export function parseMemoWritePayload(
+  body: unknown,
+): { ok: true; input: MemoWriteInput } | { ok: false; error: string } {
+  if (!body || typeof body !== 'object')
+    return { ok: false, error: '请求体必须是 JSON 对象' }
   const payload = body as Record<string, unknown>
   const input: MemoWriteInput = {}
 
   if (payload.html !== undefined) {
-    if (typeof payload.html !== 'string') return { ok: false, error: 'html 必须是字符串' }
-    if (payload.html.length > MAX_HTML_LENGTH) return { ok: false, error: '内容过长' }
+    if (typeof payload.html !== 'string')
+      return { ok: false, error: 'html 必须是字符串' }
+    if (payload.html.length > MAX_HTML_LENGTH)
+      return { ok: false, error: '内容过长' }
     input.html = sanitizeMemoHtml(payload.html)
-    input.text = typeof payload.text === 'string' ? payload.text.trim() : htmlToPlainText(input.html)
+    input.text =
+      typeof payload.text === 'string'
+        ? payload.text.trim()
+        : htmlToPlainText(input.html)
   }
 
   if (payload.visibility !== undefined) {
-    if (!isMemoVisibility(payload.visibility)) return { ok: false, error: 'visibility 只能是 private、unlisted 或 public' }
+    if (!isMemoVisibility(payload.visibility))
+      return {
+        ok: false,
+        error: 'visibility 只能是 private、unlisted 或 public',
+      }
     input.visibility = payload.visibility
   }
 
   if (payload.syndication !== undefined) {
-    if (!payload.syndication || typeof payload.syndication !== 'object' || Array.isArray(payload.syndication)) {
+    if (
+      !payload.syndication ||
+      typeof payload.syndication !== 'object' ||
+      Array.isArray(payload.syndication)
+    ) {
       return { ok: false, error: 'syndication 必须是对象' }
     }
     input.syndication = Object.fromEntries(
       Object.entries(payload.syndication as Record<string, unknown>)
-        .filter((entry): entry is [string, string] => typeof entry[1] === 'string')
+        .filter(
+          (entry): entry is [string, string] => typeof entry[1] === 'string',
+        )
         .slice(0, 20),
     )
   }

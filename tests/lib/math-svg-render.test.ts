@@ -3,7 +3,10 @@ import { renderLatexToMathSvgMarkup } from '@/lib/math-svg-render'
 
 describe('math svg renderer', () => {
   it('renders large operators as SVG for WeChat copy compatibility', async () => {
-    const svg = await renderLatexToMathSvgMarkup('\\chi = \\sum_{i=1}^{n} x_i', true)
+    const svg = await renderLatexToMathSvgMarkup(
+      '\\chi = \\sum_{i=1}^{n} x_i',
+      true,
+    )
 
     expect(svg).toContain('<svg')
     expect(svg).toContain('viewBox=')

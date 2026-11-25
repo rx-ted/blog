@@ -17,7 +17,11 @@ interface CategoriesResponse {
   categories?: Category[]
 }
 
-export function CategorySelector({ value, onChange, className = '' }: CategorySelectorProps) {
+export function CategorySelector({
+  value,
+  onChange,
+  className = '',
+}: CategorySelectorProps) {
   const [categories, setCategories] = useState<Category[]>([])
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)

@@ -43,7 +43,7 @@ export function AiActionsManager() {
   const [saving, setSaving] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<AiAction | null>(null)
 
-  const profileOptions = profiles.map(p => ({
+  const profileOptions = profiles.map((p) => ({
     ...p,
     label: p.is_default ? `${p.name}（默认）` : p.name,
   }))
@@ -56,12 +56,14 @@ export function AiActionsManager() {
       ])
 
       if (actionsRes.ok) {
-        const actionData = await actionsRes.json() as { actions: AiAction[] }
+        const actionData = (await actionsRes.json()) as { actions: AiAction[] }
         setActions(actionData.actions || [])
       }
 
       if (profilesRes.ok) {
-        const profileData = await profilesRes.json() as { profiles: AiProfile[] }
+        const profileData = (await profilesRes.json()) as {
+          profiles: AiProfile[]
+        }
         setProfiles(profileData.profiles || [])
       }
     } catch {
@@ -71,17 +73,24 @@ export function AiActionsManager() {
     }
   }, [])
 
-  useEffect(() => { loadData() }, [loadData])
+  useEffect(() => {
+    loadData()
+  }, [loadData])
 
   const getProfileName = (profileId: number | null | undefined) => {
     if (!profileId) return '未绑定'
-    const profile = profiles.find(p => p.id === profileId)
+    const profile = profiles.find((p) => p.id === profileId)
     return profile ? profile.name : '未绑定'
   }
 
   const handleSave = async () => {
     if (!editAction) return
-    if (!editAction.action_key?.trim() || !editAction.label?.trim() || !editAction.description?.trim() || !editAction.prompt?.trim()) {
+    if (
+      !editAction.action_key?.trim() ||
+      !editAction.label?.trim() ||
+      !editAction.description?.trim() ||
+      !editAction.prompt?.trim()
+    ) {
       toast.error('请填写所有必填字段')
       return
     }
@@ -94,7 +103,9 @@ export function AiActionsManager() {
         description: editAction.description?.trim(),
         prompt: editAction.prompt?.trim(),
         temperature: Number(editAction.temperature ?? 0.6),
-        profile_id: Number.isFinite(editAction.profile_id) ? Number(editAction.profile_id) : null,
+        profile_id: Number.isFinite(editAction.profile_id)
+          ? Number(editAction.profile_id)
+          : null,
       }
 
       if (isNew) {
@@ -103,7 +114,7 @@ export function AiActionsManager() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         })
-        const data = await res.json().catch(() => ({})) as { error?: string }
+        const data = (await res.json().catch(() => ({}))) as { error?: string }
         if (!res.ok) throw new Error(data.error || '创建失败')
         toast.success('操作已创建')
       } else {
@@ -112,7 +123,7 @@ export function AiActionsManager() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         })
-        const data = await res.json().catch(() => ({})) as { error?: string }
+        const data = (await res.json().catch(() => ({}))) as { error?: string }
         if (!res.ok) throw new Error(data.error || '保存失败')
         toast.success('操作已更新')
       }
@@ -130,8 +141,10 @@ export function AiActionsManager() {
   const handleDelete = async () => {
     if (!deleteTarget) return
     try {
-      const res = await fetch(`/api/admin/ai-actions/${deleteTarget.id}`, { method: 'DELETE' })
-      const data = await res.json().catch(() => ({})) as { error?: string }
+      const res = await fetch(`/api/admin/ai-actions/${deleteTarget.id}`, {
+        method: 'DELETE',
+      })
+      const data = (await res.json().catch(() => ({}))) as { error?: string }
       if (!res.ok) throw new Error(data.error || '删除失败')
       toast.success('操作已删除')
       setDeleteTarget(null)
@@ -181,17 +194,27 @@ export function AiActionsManager() {
     }
   }
 
-  if (loading) return <div className="py-8 text-center text-sm text-[var(--editor-muted)]">加载中…</div>
+  if (loading)
+    return (
+      <div className="py-8 text-center text-sm text-[var(--editor-muted)]">
+        加载中…
+      </div>
+    )
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-[var(--editor-ink)]">AI 快捷操作</h3>
+        <h3 className="text-base font-semibold text-[var(--editor-ink)]">
+          AI 快捷操作
+        </h3>
         <button
           type="button"
           onClick={() => {
-            const defaultProfile = profiles.find(p => p.is_default === 1)
-            setEditAction({ ...emptyAction, profile_id: defaultProfile?.id ?? null })
+            const defaultProfile = profiles.find((p) => p.is_default === 1)
+            setEditAction({
+              ...emptyAction,
+              profile_id: defaultProfile?.id ?? null,
+            })
             setIsNew(true)
           }}
           className="rounded-lg bg-[var(--editor-accent)] px-3 py-1.5 text-sm font-semibold text-white transition hover:brightness-105"
@@ -204,18 +227,35 @@ export function AiActionsManager() {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-[var(--editor-soft)] text-left">
-              <th className="w-16 px-3 py-2 font-medium text-[var(--editor-muted)]">排序</th>
-              <th className="px-3 py-2 font-medium text-[var(--editor-muted)]">标识</th>
-              <th className="px-3 py-2 font-medium text-[var(--editor-muted)]">名称</th>
-              <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] sm:table-cell">描述</th>
-              <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] md:table-cell">模型配置</th>
-              <th className="w-16 px-3 py-2 text-center font-medium text-[var(--editor-muted)]">启用</th>
-              <th className="w-24 px-3 py-2 text-right font-medium text-[var(--editor-muted)]">操作</th>
+              <th className="w-16 px-3 py-2 font-medium text-[var(--editor-muted)]">
+                排序
+              </th>
+              <th className="px-3 py-2 font-medium text-[var(--editor-muted)]">
+                标识
+              </th>
+              <th className="px-3 py-2 font-medium text-[var(--editor-muted)]">
+                名称
+              </th>
+              <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] sm:table-cell">
+                描述
+              </th>
+              <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] md:table-cell">
+                模型配置
+              </th>
+              <th className="w-16 px-3 py-2 text-center font-medium text-[var(--editor-muted)]">
+                启用
+              </th>
+              <th className="w-24 px-3 py-2 text-right font-medium text-[var(--editor-muted)]">
+                操作
+              </th>
             </tr>
           </thead>
           <tbody>
             {actions.map((action, idx) => (
-              <tr key={action.id} className="border-t border-[var(--editor-line)] hover:bg-[var(--editor-panel)]">
+              <tr
+                key={action.id}
+                className="border-t border-[var(--editor-line)] hover:bg-[var(--editor-panel)]"
+              >
                 <td className="px-3 py-2">
                   <div className="flex gap-0.5">
                     <button
@@ -223,38 +263,61 @@ export function AiActionsManager() {
                       disabled={idx === 0}
                       onClick={() => moveAction(idx, 'up')}
                       className="rounded px-1 text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] disabled:opacity-30"
-                    >↑</button>
+                    >
+                      ↑
+                    </button>
                     <button
                       type="button"
                       disabled={idx === actions.length - 1}
                       onClick={() => moveAction(idx, 'down')}
                       className="rounded px-1 text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] disabled:opacity-30"
-                    >↓</button>
+                    >
+                      ↓
+                    </button>
                   </div>
                 </td>
-                <td className="px-3 py-2 font-mono text-xs text-[var(--editor-muted)]">{action.action_key}</td>
-                <td className="px-3 py-2 font-medium text-[var(--editor-ink)]">{action.label}</td>
-                <td className="hidden px-3 py-2 text-[var(--editor-muted)] sm:table-cell">{action.description}</td>
-                <td className="hidden px-3 py-2 text-xs text-[var(--editor-muted)] md:table-cell">{getProfileName(action.profile_id)}</td>
+                <td className="px-3 py-2 font-mono text-xs text-[var(--editor-muted)]">
+                  {action.action_key}
+                </td>
+                <td className="px-3 py-2 font-medium text-[var(--editor-ink)]">
+                  {action.label}
+                </td>
+                <td className="hidden px-3 py-2 text-[var(--editor-muted)] sm:table-cell">
+                  {action.description}
+                </td>
+                <td className="hidden px-3 py-2 text-xs text-[var(--editor-muted)] md:table-cell">
+                  {getProfileName(action.profile_id)}
+                </td>
                 <td className="px-3 py-2 text-center">
                   <button
                     type="button"
                     onClick={() => toggleEnabled(action)}
                     className={`inline-block h-4 w-4 rounded-full transition ${action.is_enabled ? 'bg-emerald-500' : 'bg-[var(--editor-line)]'}`}
-                    title={action.is_enabled ? '已启用（点击禁用）' : '已禁用（点击启用）'}
+                    title={
+                      action.is_enabled
+                        ? '已启用（点击禁用）'
+                        : '已禁用（点击启用）'
+                    }
                   />
                 </td>
                 <td className="px-3 py-2 text-right">
                   <button
                     type="button"
-                    onClick={() => { setEditAction({ ...action }); setIsNew(false) }}
+                    onClick={() => {
+                      setEditAction({ ...action })
+                      setIsNew(false)
+                    }}
                     className="text-xs text-[var(--editor-accent)] hover:underline"
-                  >编辑</button>
+                  >
+                    编辑
+                  </button>
                   <button
                     type="button"
                     onClick={() => setDeleteTarget(action)}
                     className="ml-2 text-xs text-rose-500 hover:underline"
-                  >删除</button>
+                  >
+                    删除
+                  </button>
                 </td>
               </tr>
             ))}
@@ -263,68 +326,102 @@ export function AiActionsManager() {
       </div>
 
       {editAction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={() => setEditAction(null)}>
-          <div className="mx-4 w-full max-w-lg rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-6 shadow-xl" onClick={e => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
+          onClick={() => setEditAction(null)}
+        >
+          <div
+            className="mx-4 w-full max-w-lg rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3 className="mb-4 text-lg font-semibold text-[var(--editor-ink)]">
               {isNew ? '新增 AI 操作' : '编辑 AI 操作'}
             </h3>
 
             <div className="space-y-3">
               <div>
-                <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">操作标识 *</label>
+                <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">
+                  操作标识 *
+                </label>
                 <input
                   type="text"
                   value={editAction.action_key || ''}
-                  onChange={e => setEditAction({ ...editAction, action_key: e.target.value })}
+                  onChange={(e) =>
+                    setEditAction({ ...editAction, action_key: e.target.value })
+                  }
                   className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">操作名称 *</label>
+                <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">
+                  操作名称 *
+                </label>
                 <input
                   type="text"
                   value={editAction.label || ''}
-                  onChange={e => setEditAction({ ...editAction, label: e.target.value })}
+                  onChange={(e) =>
+                    setEditAction({ ...editAction, label: e.target.value })
+                  }
                   className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">描述 *</label>
+                <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">
+                  描述 *
+                </label>
                 <input
                   type="text"
                   value={editAction.description || ''}
-                  onChange={e => setEditAction({ ...editAction, description: e.target.value })}
+                  onChange={(e) =>
+                    setEditAction({
+                      ...editAction,
+                      description: e.target.value,
+                    })
+                  }
                   className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">提示词 *</label>
+                <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">
+                  提示词 *
+                </label>
                 <textarea
                   rows={5}
                   value={editAction.prompt || ''}
-                  onChange={e => setEditAction({ ...editAction, prompt: e.target.value })}
+                  onChange={(e) =>
+                    setEditAction({ ...editAction, prompt: e.target.value })
+                  }
                   className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
                 />
               </div>
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">温度</label>
+                  <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">
+                    温度
+                  </label>
                   <input
                     type="number"
                     min={0}
                     max={2}
                     step={0.1}
                     value={editAction.temperature ?? 0.6}
-                    onChange={e => setEditAction({ ...editAction, temperature: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setEditAction({
+                        ...editAction,
+                        temperature: Number(e.target.value),
+                      })
+                    }
                     className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">模型配置</label>
+                  <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">
+                    模型配置
+                  </label>
                   <Dropdown
                     options={[
                       { value: '', label: '未绑定' },
@@ -335,7 +432,10 @@ export function AiActionsManager() {
                     ]}
                     value={String(editAction.profile_id ?? '')}
                     onChange={(value) => {
-                      setEditAction({ ...editAction, profile_id: value ? Number(value) : null })
+                      setEditAction({
+                        ...editAction,
+                        profile_id: value ? Number(value) : null,
+                      })
                     }}
                     placeholder="搜索并选择模型配置"
                   />

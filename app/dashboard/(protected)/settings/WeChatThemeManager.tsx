@@ -3,7 +3,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Palette, Plus, Search, Trash2 } from 'lucide-react'
 import { useToast } from '@/components/Toast'
-import { WeChatThemeSelector, WeChatThemeSwatchStrip } from '@/components/WeChatThemeSelector'
+import {
+  WeChatThemeSelector,
+  WeChatThemeSwatchStrip,
+} from '@/components/WeChatThemeSelector'
 import {
   DEFAULT_WECHAT_EXPORT_THEME_CONFIG,
   WECHAT_EXPORT_THEME_CONFIG_SETTING_KEY,
@@ -42,33 +45,44 @@ export function WeChatThemeManager() {
   const toast = useToast()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [config, setConfig] = useState<WechatExportThemeConfig>(DEFAULT_WECHAT_EXPORT_THEME_CONFIG)
-  const [selectedThemeId, setSelectedThemeId] = useState(DEFAULT_WECHAT_EXPORT_THEME_CONFIG.defaultThemeId)
+  const [config, setConfig] = useState<WechatExportThemeConfig>(
+    DEFAULT_WECHAT_EXPORT_THEME_CONFIG,
+  )
+  const [selectedThemeId, setSelectedThemeId] = useState(
+    DEFAULT_WECHAT_EXPORT_THEME_CONFIG.defaultThemeId,
+  )
   const [themeQuery, setThemeQuery] = useState('')
 
-  const selectedTheme = useMemo(() => (
-    config.themes.find(theme => theme.id === selectedThemeId) || config.themes[0]
-  ), [config.themes, selectedThemeId])
+  const selectedTheme = useMemo(
+    () =>
+      config.themes.find((theme) => theme.id === selectedThemeId) ||
+      config.themes[0],
+    [config.themes, selectedThemeId],
+  )
 
   const filteredThemes = useMemo(() => {
     const keyword = themeQuery.trim().toLowerCase()
     if (!keyword) return config.themes
 
     return config.themes.filter((theme) => {
-      const haystack = `${theme.name} ${theme.description} ${theme.id}`.toLowerCase()
+      const haystack =
+        `${theme.name} ${theme.description} ${theme.id}`.toLowerCase()
       return haystack.includes(keyword)
     })
   }, [config.themes, themeQuery])
 
-  const builtinCount = useMemo(() => (
-    config.themes.filter(theme => theme.builtin).length
-  ), [config.themes])
+  const builtinCount = useMemo(
+    () => config.themes.filter((theme) => theme.builtin).length,
+    [config.themes],
+  )
   const customCount = config.themes.length - builtinCount
 
-  const updateConfig = (updater: (current: WechatExportThemeConfig) => WechatExportThemeConfig) => {
+  const updateConfig = (
+    updater: (current: WechatExportThemeConfig) => WechatExportThemeConfig,
+  ) => {
     setConfig((current) => {
       const next = updater(current)
-      if (!next.themes.some(theme => theme.id === selectedThemeId)) {
+      if (!next.themes.some((theme) => theme.id === selectedThemeId)) {
         setSelectedThemeId(next.defaultThemeId)
       }
       return next
@@ -80,16 +94,18 @@ export function WeChatThemeManager() {
 
     updateConfig((current) => ({
       ...current,
-      themes: current.themes.map(theme => (
-        theme.id === selectedTheme.id ? { ...theme, ...patch } : theme
-      )),
+      themes: current.themes.map((theme) =>
+        theme.id === selectedTheme.id ? { ...theme, ...patch } : theme,
+      ),
     }))
   }
 
   const loadConfig = async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/settings/wechat-export-themes', { cache: 'no-store' })
+      const res = await fetch('/api/settings/wechat-export-themes', {
+        cache: 'no-store',
+      })
       const data = await res.json().catch(() => null)
       if (!res.ok) throw new Error('加载公众号样式失败')
 
@@ -121,8 +137,11 @@ export function WeChatThemeManager() {
     if (!selectedTheme || selectedTheme.builtin) return
 
     updateConfig((current) => ({
-      defaultThemeId: current.defaultThemeId === selectedTheme.id ? DEFAULT_WECHAT_EXPORT_THEME_CONFIG.defaultThemeId : current.defaultThemeId,
-      themes: current.themes.filter(theme => theme.id !== selectedTheme.id),
+      defaultThemeId:
+        current.defaultThemeId === selectedTheme.id
+          ? DEFAULT_WECHAT_EXPORT_THEME_CONFIG.defaultThemeId
+          : current.defaultThemeId,
+      themes: current.themes.filter((theme) => theme.id !== selectedTheme.id),
     }))
   }
 
@@ -140,7 +159,7 @@ export function WeChatThemeManager() {
       })
 
       if (!res.ok) {
-        const data = await res.json().catch(() => ({})) as { error?: string }
+        const data = (await res.json().catch(() => ({}))) as { error?: string }
         throw new Error(data.error || '保存公众号样式失败')
       }
 
@@ -204,7 +223,12 @@ export function WeChatThemeManager() {
           <WeChatThemeSelector
             themes={config.themes}
             value={config.defaultThemeId}
-            onChange={(themeId) => updateConfig(current => ({ ...current, defaultThemeId: themeId }))}
+            onChange={(themeId) =>
+              updateConfig((current) => ({
+                ...current,
+                defaultThemeId: themeId,
+              }))
+            }
             align="left"
           />
 
@@ -226,12 +250,14 @@ export function WeChatThemeManager() {
 
           <div className="overflow-hidden rounded-xl border border-[var(--editor-line)] bg-[var(--background)]">
             <div className="flex items-center justify-between border-b border-[var(--editor-line)] px-3 py-2 text-xs text-[var(--editor-muted)]">
-              <span>{filteredThemes.length} / {config.themes.length}</span>
+              <span>
+                {filteredThemes.length} / {config.themes.length}
+              </span>
               <span>{selectedTheme?.name || '未选择'}</span>
             </div>
             <div className="max-h-[460px] overflow-y-auto overscroll-contain">
               {filteredThemes.length > 0 ? (
-                filteredThemes.map(theme => (
+                filteredThemes.map((theme) => (
                   <button
                     key={theme.id}
                     type="button"
@@ -245,7 +271,9 @@ export function WeChatThemeManager() {
                   >
                     <span className="min-w-0">
                       <span className="flex min-w-0 items-center gap-2">
-                        <span className="truncate text-sm font-medium text-[var(--editor-ink)]">{theme.name}</span>
+                        <span className="truncate text-sm font-medium text-[var(--editor-ink)]">
+                          {theme.name}
+                        </span>
                         <WeChatThemeSwatchStrip theme={theme} compact />
                       </span>
                       <span className="mt-0.5 block line-clamp-2 text-xs leading-relaxed text-[var(--editor-muted)]">
@@ -274,7 +302,9 @@ export function WeChatThemeManager() {
               <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                 <div className="min-w-0 space-y-1">
                   <div className="flex items-center gap-2">
-                    <h4 className="truncate text-sm font-semibold text-[var(--editor-ink)]">{selectedTheme.name}</h4>
+                    <h4 className="truncate text-sm font-semibold text-[var(--editor-ink)]">
+                      {selectedTheme.name}
+                    </h4>
                     {selectedTheme.builtin && (
                       <span className="rounded-full bg-[var(--editor-soft)] px-2 py-0.5 text-[10px] text-[var(--editor-muted)]">
                         内置
@@ -297,7 +327,9 @@ export function WeChatThemeManager() {
                 <input
                   type="text"
                   value={selectedTheme.name}
-                  onChange={(event) => updateSelectedTheme({ name: event.target.value })}
+                  onChange={(event) =>
+                    updateSelectedTheme({ name: event.target.value })
+                  }
                   className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
                 />
               </div>
@@ -322,7 +354,9 @@ export function WeChatThemeManager() {
               <input
                 type="text"
                 value={selectedTheme.description}
-                onChange={(event) => updateSelectedTheme({ description: event.target.value })}
+                onChange={(event) =>
+                  updateSelectedTheme({ description: event.target.value })
+                }
                 className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
               />
             </div>
@@ -334,9 +368,13 @@ export function WeChatThemeManager() {
               <input
                 type="text"
                 value={(selectedTheme.swatches || []).join(', ')}
-                onChange={(event) => updateSelectedTheme({
-                  swatches: event.target.value.split(',').map(color => color.trim()),
-                })}
+                onChange={(event) =>
+                  updateSelectedTheme({
+                    swatches: event.target.value
+                      .split(',')
+                      .map((color) => color.trim()),
+                  })
+                }
                 placeholder="#ffffff, #111111, #c96442"
                 className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
               />
@@ -349,7 +387,9 @@ export function WeChatThemeManager() {
               </label>
               <textarea
                 value={selectedTheme.css}
-                onChange={(event) => updateSelectedTheme({ css: event.target.value })}
+                onChange={(event) =>
+                  updateSelectedTheme({ css: event.target.value })
+                }
                 rows={18}
                 spellCheck={false}
                 className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 font-mono text-xs leading-relaxed text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"

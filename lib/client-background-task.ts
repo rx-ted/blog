@@ -62,7 +62,10 @@ export function startBackgroundTask<T>({
     } catch (error) {
       const message = getErrorMessage(error)
       onError?.(message, error)
-      toast.error(errorPrefix ? `${errorPrefix}：${message}` : message, errorDuration)
+      toast.error(
+        errorPrefix ? `${errorPrefix}：${message}` : message,
+        errorDuration,
+      )
     } finally {
       onSettled?.()
     }
@@ -87,12 +90,17 @@ export function writeStoredHistory<T>(storageKey: string, items: T[]) {
 
   try {
     window.localStorage.setItem(storageKey, JSON.stringify(items))
-    window.dispatchEvent(new CustomEvent<LocalHistoryUpdatedDetail<T>>(LOCAL_HISTORY_UPDATED_EVENT, {
-      detail: {
-        storageKey,
-        items,
-      },
-    }))
+    window.dispatchEvent(
+      new CustomEvent<LocalHistoryUpdatedDetail<T>>(
+        LOCAL_HISTORY_UPDATED_EVENT,
+        {
+          detail: {
+            storageKey,
+            items,
+          },
+        },
+      ),
+    )
   } catch {
     // Ignore storage sync failures. History is a best-effort enhancement.
   }

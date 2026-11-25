@@ -1,9 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { authenticateRequest } from '@/lib/admin-auth'
 import { nanoid } from 'nanoid'
-import { corsPreflight, isTrustedWriteOrigin, withCors } from '@/lib/server/cors'
-import { linkMediaAssetToArticle, upsertMediaAsset, type MediaAssetSource } from '@/lib/repositories/media-assets'
+import {
+  corsPreflight,
+  isTrustedWriteOrigin,
+  withCors,
+} from '@/lib/server/cors'
+import {
+  linkMediaAssetToArticle,
+  upsertMediaAsset,
+  type MediaAssetSource,
+} from '@/lib/repositories/media-assets'
 
 type ImageBucket = {
   put: (
@@ -15,9 +23,11 @@ type ImageBucket = {
         cacheControl?: string
       }
       customMetadata?: Record<string, string>
-    }
+    },
   ) => Promise<void>
-  get: (key: string) => Promise<{ customMetadata?: Record<string, string> } | null>
+  get: (
+    key: string,
+  ) => Promise<{ customMetadata?: Record<string, string> } | null>
 }
 
 type RuntimeEnv = {
@@ -28,13 +38,29 @@ type RuntimeEnv = {
 const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB (Cloudflare Workers limit)
 
 const ALLOWED_TYPES: Record<string, string[]> = {
-  image: ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'image/avif'],
-  audio: ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/flac', 'audio/mp4'],
+  image: [
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'image/svg+xml',
+    'image/avif',
+  ],
+  audio: [
+    'audio/mpeg',
+    'audio/wav',
+    'audio/ogg',
+    'audio/aac',
+    'audio/flac',
+    'audio/mp4',
+  ],
   video: ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'],
   document: [
     'application/pdf',
-    'application/zip', 'application/x-zip-compressed',
-    'application/x-rar-compressed', 'application/x-rar',
+    'application/zip',
+    'application/x-zip-compressed',
+    'application/x-rar-compressed',
+    'application/x-rar',
     'application/x-7z-compressed',
     'application/epub+zip',
     'application/x-mobipocket-ebook',
@@ -47,7 +73,10 @@ const ALLOWED_TYPES: Record<string, string[]> = {
 const ALL_ALLOWED = Object.values(ALLOWED_TYPES).flat()
 
 function readFlag(value: unknown): boolean {
-  return typeof value === 'string' && ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  return (
+    typeof value === 'string' &&
+    ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  )
 }
 
 function getFileCategory(mimeType: string): string {
@@ -69,20 +98,25 @@ function buildAssetUrls(encodedKey: string, cloudflareEnabled: boolean) {
     raw: baseUrl,
     content: cloudflareEnabled ? `${baseUrl}?w=1600&q=85&format=webp` : baseUrl,
     thumb: cloudflareEnabled ? `${baseUrl}?w=960&q=82&format=webp` : baseUrl,
-    cover: cloudflareEnabled ? `${baseUrl}?w=1600&h=900&fit=cover&q=84&format=webp` : baseUrl,
+    cover: cloudflareEnabled
+      ? `${baseUrl}?w=1600&h=900&fit=cover&q=84&format=webp`
+      : baseUrl,
   }
 }
 
 function parsePositiveInteger(value: unknown) {
-  const parsed = typeof value === 'number'
-    ? value
-    : typeof value === 'string'
-      ? Number.parseInt(value, 10)
-      : Number.NaN
+  const parsed =
+    typeof value === 'number'
+      ? value
+      : typeof value === 'string'
+        ? Number.parseInt(value, 10)
+        : Number.NaN
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null
 }
 
-function normalizeUploadSource(value: FormDataEntryValue | null): MediaAssetSource {
+function normalizeUploadSource(
+  value: FormDataEntryValue | null,
+): MediaAssetSource {
   if (value === 'collage') return 'collage'
   if (value === 'cover_generator') return 'cover_generator'
   if (value === 'unsplash') return 'unsplash'
@@ -131,13 +165,18 @@ async function calculateHash(file: File): Promise<string> {
   const buffer = await file.arrayBuffer()
   const hashBuffer = await crypto.subtle.digest('SHA-256', buffer)
   const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16)
+  return hashArray
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, 16)
 }
 
 async function handleUpload(req: NextRequest) {
   try {
     // 认证：Cookie OR Bearer Token
-    const env = (await getAppCloudflareEnv()) as RuntimeEnv & { DB?: D1Database }
+    const env = (await getAppCloudflareEnv()) as RuntimeEnv & {
+      DB?: D1Database
+    }
     const isAuthenticated = await authenticateRequest(req, env?.DB)
 
     if (!isAuthenticated) {
@@ -147,14 +186,17 @@ async function handleUpload(req: NextRequest) {
     if (!env?.IMAGES) {
       return NextResponse.json(
         { error: '图片存储未配置，请用 Cloudflare preview/runtime 启动。' },
-        { status: 500 }
+        { status: 500 },
       )
     }
 
     const formData = await req.formData()
     const file = formData.get('file')
     const postId = parsePositiveInteger(formData.get('postId'))
-    const slug = typeof formData.get('slug') === 'string' ? String(formData.get('slug')).trim() : ''
+    const slug =
+      typeof formData.get('slug') === 'string'
+        ? String(formData.get('slug')).trim()
+        : ''
     const role = formData.get('role') === 'cover' ? 'cover' : 'inline'
     const source = normalizeUploadSource(formData.get('source'))
 
@@ -164,16 +206,38 @@ async function handleUpload(req: NextRequest) {
 
     // Check allowed file types (allow unknown types with common extensions)
     const ext = file.name.split('.').pop()?.toLowerCase() || ''
-    const knownExts = ['zip', 'rar', '7z', 'epub', 'mobi', 'azw', 'azw3', 'pdf', 'txt', 'mp3', 'mp4', 'wav', 'ogg', 'webm', 'mov', 'flac', 'aac']
-    if (!ALL_ALLOWED.includes(file.type) && !file.type.startsWith('image/') && !knownExts.includes(ext)) {
-      return NextResponse.json({ error: `不支持的文件类型: ${file.type}` }, { status: 400 })
+    const knownExts = [
+      'zip',
+      'rar',
+      '7z',
+      'epub',
+      'mobi',
+      'azw',
+      'azw3',
+      'pdf',
+      'txt',
+      'mp3',
+      'mp4',
+      'wav',
+      'ogg',
+      'webm',
+      'mov',
+      'flac',
+      'aac',
+    ]
+    if (
+      !ALL_ALLOWED.includes(file.type) &&
+      !file.type.startsWith('image/') &&
+      !knownExts.includes(ext)
+    ) {
+      return NextResponse.json(
+        { error: `不支持的文件类型: ${file.type}` },
+        { status: 400 },
+      )
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        { error: '文件不能超过 100MB' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: '文件不能超过 100MB' }, { status: 400 })
     }
 
     const category = getFileCategory(file.type)
@@ -184,7 +248,8 @@ async function handleUpload(req: NextRequest) {
     // 小文件（<5MB）做 hash 去重；大文件跳过（hash 在 Workers 上太慢）
     const HASH_THRESHOLD = 5 * 1024 * 1024
     let key: string
-    const cloudflareImagePipeline = category === 'image' && readFlag(env.ENABLE_CF_IMAGE_PIPELINE)
+    const cloudflareImagePipeline =
+      category === 'image' && readFlag(env.ENABLE_CF_IMAGE_PIPELINE)
 
     if (file.size <= HASH_THRESHOLD) {
       const fileHash = await calculateHash(file)
@@ -193,22 +258,26 @@ async function handleUpload(req: NextRequest) {
       const existing = await env.IMAGES.get(dedupKey)
       if (existing) {
         const encodedKey = dedupKey.split('/').map(encodeURIComponent).join('/')
-        const variants = category === 'image' ? buildAssetUrls(encodedKey, cloudflareImagePipeline) : undefined
-        const assetId = category === 'image'
-          ? await recordImageAsset({
-            db: env.DB,
-            source,
-            key: dedupKey,
-            encodedKey,
-            variants,
-            mimeType: file.type || null,
-            sizeBytes: file.size,
-            alt: file.name,
-            postId,
-            slug,
-            role,
-          })
-          : undefined
+        const variants =
+          category === 'image'
+            ? buildAssetUrls(encodedKey, cloudflareImagePipeline)
+            : undefined
+        const assetId =
+          category === 'image'
+            ? await recordImageAsset({
+                db: env.DB,
+                source,
+                key: dedupKey,
+                encodedKey,
+                variants,
+                mimeType: file.type || null,
+                sizeBytes: file.size,
+                alt: file.name,
+                postId,
+                slug,
+                role,
+              })
+            : undefined
         return NextResponse.json({
           success: true,
           key: dedupKey,
@@ -243,7 +312,8 @@ async function handleUpload(req: NextRequest) {
       else if (ext === '7z') contentType = 'application/x-7z-compressed'
       else if (ext === 'epub') contentType = 'application/epub+zip'
       else if (ext === 'mobi') contentType = 'application/x-mobipocket-ebook'
-      else if (ext === 'azw' || ext === 'azw3') contentType = 'application/vnd.amazon.ebook'
+      else if (ext === 'azw' || ext === 'azw3')
+        contentType = 'application/vnd.amazon.ebook'
       else if (ext === 'txt') contentType = 'text/plain'
     }
 
@@ -258,7 +328,10 @@ async function handleUpload(req: NextRequest) {
     })
 
     const encodedKey = key.split('/').map(encodeURIComponent).join('/')
-    const variants = category === 'image' ? buildAssetUrls(encodedKey, cloudflareImagePipeline) : undefined
+    const variants =
+      category === 'image'
+        ? buildAssetUrls(encodedKey, cloudflareImagePipeline)
+        : undefined
     let assetId: number | undefined
 
     if (category === 'image' && env.DB) {
@@ -291,8 +364,8 @@ async function handleUpload(req: NextRequest) {
   } catch (error) {
     console.error('Upload error:', error)
     return NextResponse.json(
-      { error: '文件上传失败: ' + (error as Error).message },
-      { status: 500 }
+      { error: `文件上传失败: ${(error as Error).message}` },
+      { status: 500 },
     )
   }
 }
@@ -304,7 +377,10 @@ export function OPTIONS(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   if (!isTrustedWriteOrigin(req)) {
-    return withCors(req, NextResponse.json({ error: 'Forbidden origin' }, { status: 403 }))
+    return withCors(
+      req,
+      NextResponse.json({ error: 'Forbidden origin' }, { status: 403 }),
+    )
   }
   return withCors(req, await handleUpload(req))
 }

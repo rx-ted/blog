@@ -34,7 +34,8 @@ vi.mock('@/lib/background-jobs', () => ({
 vi.mock('@/lib/server/route-helpers', () => ({
   ensureAuthenticatedRequest: mocks.ensureAuthenticatedRequest,
   getRouteContextWithDb: mocks.getRouteContextWithDb,
-  jsonError: (message: string, status = 500) => Response.json({ error: message }, { status }),
+  jsonError: (message: string, status = 500) =>
+    Response.json({ error: message }, { status }),
   jsonOk: (data: unknown, status = 200) => Response.json(data, { status }),
   parseJsonBody: mocks.parseJsonBody,
 }))
@@ -42,7 +43,8 @@ vi.mock('@/lib/server/route-helpers', () => ({
 vi.mock('@/lib/remote-image-localization', () => ({
   localizeRemotePostImages: mocks.localizeRemotePostImages,
   recordLocalizedRemoteAssets: mocks.recordLocalizedRemoteAssets,
-  remoteImageResponse: (report: { found: number }) => report.found > 0 ? { remote_images: report } : {},
+  remoteImageResponse: (report: { found: number }) =>
+    report.found > 0 ? { remote_images: report } : {},
 }))
 
 import { PUT } from '@/app/api/admin/posts/[slug]/route'
@@ -69,14 +71,23 @@ describe('/api/admin/posts/[slug] route', () => {
       tags: ['AI', '写作'],
       cover_image: '/covers/dashboard.webp',
     })
-    mocks.invalidatePublicContentCache.mockRejectedValue(new Error('cache down'))
+    mocks.invalidatePublicContentCache.mockRejectedValue(
+      new Error('cache down'),
+    )
     mocks.enqueueBackgroundJob.mockResolvedValue(undefined)
     mocks.localizeRemotePostImages.mockImplementation(async (input) => ({
       content: input.content,
       html: input.html,
       coverImage: input.coverImage,
       assets: [],
-      report: { found: 0, localized: 0, reused: 0, skipped: 0, failures: [], replacements: {} },
+      report: {
+        found: 0,
+        localized: 0,
+        reused: 0,
+        skipped: 0,
+        failures: [],
+        replacements: {},
+      },
     }))
     mocks.recordLocalizedRemoteAssets.mockResolvedValue(undefined)
   })
@@ -123,11 +134,9 @@ describe('/api/admin/posts/[slug] route', () => {
     })
     const body = await response.json()
 
-    expect(mocks.updatePost).toHaveBeenCalledWith(
-      { kind: 'db' },
-      7,
-      { is_pinned: 1 },
-    )
+    expect(mocks.updatePost).toHaveBeenCalledWith({ kind: 'db' }, 7, {
+      is_pinned: 1,
+    })
     expect(body).toEqual({ success: true, id: 7, slug: 'old-slug' })
   })
 
@@ -170,7 +179,9 @@ describe('/api/admin/posts/[slug] route', () => {
       [{ url: localizedUrl }],
       { postId: 7, slug: 'old-slug' },
     )
-    expect(body.remote_images).toEqual(expect.objectContaining({ found: 1, localized: 1 }))
+    expect(body.remote_images).toEqual(
+      expect.objectContaining({ found: 1, localized: 1 }),
+    )
   })
 
   it('uses the stable post id when the route slug is stale after a custom slug edit', async () => {
@@ -208,11 +219,17 @@ describe('/api/admin/posts/[slug] route', () => {
       '2026-05-02-dh5wth',
       'why-effort-isnt-enough',
     )
-    expect(body).toEqual({ success: true, id: 100, slug: 'why-effort-isnt-enough' })
+    expect(body).toEqual({
+      success: true,
+      id: 100,
+      slug: 'why-effort-isnt-enough',
+    })
   })
 
   it('allows the shared auth helper to reject unauthorized updates', async () => {
-    mocks.ensureAuthenticatedRequest.mockResolvedValue(Response.json({ error: 'Unauthorized' }, { status: 401 }))
+    mocks.ensureAuthenticatedRequest.mockResolvedValue(
+      Response.json({ error: 'Unauthorized' }, { status: 401 }),
+    )
 
     const response = await PUT({} as never, {
       params: Promise.resolve({ slug: 'old-slug' }),

@@ -17,7 +17,9 @@ function appendEncodedBytes(b1: number, b2: number, b3: number) {
     ((b1 & 0x3) << 4) | (b2 >> 4),
     ((b2 & 0xf) << 2) | (b3 >> 6),
     b3 & 0x3f,
-  ].map(value => encode6Bit(value & 0x3f)).join('')
+  ]
+    .map((value) => encode6Bit(value & 0x3f))
+    .join('')
 }
 
 function encodePlantUmlBytes(bytes: Uint8Array) {
@@ -46,6 +48,9 @@ export function encodePlantUml(code: string) {
   return encodePlantUmlBytes(deflateSync(input, { level: 9 }))
 }
 
-export function buildPlantUmlSvgUrl(code: string, serverUrl = PLANTUML_SERVER_URL) {
+export function buildPlantUmlSvgUrl(
+  code: string,
+  serverUrl = PLANTUML_SERVER_URL,
+) {
   return `${serverUrl.replace(/\/+$/, '')}/svg/${encodePlantUml(code)}`
 }

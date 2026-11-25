@@ -1,4 +1,7 @@
-import { isWorkersAiBaseUrl, normalizeBaseUrl } from '@/lib/ai-provider-profiles'
+import {
+  isWorkersAiBaseUrl,
+  normalizeBaseUrl,
+} from '@/lib/ai-provider-profiles'
 
 type TextGenerationRequestOptionsInput =
   | {

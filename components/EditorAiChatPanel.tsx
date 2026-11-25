@@ -2,7 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useChat } from '@ai-sdk/react'
-import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls, type UIMessage } from 'ai'
+import {
+  DefaultChatTransport,
+  lastAssistantMessageIsCompleteWithToolCalls,
+  type UIMessage,
+} from 'ai'
 import {
   Copy,
   FileText,
@@ -177,9 +181,19 @@ type EditorAiChatDataParts = {
   }
 }
 
-type EditorAiChatMessage = UIMessage<never, EditorAiChatDataParts, EditorAiChatTools>
-type EditorAiImageToolPart = Extract<EditorAiChatMessage['parts'][number], { type: 'tool-generateArticleImage' }>
-type EditorAiClientToolName = Exclude<keyof EditorAiChatTools, 'generateArticleImage'>
+type EditorAiChatMessage = UIMessage<
+  never,
+  EditorAiChatDataParts,
+  EditorAiChatTools
+>
+type EditorAiImageToolPart = Extract<
+  EditorAiChatMessage['parts'][number],
+  { type: 'tool-generateArticleImage' }
+>
+type EditorAiClientToolName = Exclude<
+  keyof EditorAiChatTools,
+  'generateArticleImage'
+>
 type EditorAiImageResultDataPart = {
   type: 'data-imageResult'
   data: {
@@ -188,7 +202,9 @@ type EditorAiImageResultDataPart = {
   }
 }
 
-function isImageResultDataPart(part: EditorAiChatMessage['parts'][number]): part is EditorAiImageResultDataPart {
+function isImageResultDataPart(
+  part: EditorAiChatMessage['parts'][number],
+): part is EditorAiImageResultDataPart {
   return part.type === 'data-imageResult'
 }
 
@@ -198,10 +214,22 @@ interface EditorAiChatPanelProps {
   onSetTitle: (title: string) => EditorAiToolOutput
   onSetDescription: (description: string) => EditorAiToolOutput
   onSetTags: (tags: string[]) => EditorAiToolOutput
-  onReadArticleContent: (scope?: 'all' | 'selection', maxChars?: number) => EditorAiReadArticleContentOutput
-  onInsertMarkdown: (markdown: string, target?: EditorAiToolInsertTarget) => EditorAiToolOutput
-  onEditArticleContent: (input: EditorAiChatTools['editArticleContent']['input']) => EditorAiToolOutput
-  onInsertImage: (imageUrl: string, alt: string, target?: EditorAiToolInsertTarget) => EditorAiToolOutput
+  onReadArticleContent: (
+    scope?: 'all' | 'selection',
+    maxChars?: number,
+  ) => EditorAiReadArticleContentOutput
+  onInsertMarkdown: (
+    markdown: string,
+    target?: EditorAiToolInsertTarget,
+  ) => EditorAiToolOutput
+  onEditArticleContent: (
+    input: EditorAiChatTools['editArticleContent']['input'],
+  ) => EditorAiToolOutput
+  onInsertImage: (
+    imageUrl: string,
+    alt: string,
+    target?: EditorAiToolInsertTarget,
+  ) => EditorAiToolOutput
 }
 
 type EditorAiChatSession = {
@@ -260,15 +288,19 @@ const CHAT_TEXT_PROFILE_KEY = 'qmblog:editor-ai-chat:text-profile-id'
 const CHAT_IMAGE_PROFILE_KEY = 'qmblog:editor-ai-chat:image-profile-id'
 
 function createLocalId(prefix = 'chat') {
-  const random = typeof crypto !== 'undefined' && 'randomUUID' in crypto
-    ? crypto.randomUUID()
-    : Math.random().toString(36).slice(2)
+  const random =
+    typeof crypto !== 'undefined' && 'randomUUID' in crypto
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2)
   return `${prefix}-${Date.now()}-${random}`
 }
 
 function getMessageText(message: EditorAiChatMessage) {
   return message.parts
-    .filter((part): part is Extract<typeof part, { type: 'text' }> => part.type === 'text')
+    .filter(
+      (part): part is Extract<typeof part, { type: 'text' }> =>
+        part.type === 'text',
+    )
     .map((part) => part.text)
     .join('')
 }
@@ -311,7 +343,9 @@ function getContextTitle(context: EditorAiChatContext) {
   return context.title.trim() || context.slug.trim() || '未命名文章'
 }
 
-function buildContextSnapshot(context: EditorAiChatContext): EditorAiChatContextSnapshot {
+function buildContextSnapshot(
+  context: EditorAiChatContext,
+): EditorAiChatContextSnapshot {
   return {
     documentKey: normalizeEditorAiDocumentKey(context.documentKey),
     postId: context.postId,
@@ -320,9 +354,15 @@ function buildContextSnapshot(context: EditorAiChatContext): EditorAiChatContext
     description: context.description.trim(),
     category: context.category.trim(),
     tags: context.tags.slice(0, 12),
-    sectionToc: trimStoredText(context.sectionToc).slice(0, MAX_CONTEXT_SNAPSHOT_CHARS),
+    sectionToc: trimStoredText(context.sectionToc).slice(
+      0,
+      MAX_CONTEXT_SNAPSHOT_CHARS,
+    ),
     currentSection: trimStoredText(context.currentSection).slice(0, 300),
-    documentPreview: trimStoredText(context.documentText).slice(0, MAX_CONTEXT_SNAPSHOT_CHARS),
+    documentPreview: trimStoredText(context.documentText).slice(
+      0,
+      MAX_CONTEXT_SNAPSHOT_CHARS,
+    ),
     updatedAt: Date.now(),
   }
 }
@@ -340,7 +380,10 @@ function createSession(
     title: getSessionTitle(messages) || '新对话',
     documentTitle: getContextTitle(context),
     messages,
-    appliedToolCallIds: mergeToolCallIds(appliedToolCallIds, collectAppliedToolCallIdsFromMessages(messages)),
+    appliedToolCallIds: mergeToolCallIds(
+      appliedToolCallIds,
+      collectAppliedToolCallIdsFromMessages(messages),
+    ),
     contextSnapshot: buildContextSnapshot({ ...context, documentKey }),
     createdAt: now,
     updatedAt: now,
@@ -349,32 +392,42 @@ function createSession(
 
 function getSessionTitle(messages: EditorAiChatMessage[]) {
   const firstUserMessage = messages.find((message) => message.role === 'user')
-  const text = firstUserMessage ? getMessageText(firstUserMessage).replace(/\s+/g, ' ').trim() : ''
+  const text = firstUserMessage
+    ? getMessageText(firstUserMessage).replace(/\s+/g, ' ').trim()
+    : ''
   if (!text) return ''
   return text.length > 28 ? `${text.slice(0, 28)}...` : text
 }
 
 function trimStoredText(text: string) {
-  return text.length > MAX_STORED_TEXT_CHARS ? `${text.slice(0, MAX_STORED_TEXT_CHARS)}...` : text
+  return text.length > MAX_STORED_TEXT_CHARS
+    ? `${text.slice(0, MAX_STORED_TEXT_CHARS)}...`
+    : text
 }
 
-function sanitizeMessagesForStorage(messages: EditorAiChatMessage[]): EditorAiChatMessage[] {
-  return sanitizeMessagesForTransport(messages).slice(-MAX_STORED_MESSAGES).map((message) => ({
-    ...message,
-    parts: message.parts.map((part) => {
-      if (part.type === 'text') {
-        return { ...part, text: trimStoredText(part.text) }
-      }
-      return part
-    }),
-  }))
+function sanitizeMessagesForStorage(
+  messages: EditorAiChatMessage[],
+): EditorAiChatMessage[] {
+  return sanitizeMessagesForTransport(messages)
+    .slice(-MAX_STORED_MESSAGES)
+    .map((message) => ({
+      ...message,
+      parts: message.parts.map((part) => {
+        if (part.type === 'text') {
+          return { ...part, text: trimStoredText(part.text) }
+        }
+        return part
+      }),
+    }))
 }
 
 function hasSendableMessageParts(message: Pick<EditorAiChatMessage, 'parts'>) {
   return Array.isArray(message.parts) && message.parts.length > 0
 }
 
-function sanitizeMessagesForTransport(messages: EditorAiChatMessage[]): EditorAiChatMessage[] {
+function sanitizeMessagesForTransport(
+  messages: EditorAiChatMessage[],
+): EditorAiChatMessage[] {
   return messages.filter(hasSendableMessageParts)
 }
 
@@ -384,14 +437,21 @@ function normalizeStoredMessages(value: unknown): EditorAiChatMessage[] {
   return value.filter((message): message is EditorAiChatMessage => {
     if (!message || typeof message !== 'object') return false
     const candidate = message as Partial<EditorAiChatMessage>
-    return typeof candidate.id === 'string'
-      && (candidate.role === 'user' || candidate.role === 'assistant' || candidate.role === 'system')
-      && Array.isArray(candidate.parts)
-      && candidate.parts.length > 0
+    return (
+      typeof candidate.id === 'string' &&
+      (candidate.role === 'user' ||
+        candidate.role === 'assistant' ||
+        candidate.role === 'system') &&
+      Array.isArray(candidate.parts) &&
+      candidate.parts.length > 0
+    )
   })
 }
 
-function normalizeStoredSessions(value: unknown, context: EditorAiChatContext): EditorAiChatSession[] {
+function normalizeStoredSessions(
+  value: unknown,
+  context: EditorAiChatContext,
+): EditorAiChatSession[] {
   if (!Array.isArray(value)) return []
   const documentKey = normalizeEditorAiDocumentKey(context.documentKey)
   const fallbackSnapshot = buildContextSnapshot({ ...context, documentKey })
@@ -402,30 +462,47 @@ function normalizeStoredSessions(value: unknown, context: EditorAiChatContext): 
       const candidate = item as Partial<EditorAiChatSession>
       if (typeof candidate.id !== 'string') return null
       const messages = normalizeStoredMessages(candidate.messages)
-      const updatedAt = typeof candidate.updatedAt === 'number' ? candidate.updatedAt : Date.now()
-      const inferredToolCallIds = collectAppliedToolCallIdsFromMessages(messages)
-      const storedToolCallIds = Array.isArray(candidate.appliedToolCallIds) ? candidate.appliedToolCallIds : []
-      const contextSnapshot = candidate.contextSnapshot && typeof candidate.contextSnapshot === 'object'
-        ? {
-            ...fallbackSnapshot,
-            ...candidate.contextSnapshot,
-            documentKey,
-          }
-        : fallbackSnapshot
+      const updatedAt =
+        typeof candidate.updatedAt === 'number'
+          ? candidate.updatedAt
+          : Date.now()
+      const inferredToolCallIds =
+        collectAppliedToolCallIdsFromMessages(messages)
+      const storedToolCallIds = Array.isArray(candidate.appliedToolCallIds)
+        ? candidate.appliedToolCallIds
+        : []
+      const contextSnapshot =
+        candidate.contextSnapshot &&
+        typeof candidate.contextSnapshot === 'object'
+          ? {
+              ...fallbackSnapshot,
+              ...candidate.contextSnapshot,
+              documentKey,
+            }
+          : fallbackSnapshot
 
       return {
         id: candidate.id,
         documentKey,
-        title: typeof candidate.title === 'string' && candidate.title.trim()
-          ? candidate.title.trim()
-          : getSessionTitle(messages) || '新对话',
-        documentTitle: typeof candidate.documentTitle === 'string' && candidate.documentTitle.trim()
-          ? candidate.documentTitle.trim()
-          : '未命名文章',
+        title:
+          typeof candidate.title === 'string' && candidate.title.trim()
+            ? candidate.title.trim()
+            : getSessionTitle(messages) || '新对话',
+        documentTitle:
+          typeof candidate.documentTitle === 'string' &&
+          candidate.documentTitle.trim()
+            ? candidate.documentTitle.trim()
+            : '未命名文章',
         messages,
-        appliedToolCallIds: mergeToolCallIds(storedToolCallIds, inferredToolCallIds),
+        appliedToolCallIds: mergeToolCallIds(
+          storedToolCallIds,
+          inferredToolCallIds,
+        ),
         contextSnapshot,
-        createdAt: typeof candidate.createdAt === 'number' ? candidate.createdAt : updatedAt,
+        createdAt:
+          typeof candidate.createdAt === 'number'
+            ? candidate.createdAt
+            : updatedAt,
         updatedAt,
       }
     })
@@ -440,30 +517,39 @@ function hasVisibleMessageContent(message: EditorAiChatMessage) {
       return part.text.trim().length > 0
     }
 
-    return part.type === 'tool-generateArticleImage'
-      || isImageResultDataPart(part)
+    return (
+      part.type === 'tool-generateArticleImage' || isImageResultDataPart(part)
+    )
   })
 }
 
 function getObjectInput(value: unknown) {
-  return value && typeof value === 'object' ? value as Record<string, unknown> : {}
+  return value && typeof value === 'object'
+    ? (value as Record<string, unknown>)
+    : {}
 }
 
-function isEditorAiClientToolName(value: string): value is EditorAiClientToolName {
+function isEditorAiClientToolName(
+  value: string,
+): value is EditorAiClientToolName {
   return CLIENT_TOOL_NAMES.has(value)
 }
 
-function normalizeClientToolTarget(value: unknown): EditorAiToolInsertTarget | undefined {
+function normalizeClientToolTarget(
+  value: unknown,
+): EditorAiToolInsertTarget | undefined {
   if (!value || typeof value !== 'object') return undefined
   const input = value as Record<string, unknown>
   const mode = input.mode === 'section' ? 'section' : 'cursor'
   const rawSectionNumber = Number(input.sectionNumber)
-  const sectionNumber = Number.isInteger(rawSectionNumber) && rawSectionNumber > 0
-    ? rawSectionNumber
-    : undefined
-  const sectionTitle = typeof input.sectionTitle === 'string' && input.sectionTitle.trim()
-    ? input.sectionTitle.trim()
-    : undefined
+  const sectionNumber =
+    Number.isInteger(rawSectionNumber) && rawSectionNumber > 0
+      ? rawSectionNumber
+      : undefined
+  const sectionTitle =
+    typeof input.sectionTitle === 'string' && input.sectionTitle.trim()
+      ? input.sectionTitle.trim()
+      : undefined
 
   return { mode, sectionNumber, sectionTitle }
 }
@@ -542,7 +628,10 @@ function readInitialChatState(getContext: () => EditorAiChatContext) {
     documentKey: normalizeEditorAiDocumentKey(rawContext.documentKey),
   }
   const storageKey = buildEditorAiChatStorageKey(context.documentKey)
-  const stored = normalizeStoredSessions(readStoredHistory<EditorAiChatSession>(storageKey), context)
+  const stored = normalizeStoredSessions(
+    readStoredHistory<EditorAiChatSession>(storageKey),
+    context,
+  )
   const sessions = stored.length > 0 ? stored : [createSession(context)]
   const activeSession = sessions[0]
 
@@ -582,12 +671,14 @@ function Composer({
 }) {
   const composerRef = useRef<HTMLDivElement | null>(null)
   const composingRef = useRef(false)
-  const selectedTextProfile = textProfiles.find((profile) => profile.id === selectedTextProfileId)
-    || textProfiles.find((profile) => profile.is_default === 1)
-    || textProfiles[0]
-  const selectedImageProfile = imageProfiles.find((profile) => profile.id === selectedImageProfileId)
-    || imageProfiles.find((profile) => profile.is_default === 1)
-    || imageProfiles[0]
+  const selectedTextProfile =
+    textProfiles.find((profile) => profile.id === selectedTextProfileId) ||
+    textProfiles.find((profile) => profile.is_default === 1) ||
+    textProfiles[0]
+  const selectedImageProfile =
+    imageProfiles.find((profile) => profile.id === selectedImageProfileId) ||
+    imageProfiles.find((profile) => profile.is_default === 1) ||
+    imageProfiles[0]
 
   useEffect(() => {
     const node = composerRef.current
@@ -644,7 +735,11 @@ function Composer({
               syncInput()
             }}
             onKeyDown={(event) => {
-              if (event.key === 'Enter' && !event.shiftKey && !composingRef.current) {
+              if (
+                event.key === 'Enter' &&
+                !event.shiftKey &&
+                !composingRef.current
+              ) {
                 event.preventDefault()
                 if (busy) {
                   onStop()
@@ -666,7 +761,11 @@ function Composer({
             title={busy ? '停止生成' : '发送'}
             aria-label={busy ? '停止生成' : '发送'}
           >
-            {busy ? <Square className="h-4 w-4" /> : <Send className="h-4 w-4" />}
+            {busy ? (
+              <Square className="h-4 w-4" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
           </button>
         </div>
         <div className="flex items-center gap-1 border-t border-[var(--editor-line)] px-2 py-1.5">
@@ -674,13 +773,23 @@ function Composer({
             <MessageSquareText className="pointer-events-none absolute left-2 h-3.5 w-3.5 text-[var(--editor-muted)]" />
             <select
               value={selectedTextProfileId ?? ''}
-              onChange={(event) => onTextProfileChange(event.target.value ? Number(event.target.value) : null)}
+              onChange={(event) =>
+                onTextProfileChange(
+                  event.target.value ? Number(event.target.value) : null,
+                )
+              }
               disabled={busy || textProfiles.length === 0}
               className="h-8 max-w-[9rem] appearance-none rounded-md border border-transparent bg-transparent pl-7 pr-7 text-xs text-[var(--editor-muted)] outline-none transition hover:bg-[var(--editor-soft)] hover:text-[var(--editor-ink)] disabled:opacity-40"
-              title={selectedTextProfile ? `文本模型：${selectedTextProfile.name} · ${selectedTextProfile.model}` : '文本模型'}
+              title={
+                selectedTextProfile
+                  ? `文本模型：${selectedTextProfile.name} · ${selectedTextProfile.model}`
+                  : '文本模型'
+              }
               aria-label="切换文本模型"
             >
-              {textProfiles.length === 0 ? <option value="">文本模型</option> : null}
+              {textProfiles.length === 0 ? (
+                <option value="">文本模型</option>
+              ) : null}
               {textProfiles.map((profile) => (
                 <option key={profile.id} value={profile.id}>
                   {profile.name}
@@ -692,13 +801,23 @@ function Composer({
             <ImageIcon className="pointer-events-none absolute left-2 h-3.5 w-3.5 text-[var(--editor-muted)]" />
             <select
               value={selectedImageProfileId ?? ''}
-              onChange={(event) => onImageProfileChange(event.target.value ? Number(event.target.value) : null)}
+              onChange={(event) =>
+                onImageProfileChange(
+                  event.target.value ? Number(event.target.value) : null,
+                )
+              }
               disabled={busy || imageProfiles.length === 0}
               className="h-8 max-w-[9rem] appearance-none rounded-md border border-transparent bg-transparent pl-7 pr-7 text-xs text-[var(--editor-muted)] outline-none transition hover:bg-[var(--editor-soft)] hover:text-[var(--editor-ink)] disabled:opacity-40"
-              title={selectedImageProfile ? `图片模型：${selectedImageProfile.name} · ${selectedImageProfile.model}` : '图片模型'}
+              title={
+                selectedImageProfile
+                  ? `图片模型：${selectedImageProfile.name} · ${selectedImageProfile.model}`
+                  : '图片模型'
+              }
               aria-label="切换图片模型"
             >
-              {imageProfiles.length === 0 ? <option value="">图片模型</option> : null}
+              {imageProfiles.length === 0 ? (
+                <option value="">图片模型</option>
+              ) : null}
               {imageProfiles.map((profile) => (
                 <option key={profile.id} value={profile.id}>
                   {profile.name}
@@ -706,7 +825,10 @@ function Composer({
               ))}
             </select>
           </label>
-          <Settings2 className="ml-auto h-3.5 w-3.5 text-[var(--editor-muted)]" aria-hidden />
+          <Settings2
+            className="ml-auto h-3.5 w-3.5 text-[var(--editor-muted)]"
+            aria-hidden
+          />
         </div>
       </div>
     </form>
@@ -723,7 +845,11 @@ function ImageResultCard({
   toolCallId: string
   output: GeneratedArticleImageOutput | null
   pendingPrompt?: string
-  onInsertImage: (url: string, alt: string, target?: EditorAiToolInsertTarget) => EditorAiToolOutput
+  onInsertImage: (
+    url: string,
+    alt: string,
+    target?: EditorAiToolInsertTarget,
+  ) => EditorAiToolOutput
   onCopy: (text: string) => void
 }) {
   if (!output) {
@@ -733,7 +859,11 @@ function ImageResultCard({
           <Loader2 className="h-3.5 w-3.5 animate-spin" />
           正在生成图片
         </div>
-        {pendingPrompt ? <div className="mt-1 line-clamp-2 text-[var(--editor-ink)]">{pendingPrompt}</div> : null}
+        {pendingPrompt ? (
+          <div className="mt-1 line-clamp-2 text-[var(--editor-ink)]">
+            {pendingPrompt}
+          </div>
+        ) : null}
       </div>
     )
   }
@@ -770,7 +900,11 @@ function ImageResultCard({
           <button
             type="button"
             onClick={() => {
-              const result = onInsertImage(output.url, output.alt, output.insertTarget)
+              const result = onInsertImage(
+                output.url,
+                output.alt,
+                output.insertTarget,
+              )
               if (result.status === 'error') return
             }}
             className="rounded-md border border-[var(--editor-line)] px-2 py-1 text-xs text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)]"
@@ -791,15 +925,23 @@ function ImageResultCard({
   )
 }
 
-function getImageToolOutput(part: EditorAiImageToolPart): GeneratedArticleImageOutput | null {
+function getImageToolOutput(
+  part: EditorAiImageToolPart,
+): GeneratedArticleImageOutput | null {
   if (part.state === 'output-available') return part.output
   if (part.state === 'output-error') {
     return {
       status: 'error',
       error: part.errorText || '图片生成失败',
       prompt: typeof part.input?.prompt === 'string' ? part.input.prompt : '',
-      aspectRatio: typeof part.input?.aspectRatio === 'string' ? part.input.aspectRatio : 'auto',
-      resolution: typeof part.input?.resolution === 'string' ? part.input.resolution : 'auto',
+      aspectRatio:
+        typeof part.input?.aspectRatio === 'string'
+          ? part.input.aspectRatio
+          : 'auto',
+      resolution:
+        typeof part.input?.resolution === 'string'
+          ? part.input.resolution
+          : 'auto',
       placement: part.input?.placement || 'inline',
       insertTarget: part.input?.insertTarget,
     }
@@ -815,10 +957,15 @@ function ImageToolCard({
 }: {
   part: EditorAiImageToolPart
   output?: GeneratedArticleImageOutput
-  onInsertImage: (url: string, alt: string, target?: EditorAiToolInsertTarget) => EditorAiToolOutput
+  onInsertImage: (
+    url: string,
+    alt: string,
+    target?: EditorAiToolInsertTarget,
+  ) => EditorAiToolOutput
   onCopy: (text: string) => void
 }) {
-  const inputPrompt = typeof part.input?.prompt === 'string' ? part.input.prompt : ''
+  const inputPrompt =
+    typeof part.input?.prompt === 'string' ? part.input.prompt : ''
   const resolvedOutput = output || getImageToolOutput(part)
 
   if (part.state === 'output-error' && !resolvedOutput) {
@@ -854,15 +1001,27 @@ export function EditorAiChatPanel({
   const toast = useToast()
   const [initialChatState] = useState(() => readInitialChatState(getContext))
   const [input, setInput] = useState('')
-  const [sessions, setSessions] = useState<EditorAiChatSession[]>(initialChatState.sessions)
-  const [activeSessionId, setActiveSessionId] = useState(initialChatState.activeSessionId)
+  const [sessions, setSessions] = useState<EditorAiChatSession[]>(
+    initialChatState.sessions,
+  )
+  const [activeSessionId, setActiveSessionId] = useState(
+    initialChatState.activeSessionId,
+  )
   const [historyOpen, setHistoryOpen] = useState(false)
-  const [streamStatus, setStreamStatus] = useState<EditorChatStatusData | null>(null)
-  const [streamImageResults, setStreamImageResults] = useState<Record<string, GeneratedArticleImageOutput>>({})
+  const [streamStatus, setStreamStatus] = useState<EditorChatStatusData | null>(
+    null,
+  )
+  const [streamImageResults, setStreamImageResults] = useState<
+    Record<string, GeneratedArticleImageOutput>
+  >({})
   const [textProfiles, setTextProfiles] = useState<AiProfileItem[]>([])
   const [imageProfiles, setImageProfiles] = useState<AiProfileItem[]>([])
-  const [selectedTextProfileId, setSelectedTextProfileId] = useState<number | null>(null)
-  const [selectedImageProfileId, setSelectedImageProfileId] = useState<number | null>(null)
+  const [selectedTextProfileId, setSelectedTextProfileId] = useState<
+    number | null
+  >(null)
+  const [selectedImageProfileId, setSelectedImageProfileId] = useState<
+    number | null
+  >(null)
   const scrollRef = useRef<HTMLDivElement | null>(null)
   const hydratedRef = useRef(true)
   const switchingSessionRef = useRef(false)
@@ -871,9 +1030,13 @@ export function EditorAiChatPanel({
   const chatStorageKeyRef = useRef(initialChatState.storageKey)
   const sessionsRef = useRef(initialChatState.sessions)
   const activeSessionIdRef = useRef(initialChatState.activeSessionId)
-  const appliedToolCallIdsRef = useRef(new Set(
-    initialChatState.sessions.find((session) => session.id === initialChatState.activeSessionId)?.appliedToolCallIds || [],
-  ))
+  const appliedToolCallIdsRef = useRef(
+    new Set(
+      initialChatState.sessions.find(
+        (session) => session.id === initialChatState.activeSessionId,
+      )?.appliedToolCallIds || [],
+    ),
+  )
   const selectedTextProfileIdRef = useRef<number | null>(null)
   const selectedImageProfileIdRef = useRef<number | null>(null)
 
@@ -892,25 +1055,37 @@ export function EditorAiChatPanel({
         fetch('/api/admin/ai-provider', { credentials: 'include' }),
         fetch('/api/admin/ai-image-provider', { credentials: 'include' }),
       ])
-      const [textData, imageData] = await Promise.all([
+      const [textData, imageData] = (await Promise.all([
         textRes.json().catch(() => ({})),
         imageRes.json().catch(() => ({})),
-      ]) as [
+      ])) as [
         { profiles?: AiProfileItem[]; default_profile_id?: number | null },
         { profiles?: AiProfileItem[]; default_profile_id?: number | null },
       ]
       if (cancelled) return
 
-      const nextTextProfiles = Array.isArray(textData.profiles) ? textData.profiles : []
-      const nextImageProfiles = Array.isArray(imageData.profiles) ? imageData.profiles : []
-      const storedTextId = Number(window.localStorage.getItem(CHAT_TEXT_PROFILE_KEY) || '')
-      const storedImageId = Number(window.localStorage.getItem(CHAT_IMAGE_PROFILE_KEY) || '')
-      const nextTextId = nextTextProfiles.some((profile) => profile.id === storedTextId)
+      const nextTextProfiles = Array.isArray(textData.profiles)
+        ? textData.profiles
+        : []
+      const nextImageProfiles = Array.isArray(imageData.profiles)
+        ? imageData.profiles
+        : []
+      const storedTextId = Number(
+        window.localStorage.getItem(CHAT_TEXT_PROFILE_KEY) || '',
+      )
+      const storedImageId = Number(
+        window.localStorage.getItem(CHAT_IMAGE_PROFILE_KEY) || '',
+      )
+      const nextTextId = nextTextProfiles.some(
+        (profile) => profile.id === storedTextId,
+      )
         ? storedTextId
-        : textData.default_profile_id ?? nextTextProfiles[0]?.id ?? null
-      const nextImageId = nextImageProfiles.some((profile) => profile.id === storedImageId)
+        : (textData.default_profile_id ?? nextTextProfiles[0]?.id ?? null)
+      const nextImageId = nextImageProfiles.some(
+        (profile) => profile.id === storedImageId,
+      )
         ? storedImageId
-        : imageData.default_profile_id ?? nextImageProfiles[0]?.id ?? null
+        : (imageData.default_profile_id ?? nextImageProfiles[0]?.id ?? null)
 
       setTextProfiles(nextTextProfiles)
       setImageProfiles(nextImageProfiles)
@@ -942,58 +1117,83 @@ export function EditorAiChatPanel({
   const handleImageProfileChange = useCallback((value: number | null) => {
     selectedImageProfileIdRef.current = value
     setSelectedImageProfileId(value)
-    if (value) window.localStorage.setItem(CHAT_IMAGE_PROFILE_KEY, String(value))
+    if (value)
+      window.localStorage.setItem(CHAT_IMAGE_PROFILE_KEY, String(value))
     else window.localStorage.removeItem(CHAT_IMAGE_PROFILE_KEY)
   }, [])
 
   useEffect(() => {
     activeSessionIdRef.current = activeSessionId
-    const activeSession = sessionsRef.current.find((session) => session.id === activeSessionId)
-    appliedToolCallIdsRef.current = new Set(activeSession?.appliedToolCallIds || [])
+    const activeSession = sessionsRef.current.find(
+      (session) => session.id === activeSessionId,
+    )
+    appliedToolCallIdsRef.current = new Set(
+      activeSession?.appliedToolCallIds || [],
+    )
   }, [activeSessionId, sessions])
 
-  const transport = useMemo(() => new DefaultChatTransport<EditorAiChatMessage>({
-    api: '/api/editor/ai-chat',
-    credentials: 'same-origin',
-    prepareSendMessagesRequest({ id, messages: nextMessages, body, trigger, messageId }) {
-      return {
-        body: {
-          ...body,
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport<EditorAiChatMessage>({
+        api: '/api/editor/ai-chat',
+        credentials: 'same-origin',
+        prepareSendMessagesRequest({
           id,
-          messages: sanitizeMessagesForTransport(nextMessages),
+          messages: nextMessages,
+          body,
           trigger,
           messageId,
+        }) {
+          return {
+            body: {
+              ...body,
+              id,
+              messages: sanitizeMessagesForTransport(nextMessages),
+              trigger,
+              messageId,
+            },
+          }
         },
-      }
+      }),
+    [],
+  )
+
+  const persistSessions = useCallback(
+    (updater: (current: EditorAiChatSession[]) => EditorAiChatSession[]) => {
+      setSessions((current) => {
+        const next = updater(current)
+          .sort((a, b) => b.updatedAt - a.updatedAt)
+          .slice(0, MAX_SESSIONS)
+        sessionsRef.current = next
+        writeStoredHistory(chatStorageKeyRef.current, next)
+        return next
+      })
     },
-  }), [])
+    [],
+  )
 
-  const persistSessions = useCallback((updater: (current: EditorAiChatSession[]) => EditorAiChatSession[]) => {
-    setSessions((current) => {
-      const next = updater(current)
-        .sort((a, b) => b.updatedAt - a.updatedAt)
-        .slice(0, MAX_SESSIONS)
-      sessionsRef.current = next
-      writeStoredHistory(chatStorageKeyRef.current, next)
-      return next
-    })
-  }, [])
+  const markToolCallApplied = useCallback(
+    (toolCallId: string) => {
+      const id = toolCallId.trim()
+      if (!id) return
 
-  const markToolCallApplied = useCallback((toolCallId: string) => {
-    const id = toolCallId.trim()
-    if (!id) return
-
-    appliedToolCallIdsRef.current.add(id)
-    const sessionId = activeSessionIdRef.current
-    persistSessions((current) => current.map((session) => {
-      if (session.id !== sessionId) return session
-      return {
-        ...session,
-        appliedToolCallIds: mergeToolCallIds(session.appliedToolCallIds, [id]),
-        updatedAt: Date.now(),
-      }
-    }))
-  }, [persistSessions])
+      appliedToolCallIdsRef.current.add(id)
+      const sessionId = activeSessionIdRef.current
+      persistSessions((current) =>
+        current.map((session) => {
+          if (session.id !== sessionId) return session
+          return {
+            ...session,
+            appliedToolCallIds: mergeToolCallIds(session.appliedToolCallIds, [
+              id,
+            ]),
+            updatedAt: Date.now(),
+          }
+        }),
+      )
+    },
+    [persistSessions],
+  )
 
   const {
     messages,
@@ -1010,10 +1210,13 @@ export function EditorAiChatPanel({
     messages: initialChatState.messages,
     experimental_throttle: 80,
     sendAutomaticallyWhen({ messages: nextMessages }) {
-      return lastAssistantMessageIsCompleteWithToolCalls({ messages: nextMessages })
+      return lastAssistantMessageIsCompleteWithToolCalls({
+        messages: nextMessages,
+      })
     },
     onToolCall({ toolCall }) {
-      let output: EditorAiToolOutput | EditorAiReadArticleContentOutput | null = null
+      let output: EditorAiToolOutput | EditorAiReadArticleContentOutput | null =
+        null
       const input = getObjectInput(toolCall.input)
       const toolCallId = toolCall.toolCallId.trim()
 
@@ -1046,51 +1249,70 @@ export function EditorAiChatPanel({
 
       if (toolCall.toolName === 'readArticleContent') {
         const scope = input.scope === 'selection' ? 'selection' : 'all'
-        const maxChars = typeof input.maxChars === 'number'
-          ? input.maxChars
-          : typeof input.maxChars === 'string'
-            ? Number.parseInt(input.maxChars, 10)
-            : undefined
+        const maxChars =
+          typeof input.maxChars === 'number'
+            ? input.maxChars
+            : typeof input.maxChars === 'string'
+              ? Number.parseInt(input.maxChars, 10)
+              : undefined
         output = onReadArticleContent(scope, maxChars)
       } else if (toolCall.toolName === 'setArticleTitle') {
         const title = typeof input.title === 'string' ? input.title : ''
         output = onSetTitle(title)
       } else if (toolCall.toolName === 'setArticleDescription') {
-        const description = typeof input.description === 'string' ? input.description : ''
+        const description =
+          typeof input.description === 'string' ? input.description : ''
         output = onSetDescription(description)
       } else if (toolCall.toolName === 'setArticleTags') {
-        output = onSetTags(Array.isArray(input.tags) ? input.tags.map(String) : [])
+        output = onSetTags(
+          Array.isArray(input.tags) ? input.tags.map(String) : [],
+        )
       } else if (toolCall.toolName === 'insertMarkdownIntoArticle') {
-        const markdown = typeof input.markdown === 'string' ? input.markdown : ''
-        output = onInsertMarkdown(markdown, normalizeClientToolTarget(input.target))
+        const markdown =
+          typeof input.markdown === 'string' ? input.markdown : ''
+        output = onInsertMarkdown(
+          markdown,
+          normalizeClientToolTarget(input.target),
+        )
       } else if (toolCall.toolName === 'editArticleContent') {
-        const editTarget = input.target && typeof input.target === 'object'
-          ? input.target as Record<string, unknown>
-          : {}
-        const editTargetMode = editTarget.mode === 'all'
-          ? 'all'
-          : editTarget.mode === 'exactText'
-            ? 'exactText'
-            : 'selection'
+        const editTarget =
+          input.target && typeof input.target === 'object'
+            ? (input.target as Record<string, unknown>)
+            : {}
+        const editTargetMode =
+          editTarget.mode === 'all'
+            ? 'all'
+            : editTarget.mode === 'exactText'
+              ? 'exactText'
+              : 'selection'
         output = onEditArticleContent({
           action: input.action === 'delete' ? 'delete' : 'replace',
           target: {
             mode: editTargetMode,
-            exactText: typeof editTarget.exactText === 'string'
-              ? editTarget.exactText
-              : undefined,
-            occurrence: typeof editTarget.occurrence === 'number'
-              ? editTarget.occurrence
-              : undefined,
+            exactText:
+              typeof editTarget.exactText === 'string'
+                ? editTarget.exactText
+                : undefined,
+            occurrence:
+              typeof editTarget.occurrence === 'number'
+                ? editTarget.occurrence
+                : undefined,
             useLastMatch: editTarget.useLastMatch === true ? true : undefined,
           },
-          replacementMarkdown: typeof input.replacementMarkdown === 'string' ? input.replacementMarkdown : undefined,
-          expectedText: typeof input.expectedText === 'string' ? input.expectedText : undefined,
+          replacementMarkdown:
+            typeof input.replacementMarkdown === 'string'
+              ? input.replacementMarkdown
+              : undefined,
+          expectedText:
+            typeof input.expectedText === 'string'
+              ? input.expectedText
+              : undefined,
         })
       }
 
       if (!output) return
-      if (toolCall.toolName !== 'readArticleContent') markToolCallApplied(toolCallId)
+      if (toolCall.toolName !== 'readArticleContent')
+        markToolCallApplied(toolCallId)
 
       void addToolOutput({
         tool: toolCall.toolName,
@@ -1123,29 +1345,48 @@ export function EditorAiChatPanel({
     },
     onFinish({ messages: nextMessages }) {
       setStreamStatus(null)
-      persistSessions((current) => updateSessionMessages(
-        current,
-        activeSessionIdRef.current,
-        nextMessages,
-        getContextRef.current(),
-      ))
+      persistSessions((current) =>
+        updateSessionMessages(
+          current,
+          activeSessionIdRef.current,
+          nextMessages,
+          getContextRef.current(),
+        ),
+      )
     },
   })
 
   const busy = status === 'submitted' || status === 'streaming'
-  const visibleMessages = useMemo(() => messages.filter(hasVisibleMessageContent), [messages])
-  const lastMessage = messages[messages.length - 1]
-  const lastAssistantMessage = [...messages].reverse().find((message) => message.role === 'assistant')
-  const lastAssistantText = lastAssistantMessage ? getMessageText(lastAssistantMessage).trim() : ''
+  const visibleMessages = useMemo(
+    () => messages.filter(hasVisibleMessageContent),
+    [messages],
+  )
+  const _lastMessage = messages[messages.length - 1]
+  const lastAssistantMessage = [...messages]
+    .reverse()
+    .find((message) => message.role === 'assistant')
+  const lastAssistantText = lastAssistantMessage
+    ? getMessageText(lastAssistantMessage).trim()
+    : ''
 
   const setComposerInput = useCallback((value: string) => {
     setInput(value)
   }, [])
 
-  const persistActiveMessages = useCallback((nextMessages: EditorAiChatMessage[]) => {
-    if (!activeSessionId) return
-    persistSessions((current) => updateSessionMessages(current, activeSessionId, nextMessages, getContextRef.current()))
-  }, [activeSessionId, persistSessions])
+  const persistActiveMessages = useCallback(
+    (nextMessages: EditorAiChatMessage[]) => {
+      if (!activeSessionId) return
+      persistSessions((current) =>
+        updateSessionMessages(
+          current,
+          activeSessionId,
+          nextMessages,
+          getContextRef.current(),
+        ),
+      )
+    },
+    [activeSessionId, persistSessions],
+  )
 
   useEffect(() => {
     const rawContext = getContext()
@@ -1172,11 +1413,14 @@ export function EditorAiChatPanel({
       readStoredHistory<EditorAiChatSession>(nextStorageKey),
       nextContext,
     )
-    const shouldMigrateUnsavedSessions = isDraftEditorAiDocumentKey(previousDocumentKey)
-      || (nextDocumentKey.startsWith('post:') && !previousDocumentKey.startsWith('post:'))
-    const shouldMigrateSessions = shouldMigrateUnsavedSessions
-      && storedNextSessions.length === 0
-      && previousSessionsForStorage.some((session) => session.messages.length > 0)
+    const shouldMigrateUnsavedSessions =
+      isDraftEditorAiDocumentKey(previousDocumentKey) ||
+      (nextDocumentKey.startsWith('post:') &&
+        !previousDocumentKey.startsWith('post:'))
+    const shouldMigrateSessions =
+      shouldMigrateUnsavedSessions &&
+      storedNextSessions.length === 0 &&
+      previousSessionsForStorage.some((session) => session.messages.length > 0)
     const nextSessions = shouldMigrateSessions
       ? previousSessionsForStorage.map((session) => ({
           ...session,
@@ -1188,7 +1432,8 @@ export function EditorAiChatPanel({
         ? storedNextSessions
         : [createSession(nextContext)]
     const nextActiveSession = shouldMigrateSessions
-      ? nextSessions.find((session) => session.id === previousSessionId) || nextSessions[0]
+      ? nextSessions.find((session) => session.id === previousSessionId) ||
+        nextSessions[0]
       : nextSessions[0]
 
     switchingSessionRef.current = true
@@ -1198,7 +1443,9 @@ export function EditorAiChatPanel({
     documentKeyRef.current = nextDocumentKey
     chatStorageKeyRef.current = nextStorageKey
     activeSessionIdRef.current = nextActiveSession.id
-    appliedToolCallIdsRef.current = new Set(nextActiveSession.appliedToolCallIds)
+    appliedToolCallIdsRef.current = new Set(
+      nextActiveSession.appliedToolCallIds,
+    )
 
     window.setTimeout(() => {
       setSessions(nextSessions)
@@ -1215,7 +1462,10 @@ export function EditorAiChatPanel({
 
   useEffect(() => {
     const handleHistoryUpdated = (event: Event) => {
-      const customEvent = event as CustomEvent<{ storageKey?: string; items?: EditorAiChatSession[] }>
+      const customEvent = event as CustomEvent<{
+        storageKey?: string
+        items?: EditorAiChatSession[]
+      }>
       if (customEvent.detail?.storageKey !== chatStorageKeyRef.current) return
       const nextSessions = normalizeStoredSessions(customEvent.detail.items, {
         ...getContextRef.current(),
@@ -1226,11 +1476,18 @@ export function EditorAiChatPanel({
     }
 
     window.addEventListener(LOCAL_HISTORY_UPDATED_EVENT, handleHistoryUpdated)
-    return () => window.removeEventListener(LOCAL_HISTORY_UPDATED_EVENT, handleHistoryUpdated)
+    return () =>
+      window.removeEventListener(
+        LOCAL_HISTORY_UPDATED_EVENT,
+        handleHistoryUpdated,
+      )
   }, [])
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
+    scrollRef.current?.scrollTo({
+      top: scrollRef.current.scrollHeight,
+      behavior: 'smooth',
+    })
   }, [messages, status])
 
   useEffect(() => {
@@ -1244,17 +1501,29 @@ export function EditorAiChatPanel({
     for (const message of messages) {
       if (message.role !== 'assistant') continue
       for (const part of message.parts) {
-        if (part.type !== 'tool-generateArticleImage' && !isImageResultDataPart(part)) continue
-        const toolCallId = part.type === 'tool-generateArticleImage' ? part.toolCallId : part.data.toolCallId
+        if (
+          part.type !== 'tool-generateArticleImage' &&
+          !isImageResultDataPart(part)
+        )
+          continue
+        const toolCallId =
+          part.type === 'tool-generateArticleImage'
+            ? part.toolCallId
+            : part.data.toolCallId
         if (appliedToolCallIdsRef.current.has(toolCallId)) continue
 
-        const output = part.type === 'tool-generateArticleImage'
-          ? streamImageResults[part.toolCallId] || getImageToolOutput(part)
-          : part.data.output
+        const output =
+          part.type === 'tool-generateArticleImage'
+            ? streamImageResults[part.toolCallId] || getImageToolOutput(part)
+            : part.data.output
         if (!output) continue
         if (output.status !== 'success' || !output.insertTarget) continue
         markToolCallApplied(toolCallId)
-        const result = onInsertImage(output.url, output.alt, output.insertTarget)
+        const result = onInsertImage(
+          output.url,
+          output.alt,
+          output.insertTarget,
+        )
         if (result.status === 'success') {
           toast.success(result.message)
         } else {
@@ -1264,22 +1533,32 @@ export function EditorAiChatPanel({
     }
   }, [markToolCallApplied, messages, onInsertImage, streamImageResults, toast])
 
-  const switchToSession = useCallback((session: EditorAiChatSession) => {
-    if (busy || session.id === activeSessionId) return
-    persistActiveMessages(messages)
-    switchingSessionRef.current = true
-    activeSessionIdRef.current = session.id
-    appliedToolCallIdsRef.current = new Set(session.appliedToolCallIds)
-    clearError()
-    setStreamStatus(null)
-    setStreamImageResults({})
-    setActiveSessionId(session.id)
-    setMessages(session.messages)
-    setHistoryOpen(false)
-    window.setTimeout(() => {
-      switchingSessionRef.current = false
-    }, 0)
-  }, [activeSessionId, busy, clearError, messages, persistActiveMessages, setMessages])
+  const switchToSession = useCallback(
+    (session: EditorAiChatSession) => {
+      if (busy || session.id === activeSessionId) return
+      persistActiveMessages(messages)
+      switchingSessionRef.current = true
+      activeSessionIdRef.current = session.id
+      appliedToolCallIdsRef.current = new Set(session.appliedToolCallIds)
+      clearError()
+      setStreamStatus(null)
+      setStreamImageResults({})
+      setActiveSessionId(session.id)
+      setMessages(session.messages)
+      setHistoryOpen(false)
+      window.setTimeout(() => {
+        switchingSessionRef.current = false
+      }, 0)
+    },
+    [
+      activeSessionId,
+      busy,
+      clearError,
+      messages,
+      persistActiveMessages,
+      setMessages,
+    ],
+  )
 
   const startNewSession = useCallback(() => {
     if (busy) return
@@ -1300,33 +1579,43 @@ export function EditorAiChatPanel({
     window.setTimeout(() => {
       switchingSessionRef.current = false
     }, 0)
-  }, [busy, clearError, messages, persistActiveMessages, persistSessions, setMessages])
+  }, [
+    busy,
+    clearError,
+    messages,
+    persistActiveMessages,
+    persistSessions,
+    setMessages,
+  ])
 
-  const deleteSession = useCallback((sessionId: string) => {
-    if (busy) return
-    const remaining = sessions.filter((session) => session.id !== sessionId)
-    const fallback = remaining[0] || createSession(getContextRef.current())
-    const nextSessions = remaining.length > 0 ? remaining : [fallback]
+  const deleteSession = useCallback(
+    (sessionId: string) => {
+      if (busy) return
+      const remaining = sessions.filter((session) => session.id !== sessionId)
+      const fallback = remaining[0] || createSession(getContextRef.current())
+      const nextSessions = remaining.length > 0 ? remaining : [fallback]
 
-    switchingSessionRef.current = true
-    sessionsRef.current = nextSessions
-    setSessions(nextSessions)
-    writeStoredHistory(chatStorageKeyRef.current, nextSessions)
+      switchingSessionRef.current = true
+      sessionsRef.current = nextSessions
+      setSessions(nextSessions)
+      writeStoredHistory(chatStorageKeyRef.current, nextSessions)
 
-    if (sessionId === activeSessionId) {
-      activeSessionIdRef.current = fallback.id
-      appliedToolCallIdsRef.current = new Set(fallback.appliedToolCallIds)
-      clearError()
-      setStreamStatus(null)
-      setStreamImageResults({})
-      setActiveSessionId(fallback.id)
-      setMessages(fallback.messages)
-    }
+      if (sessionId === activeSessionId) {
+        activeSessionIdRef.current = fallback.id
+        appliedToolCallIdsRef.current = new Set(fallback.appliedToolCallIds)
+        clearError()
+        setStreamStatus(null)
+        setStreamImageResults({})
+        setActiveSessionId(fallback.id)
+        setMessages(fallback.messages)
+      }
 
-    window.setTimeout(() => {
-      switchingSessionRef.current = false
-    }, 0)
-  }, [activeSessionId, busy, clearError, sessions, setMessages])
+      window.setTimeout(() => {
+        switchingSessionRef.current = false
+      }, 0)
+    },
+    [activeSessionId, busy, clearError, sessions, setMessages],
+  )
 
   const sendPrompt = async (prompt: string) => {
     const text = prompt.trim()
@@ -1336,16 +1625,21 @@ export function EditorAiChatPanel({
     setStreamStatus({ label: '正在发送', stage: 'connecting' })
     setInput('')
     try {
-      await sendMessage({ text }, {
-        body: {
-          context: getContext(),
-          sessionId: activeSessionIdRef.current,
-          profileId: selectedTextProfileIdRef.current,
-          imageProfileId: selectedImageProfileIdRef.current,
+      await sendMessage(
+        { text },
+        {
+          body: {
+            context: getContext(),
+            sessionId: activeSessionIdRef.current,
+            profileId: selectedTextProfileIdRef.current,
+            imageProfileId: selectedImageProfileIdRef.current,
+          },
         },
-      })
+      )
     } catch (nextError) {
-      toast.error(nextError instanceof Error ? nextError.message : 'AI 对话发送失败')
+      toast.error(
+        nextError instanceof Error ? nextError.message : 'AI 对话发送失败',
+      )
       setStreamStatus(null)
     }
   }
@@ -1373,7 +1667,9 @@ export function EditorAiChatPanel({
         },
       })
     } catch (nextError) {
-      toast.error(nextError instanceof Error ? nextError.message : '重新生成失败')
+      toast.error(
+        nextError instanceof Error ? nextError.message : '重新生成失败',
+      )
       setStreamStatus(null)
     }
   }
@@ -1388,7 +1684,8 @@ export function EditorAiChatPanel({
   }
 
   const displayStatus = busy
-    ? streamStatus?.label || (status === 'submitted' ? '正在连接模型' : '正在生成')
+    ? streamStatus?.label ||
+      (status === 'submitted' ? '正在连接模型' : '正在生成')
     : ''
   const shouldShowDisplayStatus = Boolean(displayStatus)
 
@@ -1402,7 +1699,8 @@ export function EditorAiChatPanel({
               AI 对话
             </div>
             <div className="mt-1 truncate text-xs text-[var(--stone-gray)]">
-              {sessions.find((session) => session.id === activeSessionId)?.title || '新对话'}
+              {sessions.find((session) => session.id === activeSessionId)
+                ?.title || '新对话'}
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-1">
@@ -1466,7 +1764,9 @@ export function EditorAiChatPanel({
               <div
                 key={session.id}
                 className={`group flex items-center gap-2 border-b border-[var(--editor-line)] px-2 py-2 last:border-b-0 ${
-                  session.id === activeSessionId ? 'bg-[var(--editor-soft)]' : ''
+                  session.id === activeSessionId
+                    ? 'bg-[var(--editor-soft)]'
+                    : ''
                 }`}
               >
                 <button
@@ -1475,10 +1775,14 @@ export function EditorAiChatPanel({
                   className="min-w-0 flex-1 text-left"
                   disabled={busy}
                 >
-                  <div className="truncate text-xs font-medium text-[var(--editor-ink)]">{session.title}</div>
+                  <div className="truncate text-xs font-medium text-[var(--editor-ink)]">
+                    {session.title}
+                  </div>
                   <div className="mt-0.5 flex items-center gap-2 text-[10px] text-[var(--stone-gray)]">
                     <span className="truncate">{session.documentTitle}</span>
-                    <span className="shrink-0">{formatSessionTime(session.updatedAt)}</span>
+                    <span className="shrink-0">
+                      {formatSessionTime(session.updatedAt)}
+                    </span>
                   </div>
                 </button>
                 <button
@@ -1517,19 +1821,28 @@ export function EditorAiChatPanel({
             {visibleMessages.map((message) => {
               const text = getMessageText(message).trim()
               const isAssistant = message.role === 'assistant'
-              const imageResultParts = message.parts.filter(isImageResultDataPart)
+              const imageResultParts = message.parts.filter(
+                isImageResultDataPart,
+              )
               const imageResultMap = new Map(
-                imageResultParts.map((part) => [part.data.toolCallId, part.data.output] as const),
+                imageResultParts.map(
+                  (part) => [part.data.toolCallId, part.data.output] as const,
+                ),
               )
               const imageToolCallIds = new Set(
                 message.parts
-                  .filter((part): part is EditorAiImageToolPart => part.type === 'tool-generateArticleImage')
+                  .filter(
+                    (part): part is EditorAiImageToolPart =>
+                      part.type === 'tool-generateArticleImage',
+                  )
                   .map((part) => part.toolCallId),
               )
 
               return (
                 <article key={message.id} className="space-y-2">
-                  <div className={`text-xs font-semibold ${isAssistant ? 'text-[var(--editor-accent)]' : 'text-[var(--editor-ink)]'}`}>
+                  <div
+                    className={`text-xs font-semibold ${isAssistant ? 'text-[var(--editor-accent)]' : 'text-[var(--editor-ink)]'}`}
+                  >
                     {getMessageLabel(message)}
                   </div>
 
@@ -1551,7 +1864,10 @@ export function EditorAiChatPanel({
                           <ImageToolCard
                             key={part.toolCallId}
                             part={part}
-                            output={streamImageResults[part.toolCallId] || imageResultMap.get(part.toolCallId)}
+                            output={
+                              streamImageResults[part.toolCallId] ||
+                              imageResultMap.get(part.toolCallId)
+                            }
                             onInsertImage={onInsertImage}
                             onCopy={(value) => void handleCopy(value)}
                           />
@@ -1559,7 +1875,8 @@ export function EditorAiChatPanel({
                       }
 
                       if (isImageResultDataPart(part)) {
-                        if (imageToolCallIds.has(part.data.toolCallId)) return null
+                        if (imageToolCallIds.has(part.data.toolCallId))
+                          return null
                         return (
                           <ImageResultCard
                             key={`${part.data.toolCallId}-result`}
@@ -1603,7 +1920,11 @@ export function EditorAiChatPanel({
         <div className="shrink-0 border-t border-[var(--editor-line)] px-5 py-2">
           <button
             type="button"
-            onClick={() => void sendPrompt('基于刚才的回答，继续细化为更适合直接用于文章的版本。')}
+            onClick={() =>
+              void sendPrompt(
+                '基于刚才的回答，继续细化为更适合直接用于文章的版本。',
+              )
+            }
             disabled={busy}
             className="inline-flex items-center gap-1.5 rounded-md text-xs text-[var(--editor-accent)] transition hover:underline disabled:opacity-50"
           >
@@ -1642,11 +1963,14 @@ function updateSessionMessages(
   const existing = current.find((session) => session.id === activeSessionId)
 
   if (!existing) {
-    return [{
-      ...createSession({ ...context, documentKey }, storedMessages),
-      id: activeSessionId || createLocalId(),
-      updatedAt: now,
-    }, ...current]
+    return [
+      {
+        ...createSession({ ...context, documentKey }, storedMessages),
+        id: activeSessionId || createLocalId(),
+        updatedAt: now,
+      },
+      ...current,
+    ]
   }
 
   return current.map((session) => {
@@ -1657,7 +1981,10 @@ function updateSessionMessages(
       title: getSessionTitle(storedMessages) || session.title || '新对话',
       documentTitle: getContextTitle(context),
       messages: storedMessages,
-      appliedToolCallIds: mergeToolCallIds(session.appliedToolCallIds, collectAppliedToolCallIdsFromMessages(storedMessages)),
+      appliedToolCallIds: mergeToolCallIds(
+        session.appliedToolCallIds,
+        collectAppliedToolCallIdsFromMessages(storedMessages),
+      ),
       contextSnapshot: buildContextSnapshot({ ...context, documentKey }),
       updatedAt: now,
     }

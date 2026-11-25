@@ -1,4 +1,10 @@
-import { deletePost, getPostById, getPostBySlug, rememberPostSlugAlias, updatePost } from '@/lib/db'
+import {
+  deletePost,
+  getPostById,
+  getPostBySlug,
+  rememberPostSlugAlias,
+  updatePost,
+} from '@/lib/db'
 import { invalidatePublicContentCache } from '@/lib/cache'
 import { buildAutoDescription, normalizePostSlug } from '@/lib/post-utils'
 import { enqueueBackgroundJob } from '@/lib/background-jobs'
@@ -75,9 +81,12 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
 
   try {
     const rawPayload = await parseJsonBody<AdminPostPayload>(req)
-    const payloadId = typeof rawPayload.id === 'number' && Number.isInteger(rawPayload.id) && rawPayload.id > 0
-      ? rawPayload.id
-      : null
+    const payloadId =
+      typeof rawPayload.id === 'number' &&
+      Number.isInteger(rawPayload.id) &&
+      rawPayload.id > 0
+        ? rawPayload.id
+        : null
     const post = payloadId
       ? await getPostById(db, payloadId)
       : await getPostBySlug(db, slug)
@@ -85,18 +94,29 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
 
     const localization = await localizeRemotePostImages({
       bucket: env.IMAGES as RemoteImageBucket | undefined,
-      content: typeof rawPayload.content === 'string' ? rawPayload.content : undefined,
+      content:
+        typeof rawPayload.content === 'string' ? rawPayload.content : undefined,
       html: typeof rawPayload.html === 'string' ? rawPayload.html : undefined,
-      coverImage: typeof rawPayload.cover_image === 'string' || rawPayload.cover_image === null
-        ? rawPayload.cover_image
-        : undefined,
-      siteUrl: typeof env.NEXT_PUBLIC_SITE_URL === 'string' ? env.NEXT_PUBLIC_SITE_URL : undefined,
+      coverImage:
+        typeof rawPayload.cover_image === 'string' ||
+        rawPayload.cover_image === null
+          ? rawPayload.cover_image
+          : undefined,
+      siteUrl:
+        typeof env.NEXT_PUBLIC_SITE_URL === 'string'
+          ? env.NEXT_PUBLIC_SITE_URL
+          : undefined,
     })
     const payload: AdminPostPayload = {
       ...rawPayload,
-      ...(typeof rawPayload.content === 'string' ? { content: localization.content } : {}),
-      ...(typeof rawPayload.html === 'string' ? { html: localization.html } : {}),
-      ...(typeof rawPayload.cover_image === 'string' || rawPayload.cover_image === null
+      ...(typeof rawPayload.content === 'string'
+        ? { content: localization.content }
+        : {}),
+      ...(typeof rawPayload.html === 'string'
+        ? { html: localization.html }
+        : {}),
+      ...(typeof rawPayload.cover_image === 'string' ||
+      rawPayload.cover_image === null
         ? { cover_image: localization.coverImage }
         : {}),
     }
@@ -104,23 +124,27 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
     const updates: Parameters<typeof updatePost>[2] = {}
 
     if (payload.slug !== undefined) {
-      if (typeof payload.slug !== 'string') return jsonError('slug 必须是字符串', 400)
+      if (typeof payload.slug !== 'string')
+        return jsonError('slug 必须是字符串', 400)
       const nextSlug = normalizePostSlug(payload.slug)
       if (nextSlug) updates.slug = nextSlug
     }
 
     if (payload.title !== undefined) {
-      if (typeof payload.title !== 'string') return jsonError('标题必须是字符串', 400)
+      if (typeof payload.title !== 'string')
+        return jsonError('标题必须是字符串', 400)
       updates.title = payload.title.trim()
     }
 
     if (payload.content !== undefined) {
-      if (typeof payload.content !== 'string') return jsonError('正文必须是字符串', 400)
+      if (typeof payload.content !== 'string')
+        return jsonError('正文必须是字符串', 400)
       updates.content = payload.content
     }
 
     if (payload.html !== undefined) {
-      if (typeof payload.html !== 'string') return jsonError('HTML 必须是字符串', 400)
+      if (typeof payload.html !== 'string')
+        return jsonError('HTML 必须是字符串', 400)
       updates.html = payload.html
     }
 
@@ -128,12 +152,17 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       if (payload.category !== null && typeof payload.category !== 'string') {
         return jsonError('分类必须是字符串', 400)
       }
-      const category = typeof payload.category === 'string' ? payload.category.trim() : ''
+      const category =
+        typeof payload.category === 'string' ? payload.category.trim() : ''
       updates.category = category || '未分类'
     }
 
     if (payload.status !== undefined) {
-      if (payload.status !== 'draft' && payload.status !== 'published' && payload.status !== 'deleted') {
+      if (
+        payload.status !== 'draft' &&
+        payload.status !== 'published' &&
+        payload.status !== 'deleted'
+      ) {
         return jsonError('状态不合法', 400)
       }
       updates.status = payload.status
@@ -143,28 +172,35 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       if (payload.password !== null && typeof payload.password !== 'string') {
         return jsonError('密码必须是字符串', 400)
       }
-      updates.password = typeof payload.password === 'string' && payload.password.trim()
-        ? payload.password.trim()
-        : null
+      updates.password =
+        typeof payload.password === 'string' && payload.password.trim()
+          ? payload.password.trim()
+          : null
     }
 
     if (payload.is_pinned !== undefined) {
-      if (!isBinaryFlag(payload.is_pinned)) return jsonError('is_pinned 必须是 0 或 1', 400)
+      if (!isBinaryFlag(payload.is_pinned))
+        return jsonError('is_pinned 必须是 0 或 1', 400)
       updates.is_pinned = payload.is_pinned
     }
 
     if (payload.is_hidden !== undefined) {
-      if (!isBinaryFlag(payload.is_hidden)) return jsonError('is_hidden 必须是 0 或 1', 400)
+      if (!isBinaryFlag(payload.is_hidden))
+        return jsonError('is_hidden 必须是 0 或 1', 400)
       updates.is_hidden = payload.is_hidden
     }
 
     if (payload.cover_image !== undefined) {
-      if (payload.cover_image !== null && typeof payload.cover_image !== 'string') {
+      if (
+        payload.cover_image !== null &&
+        typeof payload.cover_image !== 'string'
+      ) {
         return jsonError('封面图必须是字符串', 400)
       }
-      updates.cover_image = typeof payload.cover_image === 'string' && payload.cover_image.trim()
-        ? payload.cover_image.trim()
-        : null
+      updates.cover_image =
+        typeof payload.cover_image === 'string' && payload.cover_image.trim()
+          ? payload.cover_image.trim()
+          : null
     }
 
     if (payload.tags !== undefined) {
@@ -173,9 +209,12 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
     }
 
     if (payload.description !== undefined) {
-      if (typeof payload.description !== 'string') return jsonError('摘要必须是字符串', 400)
-      const sourceContent = typeof payload.content === 'string' ? payload.content : post.content
-      updates.description = payload.description.trim() || buildAutoDescription(sourceContent)
+      if (typeof payload.description !== 'string')
+        return jsonError('摘要必须是字符串', 400)
+      const sourceContent =
+        typeof payload.content === 'string' ? payload.content : post.content
+      updates.description =
+        payload.description.trim() || buildAutoDescription(sourceContent)
     } else if (typeof payload.content === 'string') {
       updates.description = buildAutoDescription(payload.content)
     }
@@ -185,7 +224,8 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
     }
 
     await updatePost(db, post.id, updates)
-    const persistedSlug = typeof updates.slug === 'string' ? updates.slug : post.slug
+    const persistedSlug =
+      typeof updates.slug === 'string' ? updates.slug : post.slug
     await rememberPostSlugAlias(db, post.id, slug, persistedSlug)
     if (localization.assets.length > 0) {
       await recordLocalizedRemoteAssets(db, localization.assets, {
@@ -219,7 +259,10 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       ...remoteImageResponse(localization.report),
     })
   } catch (err) {
-    if (err instanceof Error && /UNIQUE constraint failed: posts\.slug/i.test(err.message)) {
+    if (
+      err instanceof Error &&
+      /UNIQUE constraint failed: posts\.slug/i.test(err.message)
+    ) {
       return jsonError('slug 已存在，请换一个', 409)
     }
     console.error('PUT /api/admin/posts/[slug] error:', err)

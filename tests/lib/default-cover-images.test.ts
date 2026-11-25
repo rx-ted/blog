@@ -9,8 +9,14 @@ import {
 
 describe('default cover images', () => {
   it('picks a stable default cover for the same seed', () => {
-    const first = pickDefaultPostCoverPath({ slug: 'stable-seed', title: 'Same title' })
-    const second = pickDefaultPostCoverPath({ slug: 'stable-seed', title: 'Same title' })
+    const first = pickDefaultPostCoverPath({
+      slug: 'stable-seed',
+      title: 'Same title',
+    })
+    const second = pickDefaultPostCoverPath({
+      slug: 'stable-seed',
+      title: 'Same title',
+    })
 
     expect(first).toBe(second)
     expect(DEFAULT_POST_COVER_IMAGES).toContain(first)
@@ -22,23 +28,38 @@ describe('default cover images', () => {
       { baseUrl: 'https://blog.19981204.xyz' },
     )
 
-    expect(cover).toMatch(/^https:\/\/blog\.19981204\.xyz\/default-covers\/qm-cover-[1-3]\.jpg$/)
+    expect(cover).toMatch(
+      /^https:\/\/blog\.19981204\.xyz\/default-covers\/qm-cover-[1-3]\.jpg$/,
+    )
   })
 
   it('prefers the explicit cover image and resolves relative paths', () => {
-    expect(resolvePostCoverImage(
-      { cover_image: '/api/images/example.png', slug: 'post-slug', title: 'Post title' },
-      { baseUrl: 'https://blog.19981204.xyz' },
-    )).toBe('https://blog.19981204.xyz/api/images/example.png')
+    expect(
+      resolvePostCoverImage(
+        {
+          cover_image: '/api/images/example.png',
+          slug: 'post-slug',
+          title: 'Post title',
+        },
+        { baseUrl: 'https://blog.19981204.xyz' },
+      ),
+    ).toBe('https://blog.19981204.xyz/api/images/example.png')
 
-    expect(resolvePostCoverImage(
-      { cover_image: 'https://cdn.example.com/cover.jpg', slug: 'post-slug', title: 'Post title' },
-      { baseUrl: 'https://blog.19981204.xyz' },
-    )).toBe('https://cdn.example.com/cover.jpg')
+    expect(
+      resolvePostCoverImage(
+        {
+          cover_image: 'https://cdn.example.com/cover.jpg',
+          slug: 'post-slug',
+          title: 'Post title',
+        },
+        { baseUrl: 'https://blog.19981204.xyz' },
+      ),
+    ).toBe('https://cdn.example.com/cover.jpg')
   })
 
   it('resolves the site-wide fallback cover image', () => {
-    expect(resolveDefaultSiteCoverImage('https://blog.19981204.xyz'))
-      .toBe('https://blog.19981204.xyz/default-covers/qm-cover-1.jpg')
+    expect(resolveDefaultSiteCoverImage('https://blog.19981204.xyz')).toBe(
+      'https://blog.19981204.xyz/default-covers/qm-cover-1.jpg',
+    )
   })
 })

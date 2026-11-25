@@ -17,7 +17,9 @@ vi.mock('@/lib/cloudflare', () => ({
 }))
 
 vi.mock('@/lib/ai-provider-profiles', async () => {
-  const actual = await vi.importActual<typeof import('@/lib/ai-provider-profiles')>('@/lib/ai-provider-profiles')
+  const actual = await vi.importActual<
+    typeof import('@/lib/ai-provider-profiles')
+  >('@/lib/ai-provider-profiles')
   return {
     ...actual,
     decryptApiKey: mocks.decryptApiKey,
@@ -39,24 +41,30 @@ describe('/api/admin/ai-provider/test route', () => {
   })
 
   it('tests Anthropic compatible providers through the Messages API', async () => {
-    vi.mocked(globalThis.fetch).mockResolvedValue(new Response(JSON.stringify({
-      content: [{ type: 'text', text: 'OK' }],
-    })))
+    vi.mocked(globalThis.fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          content: [{ type: 'text', text: 'OK' }],
+        }),
+      ),
+    )
 
-    const response = await POST(new Request('http://test.local/api/admin/ai-provider/test', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        provider: 'aigocode_anthropic',
-        provider_name: 'AIGoCode (Anthropic)',
-        provider_type: 'anthropic_compatible',
-        base_url: 'https://api.aigocode.app/v1',
-        api_key: 'test-key',
-        model: 'claude-sonnet-4-6',
-        temperature: 0.3,
-        max_tokens: 128,
-      }),
-    }) as never)
+    const response = await POST(
+      new Request('http://test.local/api/admin/ai-provider/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider: 'aigocode_anthropic',
+          provider_name: 'AIGoCode (Anthropic)',
+          provider_type: 'anthropic_compatible',
+          base_url: 'https://api.aigocode.app/v1',
+          api_key: 'test-key',
+          model: 'claude-sonnet-4-6',
+          temperature: 0.3,
+          max_tokens: 128,
+        }),
+      }) as never,
+    )
 
     await expect(response.json()).resolves.toMatchObject({
       success: true,
@@ -83,24 +91,30 @@ describe('/api/admin/ai-provider/test route', () => {
   })
 
   it('keeps OpenAI compatible providers on chat completions', async () => {
-    vi.mocked(globalThis.fetch).mockResolvedValue(new Response(JSON.stringify({
-      choices: [{ message: { content: 'OK' } }],
-    })))
+    vi.mocked(globalThis.fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          choices: [{ message: { content: 'OK' } }],
+        }),
+      ),
+    )
 
-    const response = await POST(new Request('http://test.local/api/admin/ai-provider/test', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        provider: 'custom',
-        provider_name: 'Custom',
-        provider_type: 'openai_compatible',
-        base_url: 'https://api.example.test/v1',
-        api_key: 'test-key',
-        model: 'chat-model',
-        temperature: 0.7,
-        max_tokens: 64,
-      }),
-    }) as never)
+    const response = await POST(
+      new Request('http://test.local/api/admin/ai-provider/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider: 'custom',
+          provider_name: 'Custom',
+          provider_type: 'openai_compatible',
+          base_url: 'https://api.example.test/v1',
+          api_key: 'test-key',
+          model: 'chat-model',
+          temperature: 0.7,
+          max_tokens: 64,
+        }),
+      }) as never,
+    )
 
     await expect(response.json()).resolves.toMatchObject({
       success: true,

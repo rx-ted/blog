@@ -71,7 +71,9 @@ export function FilterBar({
 
   const activeStatus = currentStatus || 'all'
   const activeCategory = currentCategory || 'all'
-  const hasActiveFilters = Boolean(query.trim() || activeStatus !== 'all' || activeCategory !== 'all')
+  const hasActiveFilters = Boolean(
+    query.trim() || activeStatus !== 'all' || activeCategory !== 'all',
+  )
 
   const categoryOptions = [
     { value: 'all', label: '全部分类' },
@@ -122,7 +124,16 @@ export function FilterBar({
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--stone-gray)] transition-colors hover:text-[var(--editor-ink)]"
                   title="清除搜索"
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                   </svg>
@@ -170,9 +181,13 @@ export function FilterBar({
                 }`}
               >
                 <span>{item.label}</span>
-                <span className={`rounded-full px-1.5 py-0.5 text-xs tabular-nums ${
-                  activeStatus === item.value ? 'bg-white/15 text-white' : 'bg-[var(--background)] text-[var(--editor-muted)]'
-                }`}>
+                <span
+                  className={`rounded-full px-1.5 py-0.5 text-xs tabular-nums ${
+                    activeStatus === item.value
+                      ? 'bg-white/15 text-white'
+                      : 'bg-[var(--background)] text-[var(--editor-muted)]'
+                  }`}
+                >
                   {item.count}
                 </span>
               </button>

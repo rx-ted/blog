@@ -36,9 +36,9 @@ function createDbReturningPost(post: Post) {
       const statement = {
         bind: vi.fn(() => statement),
         run: vi.fn(async () => ({ meta: { last_row_id: post.id } })),
-        first: vi.fn(async () => (
-          sql.includes('SELECT * FROM posts WHERE slug = ?') ? post : null
-        )),
+        first: vi.fn(async () =>
+          sql.includes('SELECT * FROM posts WHERE slug = ?') ? post : null,
+        ),
         all: vi.fn(async () => ({ results: [] })),
       }
       return statement
@@ -85,9 +85,16 @@ function createDbWithCanonicalSlugPost(post: Post) {
           return null
         }),
         all: vi.fn(async () => {
-          if (sql.includes('lower(slug) = lower(?)') && String(values[0]).toLowerCase() === post.slug.toLowerCase()) {
+          if (
+            sql.includes('lower(slug) = lower(?)') &&
+            String(values[0]).toLowerCase() === post.slug.toLowerCase()
+          ) {
             if (sql.includes('SELECT id, slug, category')) {
-              return { results: [{ id: post.id, slug: post.slug, category: post.category }] }
+              return {
+                results: [
+                  { id: post.id, slug: post.slug, category: post.category },
+                ],
+              }
             }
             return { results: [post] }
           }
@@ -117,8 +124,8 @@ function createDbWithSlugAlias(post: Post, aliasSlug: string) {
         first: vi.fn(async () => null),
         all: vi.fn(async () => {
           if (
-            sql.includes('JOIN post_slug_aliases')
-            && String(values[0]).toLowerCase() === aliasSlug.toLowerCase()
+            sql.includes('JOIN post_slug_aliases') &&
+            String(values[0]).toLowerCase() === aliasSlug.toLowerCase()
           ) {
             return { results: [post] }
           }
@@ -148,8 +155,16 @@ function createDbTrackingSlugRename(post: Post) {
           return { meta: { last_row_id: post.id } }
         }),
         first: vi.fn(async () => {
-          if (sql.includes('SELECT slug, category, deleted_at FROM posts WHERE id = ?')) {
-            return { slug: post.slug, category: post.category, deleted_at: post.deleted_at }
+          if (
+            sql.includes(
+              'SELECT slug, category, deleted_at FROM posts WHERE id = ?',
+            )
+          ) {
+            return {
+              slug: post.slug,
+              category: post.category,
+              deleted_at: post.deleted_at,
+            }
           }
           return null
         }),
@@ -262,7 +277,9 @@ describe('post visibility rules', () => {
     const post = await getPostBySlug(db, '2026-05-02-EZ83Cg')
 
     expect(post?.slug).toBe('2026-05-02-ez83cg')
-    expect(preparedSqls).toContain('SELECT * FROM posts WHERE lower(slug) = lower(?) LIMIT 2')
+    expect(preparedSqls).toContain(
+      'SELECT * FROM posts WHERE lower(slug) = lower(?) LIMIT 2',
+    )
   })
 
   it('autosaves through the canonical post row when current_slug casing is stale', async () => {
@@ -285,16 +302,21 @@ describe('post visibility rules', () => {
   })
 
   it('finds a post through a remembered slug alias', async () => {
-    const { db, preparedSqls } = createDbWithSlugAlias({
-      ...basePost,
-      id: 100,
-      slug: 'why-effort-isnt-enough',
-    }, '2026-05-02-dh5wth')
+    const { db, preparedSqls } = createDbWithSlugAlias(
+      {
+        ...basePost,
+        id: 100,
+        slug: 'why-effort-isnt-enough',
+      },
+      '2026-05-02-dh5wth',
+    )
 
     const post = await getPostBySlug(db, '2026-05-02-dh5wth')
 
     expect(post?.slug).toBe('why-effort-isnt-enough')
-    expect(preparedSqls.some((sql) => sql.includes('JOIN post_slug_aliases'))).toBe(true)
+    expect(
+      preparedSqls.some((sql) => sql.includes('JOIN post_slug_aliases')),
+    ).toBe(true)
   })
 
   it('records the old slug as an alias when a post slug is renamed by id', async () => {

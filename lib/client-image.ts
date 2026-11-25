@@ -57,29 +57,47 @@ function getExtension(type: string) {
 
 function toBlob(canvas: HTMLCanvasElement, type: string, quality?: number) {
   return new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        reject(new Error('图片压缩失败'))
-        return
-      }
-      resolve(blob)
-    }, type, quality)
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          reject(new Error('图片压缩失败'))
+          return
+        }
+        resolve(blob)
+      },
+      type,
+      quality,
+    )
   })
 }
 
-export async function optimizeImageForUpload(file: File, options: OptimizeImageOptions): Promise<File> {
+export async function optimizeImageForUpload(
+  file: File,
+  options: OptimizeImageOptions,
+): Promise<File> {
   if (typeof window === 'undefined' || !canOptimize(file)) return file
 
   const objectUrl = URL.createObjectURL(file)
 
   try {
     const image = await loadImage(objectUrl)
-    const { maxWidth, maxHeight, quality = 0.84, format = 'image/webp', minBytes = 0 } = options
+    const {
+      maxWidth,
+      maxHeight,
+      quality = 0.84,
+      format = 'image/webp',
+      minBytes = 0,
+    } = options
 
-    const scale = Math.min(maxWidth / image.naturalWidth, maxHeight / image.naturalHeight, 1)
+    const scale = Math.min(
+      maxWidth / image.naturalWidth,
+      maxHeight / image.naturalHeight,
+      1,
+    )
     const targetWidth = Math.max(1, Math.round(image.naturalWidth * scale))
     const targetHeight = Math.max(1, Math.round(image.naturalHeight * scale))
-    const shouldResize = targetWidth !== image.naturalWidth || targetHeight !== image.naturalHeight
+    const shouldResize =
+      targetWidth !== image.naturalWidth || targetHeight !== image.naturalHeight
     const shouldCompress = file.size >= minBytes || shouldResize
 
     if (!shouldCompress) return file

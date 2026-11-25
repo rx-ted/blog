@@ -1,4 +1,9 @@
-import { getCategories, createCategory, updateCategory, deleteCategory } from '@/lib/db'
+import {
+  getCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+} from '@/lib/db'
 import {
   ensureAuthenticatedRequest,
   getRouteEnvWithDb,

@@ -1,6 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from 'react'
 import { Search, X } from 'lucide-react'
 import { Dropdown } from '@/components/Dropdown'
 
@@ -59,15 +66,24 @@ export function createModelOptions(
   models: Array<{ id: string; name: string }>,
   currentModel: string,
 ) {
-  const options = models.map((model) => ({ value: model.id, label: model.name }))
+  const options = models.map((model) => ({
+    value: model.id,
+    label: model.name,
+  }))
   const normalizedCurrentModel = currentModel.trim()
 
-  if (!normalizedCurrentModel || options.some((option) => option.value === normalizedCurrentModel)) {
+  if (
+    !normalizedCurrentModel ||
+    options.some((option) => option.value === normalizedCurrentModel)
+  ) {
     return options
   }
 
   return [
-    { value: normalizedCurrentModel, label: `${normalizedCurrentModel}（当前值）` },
+    {
+      value: normalizedCurrentModel,
+      label: `${normalizedCurrentModel}（当前值）`,
+    },
     ...options,
   ]
 }
@@ -94,28 +110,47 @@ export function ProviderListTable<T extends BaseProviderProfile>({
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-[var(--editor-soft)] text-left">
-            <th className="px-3 py-2 font-medium text-[var(--editor-muted)]">名称</th>
-            <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] sm:table-cell">平台</th>
-            <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] md:table-cell">模型</th>
-            <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] lg:table-cell">更新时间</th>
-            <th className="w-36 px-3 py-2 text-right font-medium text-[var(--editor-muted)]">操作</th>
+            <th className="px-3 py-2 font-medium text-[var(--editor-muted)]">
+              名称
+            </th>
+            <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] sm:table-cell">
+              平台
+            </th>
+            <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] md:table-cell">
+              模型
+            </th>
+            <th className="hidden px-3 py-2 font-medium text-[var(--editor-muted)] lg:table-cell">
+              更新时间
+            </th>
+            <th className="w-36 px-3 py-2 text-right font-medium text-[var(--editor-muted)]">
+              操作
+            </th>
           </tr>
         </thead>
         <tbody>
           {profiles.map((profile) => (
-            <tr key={profile.id} className="border-t border-[var(--editor-line)] hover:bg-[var(--editor-panel)]">
+            <tr
+              key={profile.id}
+              className="border-t border-[var(--editor-line)] hover:bg-[var(--editor-panel)]"
+            >
               <td className="px-3 py-2 font-medium text-[var(--editor-ink)]">
                 {profile.name}
                 {profile.id === defaultProfileId || profile.is_default === 1 ? (
-                  <span className="ml-2 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] text-emerald-600">默认</span>
+                  <span className="ml-2 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] text-emerald-600">
+                    默认
+                  </span>
                 ) : null}
               </td>
               <td className="hidden px-3 py-2 text-[var(--editor-muted)] sm:table-cell">
                 {profile.provider_name || profile.provider || '-'}
               </td>
-              <td className="hidden px-3 py-2 text-[var(--editor-muted)] md:table-cell">{profile.model}</td>
+              <td className="hidden px-3 py-2 text-[var(--editor-muted)] md:table-cell">
+                {profile.model}
+              </td>
               <td className="hidden px-3 py-2 text-[var(--editor-muted)] lg:table-cell">
-                {profile.updated_at ? new Date(profile.updated_at * 1000).toLocaleString('zh-CN') : '-'}
+                {profile.updated_at
+                  ? new Date(profile.updated_at * 1000).toLocaleString('zh-CN')
+                  : '-'}
               </td>
               <td className="px-3 py-2 text-right">
                 {profile.id !== defaultProfileId && profile.is_default !== 1 ? (
@@ -146,7 +181,10 @@ export function ProviderListTable<T extends BaseProviderProfile>({
           ))}
           {profiles.length === 0 ? (
             <tr>
-              <td colSpan={5} className="px-3 py-8 text-center text-sm text-[var(--editor-muted)]">
+              <td
+                colSpan={5}
+                className="px-3 py-8 text-center text-sm text-[var(--editor-muted)]"
+              >
                 {emptyText}
               </td>
             </tr>
@@ -164,15 +202,25 @@ interface ProviderDialogProps {
   children: ReactNode
 }
 
-export function ProviderDialog({ title, onClose, headerAction, children }: ProviderDialogProps) {
+export function ProviderDialog({
+  title,
+  onClose,
+  headerAction,
+  children,
+}: ProviderDialogProps) {
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/30 p-2 sm:p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 grid place-items-center bg-black/30 p-2 sm:p-4"
+      onClick={onClose}
+    >
       <div
         className="flex max-h-[calc(100dvh-1rem)] w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] shadow-xl sm:max-h-[min(92dvh,760px)]"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex shrink-0 items-center justify-between gap-3 border-b border-[var(--editor-line)] px-4 py-3 sm:px-6">
-          <h3 className="text-lg font-semibold text-[var(--editor-ink)]">{title}</h3>
+          <h3 className="text-lg font-semibold text-[var(--editor-ink)]">
+            {title}
+          </h3>
           {headerAction}
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">
@@ -203,16 +251,29 @@ export function ProviderTemplateModal({
   const [query, setQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
 
-  const allPresets = useMemo(() => groups.flatMap((group) => group.presets), [groups])
-  const categoryFilters = useMemo(() => [
-    { id: 'all', label: '全部', count: allPresets.length },
-    ...groups.map((group) => ({ id: group.category, label: group.category, count: group.presets.length })),
-  ], [allPresets.length, groups])
+  const allPresets = useMemo(
+    () => groups.flatMap((group) => group.presets),
+    [groups],
+  )
+  const categoryFilters = useMemo(
+    () => [
+      { id: 'all', label: '全部', count: allPresets.length },
+      ...groups.map((group) => ({
+        id: group.category,
+        label: group.category,
+        count: group.presets.length,
+      })),
+    ],
+    [allPresets.length, groups],
+  )
 
   const normalizedQuery = query.trim().toLowerCase()
   const visibleGroups = useMemo(() => {
     return groups
-      .filter((group) => activeCategory === 'all' || group.category === activeCategory)
+      .filter(
+        (group) =>
+          activeCategory === 'all' || group.category === activeCategory,
+      )
       .map((group) => ({
         category: group.category,
         presets: group.presets.filter((preset) => {
@@ -228,11 +289,19 @@ export function ProviderTemplateModal({
       .filter((group) => group.presets.length > 0)
   }, [activeCategory, groups, normalizedQuery])
 
-  const visibleCount = visibleGroups.reduce((sum, group) => sum + group.presets.length, 0)
-  const activeCategoryLabel = categoryFilters.find((category) => category.id === activeCategory)?.label || '全部'
+  const visibleCount = visibleGroups.reduce(
+    (sum, group) => sum + group.presets.length,
+    0,
+  )
+  const activeCategoryLabel =
+    categoryFilters.find((category) => category.id === activeCategory)?.label ||
+    '全部'
 
   useEffect(() => {
-    const previousActiveElement = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    const previousActiveElement =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null
     window.setTimeout(() => searchRef.current?.focus(), 0)
 
     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
@@ -244,9 +313,15 @@ export function ProviderTemplateModal({
       if (event.key !== 'Tab') return
 
       const focusable = dialogRef.current
-        ? Array.from(dialogRef.current.querySelectorAll<HTMLElement>(
-          'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
-        )).filter((element) => !element.hasAttribute('disabled') && element.offsetParent !== null)
+        ? Array.from(
+            dialogRef.current.querySelectorAll<HTMLElement>(
+              'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+            ),
+          ).filter(
+            (element) =>
+              !element.hasAttribute('disabled') &&
+              element.offsetParent !== null,
+          )
         : []
 
       if (focusable.length === 0) return
@@ -293,7 +368,10 @@ export function ProviderTemplateModal({
         <div className="shrink-0 border-b border-[var(--editor-line)] bg-[var(--background)]/75 px-4 py-3 sm:px-5">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <h3 id="provider-template-title" className="truncate text-lg font-semibold text-[var(--editor-ink)]">
+              <h3
+                id="provider-template-title"
+                className="truncate text-lg font-semibold text-[var(--editor-ink)]"
+              >
                 快捷模板
               </h3>
               <p className="mt-0.5 text-xs text-[var(--editor-muted)]">
@@ -311,7 +389,10 @@ export function ProviderTemplateModal({
           </div>
 
           <div className="flex items-center gap-2 rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] px-3 py-2">
-            <Search className="h-4 w-4 shrink-0 text-[var(--editor-muted)]" aria-hidden="true" />
+            <Search
+              className="h-4 w-4 shrink-0 text-[var(--editor-muted)]"
+              aria-hidden="true"
+            />
             <input
               ref={searchRef}
               type="search"
@@ -386,7 +467,9 @@ export function ProviderTemplateModal({
                       <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--editor-muted)]">
                         {group.category}
                       </h4>
-                      <span className="text-xs text-[var(--editor-muted)]">{group.presets.length}</span>
+                      <span className="text-xs text-[var(--editor-muted)]">
+                        {group.presets.length}
+                      </span>
                     </div>
                     <div className="grid gap-2 lg:grid-cols-2">
                       {group.presets.map((preset) => (
@@ -475,37 +558,51 @@ export function ProviderBasicFields<T extends BaseProviderFormState>({
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       <div>
-        <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">配置名称</label>
+        <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">
+          配置名称
+        </label>
         <input
           type="text"
           value={editing.name}
-          onChange={(event) => onChange({ name: event.target.value } as Partial<T>)}
+          onChange={(event) =>
+            onChange({ name: event.target.value } as Partial<T>)
+          }
           className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
         />
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">平台</label>
+        <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">
+          平台
+        </label>
         <input
           type="text"
           value={editing.provider_name || editing.provider}
-          onChange={(event) => onChange({ provider_name: event.target.value } as Partial<T>)}
+          onChange={(event) =>
+            onChange({ provider_name: event.target.value } as Partial<T>)
+          }
           className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
         />
       </div>
 
       <div className="sm:col-span-2">
-        <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">Base URL</label>
+        <label className="mb-1 block text-sm font-medium text-[var(--editor-ink)]">
+          Base URL
+        </label>
         <input
           type="url"
           value={editing.base_url}
-          onChange={(event) => onChange({ base_url: event.target.value } as Partial<T>)}
+          onChange={(event) =>
+            onChange({ base_url: event.target.value } as Partial<T>)
+          }
           className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
         />
       </div>
 
       <div className="sm:col-span-2">
         <div className="mb-1 flex items-center justify-between gap-2">
-          <label className="block text-sm font-medium text-[var(--editor-ink)]">API Key</label>
+          <label className="block text-sm font-medium text-[var(--editor-ink)]">
+            API Key
+          </label>
           {editing.api_key_url ? (
             <a
               href={editing.api_key_url}
@@ -520,17 +617,23 @@ export function ProviderBasicFields<T extends BaseProviderFormState>({
         <input
           type="password"
           value={editing.api_key}
-          onChange={(event) => onChange({ api_key: event.target.value } as Partial<T>)}
+          onChange={(event) =>
+            onChange({ api_key: event.target.value } as Partial<T>)
+          }
           className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
         />
         {editing.api_key_masked ? (
-          <div className="mt-1 text-xs text-[var(--editor-muted)]">已保存：{editing.api_key_masked}</div>
+          <div className="mt-1 text-xs text-[var(--editor-muted)]">
+            已保存：{editing.api_key_masked}
+          </div>
         ) : null}
       </div>
 
       <div className="sm:col-span-2">
         <div className="mb-1 flex items-center justify-between gap-2">
-          <label className="block text-sm font-medium text-[var(--editor-ink)]">模型</label>
+          <label className="block text-sm font-medium text-[var(--editor-ink)]">
+            模型
+          </label>
           <button
             type="button"
             onClick={onFetchModels}
@@ -543,7 +646,9 @@ export function ProviderBasicFields<T extends BaseProviderFormState>({
         <input
           type="text"
           value={editing.model}
-          onChange={(event) => onChange({ model: event.target.value } as Partial<T>)}
+          onChange={(event) =>
+            onChange({ model: event.target.value } as Partial<T>)
+          }
           className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
         />
         {models.length > 0 ? (
@@ -555,13 +660,18 @@ export function ProviderBasicFields<T extends BaseProviderFormState>({
               placeholder={`搜索并选择已加载的 ${models.length} 个模型`}
             />
             <div className="text-xs text-[var(--editor-muted)]">
-              已加载 {models.length} 个模型。可在下拉里搜索，也可以直接在上方手动输入模型 ID。
+              已加载 {models.length}{' '}
+              个模型。可在下拉里搜索，也可以直接在上方手动输入模型 ID。
             </div>
           </div>
         ) : null}
         {modelsSource || modelsWarning ? (
           <div className="mt-1 text-xs text-[var(--editor-muted)]">
-            {modelsSource === 'provider' ? '来源：服务商接口' : modelsSource === 'preset' ? '来源：模板回退' : ''}
+            {modelsSource === 'provider'
+              ? '来源：服务商接口'
+              : modelsSource === 'preset'
+                ? '来源：模板回退'
+                : ''}
             {modelsWarning ? ` · ${modelsWarning}` : ''}
           </div>
         ) : null}

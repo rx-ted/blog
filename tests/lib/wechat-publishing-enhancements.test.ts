@@ -9,7 +9,10 @@ const originalDocument = globalThis.Document
 const originalNode = globalThis.Node
 
 function parseBody(html: string) {
-  const doc = new DOMParser().parseFromString(`<html><body>${html}</body></html>`, 'text/html')
+  const doc = new DOMParser().parseFromString(
+    `<html><body>${html}</body></html>`,
+    'text/html',
+  )
   globalThis.Document = doc.defaultView.Document
   globalThis.Node = doc.defaultView.Node
   return doc.body
@@ -41,10 +44,16 @@ describe('wechat publishing enhancements', () => {
 
     expect(body.querySelectorAll('sup.wechat-link-ref')).toHaveLength(0)
 
-    const items = Array.from(body.querySelectorAll('.wechat-link-reference-item'))
+    const items = Array.from(
+      body.querySelectorAll('.wechat-link-reference-item'),
+    )
     expect(items).toHaveLength(1)
-    expect(items[0].querySelector('.wechat-link-reference-number')?.textContent).toBe('[1]')
-    expect(items[0].querySelector('.wechat-link-reference-text')?.textContent).toBe('https://example.com/a')
+    expect(
+      items[0].querySelector('.wechat-link-reference-number')?.textContent,
+    ).toBe('[1]')
+    expect(
+      items[0].querySelector('.wechat-link-reference-text')?.textContent,
+    ).toBe('https://example.com/a')
     expect(items[0].textContent).not.toContain('示例文章')
     expect(items[0].querySelector('a')).toBeNull()
   })
@@ -59,7 +68,9 @@ describe('wechat publishing enhancements', () => {
 
     expect(body.querySelectorAll('sup.wechat-link-ref')).toHaveLength(0)
     expect(body.querySelectorAll('.wechat-link-references')).toHaveLength(1)
-    expect(body.querySelector('.wechat-link-reference-text')?.textContent).toBe('https://example.com/new')
+    expect(body.querySelector('.wechat-link-reference-text')?.textContent).toBe(
+      'https://example.com/new',
+    )
     expect(body.textContent).not.toContain('old.example.com')
   })
 
@@ -77,7 +88,11 @@ describe('wechat publishing enhancements', () => {
     normalizeWechatVideoPlaceholders(body)
 
     expect(body.querySelector('video')).toBeNull()
-    expect(Array.from(body.querySelectorAll('[data-wechat-video-placeholder]')).map(node => node.textContent)).toEqual([
+    expect(
+      Array.from(body.querySelectorAll('[data-wechat-video-placeholder]')).map(
+        (node) => node.textContent,
+      ),
+    ).toEqual([
       '【插入视频：德州.mp4】',
       '【插入视频：CleanShot 2026-09-02.mp4】',
       '【插入视频：德州.mp4】',

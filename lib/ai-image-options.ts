@@ -14,7 +14,10 @@ export type AIImageResolution = 'auto' | '1k' | '2k' | '4k'
 type LegacyImageSize = 'auto' | '1536x1024' | '1024x1536' | '1024x1024'
 type LegacyImageQuality = 'auto' | 'low' | 'medium' | 'high'
 
-export const AI_IMAGE_ASPECT_RATIO_OPTIONS: Array<{ value: AIImageAspectRatio; label: string }> = [
+export const AI_IMAGE_ASPECT_RATIO_OPTIONS: Array<{
+  value: AIImageAspectRatio
+  label: string
+}> = [
   { value: 'auto', label: '智能' },
   { value: '21:9', label: '21:9' },
   { value: '16:9', label: '16:9' },
@@ -26,17 +29,26 @@ export const AI_IMAGE_ASPECT_RATIO_OPTIONS: Array<{ value: AIImageAspectRatio; l
   { value: '9:16', label: '9:16' },
 ]
 
-export const AI_IMAGE_RESOLUTION_OPTIONS: Array<{ value: AIImageResolution; label: string }> = [
+export const AI_IMAGE_RESOLUTION_OPTIONS: Array<{
+  value: AIImageResolution
+  label: string
+}> = [
   { value: 'auto', label: '智能' },
   { value: '1k', label: '标准 1K' },
   { value: '2k', label: '高清 2K' },
   { value: '4k', label: '精细 4K' },
 ]
 
-const ASPECT_RATIO_SET = new Set<string>(AI_IMAGE_ASPECT_RATIO_OPTIONS.map((option) => option.value))
-const RESOLUTION_SET = new Set<string>(AI_IMAGE_RESOLUTION_OPTIONS.map((option) => option.value))
+const ASPECT_RATIO_SET = new Set<string>(
+  AI_IMAGE_ASPECT_RATIO_OPTIONS.map((option) => option.value),
+)
+const RESOLUTION_SET = new Set<string>(
+  AI_IMAGE_RESOLUTION_OPTIONS.map((option) => option.value),
+)
 
-export function normalizeAiImageAspectRatio(value?: string): AIImageAspectRatio {
+export function normalizeAiImageAspectRatio(
+  value?: string,
+): AIImageAspectRatio {
   const normalized = (value || '').trim()
   if (ASPECT_RATIO_SET.has(normalized)) return normalized as AIImageAspectRatio
   return 'auto'
@@ -48,7 +60,9 @@ export function normalizeAiImageResolution(value?: string): AIImageResolution {
   return 'auto'
 }
 
-export function inferAspectRatioFromLegacySize(size?: string): AIImageAspectRatio {
+export function inferAspectRatioFromLegacySize(
+  size?: string,
+): AIImageAspectRatio {
   const normalized = (size || '').trim()
   switch (normalized) {
     case '1536x1024':
@@ -62,7 +76,9 @@ export function inferAspectRatioFromLegacySize(size?: string): AIImageAspectRati
   }
 }
 
-export function inferResolutionFromLegacyQuality(quality?: string): AIImageResolution {
+export function inferResolutionFromLegacyQuality(
+  quality?: string,
+): AIImageResolution {
   const normalized = (quality || '').trim().toLowerCase()
   switch (normalized) {
     case 'low':
@@ -79,7 +95,13 @@ export function inferResolutionFromLegacyQuality(quality?: string): AIImageResol
 function parseAspectRatio(value: AIImageAspectRatio) {
   if (value === 'auto') return null
   const [width, height] = value.split(':').map((item) => Number(item))
-  if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) return null
+  if (
+    !Number.isFinite(width) ||
+    !Number.isFinite(height) ||
+    width <= 0 ||
+    height <= 0
+  )
+    return null
   return { width, height }
 }
 
@@ -90,7 +112,11 @@ export function deriveLegacySizeFromAspectRatio(
   const normalized = normalizeAiImageAspectRatio(aspectRatio)
   if (normalized === 'auto') {
     const fallback = (fallbackSize || '').trim()
-    if (fallback === '1536x1024' || fallback === '1024x1536' || fallback === '1024x1024') {
+    if (
+      fallback === '1536x1024' ||
+      fallback === '1024x1536' ||
+      fallback === '1024x1024'
+    ) {
       return fallback
     }
     return 'auto'
@@ -130,12 +156,18 @@ export function deriveLegacyQualityFromResolution(
 
 export function getAiImageAspectRatioLabel(value?: string) {
   const normalized = normalizeAiImageAspectRatio(value)
-  return AI_IMAGE_ASPECT_RATIO_OPTIONS.find((option) => option.value === normalized)?.label || '智能'
+  return (
+    AI_IMAGE_ASPECT_RATIO_OPTIONS.find((option) => option.value === normalized)
+      ?.label || '智能'
+  )
 }
 
 export function getAiImageResolutionLabel(value?: string) {
   const normalized = normalizeAiImageResolution(value)
-  return AI_IMAGE_RESOLUTION_OPTIONS.find((option) => option.value === normalized)?.label || '智能'
+  return (
+    AI_IMAGE_RESOLUTION_OPTIONS.find((option) => option.value === normalized)
+      ?.label || '智能'
+  )
 }
 
 export function buildAspectRatioPromptHint(aspectRatio?: string) {

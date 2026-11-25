@@ -16,7 +16,8 @@ describe('unsplash helpers', () => {
       },
       links: {
         html: 'https://unsplash.com/photos/photo-1',
-        download_location: 'https://api.unsplash.com/photos/photo-1/download?ixid=test',
+        download_location:
+          'https://api.unsplash.com/photos/photo-1/download?ixid=test',
       },
       user: {
         name: 'Jane Doe',
@@ -31,15 +32,28 @@ describe('unsplash helpers', () => {
       src: 'https://images.unsplash.com/photo-1?w=1600',
       thumbnail: 'https://images.unsplash.com/photo-1?w=400',
       source: 'Jane Doe',
-      downloadLocation: 'https://api.unsplash.com/photos/photo-1/download?ixid=test',
+      downloadLocation:
+        'https://api.unsplash.com/photos/photo-1/download?ixid=test',
       link: 'https://unsplash.com/photos/photo-1',
     })
   })
 
   it('only accepts official Unsplash download tracking URLs', () => {
-    expect(isValidUnsplashDownloadLocation('https://api.unsplash.com/photos/abc/download?ixid=test')).toBe(true)
-    expect(isValidUnsplashDownloadLocation('https://images.unsplash.com/photos/abc/download')).toBe(false)
-    expect(isValidUnsplashDownloadLocation('https://example.com/photos/abc/download')).toBe(false)
+    expect(
+      isValidUnsplashDownloadLocation(
+        'https://api.unsplash.com/photos/abc/download?ixid=test',
+      ),
+    ).toBe(true)
+    expect(
+      isValidUnsplashDownloadLocation(
+        'https://images.unsplash.com/photos/abc/download',
+      ),
+    ).toBe(false)
+    expect(
+      isValidUnsplashDownloadLocation(
+        'https://example.com/photos/abc/download',
+      ),
+    ).toBe(false)
     expect(isValidUnsplashDownloadLocation('not a url')).toBe(false)
   })
 })

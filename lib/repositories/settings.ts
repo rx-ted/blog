@@ -6,22 +6,34 @@ type SettingValueRow = {
 }
 
 // ── 站点设置 ──
-export async function getSetting(db: Database, key: string): Promise<string | null> {
+export async function getSetting(
+  db: Database,
+  key: string,
+): Promise<string | null> {
   const settings = await getSettings(db, [key])
   return settings[key] ?? null
 }
 
-export async function getSettings(db: Database, keys: string[]): Promise<Record<string, string | null>> {
+export async function getSettings(
+  db: Database,
+  keys: string[],
+): Promise<Record<string, string | null>> {
   await ensureSchema(db)
-  const uniqueKeys = Array.from(new Set(keys.map((key) => key.trim()).filter(Boolean)))
-  const values = Object.fromEntries(uniqueKeys.map((settingKey) => [settingKey, null])) as Record<string, string | null>
+  const uniqueKeys = Array.from(
+    new Set(keys.map((key) => key.trim()).filter(Boolean)),
+  )
+  const values = Object.fromEntries(
+    uniqueKeys.map((settingKey) => [settingKey, null]),
+  ) as Record<string, string | null>
 
   if (uniqueKeys.length === 0) return values
 
   try {
     const placeholders = uniqueKeys.map(() => '?').join(', ')
     const { results } = await db
-      .prepare(`SELECT key, value FROM site_settings WHERE key IN (${placeholders})`)
+      .prepare(
+        `SELECT key, value FROM site_settings WHERE key IN (${placeholders})`,
+      )
       .bind(...uniqueKeys)
       .all<SettingValueRow>()
 
@@ -35,7 +47,14 @@ export async function getSettings(db: Database, keys: string[]): Promise<Record<
   return values
 }
 
-export async function setSetting(db: Database, key: string, value: string): Promise<void> {
+export async function setSetting(
+  db: Database,
+  key: string,
+  value: string,
+): Promise<void> {
   await ensureSchema(db)
-  await db.prepare('INSERT OR REPLACE INTO site_settings (key, value) VALUES (?, ?)').bind(key, value).run()
+  await db
+    .prepare('INSERT OR REPLACE INTO site_settings (key, value) VALUES (?, ?)')
+    .bind(key, value)
+    .run()
 }

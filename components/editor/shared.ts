@@ -2,9 +2,13 @@ import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { JSONContent } from 'novel'
 import type { ArticleTocItem } from '@/lib/article-toc'
 
-export type SaveFeedback =
-  | { type: 'success' | 'error'; message: string; slug?: string; published?: boolean; canStartNew?: boolean }
-  | null
+export type SaveFeedback = {
+  type: 'success' | 'error'
+  message: string
+  slug?: string
+  published?: boolean
+  canStartNew?: boolean
+} | null
 
 export type PublishStatus = 'public' | 'draft' | 'encrypted' | 'unlisted'
 export type SaveState = 'saved' | 'dirty' | 'saving' | 'error'
@@ -63,7 +67,8 @@ export const SIDEBAR_KEY = 'qmblog:sidebar-open'
 export const TOC_COLLAPSED_KEY = 'qmblog:editor-toc-collapsed'
 export const AUTOSAVE_DEBOUNCE_MS = 5 * 60 * 1000
 export const AUTOSAVE_MAX_RETRY_DELAY_MS = 10000
-export const IMPORT_MARKDOWN_STORAGE_KEY = 'qmblog:pending-editor-import-markdown'
+export const IMPORT_MARKDOWN_STORAGE_KEY =
+  'qmblog:pending-editor-import-markdown'
 
 export const EMPTY_DOCUMENT = {
   type: 'doc',
@@ -76,9 +81,10 @@ export function calcReadTime(chars: number): string {
 }
 
 export function createEditorDraftDocumentKey() {
-  const random = typeof crypto !== 'undefined' && 'randomUUID' in crypto
-    ? crypto.randomUUID()
-    : Math.random().toString(36).slice(2)
+  const random =
+    typeof crypto !== 'undefined' && 'randomUUID' in crypto
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2)
   return `draft:${Date.now()}-${random}`
 }
 
@@ -93,13 +99,19 @@ export function normalizeSectionTitle(value: string) {
   return value.trim().replace(/\s+/g, ' ').toLowerCase()
 }
 
-export function findSectionInsertPosition(doc: ProseMirrorNode, target?: EditorAiToolInsertTarget) {
+export function findSectionInsertPosition(
+  doc: ProseMirrorNode,
+  target?: EditorAiToolInsertTarget,
+) {
   if (!target || target.mode !== 'section') return null
 
-  const sectionTitle = target.sectionTitle ? normalizeSectionTitle(target.sectionTitle) : ''
-  const sectionNumber = Number.isInteger(target.sectionNumber) && Number(target.sectionNumber) > 0
-    ? Number(target.sectionNumber)
-    : null
+  const sectionTitle = target.sectionTitle
+    ? normalizeSectionTitle(target.sectionTitle)
+    : ''
+  const sectionNumber =
+    Number.isInteger(target.sectionNumber) && Number(target.sectionNumber) > 0
+      ? Number(target.sectionNumber)
+      : null
   let matchedPos: number | null = null
   let seenSections = 0
 
@@ -111,7 +123,8 @@ export function findSectionInsertPosition(doc: ProseMirrorNode, target?: EditorA
 
     seenSections += 1
     const title = normalizeSectionTitle(node.textContent || '')
-    const matchesNumber = sectionNumber !== null && seenSections === sectionNumber
+    const matchesNumber =
+      sectionNumber !== null && seenSections === sectionNumber
     const matchesTitle = Boolean(sectionTitle) && title.includes(sectionTitle)
 
     if (matchesNumber || matchesTitle) {
@@ -125,7 +138,10 @@ export function findSectionInsertPosition(doc: ProseMirrorNode, target?: EditorA
   return matchedPos
 }
 
-export function syncEditorHeadingAnchors(root: HTMLElement | null, tocItems: ArticleTocItem[]) {
+export function syncEditorHeadingAnchors(
+  root: HTMLElement | null,
+  tocItems: ArticleTocItem[],
+) {
   if (!root || tocItems.length === 0) return
 
   const headings = Array.from(root.querySelectorAll<HTMLElement>('h1, h2, h3'))
@@ -135,3 +151,9 @@ export function syncEditorHeadingAnchors(root: HTMLElement | null, tocItems: Art
     heading.id = item.id
   }
 }
+
+export type {
+  EditorAdapter,
+  EditorContentSnapshot,
+  EditorHeading,
+} from './shared/types/editor'

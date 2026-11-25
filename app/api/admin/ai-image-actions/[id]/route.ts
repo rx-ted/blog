@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/admin-auth'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import {
@@ -23,7 +23,8 @@ export async function PUT(
   if (!(await authenticateRequest(req, db))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  if (!db) return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
+  if (!db)
+    return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
 
   await ensureAiImageConfigInfrastructure(db)
 
@@ -41,18 +42,21 @@ export async function PUT(
     is_enabled?: number
   }
   const numericId = Number(id)
-  const current = await db.prepare(`
+  const current = await db
+    .prepare(`
     SELECT id, aspect_ratio, resolution, size, quality
     FROM ai_image_actions
     WHERE id = ?
     LIMIT 1
-  `).bind(numericId).first<{
-    id: number
-    aspect_ratio: string
-    resolution: string
-    size: string
-    quality: string
-  }>()
+  `)
+    .bind(numericId)
+    .first<{
+      id: number
+      aspect_ratio: string
+      resolution: string
+      size: string
+      quality: string
+    }>()
 
   if (!current?.id) {
     return NextResponse.json({ error: '操作不存在' }, { status: 404 })
@@ -84,12 +88,16 @@ export async function PUT(
     body.quality !== undefined
   ) {
     const nextAspectRatio = normalizeAiImageAspectRatio(
-      body.aspect_ratio
-        || (body.size !== undefined ? inferAspectRatioFromLegacySize(body.size) : current.aspect_ratio),
+      body.aspect_ratio ||
+        (body.size !== undefined
+          ? inferAspectRatioFromLegacySize(body.size)
+          : current.aspect_ratio),
     )
     const nextResolution = normalizeAiImageResolution(
-      body.resolution
-        || (body.quality !== undefined ? inferResolutionFromLegacyQuality(body.quality) : current.resolution),
+      body.resolution ||
+        (body.quality !== undefined
+          ? inferResolutionFromLegacyQuality(body.quality)
+          : current.resolution),
     )
 
     sets.push('aspect_ratio = ?')
@@ -97,9 +105,19 @@ export async function PUT(
     sets.push('resolution = ?')
     values.push(nextResolution)
     sets.push('size = ?')
-    values.push(deriveLegacySizeFromAspectRatio(nextAspectRatio, body.size || current.size))
+    values.push(
+      deriveLegacySizeFromAspectRatio(
+        nextAspectRatio,
+        body.size || current.size,
+      ),
+    )
     sets.push('quality = ?')
-    values.push(deriveLegacyQualityFromResolution(nextResolution, body.quality || current.quality))
+    values.push(
+      deriveLegacyQualityFromResolution(
+        nextResolution,
+        body.quality || current.quality,
+      ),
+    )
   }
   if (body.profile_id !== undefined) {
     if (Number.isFinite(body.profile_id) && Number(body.profile_id) > 0) {
@@ -124,13 +142,21 @@ export async function PUT(
   values.push(numericId)
 
   try {
-    await db.prepare(`
+    await db
+      .prepare(`
       UPDATE ai_image_actions
       SET ${sets.join(', ')}
       WHERE id = ?
-    `).bind(...values).run()
+    `)
+      .bind(...values)
+      .run()
   } catch (error) {
-    if (error instanceof Error && /UNIQUE constraint failed: ai_image_actions\\.action_key/i.test(error.message)) {
+    if (
+      error instanceof Error &&
+      /UNIQUE constraint failed: ai_image_actions\\.action_key/i.test(
+        error.message,
+      )
+    ) {
       return NextResponse.json({ error: '操作标识已存在' }, { status: 409 })
     }
     throw error
@@ -148,12 +174,14 @@ export async function DELETE(
   if (!(await authenticateRequest(req, db))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  if (!db) return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
+  if (!db)
+    return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
 
   await ensureAiImageConfigInfrastructure(db)
 
   const { id } = await params
-  const row = await db.prepare('SELECT id FROM ai_image_actions WHERE id = ?')
+  const row = await db
+    .prepare('SELECT id FROM ai_image_actions WHERE id = ?')
     .bind(Number(id))
     .first<{ id: number }>()
 
@@ -161,6 +189,9 @@ export async function DELETE(
     return NextResponse.json({ error: '操作不存在' }, { status: 404 })
   }
 
-  await db.prepare('DELETE FROM ai_image_actions WHERE id = ?').bind(Number(id)).run()
+  await db
+    .prepare('DELETE FROM ai_image_actions WHERE id = ?')
+    .bind(Number(id))
+    .run()
   return NextResponse.json({ success: true })
 }

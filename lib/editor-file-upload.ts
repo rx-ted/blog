@@ -15,12 +15,15 @@ export interface UploadEditorFileOptions {
 }
 
 function sanitizeFilenameSegment(value: string) {
-  return value
-    .trim()
-    .replace(/[<>:"/\\|?*\u0000-\u001f]+/g, '-')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '')
+  return (
+    value
+      .trim()
+      // biome-ignore lint/suspicious/noControlCharactersInRegex: intentionally strip control characters from filenames
+      .replace(/[<>:"/\\|?*\u0000-\u001f]+/g, '-')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+  )
 }
 
 function getFilenameExtension(value: string) {
@@ -28,10 +31,16 @@ function getFilenameExtension(value: string) {
   return match?.[0]?.toLowerCase() ?? ''
 }
 
-export function buildEditorImageFilename(imageUrl: string, fallbackName = 'image') {
-  const urlSegment = imageUrl.split('/').pop()?.split('?')[0]?.split('#')[0] ?? ''
+export function buildEditorImageFilename(
+  imageUrl: string,
+  fallbackName = 'image',
+) {
+  const urlSegment =
+    imageUrl.split('/').pop()?.split('?')[0]?.split('#')[0] ?? ''
   const fallbackBase = fallbackName.replace(/\.[^.]+$/, '')
-  const preferredBase = sanitizeFilenameSegment(fallbackBase) || sanitizeFilenameSegment(urlSegment.replace(/\.[^.]+$/, ''))
+  const preferredBase =
+    sanitizeFilenameSegment(fallbackBase) ||
+    sanitizeFilenameSegment(urlSegment.replace(/\.[^.]+$/, ''))
   const extension = getFilenameExtension(urlSegment) || '.webp'
   return `${preferredBase || 'image'}${extension}`
 }
@@ -56,7 +65,11 @@ type ClipboardItemConstructor = typeof ClipboardItem & {
 }
 
 function getClipboardItemConstructor() {
-  if (typeof window === 'undefined' || typeof window.ClipboardItem === 'undefined') return null
+  if (
+    typeof window === 'undefined' ||
+    typeof window.ClipboardItem === 'undefined'
+  )
+    return null
   return window.ClipboardItem as ClipboardItemConstructor
 }
 
@@ -70,10 +83,10 @@ function browserSupportsClipboardImageType(type: string) {
 function loadBlobAsImage(blob: Blob) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     if (
-      typeof window === 'undefined'
-      || typeof window.Image === 'undefined'
-      || typeof URL === 'undefined'
-      || typeof URL.createObjectURL !== 'function'
+      typeof window === 'undefined' ||
+      typeof window.Image === 'undefined' ||
+      typeof URL === 'undefined' ||
+      typeof URL.createObjectURL !== 'function'
     ) {
       reject(new Error('当前浏览器不支持复制图片'))
       return
@@ -130,10 +143,10 @@ async function normalizeImageBlobForClipboard(blob: Blob) {
 export async function copyEditorImage(imageUrl: string) {
   const ClipboardItemCtor = getClipboardItemConstructor()
   if (
-    typeof navigator === 'undefined'
-    || !navigator.clipboard?.write
-    || !ClipboardItemCtor
-    || !browserSupportsClipboardImageType(CLIPBOARD_IMAGE_MIME_TYPE)
+    typeof navigator === 'undefined' ||
+    !navigator.clipboard?.write ||
+    !ClipboardItemCtor ||
+    !browserSupportsClipboardImageType(CLIPBOARD_IMAGE_MIME_TYPE)
   ) {
     throw new Error('当前浏览器不支持复制图片')
   }
@@ -156,7 +169,10 @@ export async function copyEditorImage(imageUrl: string) {
       }),
     ])
   } catch (error) {
-    if (error instanceof Error && /not supported|ClipboardItem/i.test(error.message)) {
+    if (
+      error instanceof Error &&
+      /not supported|ClipboardItem/i.test(error.message)
+    ) {
       throw new Error('当前浏览器不支持复制图片')
     }
 
@@ -204,7 +220,9 @@ export async function uploadEditorFile(
               url: result.url,
               type: result.type || file.type,
               name: result.name || file.name,
-              assetId: Number.isFinite(result.assetId) ? Number(result.assetId) : undefined,
+              assetId: Number.isFinite(result.assetId)
+                ? Number(result.assetId)
+                : undefined,
             })
             return
           }
@@ -230,7 +248,11 @@ export async function uploadEditorFile(
     })
 
     xhr.addEventListener('error', () => {
-      reject(new Error(`网络错误，文件可能太大（${(file.size / 1024 / 1024).toFixed(1)}MB）`))
+      reject(
+        new Error(
+          `网络错误，文件可能太大（${(file.size / 1024 / 1024).toFixed(1)}MB）`,
+        ),
+      )
     })
     xhr.addEventListener('timeout', () => reject(new Error('上传超时')))
 
@@ -255,18 +277,27 @@ export function buildUploadPlaceholderText(file: File, marker: string) {
   return `📤 ${file.name} 上传中... [${marker}]`
 }
 
-export function insertUploadPlaceholder(editor: EditorInstance, file: File, marker: string) {
+export function insertUploadPlaceholder(
+  editor: EditorInstance,
+  file: File,
+  marker: string,
+) {
   editor
     .chain()
     .focus()
     .insertContent({
       type: 'paragraph',
-      content: [{ type: 'text', text: buildUploadPlaceholderText(file, marker) }],
+      content: [
+        { type: 'text', text: buildUploadPlaceholderText(file, marker) },
+      ],
     })
     .run()
 }
 
-export function removeUploadPlaceholder(editor: EditorInstance, marker: string) {
+export function removeUploadPlaceholder(
+  editor: EditorInstance,
+  marker: string,
+) {
   const { state } = editor
   const { doc } = state
   let placeholderPos: number | null = null
@@ -282,7 +313,9 @@ export function removeUploadPlaceholder(editor: EditorInstance, marker: string) 
 
   if (placeholderPos === null) return false
 
-  editor.view.dispatch(state.tr.delete(placeholderPos, placeholderPos + placeholderNodeSize))
+  editor.view.dispatch(
+    state.tr.delete(placeholderPos, placeholderPos + placeholderNodeSize),
+  )
   return true
 }
 
@@ -292,8 +325,11 @@ export function insertUploadedFileIntoEditor(
   uploaded: UploadedEditorFile,
 ) {
   if (file.type.startsWith('video/')) {
-    // @ts-expect-error - setVideo is defined in video-extension.tsx
-    editor.chain().focus().setVideo({ src: uploaded.url, title: uploaded.name || file.name }).run()
+    editor
+      .chain()
+      .focus()
+      .setVideo({ src: uploaded.url, title: uploaded.name || file.name })
+      .run()
     return
   }
 
@@ -306,7 +342,9 @@ export function insertUploadedFileIntoEditor(
   editor
     .chain()
     .focus()
-    .insertContent(`<p><a href="${uploaded.url}" target="_blank" rel="noopener">📎 ${file.name}</a></p>`)
+    .insertContent(
+      `<p><a href="${uploaded.url}" target="_blank" rel="noopener">📎 ${file.name}</a></p>`,
+    )
     .run()
 }
 
@@ -342,7 +380,9 @@ export function insertGeneratedImageAfterNode(
   }
 
   const imageNode = editor.state.doc.nodeAt(Number(nodePos))
-  const insertPos = imageNode ? Number(nodePos) + imageNode.nodeSize : Number(nodePos)
+  const insertPos = imageNode
+    ? Number(nodePos) + imageNode.nodeSize
+    : Number(nodePos)
   insertGeneratedImageAtPosition(editor, imageUrl, alt, insertPos)
 }
 
@@ -358,7 +398,7 @@ export function replaceImageNodeAtPosition(
   const node = editor.state.doc.nodeAt(pos)
   const imageType = editor.state.schema.nodes.image
 
-  if (!node || node.type.name !== 'image' || !imageType) return false
+  if (node?.type.name !== 'image' || !imageType) return false
 
   const nextNode = imageType.create({
     ...node.attrs,

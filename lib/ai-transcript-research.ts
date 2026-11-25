@@ -1,4 +1,8 @@
-import { decryptApiKey, encryptApiKey, resolveAiConfigSecret } from '@/lib/ai-provider-profiles'
+import {
+  decryptApiKey,
+  encryptApiKey,
+  resolveAiConfigSecret,
+} from '@/lib/ai-provider-profiles'
 import {
   getAiResearchJobByNoteId,
   getAiResearchJobByTaskId,
@@ -82,24 +86,35 @@ const GETNOTE_TIMEOUT_MS = 20_000
 const MAX_RESPONSE_CHARS = 2_000_000
 
 function readFlag(value: unknown): boolean {
-  return typeof value === 'string' && ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
-}
-
-export function isAiTranscriptResearchEnabled(env?: AiTranscriptResearchEnv | null): boolean {
-  return readFlag(
-    env?.ENABLE_AI_TRANSCRIPT_RESEARCH ||
-    process.env.ENABLE_AI_TRANSCRIPT_RESEARCH ||
-    env?.ENABLE_AI_WEB_RESEARCH ||
-    process.env.ENABLE_AI_WEB_RESEARCH,
+  return (
+    typeof value === 'string' &&
+    ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
   )
 }
 
-function clampInteger(value: unknown, fallback: number, min: number, max: number) {
-  const parsed = typeof value === 'number'
-    ? value
-    : typeof value === 'string'
-      ? Number.parseInt(value, 10)
-      : Number.NaN
+export function isAiTranscriptResearchEnabled(
+  env?: AiTranscriptResearchEnv | null,
+): boolean {
+  return readFlag(
+    env?.ENABLE_AI_TRANSCRIPT_RESEARCH ||
+      process.env.ENABLE_AI_TRANSCRIPT_RESEARCH ||
+      env?.ENABLE_AI_WEB_RESEARCH ||
+      process.env.ENABLE_AI_WEB_RESEARCH,
+  )
+}
+
+function clampInteger(
+  value: unknown,
+  fallback: number,
+  min: number,
+  max: number,
+) {
+  const parsed =
+    typeof value === 'number'
+      ? value
+      : typeof value === 'string'
+        ? Number.parseInt(value, 10)
+        : Number.NaN
   if (!Number.isInteger(parsed)) return fallback
   return Math.max(min, Math.min(max, parsed))
 }
@@ -118,7 +133,12 @@ function withTimeout(ms: number) {
 }
 
 function sanitizeErrorMessage(error: unknown, fallback: string) {
-  const raw = error instanceof Error ? error.message : typeof error === 'string' ? error : fallback
+  const raw =
+    error instanceof Error
+      ? error.message
+      : typeof error === 'string'
+        ? error
+        : fallback
   const message = raw
     .replace(/Bearer\s+[A-Za-z0-9._~+/=-]+/gi, 'Bearer [redacted]')
     .replace(/gk_live_[A-Za-z0-9._-]+/g, 'gk_live_[redacted]')
@@ -163,19 +183,21 @@ function isBlockedIpAddress(hostname: string) {
   if (hostname.includes(':')) return isBlockedIpv6(hostname)
 
   const parts = hostname.split('.')
-  if (parts.length !== 4 || parts.some((part) => !/^\d+$/.test(part))) return false
+  if (parts.length !== 4 || parts.some((part) => !/^\d+$/.test(part)))
+    return false
 
   const bytes = parts.map((part) => Number.parseInt(part, 10))
-  if (bytes.some((byte) => !Number.isInteger(byte) || byte < 0 || byte > 255)) return false
+  if (bytes.some((byte) => !Number.isInteger(byte) || byte < 0 || byte > 255))
+    return false
 
   const [a, b] = bytes
   return (
     a === 0 ||
     a === 10 ||
     a === 127 ||
-    a === 169 && b === 254 ||
-    a === 172 && b >= 16 && b <= 31 ||
-    a === 192 && b === 168 ||
+    (a === 169 && b === 254) ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 168) ||
     a >= 224
   )
 }
@@ -201,9 +223,20 @@ export function detectTranscriptPlatform(input: string): string {
   }
 
   const hostname = url.hostname.toLowerCase().replace(/^www\./, '')
-  if (hostname === 'xiaoyuzhoufm.com' || hostname.endsWith('.xiaoyuzhoufm.com')) return 'xiaoyuzhou'
-  if (hostname === 'youtube.com' || hostname.endsWith('.youtube.com') || hostname === 'youtu.be') return 'youtube'
-  if (hostname === 'bilibili.com' || hostname.endsWith('.bilibili.com') || hostname === 'b23.tv') return 'bilibili'
+  if (hostname === 'xiaoyuzhoufm.com' || hostname.endsWith('.xiaoyuzhoufm.com'))
+    return 'xiaoyuzhou'
+  if (
+    hostname === 'youtube.com' ||
+    hostname.endsWith('.youtube.com') ||
+    hostname === 'youtu.be'
+  )
+    return 'youtube'
+  if (
+    hostname === 'bilibili.com' ||
+    hostname.endsWith('.bilibili.com') ||
+    hostname === 'b23.tv'
+  )
+    return 'bilibili'
   return 'unknown'
 }
 
@@ -211,7 +244,10 @@ export function isSupportedTranscriptUrl(input: string): boolean {
   return detectTranscriptPlatform(input) !== 'unknown'
 }
 
-function getRequiredCredential(env: AiTranscriptResearchEnv | null | undefined, key: string) {
+function getRequiredCredential(
+  env: AiTranscriptResearchEnv | null | undefined,
+  key: string,
+) {
   return (env?.[key] || process.env[key] || '').trim()
 }
 
@@ -285,7 +321,9 @@ function getPathNumber(value: unknown, path: string[]) {
     if (!current || typeof current !== 'object') return undefined
     current = (current as Record<string, unknown>)[key]
   }
-  return typeof current === 'number' && Number.isFinite(current) ? current : undefined
+  return typeof current === 'number' && Number.isFinite(current)
+    ? current
+    : undefined
 }
 
 function getPathArray(value: unknown, path: string[]) {
@@ -301,12 +339,15 @@ function assertOpenApiSuccess(data: unknown) {
   if (!data || typeof data !== 'object') throw new Error('Get笔记响应为空')
   const root = data as Record<string, unknown>
   if (root.success === false) {
-    const message = typeof root.message === 'string' ? root.message : 'Get笔记请求失败'
+    const message =
+      typeof root.message === 'string' ? root.message : 'Get笔记请求失败'
     throw new Error(message)
   }
   const code = getPathNumber(root, ['code'])
   if (code !== undefined && code !== 0) {
-    throw new Error(getPathString(root, ['message']) || `Get笔记请求失败：${code}`)
+    throw new Error(
+      getPathString(root, ['message']) || `Get笔记请求失败：${code}`,
+    )
   }
 }
 
@@ -362,7 +403,10 @@ function extractNoteId(data: unknown) {
   )
 }
 
-async function loadStoredTokens(db: D1Database | undefined, env?: AiTranscriptResearchEnv | null) {
+async function loadStoredTokens(
+  db: D1Database | undefined,
+  env?: AiTranscriptResearchEnv | null,
+) {
   if (!db) return null
   const encrypted = await getSetting(db, GETNOTE_TOKENS_SETTING)
   if (!encrypted) return null
@@ -378,7 +422,9 @@ async function loadStoredTokens(db: D1Database | undefined, env?: AiTranscriptRe
   }
 }
 
-function loadEnvTokens(env?: AiTranscriptResearchEnv | null): GetNoteTokens | null {
+function loadEnvTokens(
+  env?: AiTranscriptResearchEnv | null,
+): GetNoteTokens | null {
   const token = getRequiredCredential(env, 'GETNOTE_WEB_TOKEN')
   const refreshToken = getRequiredCredential(env, 'GETNOTE_WEB_REFRESH_TOKEN')
   if (!token && !refreshToken) return null
@@ -401,7 +447,11 @@ function loadEnvTokens(env?: AiTranscriptResearchEnv | null): GetNoteTokens | nu
   }
 }
 
-async function saveStoredTokens(db: D1Database | undefined, env: AiTranscriptResearchEnv | null | undefined, tokens: GetNoteTokens) {
+async function saveStoredTokens(
+  db: D1Database | undefined,
+  env: AiTranscriptResearchEnv | null | undefined,
+  tokens: GetNoteTokens,
+) {
   if (!db) return
   const secret = resolveAiConfigSecret(env || undefined)
   const encrypted = await encryptApiKey(JSON.stringify(tokens), secret)
@@ -430,7 +480,9 @@ async function refreshGetNoteJwt({
   })
   const code = getPathNumber(data, ['h', 'c'])
   if (code !== 0) {
-    throw new Error(getPathString(data, ['h', 'm']) || 'Get笔记 Web token 刷新失败')
+    throw new Error(
+      getPathString(data, ['h', 'm']) || 'Get笔记 Web token 刷新失败',
+    )
   }
 
   const token = getPathString(data, ['c', 'token'])
@@ -440,7 +492,10 @@ async function refreshGetNoteJwt({
     token,
     token_expire_at: getPathNumber(data, ['c', 'token_expire_at']),
     refresh_token: getPathString(data, ['c', 'refresh_token']) || refreshToken,
-    refresh_token_expire_at: getPathNumber(data, ['c', 'refresh_token_expire_at']),
+    refresh_token_expire_at: getPathNumber(data, [
+      'c',
+      'refresh_token_expire_at',
+    ]),
   } satisfies GetNoteTokens
 }
 
@@ -453,7 +508,7 @@ async function getValidWebJwt({
   env?: AiTranscriptResearchEnv | null
   fetcher: typeof fetch
 }) {
-  const tokens = await loadStoredTokens(db, env) || loadEnvTokens(env)
+  const tokens = (await loadStoredTokens(db, env)) || loadEnvTokens(env)
   if (!tokens) return ''
 
   const now = Math.floor(Date.now() / 1000)
@@ -462,7 +517,10 @@ async function getValidWebJwt({
     throw new Error('Get笔记 refresh_token 已过期，需要重新授权')
   }
 
-  if (tokens.token && (!tokens.token_expire_at || now < tokens.token_expire_at - 300)) {
+  if (
+    tokens.token &&
+    (!tokens.token_expire_at || now < tokens.token_expire_at - 300)
+  ) {
     return tokens.token
   }
 
@@ -473,7 +531,8 @@ async function getValidWebJwt({
     token: refreshed.token,
     token_expire_at: refreshed.token_expire_at || tokens.token_expire_at,
     refresh_token: refreshed.refresh_token || tokens.refresh_token,
-    refresh_token_expire_at: refreshed.refresh_token_expire_at || tokens.refresh_token_expire_at,
+    refresh_token_expire_at:
+      refreshed.refresh_token_expire_at || tokens.refresh_token_expire_at,
   }
   await saveStoredTokens(db, env, nextTokens)
   return nextTokens.token || ''
@@ -487,13 +546,21 @@ function stripTranscriptForExcerpt(transcript: string) {
 }
 
 function normalizeTranscriptContent(value: string) {
-  return value.replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim()
+  return value
+    .replace(/\r\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
 }
 
 async function sha256Hex(value: string) {
   if (!value) return ''
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')
+  const digest = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(value),
+  )
+  return Array.from(new Uint8Array(digest), (byte) =>
+    byte.toString(16).padStart(2, '0'),
+  ).join('')
 }
 
 function buildTranscriptExcerpt(summary: string, transcript: string) {
@@ -501,7 +568,11 @@ function buildTranscriptExcerpt(summary: string, transcript: string) {
   return source.replace(/\s+/g, ' ').trim().slice(0, 500)
 }
 
-async function linkResourceIfPossible(db: D1Database | undefined, resourceId: number | undefined, context?: ResearchLinkContext) {
+async function linkResourceIfPossible(
+  db: D1Database | undefined,
+  resourceId: number | undefined,
+  context?: ResearchLinkContext,
+) {
   if (!db || !resourceId) return
   await linkAiResearchResource(db, {
     resourceId,
@@ -638,9 +709,14 @@ async function persistFailedResource({
   return resource
 }
 
-function buildOutputFromReadyResource(resource: AiResearchResource, outputMaxChars: number): FetchTranscriptOutput {
+function buildOutputFromReadyResource(
+  resource: AiResearchResource,
+  outputMaxChars: number,
+): FetchTranscriptOutput {
   const truncated = resource.content_text.length > outputMaxChars
-  const transcript = truncated ? resource.content_text.slice(0, outputMaxChars).trimEnd() : resource.content_text
+  const transcript = truncated
+    ? resource.content_text.slice(0, outputMaxChars).trimEnd()
+    : resource.content_text
   return {
     status: 'success',
     resourceId: resource.id,
@@ -650,7 +726,9 @@ function buildOutputFromReadyResource(resource: AiResearchResource, outputMaxCha
     platform: resource.platform,
     summary: resource.summary || undefined,
     transcript,
-    excerpt: resource.excerpt || buildTranscriptExcerpt(resource.summary, resource.content_text),
+    excerpt:
+      resource.excerpt ||
+      buildTranscriptExcerpt(resource.summary, resource.content_text),
     source: 'getnote-openapi',
     truncated,
   }
@@ -685,10 +763,14 @@ async function fetchWebTranscriptDetail({
   })
   const code = getPathNumber(data, ['h', 'c'])
   if (code !== 0) {
-    throw new Error(getPathString(data, ['h', 'm']) || 'Get笔记完整转写获取失败')
+    throw new Error(
+      getPathString(data, ['h', 'm']) || 'Get笔记完整转写获取失败',
+    )
   }
 
-  const content = normalizeTranscriptContent(getPathString(data, ['c', 'content']))
+  const content = normalizeTranscriptContent(
+    getPathString(data, ['c', 'content']),
+  )
   if (!content) return null
   return {
     title: getPathString(data, ['c', 'title']),
@@ -715,19 +797,23 @@ async function fetchOpenApiTranscriptDetail({
     fetcher,
   })
 
-  const note = data && typeof data === 'object'
-    ? (data as Record<string, unknown>).data
-    : null
-  const noteObject = note && typeof note === 'object' && (note as Record<string, unknown>).note
-    ? (note as Record<string, unknown>).note
-    : note
+  const note =
+    data && typeof data === 'object'
+      ? (data as Record<string, unknown>).data
+      : null
+  const noteObject =
+    note && typeof note === 'object' && (note as Record<string, unknown>).note
+      ? (note as Record<string, unknown>).note
+      : note
 
-  const summary = normalizeTranscriptContent(getPathString(noteObject, ['content']))
+  const summary = normalizeTranscriptContent(
+    getPathString(noteObject, ['content']),
+  )
   const content = normalizeTranscriptContent(
     getPathString(noteObject, ['audio', 'transcript']) ||
-    getPathString(noteObject, ['web_page', 'content']) ||
-    getPathString(noteObject, ['ref_content']) ||
-    summary,
+      getPathString(noteObject, ['web_page', 'content']) ||
+      getPathString(noteObject, ['ref_content']) ||
+      summary,
   )
   if (!content) return null
 
@@ -759,7 +845,9 @@ function buildSuccessOutput({
   resourceId?: number
 }): FetchTranscriptOutput {
   const truncated = detail.transcript.length > outputMaxChars
-  const transcript = truncated ? detail.transcript.slice(0, outputMaxChars).trimEnd() : detail.transcript
+  const transcript = truncated
+    ? detail.transcript.slice(0, outputMaxChars).trimEnd()
+    : detail.transcript
   return {
     status: 'success',
     resourceId,
@@ -799,9 +887,21 @@ async function resolveTranscriptDetail({
   fetcher: typeof fetch
   context?: ResearchLinkContext
 }): Promise<FetchTranscriptOutput> {
-  const openApiDetail = await fetchOpenApiTranscriptDetail({ noteId, env, fetcher })
-  const webDetail = await fetchWebTranscriptDetail({ noteId, db, env, fetcher }).catch((error) => {
-    console.warn('GetNote web transcript unavailable:', sanitizeErrorMessage(error, 'Get笔记完整转写获取失败'))
+  const openApiDetail = await fetchOpenApiTranscriptDetail({
+    noteId,
+    env,
+    fetcher,
+  })
+  const webDetail = await fetchWebTranscriptDetail({
+    noteId,
+    db,
+    env,
+    fetcher,
+  }).catch((error) => {
+    console.warn(
+      'GetNote web transcript unavailable:',
+      sanitizeErrorMessage(error, 'Get笔记完整转写获取失败'),
+    )
     return null
   })
   const detail = webDetail
@@ -814,12 +914,14 @@ async function resolveTranscriptDetail({
         status: 'error',
         url,
         platform,
-        error: 'Get笔记已创建笔记，但结果里没有返回来源 URL；请带原始链接重试。',
+        error:
+          'Get笔记已创建笔记，但结果里没有返回来源 URL；请带原始链接重试。',
       }
     }
-    const outputPlatform = platform === 'unknown' || !platform
-      ? detectTranscriptPlatform(outputUrl)
-      : platform
+    const outputPlatform =
+      platform === 'unknown' || !platform
+        ? detectTranscriptPlatform(outputUrl)
+        : platform
     const resource = await persistReadyResource({
       db,
       url: outputUrl,
@@ -844,7 +946,8 @@ async function resolveTranscriptDetail({
     status: 'error',
     url,
     platform,
-    error: 'Get笔记已创建笔记，但暂时没有返回可用文字稿；如果是新音视频，请稍后再试。',
+    error:
+      'Get笔记已创建笔记，但暂时没有返回可用文字稿；如果是新音视频，请稍后再试。',
   }
 }
 
@@ -876,20 +979,43 @@ export async function fetchTranscript({
   const targetUrl = url?.trim() || ''
   try {
     if (!targetUrl && !taskId?.trim() && !noteId?.trim() && !resourceId) {
-      return { status: 'error', url: '', error: 'URL、taskId、noteId 不能都为空' }
+      return {
+        status: 'error',
+        url: '',
+        error: 'URL、taskId、noteId 不能都为空',
+      }
     }
 
-    const outputMaxChars = clampInteger(maxChars, DEFAULT_TRANSCRIPT_CHARS, 1000, MAX_TRANSCRIPT_CHARS)
-    const waitSeconds = clampInteger(maxWaitSeconds, DEFAULT_MAX_WAIT_SECONDS, 0, MAX_WAIT_SECONDS)
+    const outputMaxChars = clampInteger(
+      maxChars,
+      DEFAULT_TRANSCRIPT_CHARS,
+      1000,
+      MAX_TRANSCRIPT_CHARS,
+    )
+    const waitSeconds = clampInteger(
+      maxWaitSeconds,
+      DEFAULT_MAX_WAIT_SECONDS,
+      0,
+      MAX_WAIT_SECONDS,
+    )
 
     if (db && resourceId) {
       const resource = await getAiResearchResourceById(db, resourceId)
-      if (!resource) return { status: 'error', url: targetUrl, error: '没有找到对应素材资源' }
+      if (!resource)
+        return {
+          status: 'error',
+          url: targetUrl,
+          error: '没有找到对应素材资源',
+        }
       await linkResourceIfPossible(db, resource.id, context)
       if (resource.status === 'ready' && resource.content_text) {
         return buildOutputFromReadyResource(resource, outputMaxChars)
       }
-      const job = await getLatestAiResearchJobForResource(db, resource.id, 'getnote')
+      const job = await getLatestAiResearchJobForResource(
+        db,
+        resource.id,
+        'getnote',
+      )
       if (job?.provider_note_id) noteId = job.provider_note_id
       else if (job?.provider_task_id) taskId = job.provider_task_id
       if (!targetUrl) {
@@ -914,16 +1040,26 @@ export async function fetchTranscript({
       }
     }
 
-    const normalizedUrl = targetUrl || url
-      ? normalizePublicUrl((url || targetUrl).trim()).toString()
-      : ''
+    const normalizedUrl =
+      targetUrl || url
+        ? normalizePublicUrl((url || targetUrl).trim()).toString()
+        : ''
     const platform = detectTranscriptPlatform(normalizedUrl)
     if (normalizedUrl && platform === 'unknown') {
-      return { status: 'error', url: normalizedUrl, error: '暂不支持此链接的音视频文字稿获取' }
+      return {
+        status: 'error',
+        url: normalizedUrl,
+        error: '暂不支持此链接的音视频文字稿获取',
+      }
     }
 
     if (!isAiTranscriptResearchEnabled(env)) {
-      return { status: 'error', url: normalizedUrl, platform, error: '音视频文字稿能力未开启' }
+      return {
+        status: 'error',
+        url: normalizedUrl,
+        platform,
+        error: '音视频文字稿能力未开启',
+      }
     }
 
     if (noteId?.trim()) {
@@ -941,13 +1077,20 @@ export async function fetchTranscript({
     }
 
     if (db && normalizedUrl) {
-      const existing = await getAiResearchResourceByCanonicalUrl(db, normalizeResearchUrl(normalizedUrl))
+      const existing = await getAiResearchResourceByCanonicalUrl(
+        db,
+        normalizeResearchUrl(normalizedUrl),
+      )
       if (existing) {
         await linkResourceIfPossible(db, existing.id, context)
         if (existing.status === 'ready' && existing.content_text) {
           return buildOutputFromReadyResource(existing, outputMaxChars)
         }
-        const job = await getLatestAiResearchJobForResource(db, existing.id, 'getnote')
+        const job = await getLatestAiResearchJobForResource(
+          db,
+          existing.id,
+          'getnote',
+        )
         if (job?.provider_note_id) {
           return resolveTranscriptDetail({
             noteId: job.provider_note_id,
@@ -984,7 +1127,12 @@ export async function fetchTranscript({
           error: 'Get笔记转写任务失败',
           context,
         })
-        return { status: 'error', url: normalizedUrl, platform, error: 'Get笔记转写任务失败' }
+        return {
+          status: 'error',
+          url: normalizedUrl,
+          platform,
+          error: 'Get笔记转写任务失败',
+        }
       }
       if (progressNoteId) {
         return resolveTranscriptDetail({
@@ -1013,7 +1161,8 @@ export async function fetchTranscript({
         url: normalizedUrl,
         taskId: taskId.trim(),
         platform,
-        message: 'Get笔记仍在处理音视频文字稿，请稍后再次让 AI 获取该链接内容。',
+        message:
+          'Get笔记仍在处理音视频文字稿，请稍后再次让 AI 获取该链接内容。',
       }
     }
 
@@ -1045,7 +1194,12 @@ export async function fetchTranscript({
     }
 
     if (!createdTaskId) {
-      return { status: 'error', url: normalizedUrl, platform, error: 'Get笔记没有返回任务 ID' }
+      return {
+        status: 'error',
+        url: normalizedUrl,
+        platform,
+        error: 'Get笔记没有返回任务 ID',
+      }
     }
 
     if (waitSeconds === 0) {
@@ -1063,7 +1217,8 @@ export async function fetchTranscript({
         url: normalizedUrl,
         taskId: createdTaskId,
         platform,
-        message: 'Get笔记已开始处理音视频文字稿，请稍后再次让 AI 获取该链接内容。',
+        message:
+          'Get笔记已开始处理音视频文字稿，请稍后再次让 AI 获取该链接内容。',
       }
     }
 
@@ -1095,7 +1250,12 @@ export async function fetchTranscript({
           error: 'Get笔记转写任务失败',
           context,
         })
-        return { status: 'error', url: normalizedUrl, platform, error: 'Get笔记转写任务失败' }
+        return {
+          status: 'error',
+          url: normalizedUrl,
+          platform,
+          error: 'Get笔记转写任务失败',
+        }
       }
       if (noteId) {
         return resolveTranscriptDetail({
@@ -1126,7 +1286,8 @@ export async function fetchTranscript({
       url: normalizedUrl,
       taskId: createdTaskId,
       platform,
-      message: 'Get笔记已开始处理音视频文字稿，请稍后再次让 AI 获取该链接内容。',
+      message:
+        'Get笔记已开始处理音视频文字稿，请稍后再次让 AI 获取该链接内容。',
     }
   } catch (error) {
     return {

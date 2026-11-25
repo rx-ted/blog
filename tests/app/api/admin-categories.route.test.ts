@@ -20,7 +20,8 @@ vi.mock('@/lib/db', () => ({
 vi.mock('@/lib/server/route-helpers', () => ({
   ensureAuthenticatedRequest: mocks.ensureAuthenticatedRequest,
   getRouteEnvWithDb: mocks.getRouteEnvWithDb,
-  jsonError: (message: string, status = 500) => Response.json({ error: message }, { status }),
+  jsonError: (message: string, status = 500) =>
+    Response.json({ error: message }, { status }),
   jsonOk: (data: unknown, status = 200) => Response.json(data, { status }),
   parseJsonBody: mocks.parseJsonBody,
 }))
@@ -62,12 +63,16 @@ describe('/api/admin/categories route', () => {
     const response = await POST({} as never)
 
     expect(response.status).toBe(400)
-    await expect(response.json()).resolves.toEqual({ error: '名称和slug不能为空' })
+    await expect(response.json()).resolves.toEqual({
+      error: '名称和slug不能为空',
+    })
     expect(mocks.createCategory).not.toHaveBeenCalled()
   })
 
   it('returns the auth error response for delete requests', async () => {
-    mocks.ensureAuthenticatedRequest.mockResolvedValue(Response.json({ error: '未授权' }, { status: 401 }))
+    mocks.ensureAuthenticatedRequest.mockResolvedValue(
+      Response.json({ error: '未授权' }, { status: 401 }),
+    )
 
     const response = await DELETE({} as never)
 

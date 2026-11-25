@@ -57,23 +57,34 @@ type TwitterStatusTarget = {
 }
 
 function readFlag(value: unknown): boolean {
-  return typeof value === 'string' && ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  return (
+    typeof value === 'string' &&
+    ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  )
 }
 
 export function isAiWebResearchEnabled(env?: AiWebResearchEnv | null): boolean {
-  return readFlag(env?.ENABLE_AI_WEB_RESEARCH || process.env.ENABLE_AI_WEB_RESEARCH)
+  return readFlag(
+    env?.ENABLE_AI_WEB_RESEARCH || process.env.ENABLE_AI_WEB_RESEARCH,
+  )
 }
 
 function getPipeLlmApiKey(env?: AiWebResearchEnv | null): string {
   return (env?.PIPELLM_API_KEY || process.env.PIPELLM_API_KEY || '').trim()
 }
 
-function clampInteger(value: unknown, fallback: number, min: number, max: number) {
-  const parsed = typeof value === 'number'
-    ? value
-    : typeof value === 'string'
-      ? Number.parseInt(value, 10)
-      : Number.NaN
+function clampInteger(
+  value: unknown,
+  fallback: number,
+  min: number,
+  max: number,
+) {
+  const parsed =
+    typeof value === 'number'
+      ? value
+      : typeof value === 'string'
+        ? Number.parseInt(value, 10)
+        : Number.NaN
   if (!Number.isInteger(parsed)) return fallback
   return Math.max(min, Math.min(max, parsed))
 }
@@ -88,7 +99,12 @@ function withTimeout(ms: number) {
 }
 
 function sanitizeErrorMessage(error: unknown, fallback: string) {
-  const raw = error instanceof Error ? error.message : typeof error === 'string' ? error : fallback
+  const raw =
+    error instanceof Error
+      ? error.message
+      : typeof error === 'string'
+        ? error
+        : fallback
   const message = raw
     .replace(/Bearer\s+[A-Za-z0-9._~+/=-]+/gi, 'Bearer [redacted]')
     .replace(/sk-[A-Za-z0-9_-]{12,}/g, 'sk-[redacted]')
@@ -135,19 +151,21 @@ function isBlockedIpAddress(hostname: string) {
   }
 
   const parts = hostname.split('.')
-  if (parts.length !== 4 || parts.some((part) => !/^\d+$/.test(part))) return false
+  if (parts.length !== 4 || parts.some((part) => !/^\d+$/.test(part)))
+    return false
 
   const bytes = parts.map((part) => Number.parseInt(part, 10))
-  if (bytes.some((byte) => !Number.isInteger(byte) || byte < 0 || byte > 255)) return false
+  if (bytes.some((byte) => !Number.isInteger(byte) || byte < 0 || byte > 255))
+    return false
 
   const [a, b] = bytes
   return (
     a === 0 ||
     a === 10 ||
     a === 127 ||
-    a === 169 && b === 254 ||
-    a === 172 && b >= 16 && b <= 31 ||
-    a === 192 && b === 168 ||
+    (a === 169 && b === 254) ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 168) ||
     a >= 224
   )
 }
@@ -168,23 +186,26 @@ function normalizeSearchResult(value: unknown): WebSearchResult | null {
   if (!value || typeof value !== 'object') return null
   const row = value as Record<string, unknown>
   const title = typeof row.title === 'string' ? row.title.trim() : ''
-  const url = typeof row.link === 'string'
-    ? row.link.trim()
-    : typeof row.url === 'string'
-      ? row.url.trim()
-      : ''
-  const snippet = typeof row.snippet === 'string'
-    ? row.snippet.trim()
-    : typeof row.description === 'string'
-      ? row.description.trim()
-      : typeof row.content === 'string'
-        ? row.content.trim()
+  const url =
+    typeof row.link === 'string'
+      ? row.link.trim()
+      : typeof row.url === 'string'
+        ? row.url.trim()
         : ''
-  const source = typeof row.source === 'string'
-    ? row.source.trim()
-    : typeof row.displayed_link === 'string'
-      ? row.displayed_link.trim()
-      : undefined
+  const snippet =
+    typeof row.snippet === 'string'
+      ? row.snippet.trim()
+      : typeof row.description === 'string'
+        ? row.description.trim()
+        : typeof row.content === 'string'
+          ? row.content.trim()
+          : ''
+  const source =
+    typeof row.source === 'string'
+      ? row.source.trim()
+      : typeof row.displayed_link === 'string'
+        ? row.displayed_link.trim()
+        : undefined
 
   if (!title && !url && !snippet) return null
   const result: WebSearchResult = {
@@ -209,19 +230,39 @@ export async function searchWeb({
 }): Promise<WebSearchOutput> {
   const normalizedQuery = query.trim().slice(0, 300)
   if (!normalizedQuery) {
-    return { status: 'error', query: '', results: [], error: '搜索关键词不能为空' }
+    return {
+      status: 'error',
+      query: '',
+      results: [],
+      error: '搜索关键词不能为空',
+    }
   }
 
   if (!isAiWebResearchEnabled(env)) {
-    return { status: 'error', query: normalizedQuery, results: [], error: '网页研究能力未开启' }
+    return {
+      status: 'error',
+      query: normalizedQuery,
+      results: [],
+      error: '网页研究能力未开启',
+    }
   }
 
   const apiKey = getPipeLlmApiKey(env)
   if (!apiKey) {
-    return { status: 'error', query: normalizedQuery, results: [], error: '缺少 PIPELLM_API_KEY' }
+    return {
+      status: 'error',
+      query: normalizedQuery,
+      results: [],
+      error: '缺少 PIPELLM_API_KEY',
+    }
   }
 
-  const requestLimit = clampInteger(limit, DEFAULT_SEARCH_LIMIT, 1, MAX_SEARCH_LIMIT)
+  const requestLimit = clampInteger(
+    limit,
+    DEFAULT_SEARCH_LIMIT,
+    1,
+    MAX_SEARCH_LIMIT,
+  )
   const url = new URL('https://api.pipellm.ai/v1/websearch/search')
   url.searchParams.set('q', normalizedQuery)
   url.searchParams.set('limit', String(requestLimit))
@@ -244,11 +285,15 @@ export async function searchWeb({
       }
     }
 
-    const data = await response.json().catch(() => null) as unknown
-    const inner = data && typeof data === 'object' ? (data as Record<string, unknown>).data : null
-    const organic = inner && typeof inner === 'object'
-      ? (inner as Record<string, unknown>).organic
-      : inner
+    const data = (await response.json().catch(() => null)) as unknown
+    const inner =
+      data && typeof data === 'object'
+        ? (data as Record<string, unknown>).data
+        : null
+    const organic =
+      inner && typeof inner === 'object'
+        ? (inner as Record<string, unknown>).organic
+        : inner
     const rawResults = Array.isArray(organic) ? organic : []
     const results = rawResults
       .map(normalizeSearchResult)
@@ -288,10 +333,13 @@ function parseTwitterStatusUrl(input: string): TwitterStatusTarget | null {
   }
 
   const hostname = url.hostname.toLowerCase().replace(/^www\./, '')
-  if (!['x.com', 'twitter.com', 'mobile.twitter.com'].includes(hostname)) return null
+  if (!['x.com', 'twitter.com', 'mobile.twitter.com'].includes(hostname))
+    return null
 
   const parts = url.pathname.split('/').filter(Boolean)
-  const statusIndex = parts.findIndex((part) => part === 'status' || part === 'statuses')
+  const statusIndex = parts.findIndex(
+    (part) => part === 'status' || part === 'statuses',
+  )
   if (statusIndex <= 0) return null
 
   const username = parts[statusIndex - 1]
@@ -304,14 +352,16 @@ function parseTwitterStatusUrl(input: string): TwitterStatusTarget | null {
 function looksLikeUsefulMarkdown(content: string) {
   const normalized = content.trim()
   if (!normalized) return false
-  const lineCount = normalized.split(/\r?\n/).filter((line) => line.trim()).length
+  const lineCount = normalized
+    .split(/\r?\n/)
+    .filter((line) => line.trim()).length
   if (lineCount <= 5 && normalized.length < 500) return false
   return ![
     'Access Denied',
     '403 Forbidden',
     '404 Not Found',
     "Don't miss what's happening",
-    "Don’t miss what’s happening",
+    'Don’t miss what’s happening',
     'People on X are the first to know',
     'New to X?',
     'Just a moment...',
@@ -319,7 +369,9 @@ function looksLikeUsefulMarkdown(content: string) {
 }
 
 function extractMarkdownTitle(markdown: string) {
-  const yamlTitle = markdown.match(/^---[\s\S]*?\ntitle:\s*["']?(.+?)["']?\s*\n[\s\S]*?---/i)?.[1]?.trim()
+  const yamlTitle = markdown
+    .match(/^---[\s\S]*?\ntitle:\s*["']?(.+?)["']?\s*\n[\s\S]*?---/i)?.[1]
+    ?.trim()
   if (yamlTitle) return yamlTitle.slice(0, 200)
   const heading = markdown.match(/^#\s+(.+)$/m)?.[1]?.trim()
   return heading ? heading.slice(0, 200) : undefined
@@ -354,7 +406,9 @@ function getNestedNumber(value: unknown, path: string[]) {
     if (!current || typeof current !== 'object') return undefined
     current = (current as Record<string, unknown>)[key]
   }
-  return typeof current === 'number' && Number.isFinite(current) ? current : undefined
+  return typeof current === 'number' && Number.isFinite(current)
+    ? current
+    : undefined
 }
 
 function draftJsBlockToMarkdown(block: unknown) {
@@ -376,39 +430,62 @@ function draftJsBlockToMarkdown(block: unknown) {
     case 'ordered-list-item':
       return `1. ${text}`
     case 'blockquote':
-      return text.split('\n').map((line) => `> ${line}`).join('\n')
+      return text
+        .split('\n')
+        .map((line) => `> ${line}`)
+        .join('\n')
     default:
       return text
   }
 }
 
-function buildTwitterMarkdown(data: unknown, originalUrl: string, provider: TwitterProvider) {
-  const root = data && typeof data === 'object' ? data as Record<string, unknown> : {}
-  const tweet = root.tweet && typeof root.tweet === 'object'
-    ? root.tweet as Record<string, unknown>
-    : root
-  const author = tweet.author && typeof tweet.author === 'object'
-    ? tweet.author as Record<string, unknown>
-    : {}
-  const article = tweet.article && typeof tweet.article === 'object'
-    ? tweet.article as Record<string, unknown>
-    : root.article && typeof root.article === 'object'
-      ? root.article as Record<string, unknown>
-      : null
+function buildTwitterMarkdown(
+  data: unknown,
+  originalUrl: string,
+  provider: TwitterProvider,
+) {
+  const root =
+    data && typeof data === 'object' ? (data as Record<string, unknown>) : {}
+  const tweet =
+    root.tweet && typeof root.tweet === 'object'
+      ? (root.tweet as Record<string, unknown>)
+      : root
+  const author =
+    tweet.author && typeof tweet.author === 'object'
+      ? (tweet.author as Record<string, unknown>)
+      : {}
+  const article =
+    tweet.article && typeof tweet.article === 'object'
+      ? (tweet.article as Record<string, unknown>)
+      : root.article && typeof root.article === 'object'
+        ? (root.article as Record<string, unknown>)
+        : null
 
-  const authorName = getNestedString(author, ['name']) || getNestedString(tweet, ['user_name'])
-  const username = getNestedString(author, ['screen_name']) || getNestedString(tweet, ['user_screen_name'])
-  const tweetText = getNestedString(tweet, ['raw_text', 'text']) || getNestedString(tweet, ['text'])
-  const createdAt = getNestedString(tweet, ['created_at']) || getNestedString(root, ['date'])
-  const tweetUrl = getNestedString(tweet, ['url']) || getNestedString(tweet, ['tweetURL']) || originalUrl
+  const authorName =
+    getNestedString(author, ['name']) || getNestedString(tweet, ['user_name'])
+  const username =
+    getNestedString(author, ['screen_name']) ||
+    getNestedString(tweet, ['user_screen_name'])
+  const tweetText =
+    getNestedString(tweet, ['raw_text', 'text']) ||
+    getNestedString(tweet, ['text'])
+  const createdAt =
+    getNestedString(tweet, ['created_at']) || getNestedString(root, ['date'])
+  const tweetUrl =
+    getNestedString(tweet, ['url']) ||
+    getNestedString(tweet, ['tweetURL']) ||
+    originalUrl
   const title = article
     ? getNestedString(article, ['title']) || 'X/Twitter Article'
     : `X/Twitter: ${authorName || username || 'Tweet'}`
   const preview = article ? getNestedString(article, ['preview_text']) : ''
   const views = getNestedNumber(tweet, ['views'])
-  const likes = getNestedNumber(tweet, ['likes']) ?? getNestedNumber(root, ['likes'])
-  const retweets = getNestedNumber(tweet, ['retweets']) ?? getNestedNumber(root, ['retweets'])
-  const replies = getNestedNumber(tweet, ['replies']) ?? getNestedNumber(root, ['replies'])
+  const likes =
+    getNestedNumber(tweet, ['likes']) ?? getNestedNumber(root, ['likes'])
+  const retweets =
+    getNestedNumber(tweet, ['retweets']) ?? getNestedNumber(root, ['retweets'])
+  const replies =
+    getNestedNumber(tweet, ['replies']) ?? getNestedNumber(root, ['replies'])
   const bookmarks = getNestedNumber(tweet, ['bookmarks'])
 
   const lines: string[] = [
@@ -442,20 +519,26 @@ function buildTwitterMarkdown(data: unknown, originalUrl: string, provider: Twit
   ].filter(Boolean)
   if (stats.length > 0) lines.push(`Stats: ${stats.join(' · ')}`, '')
 
-  const blocks = article && article.content && typeof article.content === 'object'
-    ? (article.content as Record<string, unknown>).blocks
-    : undefined
+  const blocks =
+    article && article.content && typeof article.content === 'object'
+      ? (article.content as Record<string, unknown>).blocks
+      : undefined
   if (Array.isArray(blocks)) {
-    const articleLines = blocks
-      .map(draftJsBlockToMarkdown)
-      .filter(Boolean)
+    const articleLines = blocks.map(draftJsBlockToMarkdown).filter(Boolean)
 
     if (articleLines.length > 0) {
-      lines.push('## Article Content', '', ...articleLines.flatMap((line) => [line, '']))
+      lines.push(
+        '## Article Content',
+        '',
+        ...articleLines.flatMap((line) => [line, '']),
+      )
     }
   }
 
-  const markdown = lines.join('\n').replace(/\n{3,}/g, '\n\n').trim()
+  const markdown = lines
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
   return {
     title,
     markdown,
@@ -491,7 +574,8 @@ async function fetchTwitterMarkdownFallback({
 
       const data = await response.json().catch(() => null)
       const built = buildTwitterMarkdown(data, normalizedUrl, provider)
-      if (!looksLikeUsefulMarkdown(built.markdown)) throw new Error('内容不可用')
+      if (!looksLikeUsefulMarkdown(built.markdown))
+        throw new Error('内容不可用')
 
       const truncated = built.markdown.length > outputMaxChars
       return {
@@ -499,7 +583,9 @@ async function fetchTwitterMarkdownFallback({
         url: normalizedUrl,
         finalUrl: apiUrl,
         title: built.title,
-        markdown: truncated ? built.markdown.slice(0, outputMaxChars).trimEnd() : built.markdown,
+        markdown: truncated
+          ? built.markdown.slice(0, outputMaxChars).trimEnd()
+          : built.markdown,
         excerpt: built.excerpt,
         source: provider,
         truncated,
@@ -528,7 +614,11 @@ async function fetchTextWithRedirects({
   timeoutMs: number
 }) {
   let current = normalizePublicUrl(url)
-  for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount += 1) {
+  for (
+    let redirectCount = 0;
+    redirectCount <= MAX_REDIRECTS;
+    redirectCount += 1
+  ) {
     const timeout = withTimeout(timeoutMs)
     try {
       const response = await fetcher(current.toString(), {
@@ -599,10 +689,19 @@ export async function fetchPageMarkdown({
   try {
     const normalizedUrl = normalizePublicUrl(targetUrl).toString()
     if (!isAiWebResearchEnabled(env)) {
-      return { status: 'error', url: normalizedUrl, error: '网页研究能力未开启' }
+      return {
+        status: 'error',
+        url: normalizedUrl,
+        error: '网页研究能力未开启',
+      }
     }
 
-    const outputMaxChars = clampInteger(maxChars, DEFAULT_MARKDOWN_CHARS, 1000, MAX_MARKDOWN_CHARS)
+    const outputMaxChars = clampInteger(
+      maxChars,
+      DEFAULT_MARKDOWN_CHARS,
+      1000,
+      MAX_MARKDOWN_CHARS,
+    )
     const errors: string[] = []
     const twitterFallback = await fetchTwitterMarkdownFallback({
       normalizedUrl,
@@ -629,7 +728,9 @@ export async function fetchPageMarkdown({
 
         const markdown = fetched.text.trim()
         const truncated = markdown.length > outputMaxChars
-        const sliced = truncated ? markdown.slice(0, outputMaxChars).trimEnd() : markdown
+        const sliced = truncated
+          ? markdown.slice(0, outputMaxChars).trimEnd()
+          : markdown
         return {
           status: 'success',
           url: normalizedUrl,

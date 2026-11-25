@@ -1,4 +1,9 @@
-import { useEffect, type Dispatch, type RefObject, type SetStateAction } from 'react'
+import {
+  useEffect,
+  type Dispatch,
+  type RefObject,
+  type SetStateAction,
+} from 'react'
 import { SIDEBAR_KEY } from '@/components/editor/shared'
 
 interface UseNovelEditorShellEffectsOptions {
@@ -41,7 +46,7 @@ export function useNovelEditorShellEffects({
 
   // Relative time ticker
   useEffect(() => {
-    const id = window.setInterval(() => setTick(t => t + 1), 30000)
+    const id = window.setInterval(() => setTick((t) => t + 1), 30000)
     return () => window.clearInterval(id)
   }, [setTick, title])
 
@@ -56,16 +61,29 @@ export function useNovelEditorShellEffects({
   useEffect(() => {
     if (!publishPanelOpen && !copywritingMenuOpen) return
     const handler = (e: MouseEvent) => {
-      if (publishPanelRef.current && !publishPanelRef.current.contains(e.target as Node)) {
+      if (
+        publishPanelRef.current &&
+        !publishPanelRef.current.contains(e.target as Node)
+      ) {
         setPublishPanelOpen(false)
       }
-      if (copywritingMenuRef.current && !copywritingMenuRef.current.contains(e.target as Node)) {
+      if (
+        copywritingMenuRef.current &&
+        !copywritingMenuRef.current.contains(e.target as Node)
+      ) {
         setCopywritingMenuOpen(false)
       }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
-  }, [copywritingMenuOpen, publishPanelOpen, publishPanelRef, copywritingMenuRef, setCopywritingMenuOpen, setPublishPanelOpen])
+  }, [
+    copywritingMenuOpen,
+    publishPanelOpen,
+    publishPanelRef,
+    copywritingMenuRef,
+    setCopywritingMenuOpen,
+    setPublishPanelOpen,
+  ])
 
   // Keyboard shortcuts
   useEffect(() => {

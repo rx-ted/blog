@@ -30,20 +30,31 @@ type PublicPostRow = Pick<
 >
 
 function readFlag(value: unknown): boolean {
-  return typeof value === 'string' && ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  return (
+    typeof value === 'string' &&
+    ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  )
 }
 
-function isVectorizeEnabled(env?: Partial<CloudflareEnv> | null): env is Partial<CloudflareEnv> & { VECTOR_INDEX: VectorizeIndex } {
+function isVectorizeEnabled(
+  env?: Partial<CloudflareEnv> | null,
+): env is Partial<CloudflareEnv> & { VECTOR_INDEX: VectorizeIndex } {
   return Boolean(env?.VECTOR_INDEX) && readFlag(env?.ENABLE_VECTOR_SEARCH)
 }
 
 function parseTags(value: string | string[] | null | undefined): string[] {
-  if (Array.isArray(value)) return value.filter((tag): tag is string => typeof tag === 'string' && tag.trim().length > 0)
+  if (Array.isArray(value))
+    return value.filter(
+      (tag): tag is string => typeof tag === 'string' && tag.trim().length > 0,
+    )
   if (!value) return []
   try {
     const parsed = JSON.parse(value)
     return Array.isArray(parsed)
-      ? parsed.filter((tag): tag is string => typeof tag === 'string' && tag.trim().length > 0)
+      ? parsed.filter(
+          (tag): tag is string =>
+            typeof tag === 'string' && tag.trim().length > 0,
+        )
       : []
   } catch {
     return []
@@ -53,17 +64,13 @@ function parseTags(value: string | string[] | null | undefined): string[] {
 function mapPost(post: Post): PostWithTags {
   return {
     ...post,
-    status: post.deleted_at ? 'deleted' : (post.status || 'published'),
+    status: post.deleted_at ? 'deleted' : post.status || 'published',
     tags: parseTags(post.tags),
   }
 }
 
 function normalizeText(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/\r/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
+  return text.toLowerCase().replace(/\r/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
 function extractCjkBigrams(text: string): string[] {
@@ -110,7 +117,8 @@ function buildHashedEmbedding(text: string, dimensions: number): number[] {
     vector[slot] += sign * weight
   }
 
-  const magnitude = Math.sqrt(vector.reduce((sum, value) => sum + value * value, 0)) || 1
+  const magnitude =
+    Math.sqrt(vector.reduce((sum, value) => sum + value * value, 0)) || 1
   return vector.map((value) => Number((value / magnitude).toFixed(6)))
 }
 
@@ -135,19 +143,22 @@ function buildPostVectorText(post: {
 async function getVectorDimensions(index: VectorizeIndex): Promise<number> {
   try {
     const description = await index.describe()
-    const details = description as { dimensions?: number; config?: { dimensions?: number } } | undefined
+    const details = description as
+      | { dimensions?: number; config?: { dimensions?: number } }
+      | undefined
     const config = description?.config as { dimensions?: number } | undefined
     const dimensions =
-      config?.dimensions ||
-      details?.dimensions ||
-      DEFAULT_VECTOR_DIMENSIONS
+      config?.dimensions || details?.dimensions || DEFAULT_VECTOR_DIMENSIONS
     return Math.max(8, dimensions)
   } catch {
     return DEFAULT_VECTOR_DIMENSIONS
   }
 }
 
-async function fetchPostsBySlugs(db: D1Database, slugs: string[]): Promise<PostWithTags[]> {
+async function fetchPostsBySlugs(
+  db: D1Database,
+  slugs: string[],
+): Promise<PostWithTags[]> {
   if (slugs.length === 0) return []
 
   const placeholders = slugs.map(() => '?').join(', ')
@@ -158,7 +169,7 @@ async function fetchPostsBySlugs(db: D1Database, slugs: string[]): Promise<PostW
          AND status = 'published'
          AND password IS NULL
          AND is_hidden = 0
-         AND deleted_at IS NULL`
+         AND deleted_at IS NULL`,
     )
     .bind(...slugs)
     .all<Post>()
@@ -166,7 +177,11 @@ async function fetchPostsBySlugs(db: D1Database, slugs: string[]): Promise<PostW
   const order = new Map(slugs.map((slug, index) => [slug, index]))
   return results
     .map(mapPost)
-    .sort((left, right) => (order.get(left.slug) ?? Number.MAX_SAFE_INTEGER) - (order.get(right.slug) ?? Number.MAX_SAFE_INTEGER))
+    .sort(
+      (left, right) =>
+        (order.get(left.slug) ?? Number.MAX_SAFE_INTEGER) -
+        (order.get(right.slug) ?? Number.MAX_SAFE_INTEGER),
+    )
 }
 
 async function tryVectorLookup(
@@ -181,11 +196,11 @@ async function tryVectorLookup(
   try {
     const dimensions = await getVectorDimensions(env.VECTOR_INDEX)
     const vector = buildHashedEmbedding(queryText, dimensions)
-    const response = await env.VECTOR_INDEX.query(vector, {
+    const response = (await env.VECTOR_INDEX.query(vector, {
       topK: Math.max(limit + 6, 12),
       namespace: VECTOR_NAMESPACE,
       returnMetadata: 'all',
-    }) as { matches?: Array<{ metadata?: Record<string, unknown> }> }
+    })) as { matches?: Array<{ metadata?: Record<string, unknown> }> }
 
     const slugs = (response.matches || [])
       .map((match) => {
@@ -222,19 +237,30 @@ function buildTokenSet(post: {
   tags?: string[]
 }): Set<string> {
   return new Set(
-    tokenize([
-      post.title,
-      post.description || '',
-      post.category || '',
-      ...(post.tags || []),
-    ].join(' '))
+    tokenize(
+      [
+        post.title,
+        post.description || '',
+        post.category || '',
+        ...(post.tags || []),
+      ].join(' '),
+    ),
   )
 }
 
-function scoreCandidate(candidate: PostWithTags, current: PostWithTags, currentTokens: Set<string>, currentTags: Set<string>): number {
+function scoreCandidate(
+  candidate: PostWithTags,
+  current: PostWithTags,
+  currentTokens: Set<string>,
+  currentTags: Set<string>,
+): number {
   let score = 0
 
-  if (candidate.category && current.category && candidate.category === current.category) {
+  if (
+    candidate.category &&
+    current.category &&
+    candidate.category === current.category
+  ) {
     score += 6
   }
 
@@ -248,15 +274,24 @@ function scoreCandidate(candidate: PostWithTags, current: PostWithTags, currentT
   }
   score += Math.min(overlap, 10) * 0.8
 
-  const freshnessBoost = Math.max(0, candidate.published_at - current.published_at)
+  const freshnessBoost = Math.max(
+    0,
+    candidate.published_at - current.published_at,
+  )
   if (freshnessBoost > 0) score += 0.25
 
   return score
 }
 
-async function getRuleBasedRelatedPosts(db: D1Database, current: PostWithTags, limit: number): Promise<PostWithTags[]> {
+async function getRuleBasedRelatedPosts(
+  db: D1Database,
+  current: PostWithTags,
+  limit: number,
+): Promise<PostWithTags[]> {
   const query = buildRelatedQuery(current)
-  const fromSearch = query ? await searchPosts(db, query, Math.max(limit * 4, 12)) : []
+  const fromSearch = query
+    ? await searchPosts(db, query, Math.max(limit * 4, 12))
+    : []
   const recentResult = await db
     .prepare(
       `SELECT * FROM posts
@@ -266,7 +301,7 @@ async function getRuleBasedRelatedPosts(db: D1Database, current: PostWithTags, l
          AND is_hidden = 0
          AND deleted_at IS NULL
        ORDER BY published_at DESC
-       LIMIT ?`
+       LIMIT ?`,
     )
     .bind(current.slug, Math.max(limit * 12, 48))
     .all<Post>()
@@ -286,7 +321,11 @@ async function getRuleBasedRelatedPosts(db: D1Database, current: PostWithTags, l
       score: scoreCandidate(post, current, currentTokens, currentTags),
     }))
     .filter((item) => item.score > 0)
-    .sort((left, right) => right.score - left.score || right.post.published_at - left.post.published_at)
+    .sort(
+      (left, right) =>
+        right.score - left.score ||
+        right.post.published_at - left.post.published_at,
+    )
     .slice(0, limit)
     .map((item) => item.post)
 }
@@ -304,10 +343,20 @@ export async function searchPostsWithStrategy(
   const limit = options.limit ?? 20
   const trimmedQuery = query.trim()
   if (!trimmedQuery) {
-    return { strategy: isVectorizeEnabled(env) ? 'vectorize' : 'fts', source: 'rules', results: [] }
+    return {
+      strategy: isVectorizeEnabled(env) ? 'vectorize' : 'fts',
+      source: 'rules',
+      results: [],
+    }
   }
 
-  const vectorResults = await tryVectorLookup(db, env, trimmedQuery, null, limit)
+  const vectorResults = await tryVectorLookup(
+    db,
+    env,
+    trimmedQuery,
+    null,
+    limit,
+  )
   if (vectorResults && vectorResults.length > 0) {
     return {
       strategy: 'vectorize',
@@ -329,7 +378,13 @@ export async function getRelatedPosts(
   post: PostWithTags,
   limit = 3,
 ): Promise<RelatedSearchResult> {
-  const vectorResults = await tryVectorLookup(db, env, buildPostVectorText(post), post.slug, limit)
+  const vectorResults = await tryVectorLookup(
+    db,
+    env,
+    buildPostVectorText(post),
+    post.slug,
+    limit,
+  )
   if (vectorResults && vectorResults.length > 0) {
     return {
       strategy: 'vectorize',
@@ -350,18 +405,23 @@ export async function getRelatedPosts(
   return {
     strategy: 'fts',
     source: 'fts',
-    results: (await searchPosts(db, buildRelatedQuery(post) || post.title, limit + 1))
+    results: (
+      await searchPosts(db, buildRelatedQuery(post) || post.title, limit + 1)
+    )
       .filter((candidate) => candidate.slug !== post.slug)
       .slice(0, limit),
   }
 }
 
-async function getPostForIndexing(db: D1Database, postId: number): Promise<PublicPostRow | null> {
+async function getPostForIndexing(
+  db: D1Database,
+  postId: number,
+): Promise<PublicPostRow | null> {
   return db
     .prepare(
       `SELECT id, slug, title, content, description, category, tags, status, password, is_hidden, deleted_at, published_at
        FROM posts
-       WHERE id = ?`
+       WHERE id = ?`,
     )
     .bind(postId)
     .first<PublicPostRow>()
@@ -370,10 +430,10 @@ async function getPostForIndexing(db: D1Database, postId: number): Promise<Publi
 function isIndexablePost(post: PublicPostRow | null): post is PublicPostRow {
   return Boolean(
     post &&
-    post.status === 'published' &&
-    !post.password &&
-    post.is_hidden === 0 &&
-    post.deleted_at == null
+      post.status === 'published' &&
+      !post.password &&
+      post.is_hidden === 0 &&
+      post.deleted_at == null,
   )
 }
 
@@ -393,13 +453,16 @@ export async function syncPostToRelatedIndex(
   }
 
   const dimensions = await getVectorDimensions(env.VECTOR_INDEX)
-  const values = buildHashedEmbedding(buildPostVectorText({
-    title: post.title,
-    description: post.description,
-    category: post.category,
-    tags: post.tags,
-    content: post.content,
-  }), dimensions)
+  const values = buildHashedEmbedding(
+    buildPostVectorText({
+      title: post.title,
+      description: post.description,
+      category: post.category,
+      tags: post.tags,
+      content: post.content,
+    }),
+    dimensions,
+  )
 
   await env.VECTOR_INDEX.upsert([
     {

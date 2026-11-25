@@ -21,7 +21,9 @@ export async function getCategories(db: Database): Promise<CategoryRow[]> {
   return results
 }
 
-export async function getPublicCategories(db: Database): Promise<CategoryRow[]> {
+export async function getPublicCategories(
+  db: Database,
+): Promise<CategoryRow[]> {
   await ensureSchema(db)
 
   const { results } = await db
@@ -43,13 +45,25 @@ export async function getPublicCategories(db: Database): Promise<CategoryRow[]> 
 }
 
 // 创建分类
-export async function createCategory(db: Database, name: string, slug: string): Promise<void> {
+export async function createCategory(
+  db: Database,
+  name: string,
+  slug: string,
+): Promise<void> {
   await ensureSchema(db)
-  await db.prepare('INSERT OR IGNORE INTO categories (name, slug) VALUES (?, ?)').bind(name, slug).run()
+  await db
+    .prepare('INSERT OR IGNORE INTO categories (name, slug) VALUES (?, ?)')
+    .bind(name, slug)
+    .run()
 }
 
 // 更新分类
-export async function updateCategory(db: Database, oldSlug: string, name: string, newSlug: string): Promise<void> {
+export async function updateCategory(
+  db: Database,
+  oldSlug: string,
+  name: string,
+  newSlug: string,
+): Promise<void> {
   await ensureSchema(db)
 
   const cat = await db
@@ -58,14 +72,23 @@ export async function updateCategory(db: Database, oldSlug: string, name: string
     .first<Pick<CategoryRow, 'name'>>()
 
   if (cat) {
-    await db.prepare('UPDATE posts SET category = ? WHERE category = ?').bind(name, cat.name).run()
+    await db
+      .prepare('UPDATE posts SET category = ? WHERE category = ?')
+      .bind(name, cat.name)
+      .run()
   }
 
-  await db.prepare('UPDATE categories SET name = ?, slug = ? WHERE slug = ?').bind(name, newSlug, oldSlug).run()
+  await db
+    .prepare('UPDATE categories SET name = ?, slug = ? WHERE slug = ?')
+    .bind(name, newSlug, oldSlug)
+    .run()
 }
 
 // 删除分类
-export async function deleteCategory(db: Database, slug: string): Promise<void> {
+export async function deleteCategory(
+  db: Database,
+  slug: string,
+): Promise<void> {
   await ensureSchema(db)
   await db.prepare('DELETE FROM categories WHERE slug = ?').bind(slug).run()
 }

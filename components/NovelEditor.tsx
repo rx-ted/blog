@@ -1,47 +1,39 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
-import {
-  EditorInstance,
-  JSONContent,
-} from 'novel'
-import {
-  buildEditorProps,
-} from '@/lib/editor-extensions'
+import { useRef, useState, useCallback, useMemo } from 'react'
+import type { EditorInstance, JSONContent } from 'novel'
+import { buildEditorProps } from '@/lib/editor-extensions'
 import { EditorTocRail } from '@/components/ArticleToc'
 import { useToast } from '@/components/Toast'
-import { startBackgroundTask } from '@/lib/client-background-task'
 import { renderMarkdownToEditorHtml } from '@/lib/editor-markdown'
-import {
-  insertGeneratedImageAtPosition,
-} from '@/lib/editor-file-upload'
-import { CopyFormatDropdown } from '@/components/DownloadMarkdown'
+import { insertGeneratedImageAtPosition } from '@/lib/editor-file-upload'
 import {
   extractFilesFromClipboard,
   useEditorAuxiliaryModals,
 } from '@/lib/editor-ui'
 import type { EditorImageActionTarget } from '@/lib/resizable-image'
-import { buildAutoDescription, normalizePostSlug } from '@/lib/post-utils'
+import { normalizePostSlug } from '@/lib/post-utils'
 import { getSiteDisplayUrl } from '@/lib/site-config'
 import { resizeTextareaHeight } from '@/lib/textarea-autosize'
-import { focusEditorDocumentStart, isTitleEndEnter } from '@/lib/editor-title-navigation'
-
+import {
+  focusEditorDocumentStart,
+  isTitleEndEnter,
+} from '@/lib/editor-title-navigation'
 
 // Optional tools must not block the writing surface. Mount them only when opened.
-const EditorAiChatPanel = dynamic(() => import('@/components/EditorAiChatPanel').then(m => m.EditorAiChatPanel), { ssr: false })
+const EditorAiChatPanel = dynamic(
+  () =>
+    import('@/components/EditorAiChatPanel').then((m) => m.EditorAiChatPanel),
+  { ssr: false },
+)
 
 import {
   EMPTY_DOCUMENT,
   calcReadTime,
   createEditorDraftDocumentKey,
-  normalizeSectionTitle,
   relativeTime,
   type DraftMetaState,
-  type EditorAiEditArticleContentInput,
-  type EditorAiReadArticleContentOutput,
-  type EditorAiToolInsertTarget,
-  type EditorAiToolOutput,
   type EditorViewMode,
   type MetaGenerationTarget,
   type PublishStatus,
@@ -61,6 +53,7 @@ import { useNovelWechatTheme } from '@/components/editor/novel/hooks/useNovelWec
 import { useNovelImageActions } from '@/components/editor/novel/hooks/useNovelImageActions'
 import { useNovelEditorShellEffects } from '@/components/editor/novel/hooks/useNovelEditorShellEffects'
 import { useNovelEditorInit } from '@/components/editor/novel/hooks/useNovelEditorInit'
+import type { EditorAdapter } from '@/components/editor/shared/types/editor'
 import { useNovelAiBridge } from '@/components/editor/novel/hooks/useNovelAiBridge'
 import { useNovelScroll } from '@/components/editor/novel/hooks/useNovelScroll'
 import { NovelSourceView } from '@/components/editor/novel/components/NovelSourceView'
@@ -91,33 +84,36 @@ interface NovelEditorProps {
   }
 }
 
-
 export function NovelEditor({ initialData }: NovelEditorProps = {}) {
   // ── Core state ──
   const [draftReady, setDraftReady] = useState(false)
-  const [initialContent, setInitialContent] = useState<JSONContent>(EMPTY_DOCUMENT)
+  const [initialContent, setInitialContent] =
+    useState<JSONContent>(EMPTY_DOCUMENT)
   const editorRef = useRef<EditorInstance | null>(null)
+  const novelAdapterRef = useRef<EditorAdapter<EditorInstance> | null>(null)
   const markdownImportInputRef = useRef<HTMLInputElement | null>(null)
   // ── Fields ──
   const [title, setTitle] = useState('')
   const latestTitleRef = useRef('')
   const [charCount, setCharCount] = useState(0)
   const [publishStatus, setPublishStatus] = useState<PublishStatus>(
-    initialData?.status === 'draft' ? 'draft' :
-    initialData?.password ? 'encrypted' :
-    initialData?.is_hidden ? 'unlisted' : 'public'
+    initialData?.status === 'draft'
+      ? 'draft'
+      : initialData?.password
+        ? 'encrypted'
+        : initialData?.is_hidden
+          ? 'unlisted'
+          : 'public',
   )
 
   // ── Bridge refs (hook-order safe wiring) ──
-  const markDirtyRef = useRef<(metaOverrides?: Partial<DraftMetaState>) => void>(() => {})
+  const markDirtyRef = useRef<
+    (metaOverrides?: Partial<DraftMetaState>) => void
+  >(() => {})
   const handleSaveRef = useRef<() => void>(() => {})
 
   // ── Metadata / theme ──
   const {
-    postId,
-    setPostId,
-    editSlug,
-    setEditSlug,
     slug,
     setSlug,
     category,
@@ -141,7 +137,12 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     initialData,
     markDirty: (metaOverrides) => markDirtyRef.current(metaOverrides),
   })
-  const { wechatThemeConfig, selectedWechatThemeId, setSelectedWechatThemeId, selectedWechatTheme } = useNovelWechatTheme()
+  const {
+    wechatThemeConfig,
+    selectedWechatThemeId,
+    setSelectedWechatThemeId,
+    selectedWechatTheme,
+  } = useNovelWechatTheme()
 
   // ── UI state / TOC / panels ──
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -160,12 +161,16 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
   const [wechatPublishOpen, setWechatPublishOpen] = useState(false)
   const [copywritingMenuOpen, setCopywritingMenuOpen] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [pendingMetadataTargets, setPendingMetadataTargets] = useState<MetaGenerationTarget[]>([])
+  const [pendingMetadataTargets, setPendingMetadataTargets] = useState<
+    MetaGenerationTarget[]
+  >([])
   const [feedback, setFeedback] = useState<SaveFeedback>(null)
   const [saveState, setSaveState] = useState<SaveState>('saved')
   const [lastSavedAt, setLastSavedAt] = useState<number>(Date.now())
-  const [referenceImageTarget, setReferenceImageTarget] = useState<EditorImageActionTarget | null>(null)
-  const [cropImageTarget, setCropImageTarget] = useState<EditorImageActionTarget | null>(null)
+  const [referenceImageTarget, setReferenceImageTarget] =
+    useState<EditorImageActionTarget | null>(null)
+  const [cropImageTarget, setCropImageTarget] =
+    useState<EditorImageActionTarget | null>(null)
   const [, setTick] = useState(0) // force re-render for relative time
 
   // ── Refs / misc ──
@@ -180,44 +185,48 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
   const draftAiDocumentKeyRef = useRef(createEditorDraftDocumentKey())
   const skipNextEditorUpdateRef = useRef(Boolean(initialData?.html))
 
-  const getEditorContent = useCallback((editor: EditorInstance): { contentJson: unknown; html: string; plainText: string } => {
-    const isSourceMode = editorViewModeRef.current === 'source'
-    let contentJson = editor.getJSON()
-    let html = editor.getHTML()
-    let plainText = editor.getText({ blockSeparator: '\n\n' }).trim()
+  const getEditorContent = useCallback(
+    (
+      editor: EditorInstance,
+    ): { contentJson: unknown; html: string; plainText: string } => {
+      const isSourceMode = editorViewModeRef.current === 'source'
+      const contentJson = editor.getJSON()
+      let html = editor.getHTML()
+      let plainText = editor.getText({ blockSeparator: '\n\n' }).trim()
 
-    if (isSourceMode) {
-      const markdown = sourceMarkdownRef.current || ''
-      html = markdown.trim() ? renderMarkdownToEditorHtml(markdown) : ''
-      if (typeof window !== 'undefined') {
-        const parsed = new DOMParser().parseFromString(html || '<p></p>', 'text/html')
-        plainText = parsed.body.textContent?.replace(/\s+/g, ' ').trim() || markdown.trim()
-      } else {
-        plainText = markdown.trim()
+      if (isSourceMode) {
+        const markdown = sourceMarkdownRef.current || ''
+        html = markdown.trim() ? renderMarkdownToEditorHtml(markdown) : ''
+        if (typeof window !== 'undefined') {
+          const parsed = new DOMParser().parseFromString(
+            html || '<p></p>',
+            'text/html',
+          )
+          plainText =
+            parsed.body.textContent?.replace(/\s+/g, ' ').trim() ||
+            markdown.trim()
+        } else {
+          plainText = markdown.trim()
+        }
       }
-    }
 
-    return { contentJson, html, plainText }
-  }, [])
+      return { contentJson, html, plainText }
+    },
+    [],
+  )
 
-  const {
-    clearAutosaveTimers,
-    abortAutosaveRequest,
-    persistDraft,
-    scheduleDraftSave,
-    lastAutosaveSnapshotRef,
-    resetAutosaveSnapshot,
-  } = useEditorAutosave({
-    draftReady,
-    editorRef,
-    latestTitleRef,
-    latestMetaRef,
-    getEditorContent,
-    patchMetadata,
-    syncPersistedSlug,
-    setSaveState,
-    setLastSavedAt,
-  })
+  const { clearAutosaveTimers, abortAutosaveRequest, scheduleDraftSave } =
+    useEditorAutosave({
+      draftReady,
+      editorRef,
+      latestTitleRef,
+      latestMetaRef,
+      getEditorContent,
+      patchMetadata,
+      syncPersistedSlug,
+      setSaveState,
+      setLastSavedAt,
+    })
 
   const {
     editorViewMode,
@@ -254,6 +263,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     clearAutosaveTimers,
     abortAutosaveRequest,
     lastAutosaveSnapshotRef,
+    novelAdapterRef,
   })
 
   const {
@@ -261,7 +271,6 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     setMobilePreviewOpen,
     mobileWechatPreviewHtml,
     mobileWechatPreviewError,
-    mobileWechatPreviewRetry,
     setMobileWechatPreviewRetry,
     editorScrollAreaRef,
     mobilePreviewScrollRef,
@@ -274,17 +283,23 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     titleRef,
   })
 
-  const getCurrentAssetArticleTarget = useCallback(() => ({
-    postId,
-    slug: normalizePostSlug(slug) || editSlug || '',
-  }), [editSlug, postId, slug])
+  const getCurrentAssetArticleTarget = useCallback(
+    () => ({
+      postId,
+      slug: normalizePostSlug(slug) || editSlug || '',
+    }),
+    [editSlug, postId, slug],
+  )
 
-  const markDirty = useCallback((metaOverrides?: Partial<DraftMetaState>) => {
-    if (metaOverrides) {
-      patchMetadata(metaOverrides)
-    }
-    scheduleDraftSave()
-  }, [patchMetadata, scheduleDraftSave])
+  const markDirty = useCallback(
+    (metaOverrides?: Partial<DraftMetaState>) => {
+      if (metaOverrides) {
+        patchMetadata(metaOverrides)
+      }
+      scheduleDraftSave()
+    },
+    [patchMetadata, scheduleDraftSave],
+  )
   markDirtyRef.current = markDirty
 
   const {
@@ -324,7 +339,6 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     setSidebarOpen,
   })
 
-
   useNovelEditorShellEffects({
     sidebarOpen,
     setTick,
@@ -352,28 +366,32 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     openDocumentImageModal,
   } = useEditorAuxiliaryModals({
     title,
-    getDocumentText: () => editorRef.current?.getText({ blockSeparator: '\n\n' }).trim() || '',
+    getDocumentText: () =>
+      editorRef.current?.getText({ blockSeparator: '\n\n' }).trim() || '',
     getSelectionContext: () => {
       const selection = editorRef.current?.state.selection
       return {
         insertPos: selection?.to ?? null,
         selectedText: selection
-          ? editorRef.current?.state.doc.textBetween(selection.from, selection.to, '\n').trim() || ''
+          ? editorRef.current?.state.doc
+              .textBetween(selection.from, selection.to, '\n')
+              .trim() || ''
           : '',
       }
     },
   })
 
-  const { insertGeneratedImage, applyImageActionResult, imageExtensions } = useNovelImageActions({
-    editorRef,
-    imageModalInsertPos: imageModal.insertPos,
-    closeImageModal,
-    markDirty,
-    setCoverImage,
-    setFeedback,
-    setReferenceImageTarget,
-    setCropImageTarget,
-  })
+  const { insertGeneratedImage, applyImageActionResult, imageExtensions } =
+    useNovelImageActions({
+      editorRef,
+      imageModalInsertPos: imageModal.insertPos,
+      closeImageModal,
+      markDirty,
+      setCoverImage,
+      setFeedback,
+      setReferenceImageTarget,
+      setCropImageTarget,
+    })
 
   // ── Save ──
   const { handleSave, handleStartNewArticle } = useNovelSave({
@@ -440,27 +458,27 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     toast,
   })
 
-  const { handleGenerateMetadata, isMetadataTargetPending } = useNovelMetadataGeneration({
-    editorRef,
-    latestTitleRef,
-    title,
-    category,
-    description,
-    tags,
-    slug,
-    editSlug,
-    pendingMetadataTargets,
-    setPendingMetadataTargets,
-    toast,
-    setFeedback,
-    setDescription,
-    setTags,
-    setTagInput,
-    setSlug,
-    setCoverImage,
-    markDirty,
-  })
-
+  const { handleGenerateMetadata, isMetadataTargetPending } =
+    useNovelMetadataGeneration({
+      editorRef,
+      latestTitleRef,
+      title,
+      category,
+      description,
+      tags,
+      slug,
+      editSlug,
+      pendingMetadataTargets,
+      setPendingMetadataTargets,
+      toast,
+      setFeedback,
+      setDescription,
+      setTags,
+      setTagInput,
+      setSlug,
+      setCoverImage,
+      markDirty,
+    })
 
   const openAiChatPanel = useCallback(() => {
     setSidebarOpen(true)
@@ -473,8 +491,6 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     syncEditorContentState(editor)
   }, [syncEditorContentState])
   const {
-    getSelectedEditorText,
-    getEditorChatDocumentKey,
     getEditorChatContext,
     insertAiChatText,
     setAiChatTitle,
@@ -506,11 +522,21 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
   })
 
   // ── Save status display ──
-  const saveStatusText = saveState === 'saved' ? `已保存 · ${relativeTime(lastSavedAt)}` :
-    saveState === 'dirty' ? '未保存' : saveState === 'saving' ? '保存中…' : '保存失败'
+  const saveStatusText =
+    saveState === 'saved'
+      ? `已保存 · ${relativeTime(lastSavedAt)}`
+      : saveState === 'dirty'
+        ? '未保存'
+        : saveState === 'saving'
+          ? '保存中…'
+          : '保存失败'
 
-  const saveStatusColor = saveState === 'saved' ? 'text-emerald-600' :
-    saveState === 'error' ? 'text-orange-500' : 'text-[var(--stone-gray)]'
+  const saveStatusColor =
+    saveState === 'saved'
+      ? 'text-emerald-600'
+      : saveState === 'error'
+        ? 'text-orange-500'
+        : 'text-[var(--stone-gray)]'
 
   const showSidebar = sidebarOpen
   const wechatSourceUrl = useMemo(() => {
@@ -549,7 +575,8 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
           description,
           onDownloadPdf: handleDownloadPdf,
           copywritingMenuOpen,
-          onToggleCopywritingMenu: () => setCopywritingMenuOpen((open) => !open),
+          onToggleCopywritingMenu: () =>
+            setCopywritingMenuOpen((open) => !open),
           copywritingMenuRef,
           onFormatCopywriting: handleFormatCopywriting,
           showSidebar,
@@ -563,7 +590,10 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
         }}
         publish={{
           category,
-          onCategoryChange: (val) => { setCategory(val); markDirty({ category: val }) },
+          onCategoryChange: (val) => {
+            setCategory(val)
+            markDirty({ category: val })
+          },
           onSave: handleSave,
           saving,
           editSlug,
@@ -581,19 +611,46 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
       />
 
       {/* Hidden file inputs */}
-      <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={e => { void handleSelectedFiles(e.target.files) }} />
-      <input ref={fileUploadRef} type="file" accept="video/*,audio/*,.pdf,.zip,.rar,.7z,.epub,.mobi,.azw,.azw3,.txt,image/*" multiple className="hidden" onChange={e => { void handleSelectedFiles(e.target.files) }} />
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={(e) => {
+          void handleSelectedFiles(e.target.files)
+        }}
+      />
+      <input
+        ref={fileUploadRef}
+        type="file"
+        accept="video/*,audio/*,.pdf,.zip,.rar,.7z,.epub,.mobi,.azw,.azw3,.txt,image/*"
+        multiple
+        className="hidden"
+        onChange={(e) => {
+          void handleSelectedFiles(e.target.files)
+        }}
+      />
       <input
         ref={markdownImportInputRef}
         type="file"
         accept=".md,.markdown,text/markdown,text/plain"
         className="hidden"
-        onChange={e => {
+        onChange={(e) => {
           const file = e.target.files?.[0]
           if (file) void handleImportedMarkdownFile(file)
         }}
       />
-      <input ref={coverInputRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) void handleCoverUpload(f) }} />
+      <input
+        ref={coverInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0]
+          if (f) void handleCoverUpload(f)
+        }}
+      />
 
       {/* ── Main layout: editor + sidebar ── */}
       <div className="flex">
@@ -670,9 +727,13 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                 setSourceMarkdown(next)
                 const html = next.trim() ? renderMarkdownToEditorHtml(next) : ''
                 setPreviewHtml(html)
-                const plainText = typeof window !== 'undefined'
-                  ? (new DOMParser().parseFromString(html || '<p></p>', 'text/html').body.textContent?.replace(/\s+/g, ' ').trim() || next.trim())
-                  : next.trim()
+                const plainText =
+                  typeof window !== 'undefined'
+                    ? new DOMParser()
+                        .parseFromString(html || '<p></p>', 'text/html')
+                        .body.textContent?.replace(/\s+/g, ' ')
+                        .trim() || next.trim()
+                    : next.trim()
                 setCharCount(plainText.length)
                 if (editorRef.current) {
                   scheduleDraftSave(latestTitleRef.current, editorRef.current)
@@ -683,7 +744,10 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
             />
           }
           previewContent={
-            <NovelPreview html={previewHtml} mobilePreviewOpen={mobilePreviewOpen} />
+            <NovelPreview
+              html={previewHtml}
+              mobilePreviewOpen={mobilePreviewOpen}
+            />
           }
         />
 
@@ -694,7 +758,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
             onThemeChange={handleWechatThemeChange}
             previewHtml={mobileWechatPreviewHtml}
             previewError={mobileWechatPreviewError}
-            onRetry={() => setMobileWechatPreviewRetry(value => value + 1)}
+            onRetry={() => setMobileWechatPreviewRetry((value) => value + 1)}
             scrollRef={mobilePreviewScrollRef}
           />
         )}
@@ -720,7 +784,9 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
               }}
               coverImage={coverImage}
               coverInputRef={coverInputRef}
-              onCoverUpload={(f) => { void handleCoverUpload(f) }}
+              onCoverUpload={(f) => {
+                void handleCoverUpload(f)
+              }}
               onCoverRemove={() => {
                 setCoverImage('')
                 markDirty({ coverImage: '' })
@@ -739,7 +805,9 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                   markDirty({ slug: normalizedSlug })
                 }
               }}
-              onGenerateMetadata={(target) => { void handleGenerateMetadata(target) }}
+              onGenerateMetadata={(target) => {
+                void handleGenerateMetadata(target)
+              }}
               isMetadataTargetPending={isMetadataTargetPending}
             />
           ) : (
@@ -781,7 +849,12 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
         onCloseReferenceImage={() => setReferenceImageTarget(null)}
         onApplyReferenceImage={(imageUrl, alt, placementMode) => {
           if (!referenceImageTarget) return
-          applyImageActionResult(referenceImageTarget, imageUrl, alt, placementMode ?? 'replace')
+          applyImageActionResult(
+            referenceImageTarget,
+            imageUrl,
+            alt,
+            placementMode ?? 'replace',
+          )
           setReferenceImageTarget(null)
         }}
         cropImageTarget={cropImageTarget}
@@ -789,7 +862,12 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
         onApplyCrop={async (file, placementMode) => {
           if (!cropImageTarget) return
           const uploaded = await uploadImageAndGetUrl(file)
-          applyImageActionResult(cropImageTarget, uploaded, cropImageTarget.alt || file.name, placementMode)
+          applyImageActionResult(
+            cropImageTarget,
+            uploaded,
+            cropImageTarget.alt || file.name,
+            placementMode,
+          )
           setCropImageTarget(null)
         }}
         aiModal={aiModal}

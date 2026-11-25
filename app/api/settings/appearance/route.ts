@@ -10,11 +10,21 @@ export async function GET() {
       return NextResponse.json({ font: '', defaultTheme: 'default' })
     }
 
-    const settings = await getPublicSettings(env, ['body_font', 'default_theme'])
+    const settings = await getPublicSettings(env, [
+      'body_font',
+      'default_theme',
+    ])
 
     return NextResponse.json(
-      { font: settings.body_font || '', defaultTheme: normalizeTheme(settings.default_theme) },
-      { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' } }
+      {
+        font: settings.body_font || '',
+        defaultTheme: normalizeTheme(settings.default_theme),
+      },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        },
+      },
     )
   } catch {
     return NextResponse.json({ font: '', defaultTheme: 'default' })

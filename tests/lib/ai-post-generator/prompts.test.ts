@@ -32,14 +32,17 @@ const coverGenerator: AiPostGeneratorRow = {
 
 describe('ai-post-generator/prompts', () => {
   it('builds a summary context block from non-empty sections and truncates content', () => {
-    const context = buildContextBlock({
-      title: '测试标题',
-      category: 'AI',
-      description: '摘要',
-      tags: ['提示词', '编辑器'],
-      currentSlug: 'test-slug',
-      content: ` ${'a'.repeat(MAX_CONTEXT_LENGTH + 20)} `,
-    }, 'summary')
+    const context = buildContextBlock(
+      {
+        title: '测试标题',
+        category: 'AI',
+        description: '摘要',
+        tags: ['提示词', '编辑器'],
+        currentSlug: 'test-slug',
+        content: ` ${'a'.repeat(MAX_CONTEXT_LENGTH + 20)} `,
+      },
+      'summary',
+    )
 
     expect(context).toContain('标题：测试标题')
     expect(context).toContain('分类：AI')
@@ -50,14 +53,18 @@ describe('ai-post-generator/prompts', () => {
   })
 
   it('omits existing tags and current slug when building slug context', () => {
-    const context = buildContextBlock({
-      title: 'OpenAI Agents SDK 实战',
-      category: 'AI',
-      description: '围绕 Agent 编排和工具调用展开。',
-      tags: ['旧标签1', '旧标签2'],
-      currentSlug: 'old-slug',
-      content: '正文会补充这是一个关于 OpenAI Agents SDK、tool calling 和 agent workflow 的实战指南。',
-    }, 'slug')
+    const context = buildContextBlock(
+      {
+        title: 'OpenAI Agents SDK 实战',
+        category: 'AI',
+        description: '围绕 Agent 编排和工具调用展开。',
+        tags: ['旧标签1', '旧标签2'],
+        currentSlug: 'old-slug',
+        content:
+          '正文会补充这是一个关于 OpenAI Agents SDK、tool calling 和 agent workflow 的实战指南。',
+      },
+      'slug',
+    )
 
     expect(context).toContain('标题：OpenAI Agents SDK 实战')
     expect(context).toContain('正文参考：')
@@ -66,14 +73,18 @@ describe('ai-post-generator/prompts', () => {
   })
 
   it('omits existing tags and requests 3-5 tags for tag generation', () => {
-    const context = buildContextBlock({
-      title: '用 MCP 重构内容工作流',
-      category: '工作流',
-      description: '讨论 MCP、工具编排和内容生产。',
-      tags: ['旧标签'],
-      currentSlug: 'old-slug',
-      content: '正文重点讨论 MCP server、tool orchestration、agent workflow 和内容自动化。',
-    }, 'tags')
+    const context = buildContextBlock(
+      {
+        title: '用 MCP 重构内容工作流',
+        category: '工作流',
+        description: '讨论 MCP、工具编排和内容生产。',
+        tags: ['旧标签'],
+        currentSlug: 'old-slug',
+        content:
+          '正文重点讨论 MCP server、tool orchestration、agent workflow 和内容自动化。',
+      },
+      'tags',
+    )
 
     expect(context).toContain('标题：用 MCP 重构内容工作流')
     expect(context).toContain('正文：')
@@ -83,10 +94,18 @@ describe('ai-post-generator/prompts', () => {
   })
 
   it('adds target-specific json instructions to text prompts', () => {
-    expect(buildTextSystemPrompt('summary', '写摘要')).toContain('{"summary":"..."}')
-    expect(buildTextSystemPrompt('tags', '提标签')).toContain('{"tags":["标签1","标签2"]}')
-    expect(buildTextSystemPrompt('slug', 'make slug')).toContain('{"slug":"english-kebab-case-slug"}')
-    expect(buildTextSystemPrompt('slug', 'make slug')).toContain('title as the primary source of meaning')
+    expect(buildTextSystemPrompt('summary', '写摘要')).toContain(
+      '{"summary":"..."}',
+    )
+    expect(buildTextSystemPrompt('tags', '提标签')).toContain(
+      '{"tags":["标签1","标签2"]}',
+    )
+    expect(buildTextSystemPrompt('slug', 'make slug')).toContain(
+      '{"slug":"english-kebab-case-slug"}',
+    )
+    expect(buildTextSystemPrompt('slug', 'make slug')).toContain(
+      'title as the primary source of meaning',
+    )
   })
 
   it('keeps cover prompts within the configured limit while preserving key context', () => {

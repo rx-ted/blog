@@ -33,7 +33,7 @@ async function sha256Hex(input: string): Promise<string> {
   const data = encoder.encode(input)
   const hashBuffer = await crypto.subtle.digest('SHA-256', data)
   const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
 export async function hashPassword(password: string): Promise<string> {
@@ -41,9 +41,12 @@ export async function hashPassword(password: string): Promise<string> {
 }
 
 // 验证密码：优先兼容当前明文存储，同时兼容历史哈希值
-export async function verifyPassword(input: string, stored: string): Promise<boolean> {
+export async function verifyPassword(
+  input: string,
+  stored: string,
+): Promise<boolean> {
   if (input === stored) return true
-  if (await hashPassword(input) === stored) return true
-  if (await sha256Hex(input) === stored) return true // 兼容更早的无盐哈希
+  if ((await hashPassword(input)) === stored) return true
+  if ((await sha256Hex(input)) === stored) return true // 兼容更早的无盐哈希
   return false
 }

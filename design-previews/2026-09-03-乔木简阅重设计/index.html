@@ -351,7 +351,7 @@
   <script>
     ['variance', 'motion', 'density'].forEach((id) => {
       const input = document.getElementById(id);
-      const output = document.getElementById(id + 'Out');
+      const output = document.getElementById(`${id}Out`);
       input.addEventListener('input', () => {
         output.value = input.value;
         output.textContent = input.value;

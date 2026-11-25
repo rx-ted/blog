@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/admin-auth'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import {
@@ -10,7 +10,10 @@ import {
   type AiPostGeneratorProviderMode,
   type AiPostGeneratorTarget,
 } from '@/lib/ai-post-generators'
-import { normalizeAiImageAspectRatio, normalizeAiImageResolution } from '@/lib/ai-image-options'
+import {
+  normalizeAiImageAspectRatio,
+  normalizeAiImageResolution,
+} from '@/lib/ai-image-options'
 import { clampMaxTokens, clampTemperature } from '@/lib/ai-provider-profiles'
 
 interface UpdateGeneratorBody {
@@ -30,7 +33,7 @@ interface UpdateGeneratorBody {
 function normalizeTarget(value: unknown): AiPostGeneratorTarget | null {
   const normalized = typeof value === 'string' ? value.trim() : ''
   return ['summary', 'tags', 'slug', 'cover'].includes(normalized)
-    ? normalized as AiPostGeneratorTarget
+    ? (normalized as AiPostGeneratorTarget)
     : null
 }
 
@@ -79,7 +82,10 @@ export async function PUT(req: NextRequest) {
 
   const target = normalizeTarget(body.target_key)
   if (!target) {
-    return NextResponse.json({ error: '缺少有效的 target_key' }, { status: 400 })
+    return NextResponse.json(
+      { error: '缺少有效的 target_key' },
+      { status: 400 },
+    )
   }
 
   const current = await getAiPostGeneratorByTarget(db, target, env)
@@ -87,43 +93,64 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: '生成器配置不存在' }, { status: 404 })
   }
 
-  const providerMode = normalizeProviderMode(body.provider_mode ?? current.provider_mode)
-  const prompt = typeof body.prompt === 'string' ? body.prompt.trim() : current.prompt
-  const workersModel = typeof body.workers_model === 'string'
-    ? body.workers_model.trim()
-    : current.workers_model
-  const textProfileId = body.text_profile_id === null
-    ? null
-    : Number.isFinite(body.text_profile_id)
-      ? Number(body.text_profile_id)
-      : current.text_profile_id
-  const imageProfileId = body.image_profile_id === null
-    ? null
-    : Number.isFinite(body.image_profile_id)
-      ? Number(body.image_profile_id)
-      : current.image_profile_id
+  const providerMode = normalizeProviderMode(
+    body.provider_mode ?? current.provider_mode,
+  )
+  const prompt =
+    typeof body.prompt === 'string' ? body.prompt.trim() : current.prompt
+  const workersModel =
+    typeof body.workers_model === 'string'
+      ? body.workers_model.trim()
+      : current.workers_model
+  const textProfileId =
+    body.text_profile_id === null
+      ? null
+      : Number.isFinite(body.text_profile_id)
+        ? Number(body.text_profile_id)
+        : current.text_profile_id
+  const imageProfileId =
+    body.image_profile_id === null
+      ? null
+      : Number.isFinite(body.image_profile_id)
+        ? Number(body.image_profile_id)
+        : current.image_profile_id
   const temperature = clampTemperature(
-    body.temperature === undefined ? current.temperature : Number(body.temperature),
+    body.temperature === undefined
+      ? current.temperature
+      : Number(body.temperature),
   )
   const maxTokens = clampMaxTokens(
-    body.max_tokens === undefined ? current.max_tokens : Number(body.max_tokens),
+    body.max_tokens === undefined
+      ? current.max_tokens
+      : Number(body.max_tokens),
   )
-  const aspectRatio = normalizeAiImageAspectRatio(body.aspect_ratio || current.aspect_ratio)
-  const resolution = normalizeAiImageResolution(body.resolution || current.resolution)
-  const isEnabled = body.is_enabled === undefined
-    ? current.is_enabled
-    : (body.is_enabled === true || Number(body.is_enabled) === 1 ? 1 : 0)
+  const aspectRatio = normalizeAiImageAspectRatio(
+    body.aspect_ratio || current.aspect_ratio,
+  )
+  const resolution = normalizeAiImageResolution(
+    body.resolution || current.resolution,
+  )
+  const isEnabled =
+    body.is_enabled === undefined
+      ? current.is_enabled
+      : body.is_enabled === true || Number(body.is_enabled) === 1
+        ? 1
+        : 0
 
   if (!prompt) {
     return NextResponse.json({ error: '提示词不能为空' }, { status: 400 })
   }
 
   if (providerMode === 'workers_ai' && !workersModel) {
-    return NextResponse.json({ error: 'Workers AI 模型不能为空' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'Workers AI 模型不能为空' },
+      { status: 400 },
+    )
   }
 
   if (target === 'cover') {
-    await db.prepare(`
+    await db
+      .prepare(`
       UPDATE ai_post_generators
       SET prompt = ?,
           provider_mode = ?,
@@ -134,18 +161,21 @@ export async function PUT(req: NextRequest) {
           is_enabled = ?,
           updated_at = strftime('%s', 'now')
       WHERE target_key = ?
-    `).bind(
-      prompt,
-      providerMode,
-      providerMode === 'profile' ? imageProfileId : imageProfileId,
-      workersModel,
-      aspectRatio,
-      resolution,
-      isEnabled,
-      target,
-    ).run()
+    `)
+      .bind(
+        prompt,
+        providerMode,
+        providerMode === 'profile' ? imageProfileId : imageProfileId,
+        workersModel,
+        aspectRatio,
+        resolution,
+        isEnabled,
+        target,
+      )
+      .run()
   } else {
-    await db.prepare(`
+    await db
+      .prepare(`
       UPDATE ai_post_generators
       SET prompt = ?,
           provider_mode = ?,
@@ -156,16 +186,18 @@ export async function PUT(req: NextRequest) {
           is_enabled = ?,
           updated_at = strftime('%s', 'now')
       WHERE target_key = ?
-    `).bind(
-      prompt,
-      providerMode,
-      providerMode === 'profile' ? textProfileId : textProfileId,
-      workersModel,
-      temperature,
-      maxTokens,
-      isEnabled,
-      target,
-    ).run()
+    `)
+      .bind(
+        prompt,
+        providerMode,
+        providerMode === 'profile' ? textProfileId : textProfileId,
+        workersModel,
+        temperature,
+        maxTokens,
+        isEnabled,
+        target,
+      )
+      .run()
   }
 
   const generator = await getAiPostGeneratorByTarget(db, target, env)

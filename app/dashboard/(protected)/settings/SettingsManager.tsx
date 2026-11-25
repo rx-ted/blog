@@ -74,7 +74,13 @@ export function SettingsManager({
     }
   }
 
-  const saveThemeSettings = async ({ theme, font }: { theme: Theme; font: BodyFont }) => {
+  const saveThemeSettings = async ({
+    theme,
+    font,
+  }: {
+    theme: Theme
+    font: BodyFont
+  }) => {
     setSaving(true)
     setMsg('')
     try {
@@ -126,7 +132,8 @@ export function SettingsManager({
             </div>
           )}
           <p className="text-sm text-[var(--editor-muted)]">
-            此代码会注入到所有页面的 &lt;head&gt; 中，适合添加统计代码（如 Google Analytics、百度统计等）。
+            此代码会注入到所有页面的 &lt;head&gt; 中，适合添加统计代码（如
+            Google Analytics、百度统计等）。
           </p>
           <CustomJsEditor
             initialValue={initialCustomJs}
@@ -192,7 +199,9 @@ export function SettingsManager({
     {
       id: 'runtime',
       label: '运行环境',
-      content: <RuntimeCapabilitiesPanel capabilities={initialRuntimeCapabilities} />,
+      content: (
+        <RuntimeCapabilitiesPanel capabilities={initialRuntimeCapabilities} />
+      ),
     },
   ]
 

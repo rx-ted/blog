@@ -93,7 +93,9 @@ function parseVariants(value: string | null) {
   try {
     const parsed = JSON.parse(value) as Record<string, unknown>
     return Object.fromEntries(
-      Object.entries(parsed).filter((entry): entry is [string, string] => typeof entry[1] === 'string'),
+      Object.entries(parsed).filter(
+        (entry): entry is [string, string] => typeof entry[1] === 'string',
+      ),
     )
   } catch {
     return {}
@@ -103,7 +105,10 @@ function parseVariants(value: string | null) {
 function serializeVariants(value: UpsertMediaAssetInput['variants']) {
   if (!value) return null
   const variants = Object.fromEntries(
-    Object.entries(value).filter((entry): entry is [string, string] => typeof entry[1] === 'string' && entry[1].trim().length > 0),
+    Object.entries(value).filter(
+      (entry): entry is [string, string] =>
+        typeof entry[1] === 'string' && entry[1].trim().length > 0,
+    ),
   )
   return Object.keys(variants).length > 0 ? JSON.stringify(variants) : null
 }
@@ -198,7 +203,10 @@ export async function upsertMediaAsset(
   return asset
 }
 
-export async function getMediaAssetByUrl(db: Database, url: string): Promise<MediaAsset | null> {
+export async function getMediaAssetByUrl(
+  db: Database,
+  url: string,
+): Promise<MediaAsset | null> {
   await ensureSchema(db)
   const row = await db
     .prepare('SELECT * FROM media_assets WHERE url = ?')

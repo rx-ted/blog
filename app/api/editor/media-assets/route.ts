@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server'
 import {
   ensureAuthenticatedRequest,
   getRouteEnvWithDb,
@@ -13,11 +13,12 @@ import {
 } from '@/lib/repositories/media-assets'
 
 function parsePositiveInteger(value: unknown) {
-  const parsed = typeof value === 'number'
-    ? value
-    : typeof value === 'string'
-      ? Number.parseInt(value, 10)
-      : Number.NaN
+  const parsed =
+    typeof value === 'number'
+      ? value
+      : typeof value === 'string'
+        ? Number.parseInt(value, 10)
+        : Number.NaN
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null
 }
 
@@ -60,7 +61,10 @@ export async function POST(req: NextRequest) {
   try {
     body = await parseJsonBody<typeof body>(req)
   } catch (error) {
-    return jsonError(error instanceof Error ? error.message : '请求体不是有效 JSON', 400)
+    return jsonError(
+      error instanceof Error ? error.message : '请求体不是有效 JSON',
+      400,
+    )
   }
 
   let assetId = parsePositiveInteger(body.assetId)

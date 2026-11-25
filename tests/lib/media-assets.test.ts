@@ -6,10 +6,12 @@ import {
   upsertMediaAsset,
 } from '@/lib/db'
 
-function createRecordingDb(options: {
-  assetRow?: Record<string, unknown> | null
-  listRows?: Array<Record<string, unknown>>
-} = {}) {
+function createRecordingDb(
+  options: {
+    assetRow?: Record<string, unknown> | null
+    listRows?: Array<Record<string, unknown>>
+  } = {},
+) {
   const runs: Array<{ sql: string; values: unknown[] }> = []
   const preparedSqls: string[] = []
 
@@ -91,7 +93,9 @@ describe('media asset repository', () => {
       resolution: '2k',
     })
 
-    expect(runs.some((item) => item.sql.includes('INSERT INTO media_assets'))).toBe(true)
+    expect(
+      runs.some((item) => item.sql.includes('INSERT INTO media_assets')),
+    ).toBe(true)
     expect(asset.variants).toEqual({ thumb: '/thumb.webp' })
     expect(asset.current_post_link_count).toBe(1)
   })
@@ -108,7 +112,9 @@ describe('media asset repository', () => {
       sessionId: 'session-1',
     })
 
-    const linkRun = runs.find((item) => item.sql.includes('INSERT INTO article_asset_links'))
+    const linkRun = runs.find((item) =>
+      item.sql.includes('INSERT INTO article_asset_links'),
+    )
     expect(linkRun?.values).toContain(42)
     expect(linkRun?.values).toContain('section')
     expect(linkRun?.values).toContain('tool-1')
@@ -154,7 +160,9 @@ describe('media asset repository', () => {
       status: 'success',
     })
 
-    const actionRun = runs.find((item) => item.sql.includes('INSERT INTO ai_chat_tool_actions'))
+    const actionRun = runs.find((item) =>
+      item.sql.includes('INSERT INTO ai_chat_tool_actions'),
+    )
     expect(actionRun?.sql).toContain('ON CONFLICT(tool_call_id)')
     expect(actionRun?.values).toContain('call-1')
     expect(actionRun?.values).toContain('insert_image')

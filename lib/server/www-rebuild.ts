@@ -13,17 +13,24 @@ export async function triggerWwwRebuild(env: RebuildEnv, reason: string) {
   if (!token) return
   const repo = env.WWW_REBUILD_REPO || DEFAULT_REPO
   try {
-    const response = await fetch(`https://api.github.com/repos/${repo}/dispatches`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/vnd.github+json',
-        Authorization: `Bearer ${token}`,
-        'User-Agent': 'qmblog-memos',
-        'X-GitHub-Api-Version': '2022-11-28',
+    const response = await fetch(
+      `https://api.github.com/repos/${repo}/dispatches`,
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/vnd.github+json',
+          Authorization: `Bearer ${token}`,
+          'User-Agent': 'qmblog-memos',
+          'X-GitHub-Api-Version': '2022-11-28',
+        },
+        body: JSON.stringify({
+          event_type: 'memos-updated',
+          client_payload: { reason },
+        }),
       },
-      body: JSON.stringify({ event_type: 'memos-updated', client_payload: { reason } }),
-    })
-    if (!response.ok) console.warn('www rebuild dispatch failed:', response.status)
+    )
+    if (!response.ok)
+      console.warn('www rebuild dispatch failed:', response.status)
   } catch (error) {
     console.warn('www rebuild dispatch failed:', error)
   }

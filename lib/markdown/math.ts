@@ -17,7 +17,11 @@ function findUnescapedMarker(value: string, marker: string, from: number) {
   let index = value.indexOf(marker, from)
   while (index !== -1) {
     let slashCount = 0
-    for (let cursor = index - 1; cursor >= 0 && value[cursor] === '\\'; cursor -= 1) {
+    for (
+      let cursor = index - 1;
+      cursor >= 0 && value[cursor] === '\\';
+      cursor -= 1
+    ) {
       slashCount += 1
     }
     if (slashCount % 2 === 0) return index
@@ -39,15 +43,20 @@ function findClosingSingleDollar(value: string, from: number) {
 function looksLikeFormula(value: string, options: { inferred?: boolean } = {}) {
   const trimmed = value.trim()
   if (!trimmed) return false
-  if (options.inferred && trimmed.length > INFERRED_PAREN_MATH_MAX_LENGTH) return false
+  if (options.inferred && trimmed.length > INFERRED_PAREN_MATH_MAX_LENGTH)
+    return false
   if (options.inferred && /[\u4e00-\u9fff]/.test(trimmed)) return false
   if (/^\d+(?:[.,]\d+)?$/.test(trimmed)) return false
 
   return (
     /\\[a-zA-Z]+/.test(trimmed) ||
     /[\^_]\s*\{?[-+A-Za-z0-9]+/.test(trimmed) ||
-    /(?:\d|[A-Za-z])\s*(?:[=<>+\-*/×]|\\times|\\cdot)\s*(?:\d|[A-Za-z])/.test(trimmed) ||
-    /\\(?:frac|sqrt|sum|prod|int|log|ln|exp|alpha|beta|gamma|delta|theta|lambda|mu|pi|sigma|times|cdot)\b/.test(trimmed)
+    /(?:\d|[A-Za-z])\s*(?:[=<>+\-*/×]|\\times|\\cdot)\s*(?:\d|[A-Za-z])/.test(
+      trimmed,
+    ) ||
+    /\\(?:frac|sqrt|sum|prod|int|log|ln|exp|alpha|beta|gamma|delta|theta|lambda|mu|pi|sigma|times|cdot)\b/.test(
+      trimmed,
+    )
   )
 }
 
@@ -57,7 +66,11 @@ function createMathToken(
   markup: string,
   displayMode = false,
 ) {
-  const token = state.push(displayMode ? 'math_block' : 'math_inline', displayMode ? 'div' : 'span', 0)
+  const token = state.push(
+    displayMode ? 'math_block' : 'math_inline',
+    displayMode ? 'div' : 'span',
+    0,
+  )
   token.content = normalizeLatex(latex)
   token.markup = markup
   token.meta = { displayMode }
@@ -98,7 +111,12 @@ function inlineMathRule(state: StateInline, silent: boolean) {
     if (end === -1) return false
 
     const latex = src.slice(pos + 1, end)
-    if (!latex.trim() || latex.includes('\n') || latex.length > INLINE_MATH_MAX_LENGTH) return false
+    if (
+      !latex.trim() ||
+      latex.includes('\n') ||
+      latex.length > INLINE_MATH_MAX_LENGTH
+    )
+      return false
     if (!looksLikeFormula(latex)) return false
     if (!silent) createMathToken(state, latex, '$', false)
     state.pos = end + 1
@@ -152,7 +170,8 @@ function inferredParenthesizedMathRule(state: StateInline) {
 
       if (!looksLikeFormula(latex, { inferred: true })) continue
 
-      if (start > cursor) nextTokens.push(createInlineTextToken(state, text.slice(cursor, start)))
+      if (start > cursor)
+        nextTokens.push(createInlineTextToken(state, text.slice(cursor, start)))
       nextTokens.push(createInferredInlineMathToken(state, latex))
       cursor = start + raw.length
       changed = true
@@ -167,7 +186,8 @@ function inferredParenthesizedMathRule(state: StateInline) {
       continue
     }
 
-    if (cursor < text.length) nextTokens.push(createInlineTextToken(state, text.slice(cursor)))
+    if (cursor < text.length)
+      nextTokens.push(createInlineTextToken(state, text.slice(cursor)))
     index = cursorIndex
   }
 
@@ -179,7 +199,11 @@ function readMathBlock(state: StateBlock, startLine: number, endLine: number) {
   const start = state.bMarks[startLine] + state.tShift[startLine]
   const firstLineEnd = state.eMarks[startLine]
   const firstLine = state.src.slice(start, firstLineEnd)
-  const openMarker = firstLine.startsWith('$$') ? '$$' : firstLine.startsWith('\\[') ? '\\[' : ''
+  const openMarker = firstLine.startsWith('$$')
+    ? '$$'
+    : firstLine.startsWith('\\[')
+      ? '\\['
+      : ''
   if (!openMarker) return null
 
   const closeMarker = openMarker === '$$' ? '$$' : '\\]'
@@ -220,7 +244,12 @@ function readMathBlock(state: StateBlock, startLine: number, endLine: number) {
   return null
 }
 
-function mathBlockRule(state: StateBlock, startLine: number, endLine: number, silent: boolean) {
+function mathBlockRule(
+  state: StateBlock,
+  startLine: number,
+  endLine: number,
+  silent: boolean,
+) {
   if (state.sCount[startLine] - state.blkIndent >= 4) return false
 
   const block = readMathBlock(state, startLine, endLine)
@@ -237,7 +266,12 @@ function mathBlockRule(state: StateBlock, startLine: number, endLine: number, si
   return true
 }
 
-function renderMathToken(md: MarkdownItInstance, tokens: Token[], index: number, displayMode: boolean) {
+function renderMathToken(
+  md: MarkdownItInstance,
+  tokens: Token[],
+  index: number,
+  displayMode: boolean,
+) {
   const latex = normalizeLatex(tokens[index]?.content || '')
   const escapedLatex = md.utils.escapeHtml(latex)
   const tag = displayMode ? 'div' : 'span'
@@ -249,12 +283,17 @@ function renderMathToken(md: MarkdownItInstance, tokens: Token[], index: number,
 
 export function markdownMathPlugin(md: MarkdownItInstance) {
   md.inline.ruler.before('text', 'editor_math_inline', inlineMathRule)
-  md.inline.ruler2.push('editor_math_parentheses', inferredParenthesizedMathRule)
+  md.inline.ruler2.push(
+    'editor_math_parentheses',
+    inferredParenthesizedMathRule,
+  )
   md.block.ruler.before('paragraph', 'editor_math_block', mathBlockRule, {
     alt: ['paragraph', 'reference', 'blockquote'],
   })
-  md.renderer.rules.math_inline = (tokens, index) => renderMathToken(md, tokens, index, false)
-  md.renderer.rules.math_block = (tokens, index) => renderMathToken(md, tokens, index, true)
+  md.renderer.rules.math_inline = (tokens, index) =>
+    renderMathToken(md, tokens, index, false)
+  md.renderer.rules.math_block = (tokens, index) =>
+    renderMathToken(md, tokens, index, true)
 }
 
 export function hasEditorMarkdownMath(markdown: string) {
@@ -266,9 +305,10 @@ export function hasEditorMarkdownMath(markdown: string) {
     /\\\[([\s\S]+?)\\\]/.test(text) ||
     /\$\$([\s\S]+?)\$\$/.test(text) ||
     /(^|[^$])\$([^$\n]+?)\$/.test(text) ||
-    /\(([^()\n]+)\)/.test(text) && text.match(/\(([^()\n]+)\)/g)?.some((match) => {
-      const latex = match.slice(1, -1)
-      return looksLikeFormula(latex, { inferred: true })
-    }) === true
+    (/\(([^()\n]+)\)/.test(text) &&
+      text.match(/\(([^()\n]+)\)/g)?.some((match) => {
+        const latex = match.slice(1, -1)
+        return looksLikeFormula(latex, { inferred: true })
+      }) === true)
   )
 }

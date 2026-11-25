@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/admin-auth'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import {
@@ -7,7 +7,10 @@ import {
   saveEncryptedAiImageApiKey,
   type AIImageProviderProfileRow,
 } from '@/lib/ai-image-config'
-import { normalizeBaseUrl, resolveAiConfigSecret } from '@/lib/ai-provider-profiles'
+import {
+  normalizeBaseUrl,
+  resolveAiConfigSecret,
+} from '@/lib/ai-provider-profiles'
 
 interface SaveProfileBody {
   id?: number
@@ -36,7 +39,8 @@ function buildProfilePayload(body: SaveProfileBody) {
     name,
     provider: (body.provider || 'custom').trim() || 'custom',
     provider_name: (body.provider_name || '').trim(),
-    provider_type: (body.provider_type || 'openai_images').trim() || 'openai_images',
+    provider_type:
+      (body.provider_type || 'openai_images').trim() || 'openai_images',
     provider_category: (body.provider_category || '').trim(),
     api_key_url: (body.api_key_url || '').trim(),
     base_url: baseUrl,
@@ -45,15 +49,18 @@ function buildProfilePayload(body: SaveProfileBody) {
 }
 
 async function listProfiles(db: D1Database) {
-  const { results } = await db.prepare(`
+  const { results } = await db
+    .prepare(`
     SELECT id, name, provider, provider_name, provider_type, provider_category, api_key_url,
            base_url, model, api_key_masked, is_default, created_at, updated_at
     FROM ai_image_provider_profiles
     ORDER BY is_default DESC, updated_at DESC, id DESC
-  `).all<AIImageProviderProfileRow>()
+  `)
+    .all<AIImageProviderProfileRow>()
 
   const profiles = results || []
-  const defaultProfileId = profiles.find((profile) => profile.is_default === 1)?.id ?? null
+  const defaultProfileId =
+    profiles.find((profile) => profile.is_default === 1)?.id ?? null
   return { profiles, defaultProfileId }
 }
 
@@ -63,7 +70,8 @@ export async function GET(req: NextRequest) {
   if (!(await authenticateRequest(req, db))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  if (!db) return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
+  if (!db)
+    return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
 
   await ensureAiImageConfigInfrastructure(db)
   const { profiles, defaultProfileId } = await listProfiles(db)
@@ -76,7 +84,8 @@ export async function POST(req: NextRequest) {
   if (!(await authenticateRequest(req, db))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  if (!db) return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
+  if (!db)
+    return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
 
   await ensureAiImageConfigInfrastructure(db)
 
@@ -88,43 +97,59 @@ export async function POST(req: NextRequest) {
 
   const secret = resolveAiConfigSecret(env)
   const rawApiKey = (body.api_key || '').trim()
-  const { encrypted, masked } = await saveEncryptedAiImageApiKey(rawApiKey, secret)
+  const { encrypted, masked } = await saveEncryptedAiImageApiKey(
+    rawApiKey,
+    secret,
+  )
 
   if (body.is_default) {
-    await db.prepare('UPDATE ai_image_provider_profiles SET is_default = 0').run()
+    await db
+      .prepare('UPDATE ai_image_provider_profiles SET is_default = 0')
+      .run()
   }
 
-  const result = await db.prepare(`
+  const result = await db
+    .prepare(`
     INSERT INTO ai_image_provider_profiles (
       name, provider, provider_name, provider_type, provider_category, api_key_url,
       base_url, model, api_key_encrypted, api_key_masked, is_default, created_at, updated_at
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%s', 'now'), strftime('%s', 'now'))
-  `).bind(
-    payload.name,
-    payload.provider,
-    payload.provider_name,
-    payload.provider_type,
-    payload.provider_category,
-    payload.api_key_url,
-    payload.base_url,
-    payload.model,
-    encrypted,
-    masked,
-    body.is_default ? 1 : 0,
-  ).run()
+  `)
+    .bind(
+      payload.name,
+      payload.provider,
+      payload.provider_name,
+      payload.provider_type,
+      payload.provider_category,
+      payload.api_key_url,
+      payload.base_url,
+      payload.model,
+      encrypted,
+      masked,
+      body.is_default ? 1 : 0,
+    )
+    .run()
 
   const insertedId = result.meta.last_row_id
   const defaultId = await ensureDefaultImageProfileId(db)
   if (defaultId) {
-    await db.prepare('UPDATE ai_image_actions SET profile_id = ? WHERE profile_id IS NULL').bind(defaultId).run()
+    await db
+      .prepare(
+        'UPDATE ai_image_actions SET profile_id = ? WHERE profile_id IS NULL',
+      )
+      .bind(defaultId)
+      .run()
   }
 
-  const row = await db.prepare(`
+  const row = await db
+    .prepare(`
     SELECT id, name, provider, provider_name, provider_type, provider_category, api_key_url,
            base_url, model, api_key_masked, is_default, created_at, updated_at
     FROM ai_image_provider_profiles
     WHERE id = ?
-  `).bind(insertedId).first<AIImageProviderProfileRow>()
+  `)
+    .bind(insertedId)
+    .first<AIImageProviderProfileRow>()
 
   return NextResponse.json({ success: true, profile: row || null })
 }
@@ -135,7 +160,8 @@ export async function PUT(req: NextRequest) {
   if (!(await authenticateRequest(req, db))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  if (!db) return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
+  if (!db)
+    return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
 
   await ensureAiImageConfigInfrastructure(db)
 
@@ -145,11 +171,14 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: '缺少有效的配置 ID' }, { status: 400 })
   }
 
-  const exists = await db.prepare(`
+  const exists = await db
+    .prepare(`
     SELECT id, api_key_masked, is_default
     FROM ai_image_provider_profiles
     WHERE id = ?
-  `).bind(id).first<{ id: number; api_key_masked: string; is_default: number }>()
+  `)
+    .bind(id)
+    .first<{ id: number; api_key_masked: string; is_default: number }>()
 
   if (!exists) {
     return NextResponse.json({ error: '配置不存在' }, { status: 404 })
@@ -174,7 +203,9 @@ export async function PUT(req: NextRequest) {
         : exists.is_default
 
   if (nextIsDefault === 1) {
-    await db.prepare('UPDATE ai_image_provider_profiles SET is_default = 0').run()
+    await db
+      .prepare('UPDATE ai_image_provider_profiles SET is_default = 0')
+      .run()
   }
 
   const sets = [
@@ -210,23 +241,34 @@ export async function PUT(req: NextRequest) {
 
   values.push(id)
 
-  await db.prepare(`
+  await db
+    .prepare(`
     UPDATE ai_image_provider_profiles
     SET ${sets.join(', ')}
     WHERE id = ?
-  `).bind(...values).run()
+  `)
+    .bind(...values)
+    .run()
 
   const defaultId = await ensureDefaultImageProfileId(db)
   if (defaultId) {
-    await db.prepare('UPDATE ai_image_actions SET profile_id = ? WHERE profile_id IS NULL').bind(defaultId).run()
+    await db
+      .prepare(
+        'UPDATE ai_image_actions SET profile_id = ? WHERE profile_id IS NULL',
+      )
+      .bind(defaultId)
+      .run()
   }
 
-  const row = await db.prepare(`
+  const row = await db
+    .prepare(`
     SELECT id, name, provider, provider_name, provider_type, provider_category, api_key_url,
            base_url, model, api_key_masked, is_default, created_at, updated_at
     FROM ai_image_provider_profiles
     WHERE id = ?
-  `).bind(id).first<AIImageProviderProfileRow>()
+  `)
+    .bind(id)
+    .first<AIImageProviderProfileRow>()
 
   return NextResponse.json({ success: true, profile: row || null })
 }
@@ -237,7 +279,8 @@ export async function DELETE(req: NextRequest) {
   if (!(await authenticateRequest(req, db))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  if (!db) return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
+  if (!db)
+    return NextResponse.json({ error: 'DB unavailable' }, { status: 500 })
 
   await ensureAiImageConfigInfrastructure(db)
 
@@ -247,17 +290,28 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: '缺少有效的配置 ID' }, { status: 400 })
   }
 
-  const boundCount = await db.prepare(`
+  const boundCount = await db
+    .prepare(`
     SELECT COUNT(*) as count
     FROM ai_image_actions
     WHERE profile_id = ?
-  `).bind(id).first<{ count: number }>()
+  `)
+    .bind(id)
+    .first<{ count: number }>()
 
-  await db.prepare('DELETE FROM ai_image_provider_profiles WHERE id = ?').bind(id).run()
+  await db
+    .prepare('DELETE FROM ai_image_provider_profiles WHERE id = ?')
+    .bind(id)
+    .run()
 
   const defaultId = await ensureDefaultImageProfileId(db)
   if ((boundCount?.count ?? 0) > 0) {
-    await db.prepare('UPDATE ai_image_actions SET profile_id = ? WHERE profile_id = ?').bind(defaultId ?? null, id).run()
+    await db
+      .prepare(
+        'UPDATE ai_image_actions SET profile_id = ? WHERE profile_id = ?',
+      )
+      .bind(defaultId ?? null, id)
+      .run()
   }
 
   return NextResponse.json({ success: true })

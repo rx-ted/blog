@@ -37,7 +37,9 @@ export function ApiTokensManager() {
     } catch {}
   }
 
-  useEffect(() => { loadTokens() }, [])
+  useEffect(() => {
+    loadTokens()
+  }, [])
 
   const createToken = async () => {
     if (!newName.trim()) return
@@ -167,7 +169,8 @@ export function ApiTokensManager() {
                   </code>
                 </div>
                 <div className="text-xs text-[var(--stone-gray)] mt-0.5">
-                  创建于 {formatDate(t.created_at)} · 最后使用 {formatDate(t.last_used_at)}
+                  创建于 {formatDate(t.created_at)} · 最后使用{' '}
+                  {formatDate(t.last_used_at)}
                 </div>
               </div>
               <button

@@ -27,7 +27,11 @@ export function NovelWysiwygCanvas({
         <EditorContent
           initialContent={initialContent}
           extensions={extensions}
-          className={mobilePreviewOpen ? 'editor-surface editor-mobile-preview-surface' : 'editor-surface'}
+          className={
+            mobilePreviewOpen
+              ? 'editor-surface editor-mobile-preview-surface'
+              : 'editor-surface'
+          }
           immediatelyRender={false}
           editorProps={editorProps}
           onCreate={onCreate}

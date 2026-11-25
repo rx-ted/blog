@@ -18,8 +18,10 @@ export function parsePostTags(value: string | null): string[] {
   }
 }
 
-export function normalizePostStatus(post: Pick<Post, 'status' | 'deleted_at'>): Post['status'] {
-  return post.deleted_at ? 'deleted' : (post.status || 'published')
+export function normalizePostStatus(
+  post: Pick<Post, 'status' | 'deleted_at'>,
+): Post['status'] {
+  return post.deleted_at ? 'deleted' : post.status || 'published'
 }
 
 export function mapPostWithTags(post: Post): PostWithTags {

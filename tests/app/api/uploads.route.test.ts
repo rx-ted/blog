@@ -63,14 +63,18 @@ describe('/api/uploads route', () => {
     mocks.authenticateRequest.mockResolvedValue(false)
     mocks.getAppCloudflareEnv.mockResolvedValue({ DB: { kind: 'db' } })
 
-    const response = await POST(createFormRequest(new File(['x'], 'cover.png', { type: 'image/png' })))
+    const response = await POST(
+      createFormRequest(new File(['x'], 'cover.png', { type: 'image/png' })),
+    )
 
     expect(response.status).toBe(401)
     await expect(response.json()).resolves.toEqual({ error: 'Unauthorized' })
   })
 
   it('returns a deduplicated response when the small-file key already exists', async () => {
-    const get = vi.fn(async () => ({ customMetadata: { originalName: 'cover.png' } }))
+    const get = vi.fn(async () => ({
+      customMetadata: { originalName: 'cover.png' },
+    }))
     const put = vi.fn(async () => undefined)
     mocks.getAppCloudflareEnv.mockResolvedValue({
       DB: { kind: 'db' },
@@ -80,7 +84,7 @@ describe('/api/uploads route', () => {
 
     const file = new File(['small-image'], 'cover.png', { type: 'image/png' })
     const response = await POST(createFormRequest(file))
-    const body = await response.json() as UploadResponseBody
+    const body = (await response.json()) as UploadResponseBody
 
     expect(body.success).toBe(true)
     expect(body.deduplicated).toBe(true)
@@ -93,12 +97,15 @@ describe('/api/uploads route', () => {
       cover: expect.stringContaining('fit=cover'),
     })
     expect(body.assetId).toBe(99)
-    expect(mocks.upsertMediaAsset).toHaveBeenCalledWith({ kind: 'db' }, expect.objectContaining({
-      source: 'upload',
-      url: expect.stringContaining('/api/images/image/'),
-      mimeType: 'image/png',
-      alt: 'cover.png',
-    }))
+    expect(mocks.upsertMediaAsset).toHaveBeenCalledWith(
+      { kind: 'db' },
+      expect.objectContaining({
+        source: 'upload',
+        url: expect.stringContaining('/api/images/image/'),
+        mimeType: 'image/png',
+        alt: 'cover.png',
+      }),
+    )
     expect(put).not.toHaveBeenCalled()
   })
 
@@ -111,10 +118,12 @@ describe('/api/uploads route', () => {
     })
 
     const largeContent = new Uint8Array(6 * 1024 * 1024)
-    const file = new File([largeContent], 'movie.mov', { type: 'application/octet-stream' })
+    const file = new File([largeContent], 'movie.mov', {
+      type: 'application/octet-stream',
+    })
 
     const response = await POST(createFormRequest(file))
-    const body = await response.json() as UploadResponseBody
+    const body = (await response.json()) as UploadResponseBody
 
     expect(body.success).toBe(true)
     expect(body.type).toBe('document')
@@ -142,27 +151,38 @@ describe('/api/uploads route', () => {
       IMAGES: { get, put },
     })
 
-    const response = await POST(createFormRequest(new File(['image'], 'inline.png', { type: 'image/png' }), {
-      postId: '42',
-      slug: 'hello-world',
-      role: 'cover',
-      source: 'collage',
-    }))
-    const body = await response.json() as UploadResponseBody
+    const response = await POST(
+      createFormRequest(
+        new File(['image'], 'inline.png', { type: 'image/png' }),
+        {
+          postId: '42',
+          slug: 'hello-world',
+          role: 'cover',
+          source: 'collage',
+        },
+      ),
+    )
+    const body = (await response.json()) as UploadResponseBody
 
     expect(body.success).toBe(true)
     expect(body.assetId).toBe(99)
-    expect(mocks.upsertMediaAsset).toHaveBeenCalledWith({ kind: 'db' }, expect.objectContaining({
-      source: 'collage',
-      r2Key: expect.stringContaining('inline.png'),
-      url: expect.stringContaining('/api/images/image/'),
-    }))
-    expect(mocks.linkMediaAssetToArticle).toHaveBeenCalledWith({ kind: 'db' }, {
-      assetId: 99,
-      postId: 42,
-      slug: 'hello-world',
-      role: 'cover',
-    })
+    expect(mocks.upsertMediaAsset).toHaveBeenCalledWith(
+      { kind: 'db' },
+      expect.objectContaining({
+        source: 'collage',
+        r2Key: expect.stringContaining('inline.png'),
+        url: expect.stringContaining('/api/images/image/'),
+      }),
+    )
+    expect(mocks.linkMediaAssetToArticle).toHaveBeenCalledWith(
+      { kind: 'db' },
+      {
+        assetId: 99,
+        postId: 42,
+        slug: 'hello-world',
+        role: 'cover',
+      },
+    )
   })
 
   it('rejects unsupported file types before upload', async () => {
@@ -173,10 +193,16 @@ describe('/api/uploads route', () => {
       IMAGES: { get, put },
     })
 
-    const response = await POST(createFormRequest(new File(['x'], 'script.exe', { type: 'application/x-msdownload' })))
+    const response = await POST(
+      createFormRequest(
+        new File(['x'], 'script.exe', { type: 'application/x-msdownload' }),
+      ),
+    )
 
     expect(response.status).toBe(400)
-    await expect(response.json()).resolves.toEqual({ error: '不支持的文件类型: application/x-msdownload' })
+    await expect(response.json()).resolves.toEqual({
+      error: '不支持的文件类型: application/x-msdownload',
+    })
     expect(put).not.toHaveBeenCalled()
   })
 })

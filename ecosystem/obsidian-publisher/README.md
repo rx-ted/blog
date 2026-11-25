@@ -15,6 +15,7 @@
 ### 手动安装
 
 1. 下载 `main.js`、`manifest.json` 到你的 Obsidian 插件目录：
+
    ```
    {你的笔记库}/.obsidian/plugins/qiaomu-blog-publisher/
    ```

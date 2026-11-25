@@ -1,7 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { FONT_PRESETS, THEME_OPTIONS, type BodyFont, type Theme } from '@/lib/appearance'
+import {
+  FONT_PRESETS,
+  THEME_OPTIONS,
+  type BodyFont,
+  type Theme,
+} from '@/lib/appearance'
 
 interface Props {
   initialTheme: Theme
@@ -10,16 +15,24 @@ interface Props {
   saving: boolean
 }
 
-export function ThemeManager({ initialTheme, initialFont, onSave, saving }: Props) {
+export function ThemeManager({
+  initialTheme,
+  initialFont,
+  onSave,
+  saving,
+}: Props) {
   const [selectedTheme, setSelectedTheme] = useState<Theme>(initialTheme)
   const [selectedFont, setSelectedFont] = useState<BodyFont>(initialFont)
 
-  const currentFont = FONT_PRESETS.find((preset) => preset.id === selectedFont) || FONT_PRESETS[0]
+  const currentFont =
+    FONT_PRESETS.find((preset) => preset.id === selectedFont) || FONT_PRESETS[0]
 
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h3 className="text-base font-medium text-[var(--editor-ink)]">默认主题</h3>
+        <h3 className="text-base font-medium text-[var(--editor-ink)]">
+          默认主题
+        </h3>
         <p className="text-sm text-[var(--editor-muted)]">
           这里设置的是网站首次访问时的默认主题。访客后续如果自己切换主题，会优先使用本地保存的偏好。
         </p>
@@ -42,8 +55,12 @@ export function ThemeManager({ initialTheme, initialFont, onSave, saving }: Prop
                 className="mt-1 accent-[var(--editor-accent)]"
               />
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-medium text-[var(--editor-ink)]">{theme.label}</div>
-                <p className="mt-1 text-sm leading-relaxed text-[var(--editor-muted)]">{theme.description}</p>
+                <div className="text-sm font-medium text-[var(--editor-ink)]">
+                  {theme.label}
+                </div>
+                <p className="mt-1 text-sm leading-relaxed text-[var(--editor-muted)]">
+                  {theme.description}
+                </p>
               </div>
             </label>
           ))}
@@ -51,7 +68,9 @@ export function ThemeManager({ initialTheme, initialFont, onSave, saving }: Prop
       </div>
 
       <div className="space-y-2">
-        <h3 className="text-base font-medium text-[var(--editor-ink)]">正文字体</h3>
+        <h3 className="text-base font-medium text-[var(--editor-ink)]">
+          正文字体
+        </h3>
         <p className="text-sm text-[var(--editor-muted)]">
           设置前台文章正文的字体。主题控制首页风格，字体控制阅读正文体验。
         </p>
@@ -75,14 +94,19 @@ export function ThemeManager({ initialTheme, initialFont, onSave, saving }: Prop
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-[var(--editor-ink)]">{preset.name}</span>
-                  <span className="text-xs text-[var(--stone-gray)]">{preset.desc}</span>
+                  <span className="text-sm font-medium text-[var(--editor-ink)]">
+                    {preset.name}
+                  </span>
+                  <span className="text-xs text-[var(--stone-gray)]">
+                    {preset.desc}
+                  </span>
                 </div>
                 <p
                   className="mt-1 text-sm leading-relaxed text-[var(--editor-muted)]"
                   style={{ fontFamily: preset.family || 'inherit' }}
                 >
-                  白日依山尽，黄河入海流。The quick brown fox jumps over the lazy dog.
+                  白日依山尽，黄河入海流。The quick brown fox jumps over the
+                  lazy dog.
                 </p>
               </div>
             </label>
@@ -97,7 +121,9 @@ export function ThemeManager({ initialTheme, initialFont, onSave, saving }: Prop
       )}
 
       <button
-        onClick={() => void onSave({ theme: selectedTheme, font: selectedFont })}
+        onClick={() =>
+          void onSave({ theme: selectedTheme, font: selectedFont })
+        }
         disabled={saving}
         className="rounded-lg bg-[var(--editor-accent)] px-4 py-2 text-sm font-medium text-white hover:brightness-105 disabled:opacity-50"
       >

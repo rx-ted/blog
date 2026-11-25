@@ -5,7 +5,15 @@ import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/Toast'
 import { Modal } from '@/components/Modal'
 
-export function DeleteButton({ slug, title, status }: { slug: string; title: string; status: string }) {
+export function DeleteButton({
+  slug,
+  title,
+  status,
+}: {
+  slug: string
+  title: string
+  status: string
+}) {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showPermanentModal, setShowPermanentModal] = useState(false)
   const [loading, setLoading] = useState(false)

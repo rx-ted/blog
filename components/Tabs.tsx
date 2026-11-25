@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 
 interface Tab {
   id: string
@@ -16,14 +16,14 @@ interface TabsProps {
 export function Tabs({ tabs, defaultTab }: TabsProps) {
   const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]?.id)
 
-  const activeContent = tabs.find(t => t.id === activeTab)?.content
+  const activeContent = tabs.find((t) => t.id === activeTab)?.content
 
   return (
     <div>
       {/* Tab 导航 */}
       <div className="border-b border-[var(--editor-line)] mb-6 overflow-x-auto">
         <div className="flex min-w-max gap-1">
-          {tabs.map(tab => (
+          {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}

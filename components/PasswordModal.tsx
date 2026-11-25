@@ -172,7 +172,8 @@ export function PasswordModal({
           ) : (
             <>
               <p className="text-sm text-[var(--editor-muted)]">
-                启用密码保护后，文章将不会在首页、RSS 和搜索结果中显示，只能通过直接链接+密码访问。
+                启用密码保护后，文章将不会在首页、RSS
+                和搜索结果中显示，只能通过直接链接+密码访问。
               </p>
               <button
                 type="button"

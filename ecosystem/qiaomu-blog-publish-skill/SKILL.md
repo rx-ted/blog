@@ -1,4 +1,5 @@
 ---
+
 name: qiaomu-blog-publish
 description: 将 Markdown 文件、文本内容或 URL 发布到自己的 Qiaomu Blog，支持分类选择、状态控制、本地和远程图片自动上传
 trigger: /qiaomu-blog-publish

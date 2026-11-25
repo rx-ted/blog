@@ -13,8 +13,17 @@ const PUNCTUATION_MAP: Record<string, string> = {
 
 function normalizeAsciiPunctuationNearChinese(value: string): string {
   return value.replace(
-    new RegExp(`(${CJK_RE})\\s*([,.:;?!])\\s*|\\s*([,.:;?!])\\s*(${CJK_RE})`, 'gu'),
-    (_match, leftCjk: string | undefined, leftPunc: string | undefined, rightPunc: string | undefined, rightCjk: string | undefined) => {
+    new RegExp(
+      `(${CJK_RE})\\s*([,.:;?!])\\s*|\\s*([,.:;?!])\\s*(${CJK_RE})`,
+      'gu',
+    ),
+    (
+      _match,
+      leftCjk: string | undefined,
+      leftPunc: string | undefined,
+      rightPunc: string | undefined,
+      rightCjk: string | undefined,
+    ) => {
       if (leftCjk && leftPunc) {
         return `${leftCjk}${PUNCTUATION_MAP[leftPunc] ?? leftPunc}`
       }

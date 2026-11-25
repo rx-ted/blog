@@ -18,27 +18,35 @@ export default async function EditorPage({
   if (!isAuthenticated) {
     const params = await searchParams
     const editSlug = params.edit ?? params.slug
-    const editParam = editSlug ? `?edit=${editSlug}` : params.new === '1' ? '?new=1' : ''
-    redirect(`/dashboard/login?redirect_to=${encodeURIComponent(`/editor${editParam}`)}`)
+    const editParam = editSlug
+      ? `?edit=${editSlug}`
+      : params.new === '1'
+        ? '?new=1'
+        : ''
+    redirect(
+      `/dashboard/login?redirect_to=${encodeURIComponent(`/editor${editParam}`)}`,
+    )
   }
 
   const params = await searchParams
   const edit = params.edit ?? params.slug
   const isNew = params.new === '1'
 
-  let initialData: {
-    id: number
-    slug: string
-    title: string
-    html: string
-    category?: string
-    status?: 'draft' | 'published' | 'deleted'
-    password?: string | null
-    is_hidden?: number
-    tags?: string[]
-    description?: string | null
-    cover_image?: string | null
-  } | undefined
+  let initialData:
+    | {
+        id: number
+        slug: string
+        title: string
+        html: string
+        category?: string
+        status?: 'draft' | 'published' | 'deleted'
+        password?: string | null
+        is_hidden?: number
+        tags?: string[]
+        description?: string | null
+        cover_image?: string | null
+      }
+    | undefined
 
   if (edit) {
     const env = await getAppCloudflareEnv()
@@ -68,5 +76,11 @@ export default async function EditorPage({
 
   const editorKey = edit ? `edit:${edit}` : isNew ? 'new' : 'default'
 
-  return <NovelEditorClient key={editorKey} initialData={initialData} skipDraftRestore={isNew} />
+  return (
+    <NovelEditorClient
+      key={editorKey}
+      initialData={initialData}
+      skipDraftRestore={isNew}
+    />
+  )
 }

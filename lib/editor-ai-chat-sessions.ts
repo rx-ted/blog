@@ -1,5 +1,7 @@
-export const EDITOR_AI_CHAT_SESSIONS_STORAGE_PREFIX = 'qmblog:editor-ai-chat-sessions:v2'
-export const LEGACY_EDITOR_AI_CHAT_SESSIONS_STORAGE_KEY = 'qmblog:editor-ai-chat-sessions:v1'
+export const EDITOR_AI_CHAT_SESSIONS_STORAGE_PREFIX =
+  'qmblog:editor-ai-chat-sessions:v2'
+export const LEGACY_EDITOR_AI_CHAT_SESSIONS_STORAGE_KEY =
+  'qmblog:editor-ai-chat-sessions:v1'
 
 const FALLBACK_DOCUMENT_KEY = 'draft:unknown'
 const SIDE_EFFECT_TOOL_TYPES = new Set([
@@ -35,11 +37,14 @@ function getAppliedImageResultToolCallId(part: Record<string, unknown>) {
   if (part.type !== 'data-imageResult') return ''
   const data = part.data
   if (!isRecord(data)) return ''
-  const toolCallId = typeof data.toolCallId === 'string' ? data.toolCallId.trim() : ''
+  const toolCallId =
+    typeof data.toolCallId === 'string' ? data.toolCallId.trim() : ''
   if (!toolCallId) return ''
   const output = data.output
   if (!isRecord(output)) return ''
-  return output.status === 'success' && isRecord(output.insertTarget) ? toolCallId : ''
+  return output.status === 'success' && isRecord(output.insertTarget)
+    ? toolCallId
+    : ''
 }
 
 export function normalizeEditorAiDocumentKey(value: unknown) {
@@ -56,7 +61,9 @@ export function buildEditorAiChatStorageKey(documentKey: unknown) {
   return `${EDITOR_AI_CHAT_SESSIONS_STORAGE_PREFIX}:${encodeURIComponent(normalizeEditorAiDocumentKey(documentKey))}`
 }
 
-export function mergeToolCallIds(...groups: Array<Iterable<unknown> | null | undefined>) {
+export function mergeToolCallIds(
+  ...groups: Array<Iterable<unknown> | null | undefined>
+) {
   const ids: string[] = []
   const seen = new Set<string>()
 
@@ -91,7 +98,8 @@ export function collectAppliedToolCallIdsFromMessages(messages: unknown) {
         continue
       }
 
-      const toolCallId = typeof rawPart.toolCallId === 'string' ? rawPart.toolCallId.trim() : ''
+      const toolCallId =
+        typeof rawPart.toolCallId === 'string' ? rawPart.toolCallId.trim() : ''
       if (!toolCallId || !SIDE_EFFECT_TOOL_TYPES.has(type)) continue
 
       if (type === 'tool-generateArticleImage') {

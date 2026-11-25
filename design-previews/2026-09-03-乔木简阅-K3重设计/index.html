@@ -520,7 +520,7 @@
   <script>
     ['variance', 'motion', 'density'].forEach(function (id) {
       var input = document.getElementById(id);
-      var output = document.getElementById(id + 'Out');
+      var output = document.getElementById(`${id}Out`);
       input.addEventListener('input', function () {
         output.value = input.value;
         output.textContent = input.value;

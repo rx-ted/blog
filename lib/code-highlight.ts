@@ -10,7 +10,9 @@ export function escapeHtml(value: string) {
 }
 
 export function getCodeLanguage(code: HTMLElement) {
-  const languageClass = Array.from(code.classList).find(className => className.startsWith('language-'))
+  const languageClass = Array.from(code.classList).find((className) =>
+    className.startsWith('language-'),
+  )
   const fromClass = languageClass?.replace(/^language-/, '').trim()
   const fromData = code.getAttribute('data-language')?.trim()
   const language = fromClass || fromData || ''
@@ -31,7 +33,11 @@ export function isInfographicLanguage(language: string) {
 }
 
 export function isVisualDiagramLanguage(language: string) {
-  return isMermaidLanguage(language) || isPlantUmlLanguage(language) || isInfographicLanguage(language)
+  return (
+    isMermaidLanguage(language) ||
+    isPlantUmlLanguage(language) ||
+    isInfographicLanguage(language)
+  )
 }
 
 // WeChat export renders plain code blocks without syntax highlighting:
@@ -40,9 +46,10 @@ export function buildPlainCodeLinesHtml(codeText: string) {
   return codeText
     .replace(/\r\n/g, '\n')
     .split('\n')
-    .map((line, index) => (
-      `<span class="wechat-code-row"><span class="wechat-code-line-number" aria-hidden="true">${index + 1}</span><span class="wechat-code-line">${escapeHtml(line) || '&nbsp;'}</span></span>`
-    ))
+    .map(
+      (line, index) =>
+        `<span class="wechat-code-row"><span class="wechat-code-line-number" aria-hidden="true">${index + 1}</span><span class="wechat-code-line">${escapeHtml(line) || '&nbsp;'}</span></span>`,
+    )
     .join('')
 }
 

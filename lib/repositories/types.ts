@@ -120,21 +120,20 @@ export interface AiResearchJobRow {
 export function isPubliclyAccessiblePost(
   post: Pick<Post, 'status' | 'deleted_at'> | null | undefined,
 ): boolean {
-  return Boolean(
-    post &&
-    post.status === 'published' &&
-    post.deleted_at == null,
-  )
+  return Boolean(post && post.status === 'published' && post.deleted_at == null)
 }
 
 export function isSearchIndexablePost(
-  post: Pick<Post, 'status' | 'password' | 'is_hidden' | 'deleted_at'> | null | undefined,
+  post:
+    | Pick<Post, 'status' | 'password' | 'is_hidden' | 'deleted_at'>
+    | null
+    | undefined,
 ): boolean {
   return Boolean(
     post &&
-    post.status === 'published' &&
-    post.password == null &&
-    post.is_hidden === 0 &&
-    post.deleted_at == null,
+      post.status === 'published' &&
+      post.password == null &&
+      post.is_hidden === 0 &&
+      post.deleted_at == null,
   )
 }

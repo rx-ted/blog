@@ -30,11 +30,11 @@ async function runSchemaMigrations(db: Database) {
   try {
     // 安全地添加新列（ALTER TABLE ADD COLUMN 在列已存在时会报错，所以需要 try/catch）
     const columnMigrations = [
-      "ALTER TABLE posts ADD COLUMN password TEXT",
-      "ALTER TABLE posts ADD COLUMN is_pinned INTEGER DEFAULT 0",
-      "ALTER TABLE posts ADD COLUMN is_hidden INTEGER DEFAULT 0",
-      "ALTER TABLE posts ADD COLUMN deleted_at INTEGER",
-      "ALTER TABLE posts ADD COLUMN cover_image TEXT",
+      'ALTER TABLE posts ADD COLUMN password TEXT',
+      'ALTER TABLE posts ADD COLUMN is_pinned INTEGER DEFAULT 0',
+      'ALTER TABLE posts ADD COLUMN is_hidden INTEGER DEFAULT 0',
+      'ALTER TABLE posts ADD COLUMN deleted_at INTEGER',
+      'ALTER TABLE posts ADD COLUMN cover_image TEXT',
     ]
     for (const sql of columnMigrations) {
       try {
@@ -56,7 +56,9 @@ async function runSchemaMigrations(db: Database) {
       )
       .run()
     await db
-      .prepare('CREATE INDEX IF NOT EXISTS idx_post_slug_aliases_post_id ON post_slug_aliases(post_id)')
+      .prepare(
+        'CREATE INDEX IF NOT EXISTS idx_post_slug_aliases_post_id ON post_slug_aliases(post_id)',
+      )
       .run()
     await db
       .prepare(
@@ -84,10 +86,14 @@ async function runSchemaMigrations(db: Database) {
       )
       .run()
     await db
-      .prepare('CREATE INDEX IF NOT EXISTS idx_media_assets_type_created ON media_assets(type, created_at DESC)')
+      .prepare(
+        'CREATE INDEX IF NOT EXISTS idx_media_assets_type_created ON media_assets(type, created_at DESC)',
+      )
       .run()
     await db
-      .prepare('CREATE INDEX IF NOT EXISTS idx_media_assets_source_created ON media_assets(source, created_at DESC)')
+      .prepare(
+        'CREATE INDEX IF NOT EXISTS idx_media_assets_source_created ON media_assets(source, created_at DESC)',
+      )
       .run()
     await db
       .prepare(
@@ -109,13 +115,19 @@ async function runSchemaMigrations(db: Database) {
       )
       .run()
     await db
-      .prepare('CREATE INDEX IF NOT EXISTS idx_article_asset_links_asset_id ON article_asset_links(asset_id)')
+      .prepare(
+        'CREATE INDEX IF NOT EXISTS idx_article_asset_links_asset_id ON article_asset_links(asset_id)',
+      )
       .run()
     await db
-      .prepare('CREATE INDEX IF NOT EXISTS idx_article_asset_links_post_id ON article_asset_links(post_id, inserted_at DESC)')
+      .prepare(
+        'CREATE INDEX IF NOT EXISTS idx_article_asset_links_post_id ON article_asset_links(post_id, inserted_at DESC)',
+      )
       .run()
     await db
-      .prepare('CREATE INDEX IF NOT EXISTS idx_article_asset_links_slug ON article_asset_links(slug, inserted_at DESC)')
+      .prepare(
+        'CREATE INDEX IF NOT EXISTS idx_article_asset_links_slug ON article_asset_links(slug, inserted_at DESC)',
+      )
       .run()
     await db
       .prepare(
@@ -138,10 +150,14 @@ async function runSchemaMigrations(db: Database) {
       )
       .run()
     await db
-      .prepare('CREATE INDEX IF NOT EXISTS idx_ai_chat_tool_actions_session ON ai_chat_tool_actions(session_id, applied_at DESC)')
+      .prepare(
+        'CREATE INDEX IF NOT EXISTS idx_ai_chat_tool_actions_session ON ai_chat_tool_actions(session_id, applied_at DESC)',
+      )
       .run()
     await db
-      .prepare('CREATE INDEX IF NOT EXISTS idx_ai_chat_tool_actions_post_id ON ai_chat_tool_actions(post_id, applied_at DESC)')
+      .prepare(
+        'CREATE INDEX IF NOT EXISTS idx_ai_chat_tool_actions_post_id ON ai_chat_tool_actions(post_id, applied_at DESC)',
+      )
       .run()
     await db
       .prepare(
@@ -166,10 +182,14 @@ async function runSchemaMigrations(db: Database) {
       )
       .run()
     await db
-      .prepare('CREATE INDEX IF NOT EXISTS idx_ai_research_resources_type_status ON ai_research_resources(source_type, status, updated_at DESC)')
+      .prepare(
+        'CREATE INDEX IF NOT EXISTS idx_ai_research_resources_type_status ON ai_research_resources(source_type, status, updated_at DESC)',
+      )
       .run()
     await db
-      .prepare('CREATE INDEX IF NOT EXISTS idx_ai_research_resources_platform ON ai_research_resources(platform, updated_at DESC)')
+      .prepare(
+        'CREATE INDEX IF NOT EXISTS idx_ai_research_resources_platform ON ai_research_resources(platform, updated_at DESC)',
+      )
       .run()
     await db
       .prepare(
@@ -191,16 +211,24 @@ async function runSchemaMigrations(db: Database) {
       )
       .run()
     await db
-      .prepare('CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_research_jobs_provider_task ON ai_research_jobs(provider, provider_task_id) WHERE provider_task_id IS NOT NULL')
+      .prepare(
+        'CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_research_jobs_provider_task ON ai_research_jobs(provider, provider_task_id) WHERE provider_task_id IS NOT NULL',
+      )
       .run()
     await db
-      .prepare('CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_research_jobs_provider_note ON ai_research_jobs(provider, provider_note_id) WHERE provider_note_id IS NOT NULL')
+      .prepare(
+        'CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_research_jobs_provider_note ON ai_research_jobs(provider, provider_note_id) WHERE provider_note_id IS NOT NULL',
+      )
       .run()
     await db
-      .prepare('CREATE INDEX IF NOT EXISTS idx_ai_research_jobs_resource ON ai_research_jobs(resource_id, updated_at DESC)')
+      .prepare(
+        'CREATE INDEX IF NOT EXISTS idx_ai_research_jobs_resource ON ai_research_jobs(resource_id, updated_at DESC)',
+      )
       .run()
     await db
-      .prepare('CREATE INDEX IF NOT EXISTS idx_ai_research_jobs_status_poll ON ai_research_jobs(status, next_poll_at)')
+      .prepare(
+        'CREATE INDEX IF NOT EXISTS idx_ai_research_jobs_status_poll ON ai_research_jobs(status, next_poll_at)',
+      )
       .run()
     await db
       .prepare(
@@ -218,13 +246,19 @@ async function runSchemaMigrations(db: Database) {
       )
       .run()
     await db
-      .prepare('CREATE INDEX IF NOT EXISTS idx_ai_research_links_session ON ai_research_links(session_id, created_at DESC)')
+      .prepare(
+        'CREATE INDEX IF NOT EXISTS idx_ai_research_links_session ON ai_research_links(session_id, created_at DESC)',
+      )
       .run()
     await db
-      .prepare('CREATE INDEX IF NOT EXISTS idx_ai_research_links_post ON ai_research_links(post_id, created_at DESC)')
+      .prepare(
+        'CREATE INDEX IF NOT EXISTS idx_ai_research_links_post ON ai_research_links(post_id, created_at DESC)',
+      )
       .run()
     await db
-      .prepare('CREATE INDEX IF NOT EXISTS idx_ai_research_links_slug ON ai_research_links(slug, created_at DESC)')
+      .prepare(
+        'CREATE INDEX IF NOT EXISTS idx_ai_research_links_slug ON ai_research_links(slug, created_at DESC)',
+      )
       .run()
     await db
       .prepare(

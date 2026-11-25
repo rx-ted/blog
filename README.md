@@ -87,12 +87,12 @@ Qiaomu Blog Open Source 不是一个只会渲染 Markdown 的静态模板，而�
 如果你更想手动掌控 Cloudflare 资源，也可以走 CLI：
 
 ```bash
-npm install
+pnpm install
 cp .env.example .env.local
-npx wrangler login
-npm run cf:init -- --site-url=https://your-domain.com
-npm run build
-npm run deploy
+pnpm exec wrangler login
+pnpm cf:init -- --site-url=https://your-domain.com
+pnpm build
+pnpm deploy
 ```
 
 ## 本地开发
@@ -101,9 +101,9 @@ npm run deploy
 git clone https://github.com/rx-ted/blog.git
 cd blog
 git switch qiaomu-blog-opensource
-npm install
+pnpm install
 cp .env.example .env.local
-npm run dev
+pnpm dev
 ```
 
 常用入口：
@@ -115,9 +115,9 @@ npm run dev
 如果你要在 Worker 运行时本地预览：
 
 ```bash
-npm run preview         # 使用 wrangler.local.jsonc 的绑定设置（D1 可能是远程）
-npm run db:local:init   # 首次：初始化本地 D1
-npm run preview:local   # 纯本地预览，不访问 Cloudflare
+pnpm cf:local:init    # 首次：初始化本地 D1
+pnpm preview:local    # 本地预览，使用本地模拟资源
+pnpm preview:prod     # 生产资源预览（不部署，会连接远程资源）
 ```
 
 `*.workers.dev` 不可访问时，远程绑定会让请求卡住，请使用 `preview:local`。
@@ -149,17 +149,17 @@ npm run preview:local   # 纯本地预览，不访问 Cloudflare
 
 ## 常用命令
 
-| 命令 | 说明 |
-| --- | --- |
-| `npm run dev` | Next.js 本地开发 |
-| `npm run build` | 构建应用 |
-| `npm run verify:quick` | 跑 lint、test、build |
-| `npm run verify` | 跑完整验证链路 |
-| `npm run cf:init` | 初始化 Cloudflare 资源和模板默认设置 |
-| `npm run preview` | Worker 运行时预览 |
-| `npm run preview:local` | 纯本地绑定预览（D1/R2/AI 本地模拟） |
-| `npm run db:local:init` | 初始化本地 D1（支持 `-- --from-remote`） |
-| `npm run deploy` | 部署到 Cloudflare Workers |
+| 命令                 | 说明                                     |
+| -------------------- | ---------------------------------------- |
+| `pnpm dev`           | Next.js 本地开发                         |
+| `pnpm build`         | OpenNext 构建（Cloudflare Workers 产物） |
+| `pnpm verify:quick`  | 跑 lint、test、build                     |
+| `pnpm verify`        | 跑完整验证链路                           |
+| `pnpm cf:local:init` | 初始化本地 D1（支持 `-- --from-remote`） |
+| `pnpm preview:local` | 本地预览（本地模拟资源）                 |
+| `pnpm preview:prod`  | 生产资源预览（不部署，连接远程资源）     |
+| `pnpm deploy`        | 部署到 Cloudflare Workers                |
+| `pnpm cf:types`      | 根据 Wrangler 配置生成类型               |
 
 ## 作者
 

@@ -90,10 +90,11 @@ function decodeHtmlEntities(input: string) {
 function extractImageSources(html: string) {
   const sources: string[] = []
   const regex = /<img\b[^>]*?\bsrc\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi
-  let match: RegExpExecArray | null
 
-  while ((match = regex.exec(html)) !== null) {
-    const src = decodeHtmlEntities(match[1] || match[2] || match[3] || '').trim()
+  for (let match = regex.exec(html); match !== null; match = regex.exec(html)) {
+    const src = decodeHtmlEntities(
+      match[1] || match[2] || match[3] || '',
+    ).trim()
     if (src) sources.push(src)
   }
 
@@ -101,12 +102,14 @@ function extractImageSources(html: string) {
 }
 
 function stripHtml(input: string) {
-  return decodeHtmlEntities(input
-    .replace(/<script\b[\s\S]*?<\/script>/gi, '')
-    .replace(/<style\b[\s\S]*?<\/style>/gi, '')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim())
+  return decodeHtmlEntities(
+    input
+      .replace(/<script\b[\s\S]*?<\/script>/gi, '')
+      .replace(/<style\b[\s\S]*?<\/style>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim(),
+  )
 }
 
 function stripStyleAndScript(input: string) {
@@ -137,20 +140,27 @@ function appendLimitCheck(
 ) {
   const measured = measureText(options.value)
   const exceedsChars = measured.chars > options.maxChars
-  const exceedsBytes = options.maxBytes !== undefined && measured.bytes > options.maxBytes
-  const changed = options.normalizedValue !== undefined
-    && options.value.trim() !== ''
-    && options.value.trim() !== options.normalizedValue.trim()
+  const exceedsBytes =
+    options.maxBytes !== undefined && measured.bytes > options.maxBytes
+  const changed =
+    options.normalizedValue !== undefined &&
+    options.value.trim() !== '' &&
+    options.value.trim() !== options.normalizedValue.trim()
 
   if (!exceedsChars && !exceedsBytes && !changed) return
 
-  const byteLabel = options.maxBytes === undefined ? '' : ` / ${options.maxBytes} bytes`
+  const byteLabel =
+    options.maxBytes === undefined ? '' : ` / ${options.maxBytes} bytes`
   checks.push({
     level: options.level || 'warning',
     code: options.code,
     field: options.field,
-    message: options.message || `${options.label}超出微信草稿 API 限制，提交时会自动截断。`,
-    suggested_fix: options.suggestedFix || `控制在 ${options.maxChars} 个字${byteLabel}以内。`,
+    message:
+      options.message ||
+      `${options.label}超出微信草稿 API 限制，提交时会自动截断。`,
+    suggested_fix:
+      options.suggestedFix ||
+      `控制在 ${options.maxChars} 个字${byteLabel}以内。`,
   })
 }
 
@@ -159,18 +169,28 @@ function hasListMarkup(html: string) {
 }
 
 function hasWechatListMarkers(html: string) {
-  return /\bwechat-list-marker\b|data-wechat-list-marker/i.test(stripStyleAndScript(html))
+  return /\bwechat-list-marker\b|data-wechat-list-marker/i.test(
+    stripStyleAndScript(html),
+  )
 }
 
 function changedFields(input: WechatPublishInspectInput) {
   const fields: string[] = []
-  if ((input.title || '').trim() !== (input.normalizedTitle || '').trim()) fields.push('title')
-  if ((input.author || '').trim() && (input.author || '').trim() !== (input.normalizedAuthor || '').trim()) fields.push('author')
-  if ((input.digest || '').trim() !== (input.normalizedDigest || '').trim()) fields.push('digest')
+  if ((input.title || '').trim() !== (input.normalizedTitle || '').trim())
+    fields.push('title')
+  if (
+    (input.author || '').trim() &&
+    (input.author || '').trim() !== (input.normalizedAuthor || '').trim()
+  )
+    fields.push('author')
+  if ((input.digest || '').trim() !== (input.normalizedDigest || '').trim())
+    fields.push('digest')
   return fields
 }
 
-export function inspectWechatPublishInput(input: WechatPublishInspectInput): WechatPublishInspectResult {
+export function inspectWechatPublishInput(
+  input: WechatPublishInspectInput,
+): WechatPublishInspectResult {
   const checks: WechatPublishCheck[] = []
   const accountId = (input.accountId || '').trim()
   const title = (input.title || '').trim()
@@ -242,7 +262,9 @@ export function inspectWechatPublishInput(input: WechatPublishInspectInput): Wec
   })
 
   const imageSources = extractImageSources(contentHtml)
-  const dataUrlImageCount = imageSources.filter(src => /^data:/i.test(src)).length
+  const dataUrlImageCount = imageSources.filter((src) =>
+    /^data:/i.test(src),
+  ).length
 
   if (dataUrlImageCount > 0) {
     checks.push({
@@ -303,14 +325,17 @@ export function inspectWechatPublishInput(input: WechatPublishInspectInput): Wec
   }
 
   const blocking = hasBlockingWechatPublishChecks(checks)
-  const listWarning = checks.some(check => check.code === 'LIST_MARKERS_MISSING')
+  const listWarning = checks.some(
+    (check) => check.code === 'LIST_MARKERS_MISSING',
+  )
 
   return {
     checks,
     readiness: {
       convert_ready: !blocking,
       upload_ready: !blocking && dataUrlImageCount === 0,
-      draft_ready: !blocking && Boolean(accountId) && Boolean(resolvedCoverImageUrl),
+      draft_ready:
+        !blocking && Boolean(accountId) && Boolean(resolvedCoverImageUrl),
       preview_fidelity: listWarning ? 'degraded' : 'exact',
     },
     summary: {
@@ -318,7 +343,8 @@ export function inspectWechatPublishInput(input: WechatPublishInspectInput): Wec
       data_url_image_count: dataUrlImageCount,
       remote_image_count: imageSources.length - dataUrlImageCount,
       cover_ready: Boolean(resolvedCoverImageUrl),
-      estimated_upload_seconds: imageSources.length === 0 ? 0 : Math.max(8, imageSources.length * 7),
+      estimated_upload_seconds:
+        imageSources.length === 0 ? 0 : Math.max(8, imageSources.length * 7),
       normalized_changed_fields: changedFields({
         ...input,
         normalizedTitle,
@@ -330,13 +356,13 @@ export function inspectWechatPublishInput(input: WechatPublishInspectInput): Wec
 }
 
 export function hasBlockingWechatPublishChecks(checks: WechatPublishCheck[]) {
-  return checks.some(check => check.level === 'error')
+  return checks.some((check) => check.level === 'error')
 }
 
 export function getBlockingWechatPublishChecks(checks: WechatPublishCheck[]) {
-  return checks.filter(check => check.level === 'error')
+  return checks.filter((check) => check.level === 'error')
 }
 
 export function formatWechatPublishCheckSummary(checks: WechatPublishCheck[]) {
-  return checks.map(check => check.message).join(' ')
+  return checks.map((check) => check.message).join(' ')
 }

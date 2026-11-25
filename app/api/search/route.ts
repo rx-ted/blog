@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { searchPostsWithStrategy } from '@/lib/related-content'
 
@@ -16,7 +16,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ results: [] })
     }
 
-    const result = await searchPostsWithStrategy(env.DB, env, query.trim(), { limit: 50 })
+    const result = await searchPostsWithStrategy(env.DB, env, query.trim(), {
+      limit: 50,
+    })
 
     return NextResponse.json({
       strategy: result.strategy,

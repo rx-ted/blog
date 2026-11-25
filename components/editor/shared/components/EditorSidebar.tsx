@@ -10,16 +10,28 @@ interface EditorSidebarProps {
   children: ReactNode
 }
 
-export function EditorSidebar({ open, tab, onTabChange, onClose, children }: EditorSidebarProps) {
+export function EditorSidebar({
+  open,
+  tab,
+  onTabChange,
+  onClose,
+  children,
+}: EditorSidebarProps) {
   return (
     <aside
       className={`shrink-0 overflow-hidden border-l border-[var(--editor-line)] bg-[var(--background)] transition-all duration-200 ease-in-out ${
         open ? (tab === 'ai' ? 'w-[380px]' : 'w-[300px]') : 'w-0 border-l-0'
       }`}
-      style={{ position: 'sticky', top: '3.5rem', height: 'calc(100vh - 3.5rem)' }}
+      style={{
+        position: 'sticky',
+        top: '3.5rem',
+        height: 'calc(100vh - 3.5rem)',
+      }}
     >
       {open && (
-        <div className={`${tab === 'ai' ? 'w-[380px]' : 'w-[300px]'} flex h-full min-h-0 flex-col`}>
+        <div
+          className={`${tab === 'ai' ? 'w-[380px]' : 'w-[300px]'} flex h-full min-h-0 flex-col`}
+        >
           <div className="flex shrink-0 items-center gap-2 border-b border-[var(--editor-line)] px-4 py-3">
             <div className="grid flex-1 grid-cols-2 rounded-lg bg-[var(--editor-soft)] p-1">
               <button

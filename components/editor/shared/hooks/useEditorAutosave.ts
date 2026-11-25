@@ -23,7 +23,11 @@ export interface UseEditorAutosaveOptions<TEditor> {
   latestMetaRef: React.RefObject<DraftMetaState>
   getEditorContent: (editor: TEditor) => EditorAutosaveContent
   patchMetadata: (metaOverrides?: Partial<DraftMetaState>) => void
-  syncPersistedSlug: (persistedSlug: string, previousSlug: string | null, forceVisibleSync?: boolean) => void
+  syncPersistedSlug: (
+    persistedSlug: string,
+    previousSlug: string | null,
+    forceVisibleSync?: boolean,
+  ) => void
   setSaveState: React.Dispatch<React.SetStateAction<SaveState>>
   setLastSavedAt: React.Dispatch<React.SetStateAction<number>>
 }
@@ -64,168 +68,217 @@ export function useEditorAutosave<TEditor>({
     autosaveAbortRef.current = null
   }, [])
 
-  const persistDraft = useCallback(async (
-    nextTitle = latestTitleRef.current ?? '',
-    editor = editorRef.current,
-    retryAttempt = 0,
-  ) => {
-    if (typeof window === 'undefined' || !draftReady || !editor) return
+  const persistDraft = useCallback(
+    async (
+      nextTitle = latestTitleRef.current ?? '',
+      editor = editorRef.current,
+      retryAttempt = 0,
+    ) => {
+      if (typeof window === 'undefined' || !draftReady || !editor) return
 
-    const { postId: currentPostId, editSlug: currentSlug, slug: nextSlugRaw, category, tags, description, coverImage } = latestMetaRef.current
-    const nextSlug = normalizePostSlug(nextSlugRaw)
-    const { contentJson, html, plainText } = getEditorContentRef.current(editor)
+      const {
+        postId: currentPostId,
+        editSlug: currentSlug,
+        slug: nextSlugRaw,
+        category,
+        tags,
+        description,
+        coverImage,
+      } = latestMetaRef.current
+      const nextSlug = normalizePostSlug(nextSlugRaw)
+      const { contentJson, html, plainText } =
+        getEditorContentRef.current(editor)
 
-    const draftState = resolveEditorAutosaveDraftState({
-      title: nextTitle,
-      plainText,
-      html,
-      description,
-      coverImage,
-      tags,
-      category,
-      nextSlug,
-    })
-    const normalizedDescription = draftState.normalizedDescription
+      const draftState = resolveEditorAutosaveDraftState({
+        title: nextTitle,
+        plainText,
+        html,
+        description,
+        coverImage,
+        tags,
+        category,
+        nextSlug,
+      })
+      const normalizedDescription = draftState.normalizedDescription
 
-    if (!draftState.canAutosave) {
-      setSaveState(draftState.blockedSaveState)
-      return
-    }
+      if (!draftState.canAutosave) {
+        setSaveState(draftState.blockedSaveState)
+        return
+      }
 
-    const normalizedTitle = draftState.trimmedTitle
-    const snapshot = buildEditorAutosaveSnapshot({
-      currentSlug,
-      nextSlug,
-      title: normalizedTitle,
-      html,
-      description: normalizedDescription,
-      category,
-      tags,
-      coverImage,
-    })
+      const normalizedTitle = draftState.trimmedTitle
+      const snapshot = buildEditorAutosaveSnapshot({
+        currentSlug,
+        nextSlug,
+        title: normalizedTitle,
+        html,
+        description: normalizedDescription,
+        category,
+        tags,
+        coverImage,
+      })
 
-    if (snapshot === lastAutosaveSnapshotRef.current) {
-      setSaveState('saved')
-      return
-    }
+      if (snapshot === lastAutosaveSnapshotRef.current) {
+        setSaveState('saved')
+        return
+      }
 
-    const requestId = autosaveSeqRef.current + 1
-    autosaveSeqRef.current = requestId
+      const requestId = autosaveSeqRef.current + 1
+      autosaveSeqRef.current = requestId
 
-    abortAutosaveRequest()
-    const controller = new AbortController()
-    autosaveAbortRef.current = controller
+      abortAutosaveRequest()
+      const controller = new AbortController()
+      autosaveAbortRef.current = controller
 
-    setSaveState('saving')
+      setSaveState('saving')
 
-    try {
-      if (currentPostId || currentSlug) {
-        const res = await fetch('/api/posts', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            current_id: currentPostId ?? undefined,
-            current_slug: currentSlug || undefined,
-            new_slug: nextSlug && nextSlug !== currentSlug ? nextSlug : undefined,
-            title: normalizedTitle,
-            html,
-            content: plainText || JSON.stringify(contentJson),
-            description: normalizedDescription,
-            category,
-            tags,
-            cover_image: coverImage,
-          }),
-          signal: controller.signal,
-        })
+      try {
+        if (currentPostId || currentSlug) {
+          const res = await fetch('/api/posts', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              current_id: currentPostId ?? undefined,
+              current_slug: currentSlug || undefined,
+              new_slug:
+                nextSlug && nextSlug !== currentSlug ? nextSlug : undefined,
+              title: normalizedTitle,
+              html,
+              content: plainText || JSON.stringify(contentJson),
+              description: normalizedDescription,
+              category,
+              tags,
+              cover_image: coverImage,
+            }),
+            signal: controller.signal,
+          })
 
-        const data = await res.json().catch(() => ({})) as { error?: string; id?: number; slug?: string }
-        if (!res.ok) {
-          throw new Error(data.error || '自动保存失败')
+          const data = (await res.json().catch(() => ({}))) as {
+            error?: string
+            id?: number
+            slug?: string
+          }
+          if (!res.ok) {
+            throw new Error(data.error || '自动保存失败')
+          }
+
+          if (requestId !== autosaveSeqRef.current) return
+
+          if (typeof data.id === 'number') {
+            patchMetadata({ postId: data.id })
+          }
+          const persistedSlug =
+            typeof data.slug === 'string' ? data.slug : currentSlug || nextSlug
+          if (
+            persistedSlug !== currentSlug ||
+            latestMetaRef.current.slug !== persistedSlug
+          ) {
+            syncPersistedSlug(persistedSlug, currentSlug)
+          }
+        } else {
+          const res = await fetch('/api/posts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              title: normalizedTitle,
+              html,
+              content: plainText || JSON.stringify(contentJson),
+              category,
+              status: 'draft',
+              tags,
+              description: normalizedDescription,
+              cover_image: coverImage,
+            }),
+            signal: controller.signal,
+          })
+
+          const data = (await res.json().catch(() => ({}))) as {
+            error?: string
+            id?: number
+            slug?: string
+          }
+          if (!res.ok) {
+            throw new Error(data.error || '自动保存失败')
+          }
+
+          if (requestId !== autosaveSeqRef.current) return
+
+          if (typeof data.id === 'number') {
+            patchMetadata({ postId: data.id })
+          }
+          if (typeof data.slug === 'string' && data.slug) {
+            syncPersistedSlug(data.slug, null, true)
+          }
         }
 
         if (requestId !== autosaveSeqRef.current) return
 
-        if (typeof data.id === 'number') {
-          patchMetadata({ postId: data.id })
-        }
-        const persistedSlug = typeof data.slug === 'string' ? data.slug : currentSlug || nextSlug
-        if (persistedSlug !== currentSlug || latestMetaRef.current.slug !== persistedSlug) {
-          syncPersistedSlug(persistedSlug, currentSlug)
-        }
-      } else {
-        const res = await fetch('/api/posts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title: normalizedTitle,
-            html,
-            content: plainText || JSON.stringify(contentJson),
-            category,
-            status: 'draft',
-            tags,
-            description: normalizedDescription,
-            cover_image: coverImage,
-          }),
-          signal: controller.signal,
-        })
-
-        const data = await res.json().catch(() => ({})) as { error?: string; id?: number; slug?: string }
-        if (!res.ok) {
-          throw new Error(data.error || '自动保存失败')
-        }
-
+        lastAutosaveSnapshotRef.current = snapshot
+        setSaveState('saved')
+        setLastSavedAt(Date.now())
+      } catch (error) {
+        if (controller.signal.aborted) return
         if (requestId !== autosaveSeqRef.current) return
 
-        if (typeof data.id === 'number') {
-          patchMetadata({ postId: data.id })
-        }
-        if (typeof data.slug === 'string' && data.slug) {
-          syncPersistedSlug(data.slug, null, true)
+        console.error('Auto-save failed:', error)
+        setSaveState('error')
+
+        const nextAttempt = retryAttempt + 1
+        const delay = Math.min(
+          AUTOSAVE_MAX_RETRY_DELAY_MS,
+          2000 * 2 ** retryAttempt,
+        )
+        retrySaveTimerRef.current = window.setTimeout(() => {
+          if (editorRef.current) {
+            void persistDraft(
+              latestTitleRef.current ?? '',
+              editorRef.current,
+              nextAttempt,
+            )
+          }
+        }, delay)
+      } finally {
+        if (autosaveAbortRef.current === controller) {
+          autosaveAbortRef.current = null
         }
       }
+    },
+    [
+      abortAutosaveRequest,
+      draftReady,
+      editorRef,
+      latestMetaRef,
+      latestTitleRef,
+      patchMetadata,
+      setLastSavedAt,
+      setSaveState,
+      syncPersistedSlug,
+    ],
+  )
 
-      if (requestId !== autosaveSeqRef.current) return
+  const scheduleDraftSave = useCallback(
+    (nextTitle = latestTitleRef.current ?? '', editor = editorRef.current) => {
+      if (typeof window === 'undefined' || !draftReady || !editor) return
 
-      lastAutosaveSnapshotRef.current = snapshot
-      setSaveState('saved')
-      setLastSavedAt(Date.now())
-    } catch (error) {
-      if (controller.signal.aborted) return
-      if (requestId !== autosaveSeqRef.current) return
-
-      console.error('Auto-save failed:', error)
-      setSaveState('error')
-
-      const nextAttempt = retryAttempt + 1
-      const delay = Math.min(AUTOSAVE_MAX_RETRY_DELAY_MS, 2000 * (2 ** retryAttempt))
-      retrySaveTimerRef.current = window.setTimeout(() => {
-        if (editorRef.current) {
-          void persistDraft(latestTitleRef.current ?? '', editorRef.current, nextAttempt)
-        }
-      }, delay)
-    } finally {
-      if (autosaveAbortRef.current === controller) {
-        autosaveAbortRef.current = null
+      if (latestTitleRef.current !== undefined) {
+        latestTitleRef.current = nextTitle
       }
-    }
-  }, [abortAutosaveRequest, draftReady, editorRef, latestMetaRef, latestTitleRef, patchMetadata, setLastSavedAt, setSaveState, syncPersistedSlug])
+      clearAutosaveTimers()
+      setSaveState((prev) => (prev === 'saving' ? prev : 'dirty'))
 
-  const scheduleDraftSave = useCallback((
-    nextTitle = latestTitleRef.current ?? '',
-    editor = editorRef.current,
-  ) => {
-    if (typeof window === 'undefined' || !draftReady || !editor) return
-
-    if (latestTitleRef.current !== undefined) {
-      latestTitleRef.current = nextTitle
-    }
-    clearAutosaveTimers()
-    setSaveState((prev) => (prev === 'saving' ? prev : 'dirty'))
-
-    draftSaveTimerRef.current = window.setTimeout(() => {
-      void persistDraft(nextTitle, editor)
-    }, AUTOSAVE_DEBOUNCE_MS)
-  }, [clearAutosaveTimers, draftReady, editorRef, latestTitleRef, persistDraft, setSaveState])
+      draftSaveTimerRef.current = window.setTimeout(() => {
+        void persistDraft(nextTitle, editor)
+      }, AUTOSAVE_DEBOUNCE_MS)
+    },
+    [
+      clearAutosaveTimers,
+      draftReady,
+      editorRef,
+      latestTitleRef,
+      persistDraft,
+      setSaveState,
+    ],
+  )
 
   useEffect(() => {
     return () => {

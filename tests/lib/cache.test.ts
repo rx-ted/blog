@@ -47,7 +47,9 @@ describe('cache helpers', () => {
     const cache = createKvMock()
     const kv = createKvMock()
 
-    expect(getCacheNamespace({ CACHE: cache as never, KV: kv as never })).toBe(cache)
+    expect(getCacheNamespace({ CACHE: cache as never, KV: kv as never })).toBe(
+      cache,
+    )
     expect(getCacheNamespace({ KV: kv as never })).toBe(kv)
     expect(getCacheNamespace({})).toBeUndefined()
   })
@@ -61,15 +63,21 @@ describe('cache helpers', () => {
     process.env.NODE_ENV = 'test'
     process.env.ENABLE_PUBLIC_CACHE_IN_DEV = 'true'
     expect(shouldUsePublicContentCache({ CACHE: cache as never })).toBe(true)
-    expect(getPublicContentCacheNamespace({ CACHE: cache as never })).toBe(cache)
+    expect(getPublicContentCacheNamespace({ CACHE: cache as never })).toBe(
+      cache,
+    )
   })
 
   it('returns false when cache is unavailable or disabled in dev', async () => {
     const cache = createKvMock()
 
     expect(shouldUsePublicContentCache({})).toBe(false)
-    expect(getPublicContentCacheNamespace({ CACHE: cache as never })).toBeUndefined()
-    await expect(invalidatePublicContentCache({ CACHE: cache as never })).resolves.toBe(false)
+    expect(
+      getPublicContentCacheNamespace({ CACHE: cache as never }),
+    ).toBeUndefined()
+    await expect(
+      invalidatePublicContentCache({ CACHE: cache as never }),
+    ).resolves.toBe(false)
   })
 
   it('reads cached values before invoking the fetcher and writes misses asynchronously', async () => {
@@ -77,13 +85,23 @@ describe('cache helpers', () => {
     const fetcher = vi.fn(async () => ({ value: 2 }))
 
     kv.get.mockResolvedValueOnce({ value: 1 })
-    await expect(getCached(kv as never, 'cache:key', fetcher)).resolves.toEqual({ value: 1 })
+    await expect(getCached(kv as never, 'cache:key', fetcher)).resolves.toEqual(
+      { value: 1 },
+    )
     expect(fetcher).not.toHaveBeenCalled()
 
     kv.get.mockResolvedValueOnce(null)
-    await expect(getCached(kv as never, 'cache:key', fetcher, 120)).resolves.toEqual({ value: 2 })
+    await expect(
+      getCached(kv as never, 'cache:key', fetcher, 120),
+    ).resolves.toEqual({ value: 2 })
     expect(fetcher).toHaveBeenCalledTimes(1)
-    expect(kv.put).toHaveBeenCalledWith('cache:key', JSON.stringify({ value: 2 }), { expirationTtl: 120 })
+    expect(kv.put).toHaveBeenCalledWith(
+      'cache:key',
+      JSON.stringify({ value: 2 }),
+      {
+        expirationTtl: 120,
+      },
+    )
   })
 
   it('increments cache version, builds versioned keys, and deletes direct keys', async () => {
@@ -93,15 +111,21 @@ describe('cache helpers', () => {
     await invalidateCache(kv as never)
     expect(kv.put).toHaveBeenCalledWith('cache:version', '4')
 
-    await expect(getCacheKey(kv as never, 'posts:index')).resolves.toBe('posts:index:v4')
+    await expect(getCacheKey(kv as never, 'posts:index')).resolves.toBe(
+      'posts:index:v4',
+    )
 
     const versionedKv = createKvMock()
     versionedKv.get.mockResolvedValueOnce('9')
-    await expect(getCacheKey(versionedKv as never, 'posts:index')).resolves.toBe('posts:index:v9')
+    await expect(
+      getCacheKey(versionedKv as never, 'posts:index'),
+    ).resolves.toBe('posts:index:v9')
 
     const unversionedKv = createKvMock()
     unversionedKv.get.mockResolvedValueOnce(null)
-    await expect(getCacheKey(unversionedKv as never, 'posts:index')).resolves.toBe('posts:index')
+    await expect(
+      getCacheKey(unversionedKv as never, 'posts:index'),
+    ).resolves.toBe('posts:index')
 
     await deleteCache(versionedKv as never, 'posts:index:v9')
     expect(versionedKv.delete).toHaveBeenCalledWith('posts:index:v9')
@@ -114,8 +138,18 @@ describe('cache helpers', () => {
     kv.get.mockResolvedValueOnce('4')
     kv.get.mockResolvedValueOnce(null)
 
-    await expect(getVersionedCached(kv as never, 'home:page:1', fetcher, 90)).resolves.toEqual({ value: 2 })
+    await expect(
+      getVersionedCached(kv as never, 'home:page:1', fetcher, 90),
+    ).resolves.toEqual({
+      value: 2,
+    })
     expect(fetcher).toHaveBeenCalledTimes(1)
-    expect(kv.put).toHaveBeenCalledWith('home:page:1:v4', JSON.stringify({ value: 2 }), { expirationTtl: 90 })
+    expect(kv.put).toHaveBeenCalledWith(
+      'home:page:1:v4',
+      JSON.stringify({ value: 2 }),
+      {
+        expirationTtl: 90,
+      },
+    )
   })
 })

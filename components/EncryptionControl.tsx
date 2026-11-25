@@ -9,7 +9,11 @@ interface EncryptionControlProps {
   articleUrl?: string
 }
 
-export function EncryptionControl({ initialPassword, onChange, articleUrl }: EncryptionControlProps) {
+export function EncryptionControl({
+  initialPassword,
+  onChange,
+  articleUrl,
+}: EncryptionControlProps) {
   const [isEncrypted, setIsEncrypted] = useState(!!initialPassword)
   const [password, setPassword] = useState(initialPassword || '')
   const [showPanel, setShowPanel] = useState(false)
@@ -47,9 +51,10 @@ export function EncryptionControl({ initialPassword, onChange, articleUrl }: Enc
     }
   }
 
-  const fullUrl = articleUrl && password
-    ? `${articleUrl}?pwd=${encodeURIComponent(password)}`
-    : articleUrl || ''
+  const fullUrl =
+    articleUrl && password
+      ? `${articleUrl}?pwd=${encodeURIComponent(password)}`
+      : articleUrl || ''
 
   return (
     <div className="relative">
@@ -63,7 +68,16 @@ export function EncryptionControl({ initialPassword, onChange, articleUrl }: Enc
         }`}
         title={isEncrypted ? '已加密' : '加密文章'}
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           {isEncrypted ? (
             <>
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -85,7 +99,16 @@ export function EncryptionControl({ initialPassword, onChange, articleUrl }: Enc
           className="ml-1 p-2 rounded-md bg-[var(--editor-soft)] text-[var(--editor-muted)] hover:bg-[var(--editor-line)] transition-colors"
           title="查看密码"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
             <circle cx="12" cy="12" r="3"></circle>
           </svg>
@@ -95,13 +118,24 @@ export function EncryptionControl({ initialPassword, onChange, articleUrl }: Enc
       {showPanel && isEncrypted && (
         <div className="absolute top-full right-0 mt-2 w-80 bg-[var(--editor-panel)] rounded-lg border border-[var(--editor-line)] shadow-lg p-4 z-50">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-[var(--editor-ink)]">文章加密</h3>
+            <h3 className="text-sm font-semibold text-[var(--editor-ink)]">
+              文章加密
+            </h3>
             <button
               type="button"
               onClick={() => setShowPanel(false)}
               className="text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>

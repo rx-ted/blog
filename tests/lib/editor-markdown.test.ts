@@ -30,7 +30,9 @@ describe('editor markdown helpers', () => {
   })
 
   it('renders common AI parenthesized exponent formulas as editor math markup', () => {
-    const html = renderMarkdownToEditorHtml('大约需要 (10^{30}) FLOPs 的计算量。')
+    const html = renderMarkdownToEditorHtml(
+      '大约需要 (10^{30}) FLOPs 的计算量。',
+    )
 
     expect(html).toContain('大约需要 ')
     expect(html).toContain('data-math-latex="10^{30}"')
@@ -38,7 +40,8 @@ describe('editor markdown helpers', () => {
   })
 
   it('does not treat ordinary explanatory parentheses as math', () => {
-    const markdown = '目前前沿模型的预训练算力估计在 (5 \\times 10^{26}) FLOPs 左右（来自 xAI 的 Grok 4 数据）。'
+    const markdown =
+      '目前前沿模型的预训练算力估计在 (5 \\times 10^{26}) FLOPs 左右（来自 xAI 的 Grok 4 数据）。'
     const html = renderMarkdownToEditorHtml(markdown)
 
     expect(html).toContain(String.raw`data-math-latex="5 \times 10^{26}"`)
@@ -86,7 +89,11 @@ describe('editor markdown helpers', () => {
 
   it('detects math markdown before the editor takes over paste handling', () => {
     expect(hasEditorMarkdownMath(String.raw`\(5 \times 10^{26}\)`)).toBe(true)
-    expect(hasEditorMarkdownMath('大约需要 (10^{30}) FLOPs 的计算量。')).toBe(true)
-    expect(hasEditorMarkdownMath('普通说明（来自 xAI 的 Grok 4 数据）。')).toBe(false)
+    expect(hasEditorMarkdownMath('大约需要 (10^{30}) FLOPs 的计算量。')).toBe(
+      true,
+    )
+    expect(hasEditorMarkdownMath('普通说明（来自 xAI 的 Grok 4 数据）。')).toBe(
+      false,
+    )
   })
 })

@@ -1,12 +1,19 @@
 import type { EditorInstance } from 'novel'
 import { formatChineseCopywritingText } from '@/lib/chinese-copywriting'
 
-const CHINESE_COPYWRITING_SKIP_NODES = new Set(['codeBlock', 'mathBlock', 'inlineMath'])
+const CHINESE_COPYWRITING_SKIP_NODES = new Set([
+  'codeBlock',
+  'mathBlock',
+  'inlineMath',
+])
 const CHINESE_COPYWRITING_SKIP_MARKS = new Set(['code', 'link'])
 
 export type ChineseCopywritingScope = 'selection' | 'block' | 'document'
 
-function getChineseCopywritingRange(editor: EditorInstance, scope: ChineseCopywritingScope) {
+function getChineseCopywritingRange(
+  editor: EditorInstance,
+  scope: ChineseCopywritingScope,
+) {
   const { state } = editor
   const { selection } = state
 
@@ -39,8 +46,14 @@ export function formatChineseCopywritingInEditor(
   state.doc.nodesBetween(from, to, (node, pos, parent) => {
     if (CHINESE_COPYWRITING_SKIP_NODES.has(node.type.name)) return false
     if (!node.isText || !node.text) return true
-    if (parent && CHINESE_COPYWRITING_SKIP_NODES.has(parent.type.name)) return false
-    if (node.marks.some((mark) => CHINESE_COPYWRITING_SKIP_MARKS.has(mark.type.name))) return true
+    if (parent && CHINESE_COPYWRITING_SKIP_NODES.has(parent.type.name))
+      return false
+    if (
+      node.marks.some((mark) =>
+        CHINESE_COPYWRITING_SKIP_MARKS.has(mark.type.name),
+      )
+    )
+      return true
 
     const nodeFrom = Math.max(from, pos)
     const nodeTo = Math.min(to, pos + node.nodeSize)

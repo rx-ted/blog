@@ -99,7 +99,9 @@ type TextRuntime =
       maxTokens: number
     }
 
-type ImageProfileConfig = NonNullable<Awaited<ReturnType<typeof resolveAiImageProfileConfig>>>
+type ImageProfileConfig = NonNullable<
+  Awaited<ReturnType<typeof resolveAiImageProfileConfig>>
+>
 
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error || '')
@@ -147,7 +149,10 @@ function generateCoverWithProfile(
 }
 
 function readFlag(value: unknown): boolean {
-  return typeof value === 'string' && ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  return (
+    typeof value === 'string' &&
+    ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  )
 }
 
 async function toUint8Array(input: ReadableStream | Uint8Array) {
@@ -161,14 +166,14 @@ async function runTextGenerator(
   messages: Array<{ role: 'system' | 'user'; content: string }>,
   target: Exclude<AiPostGeneratorTarget, 'cover'>,
 ): Promise<{ text: string; reasoningText: string }> {
-  const retryMessages = messages.map((message, index) => (
+  const retryMessages = messages.map((message, index) =>
     index === 0 && message.role === 'system'
       ? {
           ...message,
           content: `${message.content}\n\nDo not output reasoning, thinking, or analysis. Return only the final answer.\n${buildPlainRetryInstruction(target)}`,
         }
-      : message
-  ))
+      : message,
+  )
 
   if (config.strategy === 'workers-ai') {
     const requestOptions = buildTextGenerationRequestOptions({
@@ -216,11 +221,13 @@ async function runTextGenerator(
     }
   }
 
-  if (isAnthropicCompatibleConfig({
-    provider: config.provider,
-    providerName: config.providerName,
-    providerType: config.providerType,
-  })) {
+  if (
+    isAnthropicCompatibleConfig({
+      provider: config.provider,
+      providerName: config.providerName,
+      providerType: config.providerType,
+    })
+  ) {
     const primary = await runAnthropicCompatibleText({
       apiKey: config.apiKey,
       baseURL: config.baseURL,
@@ -260,32 +267,39 @@ async function runTextGenerator(
       nextMessages: Array<{ role: 'system' | 'user'; content: string }>,
       nextMaxTokens: number,
     ) => {
-      const response = await fetch(`${normalizeBaseUrl(config.baseURL)}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${config.apiKey}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${normalizeBaseUrl(config.baseURL)}/chat/completions`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${config.apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: config.model,
+            messages: nextMessages,
+            temperature: config.temperature,
+            max_tokens: nextMaxTokens,
+            ...requestOptions,
+          }),
+          signal: AbortSignal.timeout(30000),
         },
-        body: JSON.stringify({
-          model: config.model,
-          messages: nextMessages,
-          temperature: config.temperature,
-          max_tokens: nextMaxTokens,
-          ...requestOptions,
-        }),
-        signal: AbortSignal.timeout(30000),
-      })
+      )
 
       const rawBody = await response.text().catch(() => '')
       if (!response.ok) {
         try {
-          const parsed = rawBody ? JSON.parse(rawBody) as {
-            errors?: Array<{ message?: string }>
-            error?: { message?: string } | string
-            message?: string
-          } : null
+          const parsed = rawBody
+            ? (JSON.parse(rawBody) as {
+                errors?: Array<{ message?: string }>
+                error?: { message?: string } | string
+                message?: string
+              })
+            : null
 
-          const firstWorkersError = parsed?.errors?.find((item) => typeof item?.message === 'string' && item.message.trim())
+          const firstWorkersError = parsed?.errors?.find(
+            (item) => typeof item?.message === 'string' && item.message.trim(),
+          )
           if (firstWorkersError?.message) {
             throw new Error(firstWorkersError.message.trim())
           }
@@ -302,7 +316,9 @@ async function runTextGenerator(
           if (error instanceof Error) throw error
         }
 
-        throw new Error(rawBody.trim() || `Workers AI 文本生成失败：HTTP ${response.status}`)
+        throw new Error(
+          rawBody.trim() || `Workers AI 文本生成失败：HTTP ${response.status}`,
+        )
       }
 
       return rawBody ? JSON.parse(rawBody) : null
@@ -404,25 +420,29 @@ async function resolveWorkersAiProfile(
   secret: string,
   preferredProfileId?: number,
 ) {
-  const preferredProfile = Number.isFinite(preferredProfileId) && Number(preferredProfileId) > 0
-    ? await resolveAiProfileConfig(db, secret, Number(preferredProfileId))
-    : null
+  const preferredProfile =
+    Number.isFinite(preferredProfileId) && Number(preferredProfileId) > 0
+      ? await resolveAiProfileConfig(db, secret, Number(preferredProfileId))
+      : null
 
-  if (preferredProfile && (
-    preferredProfile.provider === 'workers_ai'
-    || isWorkersAiBaseUrl(preferredProfile.base_url)
-  )) {
+  if (
+    preferredProfile &&
+    (preferredProfile.provider === 'workers_ai' ||
+      isWorkersAiBaseUrl(preferredProfile.base_url))
+  ) {
     return preferredProfile
   }
 
-  const row = await db.prepare(`
+  const row = await db
+    .prepare(`
     SELECT id
     FROM ai_provider_profiles
     WHERE provider = 'workers_ai'
        OR base_url LIKE '%api.cloudflare.com/client/v4/accounts/%/ai/%'
     ORDER BY is_default DESC, updated_at DESC, id DESC
     LIMIT 1
-  `).first<{ id: number }>()
+  `)
+    .first<{ id: number }>()
 
   if (!row?.id) return null
   return resolveAiProfileConfig(db, secret, row.id)
@@ -439,18 +459,25 @@ async function resolveTextRuntime(
       return {
         strategy: 'workers-ai',
         binding: env.WORKERS_AI,
-        model: generator.workers_model || aiEnv.WORKERS_AI_MODEL || DEFAULT_TEXT_WORKERS_MODEL,
+        model:
+          generator.workers_model ||
+          aiEnv.WORKERS_AI_MODEL ||
+          DEFAULT_TEXT_WORKERS_MODEL,
         temperature: clampTemperature(generator.temperature),
         maxTokens: clampMaxTokens(generator.max_tokens),
       }
     }
 
     if (db) {
-      const secret = resolveAiConfigSecret(env as Record<string, unknown> | undefined)
+      const secret = resolveAiConfigSecret(
+        env as Record<string, unknown> | undefined,
+      )
       const selectedWorkersProfile = await resolveWorkersAiProfile(
         db,
         secret,
-        Number.isFinite(generator.text_profile_id) ? Number(generator.text_profile_id) : undefined,
+        Number.isFinite(generator.text_profile_id)
+          ? Number(generator.text_profile_id)
+          : undefined,
       )
 
       if (selectedWorkersProfile) {
@@ -458,7 +485,10 @@ async function resolveTextRuntime(
           strategy: 'external-provider',
           apiKey: selectedWorkersProfile.api_key,
           baseURL: selectedWorkersProfile.base_url,
-          model: generator.workers_model || selectedWorkersProfile.model || DEFAULT_TEXT_WORKERS_MODEL,
+          model:
+            generator.workers_model ||
+            selectedWorkersProfile.model ||
+            DEFAULT_TEXT_WORKERS_MODEL,
           provider: selectedWorkersProfile.provider,
           providerName: selectedWorkersProfile.provider_name,
           providerType: selectedWorkersProfile.provider_type,
@@ -468,18 +498,24 @@ async function resolveTextRuntime(
       }
     }
 
-    throw new Error('当前部署未启用 Workers AI binding，且未找到可用的 Workers AI provider profile')
+    throw new Error(
+      '当前部署未启用 Workers AI binding，且未找到可用的 Workers AI provider profile',
+    )
   }
 
   if (!db) {
     throw new Error('文本模型配置缺少数据库上下文')
   }
 
-  const secret = resolveAiConfigSecret(env as Record<string, unknown> | undefined)
+  const secret = resolveAiConfigSecret(
+    env as Record<string, unknown> | undefined,
+  )
   const profile = await resolveAiProfileConfig(
     db,
     secret,
-    Number.isFinite(generator.text_profile_id) ? Number(generator.text_profile_id) : undefined,
+    Number.isFinite(generator.text_profile_id)
+      ? Number(generator.text_profile_id)
+      : undefined,
   )
 
   if (!profile) {
@@ -499,27 +535,36 @@ async function resolveTextRuntime(
   }
 }
 
-export async function generatePostMetadata(
-  input: GeneratePostMetadataInput,
-) {
-  const generator = await getAiPostGeneratorByTarget(input.db, input.target, input.env)
+export async function generatePostMetadata(input: GeneratePostMetadataInput) {
+  const generator = await getAiPostGeneratorByTarget(
+    input.db,
+    input.target,
+    input.env,
+  )
   if (!generator || generator.is_enabled !== 1) {
     throw new Error('当前字段未启用 AI 生成')
   }
 
-  const fallbackSummary = buildFallbackSummary(input.title || '', input.content || '')
+  const fallbackSummary = buildFallbackSummary(
+    input.title || '',
+    input.content || '',
+  )
   const runtime = await resolveTextRuntime(generator, input.env, input.db)
   const contextBlock = buildContextBlock(input, input.target)
-  const generation = await runTextGenerator(runtime, [
-    {
-      role: 'system',
-      content: buildTextSystemPrompt(input.target, generator.prompt),
-    },
-    {
-      role: 'user',
-      content: contextBlock,
-    },
-  ], input.target)
+  const generation = await runTextGenerator(
+    runtime,
+    [
+      {
+        role: 'system',
+        content: buildTextSystemPrompt(input.target, generator.prompt),
+      },
+      {
+        role: 'user',
+        content: contextBlock,
+      },
+    ],
+    input.target,
+  )
   const resultText = generation.text
 
   const parsed = parseJsonValue(resultText)
@@ -528,7 +573,13 @@ export async function generatePostMetadata(
     return {
       target: input.target,
       value: normalizeSummary(
-        extractGeneratedText(parsed, resultText, ['summary', 'description', 'text', 'content', 'result']),
+        extractGeneratedText(parsed, resultText, [
+          'summary',
+          'description',
+          'text',
+          'content',
+          'result',
+        ]),
         fallbackSummary,
       ),
       generator,
@@ -573,7 +624,10 @@ async function generateWorkersAiCover(
   input: GeneratePostCoverInput,
 ) {
   const prompt = buildCoverPrompt(generator, input)
-  const { width, height } = resolveWorkersAiImageSize(generator.aspect_ratio, generator.resolution)
+  const { width, height } = resolveWorkersAiImageSize(
+    generator.aspect_ratio,
+    generator.resolution,
+  )
 
   let rawResult: unknown
   let model = generator.workers_model || DEFAULT_IMAGE_WORKERS_MODEL
@@ -585,14 +639,24 @@ async function generateWorkersAiCover(
       height,
     })
   } else {
-    const secret = resolveAiConfigSecret(input.env as Record<string, unknown> | undefined)
-    const selectedWorkersProfile = await resolveWorkersAiProfile(input.db, secret)
+    const secret = resolveAiConfigSecret(
+      input.env as Record<string, unknown> | undefined,
+    )
+    const selectedWorkersProfile = await resolveWorkersAiProfile(
+      input.db,
+      secret,
+    )
 
     if (!selectedWorkersProfile) {
-      throw new Error('当前部署未启用 Workers AI binding，且未找到可用的 Workers AI provider profile')
+      throw new Error(
+        '当前部署未启用 Workers AI binding，且未找到可用的 Workers AI provider profile',
+      )
     }
 
-    model = generator.workers_model || selectedWorkersProfile.model || DEFAULT_IMAGE_WORKERS_MODEL
+    model =
+      generator.workers_model ||
+      selectedWorkersProfile.model ||
+      DEFAULT_IMAGE_WORKERS_MODEL
     rawResult = await runWorkersAiCompatImageRequest(
       {
         apiKey: selectedWorkersProfile.api_key,
@@ -626,7 +690,10 @@ async function generateWorkersAiCover(
   })
 
   const encodedKey = key.split('/').map(encodeURIComponent).join('/')
-  const variants = buildAssetUrls(encodedKey, readFlag(input.env?.ENABLE_CF_IMAGE_PIPELINE))
+  const variants = buildAssetUrls(
+    encodedKey,
+    readFlag(input.env?.ENABLE_CF_IMAGE_PIPELINE),
+  )
   const url = `/api/images/${encodedKey}`
   const mediaAsset = await upsertMediaAsset(input.db, {
     source: 'cover_generator',
@@ -666,7 +733,11 @@ async function generateWorkersAiCover(
 export async function generatePostCover(
   input: GeneratePostCoverInput,
 ): Promise<{ generator: AiPostGeneratorRow; image: GeneratedEditorImage }> {
-  const generator = await getAiPostGeneratorByTarget(input.db, 'cover', input.env)
+  const generator = await getAiPostGeneratorByTarget(
+    input.db,
+    'cover',
+    input.env,
+  )
   if (!generator || generator.is_enabled !== 1) {
     throw new Error('当前封面生成功能未启用')
   }
@@ -676,11 +747,15 @@ export async function generatePostCover(
   if (generator.provider_mode === 'workers_ai') {
     image = await generateWorkersAiCover(generator, input)
   } else {
-    const secret = resolveAiConfigSecret(input.env as Record<string, unknown> | undefined)
+    const secret = resolveAiConfigSecret(
+      input.env as Record<string, unknown> | undefined,
+    )
     const profile = await resolveAiImageProfileConfig(
       input.db,
       secret,
-      Number.isFinite(generator.image_profile_id) ? Number(generator.image_profile_id) : undefined,
+      Number.isFinite(generator.image_profile_id)
+        ? Number(generator.image_profile_id)
+        : undefined,
     )
 
     if (!profile) {
@@ -698,11 +773,14 @@ export async function generatePostCover(
         throw error
       }
 
-      console.warn('[ai-post-cover] Primary image profile failed; retrying with default profile', {
-        profileId: profile.id,
-        fallbackProfileId: fallbackProfile.id,
-        error: getErrorMessage(error),
-      })
+      console.warn(
+        '[ai-post-cover] Primary image profile failed; retrying with default profile',
+        {
+          profileId: profile.id,
+          fallbackProfileId: fallbackProfile.id,
+          error: getErrorMessage(error),
+        },
+      )
 
       image = await generateCoverWithProfile(generator, input, fallbackProfile)
     }

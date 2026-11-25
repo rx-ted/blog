@@ -54,7 +54,13 @@ export function NovelMainPane({
         </div>
 
         {!draftReady ? (
-          <div className={mobilePreviewOpen ? 'editor-surface editor-mobile-preview-surface' : 'editor-surface'} />
+          <div
+            className={
+              mobilePreviewOpen
+                ? 'editor-surface editor-mobile-preview-surface'
+                : 'editor-surface'
+            }
+          />
         ) : (
           <>
             <div className={editorViewMode === 'wysiwyg' ? '' : 'hidden'}>

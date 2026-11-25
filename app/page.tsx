@@ -1,6 +1,6 @@
 import { getPosts, getPostsCount } from '@/lib/db'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
-import { type Theme } from '@/lib/appearance'
+import type { Theme } from '@/lib/appearance'
 import type { SiteCategoryLink, SiteNavLink } from '@/lib/site'
 import { getSiteHeaderData } from '@/lib/site'
 import { HomeClient } from '@/components/HomeClient'
@@ -37,18 +37,15 @@ export default async function Home({
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
       const db = env.DB
-      const { headerData, nextPosts, nextTotalCount } = await getCachedPublicData(
-        env,
-        `home:page:${currentPage}`,
-        async () => {
+      const { headerData, nextPosts, nextTotalCount } =
+        await getCachedPublicData(env, `home:page:${currentPage}`, async () => {
           const [headerData, nextPosts, nextTotalCount] = await Promise.all([
             getSiteHeaderData(db),
             getPosts(db, PAGE_SIZE, (currentPage - 1) * PAGE_SIZE),
             getPostsCount(db),
           ])
           return { headerData, nextPosts, nextTotalCount }
-        },
-      )
+        })
       posts = nextPosts
       totalCount = nextTotalCount
       navLinks = headerData.navLinks
@@ -61,7 +58,7 @@ export default async function Home({
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
   const categorySlugMap: Record<string, string> = Object.fromEntries(
-    categories.map((cat) => [cat.name, cat.slug])
+    categories.map((cat) => [cat.name, cat.slug]),
   )
 
   return (
@@ -77,7 +74,10 @@ export default async function Home({
             description: '学习技术，记录思考，分享所学，探索未知。',
             potentialAction: {
               '@type': 'SearchAction',
-              target: { '@type': 'EntryPoint', urlTemplate: `${BASE_URL}/search?q={search_term_string}` },
+              target: {
+                '@type': 'EntryPoint',
+                urlTemplate: `${BASE_URL}/search?q={search_term_string}`,
+              },
               'query-input': 'required name=search_term_string',
             },
           }),

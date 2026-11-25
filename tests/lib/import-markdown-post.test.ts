@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { extractFirstMarkdownH1, parseImportedMarkdown } from '@/lib/import-markdown-post'
+import {
+  extractFirstMarkdownH1,
+  parseImportedMarkdown,
+} from '@/lib/import-markdown-post'
 
 describe('extractFirstMarkdownH1', () => {
   it('extracts the first h1 at the start and strips it from body', () => {

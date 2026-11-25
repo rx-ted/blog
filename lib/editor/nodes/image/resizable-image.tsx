@@ -4,7 +4,16 @@ import { useToast } from '@/components/Toast'
 import { mergeAttributes } from '@tiptap/core'
 import Image, { type ImageOptions } from '@tiptap/extension-image'
 import { ReactNodeViewRenderer, NodeViewWrapper } from '@tiptap/react'
-import { AlignCenter, AlignLeft, Copy, Crop, Download, ImagePlus, MoreHorizontal, WandSparkles } from 'lucide-react'
+import {
+  AlignCenter,
+  AlignLeft,
+  Copy,
+  Crop,
+  Download,
+  ImagePlus,
+  MoreHorizontal,
+  WandSparkles,
+} from 'lucide-react'
 import { UploadImagesPlugin } from 'novel'
 import { createPortal } from 'react-dom'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -51,7 +60,10 @@ function buildWidthStyle(width: number | string | null | undefined) {
   return typeof width === 'number' ? `${width}px` : String(width)
 }
 
-function buildImageStyle(width: number | string | null | undefined, align: EditorImageAlignment) {
+function buildImageStyle(
+  width: number | string | null | undefined,
+  align: EditorImageAlignment,
+) {
   const styles = ['display: block', 'max-width: 100%']
   const widthStyle = buildWidthStyle(width)
 
@@ -79,34 +91,31 @@ function clampMenuPosition(x: number, y: number) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function ResizableImageView(props: any) {
-  const {
-    editor,
-    extension,
-    getPos,
-    node,
-    selected,
-    updateAttributes,
-  } = props as {
-    editor: {
-      commands: {
-        setNodeSelection?: (pos: number) => void
+  const { editor, extension, getPos, node, selected, updateAttributes } =
+    props as {
+      editor: {
+        commands: {
+          setNodeSelection?: (pos: number) => void
+        }
       }
-    }
-    extension: {
-      options?: {
-        imageActions?: ResizableImageActionHandlers
+      extension: {
+        options?: {
+          imageActions?: ResizableImageActionHandlers
+        }
       }
+      getPos?: (() => number) | boolean
+      node: ResizableImageNode
+      selected: boolean
+      updateAttributes: (attrs: Record<string, unknown>) => void
     }
-    getPos?: (() => number) | boolean
-    node: ResizableImageNode
-    selected: boolean
-    updateAttributes: (attrs: Record<string, unknown>) => void
-  }
 
   const imgRef = useRef<HTMLImageElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const [resizing, setResizing] = useState(false)
-  const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null)
+  const [menuPosition, setMenuPosition] = useState<{
+    x: number
+    y: number
+  } | null>(null)
   const align = normalizeAlignment(node.attrs.align)
   const imageActions = extension.options?.imageActions
   const toast = useToast()
@@ -124,16 +133,22 @@ function ResizableImageView(props: any) {
     setMenuPosition(null)
   }, [])
 
-  const openMenu = useCallback((clientX: number, clientY: number) => {
-    if (typeof getPos === 'function') {
-      const pos = getPos()
-      if (Number.isFinite(pos) && typeof editor.commands.setNodeSelection === 'function') {
-        editor.commands.setNodeSelection(Number(pos))
+  const openMenu = useCallback(
+    (clientX: number, clientY: number) => {
+      if (typeof getPos === 'function') {
+        const pos = getPos()
+        if (
+          Number.isFinite(pos) &&
+          typeof editor.commands.setNodeSelection === 'function'
+        ) {
+          editor.commands.setNodeSelection(Number(pos))
+        }
       }
-    }
 
-    setMenuPosition(clampMenuPosition(clientX, clientY))
-  }, [editor.commands, getPos])
+      setMenuPosition(clampMenuPosition(clientX, clientY))
+    },
+    [editor.commands, getPos],
+  )
 
   useEffect(() => {
     if (!menuPosition) return
@@ -163,31 +178,35 @@ function ResizableImageView(props: any) {
     }
   }, [closeMenu, menuPosition])
 
-  const handleMouseDown = useCallback((event: React.MouseEvent, direction: 'right' | 'left') => {
-    event.preventDefault()
-    event.stopPropagation()
-    setResizing(true)
+  const handleMouseDown = useCallback(
+    (event: React.MouseEvent, direction: 'right' | 'left') => {
+      event.preventDefault()
+      event.stopPropagation()
+      setResizing(true)
 
-    const startX = event.clientX
-    const startWidth = imgRef.current?.offsetWidth || 300
+      const startX = event.clientX
+      const startWidth = imgRef.current?.offsetWidth || 300
 
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      const diff = direction === 'right'
-        ? moveEvent.clientX - startX
-        : startX - moveEvent.clientX
-      const newWidth = Math.max(100, startWidth + diff)
-      updateAttributes({ width: newWidth })
-    }
+      const handleMouseMove = (moveEvent: MouseEvent) => {
+        const diff =
+          direction === 'right'
+            ? moveEvent.clientX - startX
+            : startX - moveEvent.clientX
+        const newWidth = Math.max(100, startWidth + diff)
+        updateAttributes({ width: newWidth })
+      }
 
-    const handleMouseUp = () => {
-      setResizing(false)
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
-    }
+      const handleMouseUp = () => {
+        setResizing(false)
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+      }
 
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', handleMouseUp)
-  }, [updateAttributes])
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+    },
+    [updateAttributes],
+  )
 
   const menu = menuPosition
     ? createPortal(
@@ -215,7 +234,9 @@ function ResizableImageView(props: any) {
                 await copyEditorImage(imageTarget.src)
                 toast.success('已复制图片')
               } catch (error) {
-                toast.error(error instanceof Error ? error.message : '复制图片失败')
+                toast.error(
+                  error instanceof Error ? error.message : '复制图片失败',
+                )
               } finally {
                 closeMenu()
               }
@@ -291,7 +312,10 @@ function ResizableImageView(props: any) {
     <NodeViewWrapper
       data-type="image"
       className="resizable-image-wrapper"
-      style={{ display: 'flex', justifyContent: align === 'left' ? 'flex-start' : 'center' }}
+      style={{
+        display: 'flex',
+        justifyContent: align === 'left' ? 'flex-start' : 'center',
+      }}
       onContextMenu={(event: React.MouseEvent) => {
         event.preventDefault()
         event.stopPropagation()
@@ -300,7 +324,12 @@ function ResizableImageView(props: any) {
     >
       <div
         className={`resizable-image ${selected ? 'selected' : ''} ${resizing ? 'resizing' : ''}`}
-        style={{ position: 'relative', display: 'inline-block', width: buildWidthStyle(node.attrs.width) || undefined, maxWidth: '100%' }}
+        style={{
+          position: 'relative',
+          display: 'inline-block',
+          width: buildWidthStyle(node.attrs.width) || undefined,
+          maxWidth: '100%',
+        }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -369,7 +398,8 @@ export const ResizableImage = Image.extend({
       ...this.parent?.(),
       width: {
         default: null,
-        parseHTML: (element: HTMLElement) => element.getAttribute('width') || element.style.width || null,
+        parseHTML: (element: HTMLElement) =>
+          element.getAttribute('width') || element.style.width || null,
       },
       align: {
         default: 'center',
@@ -378,7 +408,8 @@ export const ResizableImage = Image.extend({
           if (attr === 'left') return 'left'
 
           const style = element.getAttribute('style') || ''
-          return /margin-right:\s*auto/i.test(style) && /margin-left:\s*0/i.test(style)
+          return /margin-right:\s*auto/i.test(style) &&
+            /margin-left:\s*0/i.test(style)
             ? 'left'
             : 'center'
         },
@@ -387,11 +418,10 @@ export const ResizableImage = Image.extend({
   },
 
   renderHTML({ HTMLAttributes }) {
-    const {
-      align,
-      width,
-      ...rest
-    } = HTMLAttributes as Record<string, unknown> & {
+    const { align, width, ...rest } = HTMLAttributes as Record<
+      string,
+      unknown
+    > & {
       align?: EditorImageAlignment
       width?: number | string | null
     }

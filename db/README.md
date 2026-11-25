@@ -33,7 +33,7 @@ db/
 ### `migrations/*.sql` 是什么？
 
 - 历史上的**增量变更**记录（如 `ALTER TABLE ... ADD COLUMN ...`、补建表等）。
-- 当前仓库里 **`cf-init.sh` / `cf-local-db.sh` 并不会自动遍历执行 `migrations/`**；是否执行取决于你当时的运维流程（手动 `wrangler d1 execute --file ...` 等）。
+- 当前仓库里 **`cf-init.sh` / `cf-local-init.sh` 并不会自动遍历执行 `migrations/`**；是否执行取决于你当时的运维流程（手动 `wrangler d1 execute --file ...` 等）。
 - 因此容易出现：**`schema.sql` 已包含某些变更，而迁移文件仍保留在仓库**（历史归档），或反之导致不一致。维护时需注意对齐。
 
 ---
@@ -43,12 +43,12 @@ db/
 1. **`schema.sql` 已包含 `memos` 表**（与 `migrations/008_add_memos.sql` 对齐）。全新库执行 `schema.sql` 即包含该表。
 2. **`ai_provider_profiles.max_tokens` 默认值已统一为 `2000`**（`schema.sql` 与 `migrations/004_add_ai_provider_profiles.sql` 保持一致）。
 3. **`ai_actions.profile_id`**：以 `schema.sql` 为准，全新初始化已包含该列。
-4. **`*.sql` 是否「没问题」**  
-   - 语法上多为常见 SQLite/D1 写法，但**是否可无脑叠加执行**取决于目标库是否已应用过旧迁移（例如 `ALTER TABLE ... ADD COLUMN` 重复执行会报错）。  
-   - **是否需要合并**：建议策略二选一并写死在团队约定里：  
-     - **策略 A（推荐长期维护）**：以 `schema.sql` 作为「从零初始化的权威结构快照」，每次结构变更时同时更新 `schema.sql`；`migrations/` 仅保留历史或逐步废弃，并在 README 注明。  
+4. **`*.sql` 是否「没问题」**
+   - 语法上多为常见 SQLite/D1 写法，但**是否可无脑叠加执行**取决于目标库是否已应用过旧迁移（例如 `ALTER TABLE ... ADD COLUMN` 重复执行会报错）。
+   - **是否需要合并**：建议策略二选一并写死在团队约定里：
+     - **策略 A（推荐长期维护）**：以 `schema.sql` 作为「从零初始化的权威结构快照」，每次结构变更时同时更新 `schema.sql`；`migrations/` 仅保留历史或逐步废弃，并在 README 注明。
      - **策略 B**：保留「纯迁移」流程，`schema.sql` 退化为由迁移拼装或仅作参考，此时必须有明确的「按顺序 apply migrations」步骤并脚本化。  
-   当前仓库更接近 **策略 A**（`cf-init` / 本地初始化依赖 `schema.sql`）。以后改结构时请同步更新 `schema.sql` 与必要的迁移说明。
+       当前仓库更接近 **策略 A**（`cf-init` / 本地初始化依赖 `schema.sql`）。以后改结构时请同步更新 `schema.sql` 与必要的迁移说明。
 
 ---
 
@@ -69,14 +69,14 @@ db/
    - 因此：**新库**以更新后的 `schema.sql` 为准；**老库**用 `migrations/*.sql`（或约定脚本）增量升级，并在 PR 说明中写清执行顺序与是否可重复执行。
 4. 若还有**已经跑在远程/他人环境的 D1**，为该次变更新增 `migrations/00X_描述.sql`（编号递增），并在说明里写明：新库跑 `schema.sql` 即可，老库需执行该迁移。
 5. 修改后建议：
-   - 本地：`npm run db:local:init -- --reset` 重建本地库验证。
+   - 本地：`pnpm cf:local:init -- --reset` 重建本地库验证。
    - 远程：先在测试/预览环境验证，再上线；操作前建议 `wrangler d1 export ... --remote` 备份。
 
 ---
 
 ## 如何写入 D1（应用 SQL）
 
-所有示例假设在仓库根目录执行。配置文件以 `wrangler.local.jsonc` 为例（由 `npm run cf:init` 生成）；模板为 `wrangler.jsonc`（不含真实 id，不可直接用于生产写入真实库）。
+所有示例假设在仓库根目录执行。配置文件以 `wrangler.local.jsonc` 为例（由 `pnpm cf:init` 生成）；模板为 `wrangler.jsonc`（不含真实 id，不可直接用于生产写入真实库）。
 
 ### 本地开发库（Miniflare / `.wrangler/state/...`）
 
@@ -84,13 +84,13 @@ db/
 
 ```bash
 # 首次：按 schema.sql（及脚本逻辑）初始化本地 D1
-npm run db:local:init
+pnpm cf:local:init
 
 # 本地库删掉重建（会清空本地 D1 数据）
-npm run db:local:init -- --reset
+pnpm cf:local:init -- --reset
 
 # 从远程 D1 导出数据覆盖本地（隐含 --reset；注意导出对 FTS 等虚拟表有限制，脚本内有说明）
-npm run db:local:init -- --from-remote
+pnpm cf:local:init -- --from-remote
 ```
 
 手动对本地库执行单个 SQL 文件：
@@ -124,10 +124,10 @@ npx wrangler d1 execute DB --remote --yes --file db/migrations/008_add_memos.sql
 使用 `cf-init.sh` 的「首次初始化远程库」流程（会创建资源、写回配置，并对远程执行 `db/schema.sql`）：
 
 ```bash
-npm run cf:init -- --site-url=https://你的域名
+pnpm cf:init -- --site-url=https://你的域名
 ```
 
-（若仓库脚本行为与上述描述不一致，以 `scripts/cf-init.sh`、`scripts/cf-local-db.sh` 当前实现为准。）
+（若仓库脚本行为与上述描述不一致，以 `scripts/cf-init.sh`、`scripts/cf-local-init.sh` 当前实现为准。）
 
 ### 导出远程库为 SQL（备份）
 
@@ -164,7 +164,7 @@ npx wrangler d1 execute DB --local -c wrangler.local.jsonc --json --command "SEL
 ### 在应用代码里读取
 
 - 运行在 Cloudflare Workers / OpenNext 环境中时，通过绑定 **`DB`**（见 `wrangler*.jsonc` 中的 `d1_databases`）使用 D1 API（`env.DB.prepare(...).bind(...).all()/first()/run()` 等），具体以项目内 `lib/` 下封装为准。
-- 本地 `wrangler dev` / `npm run preview` 时，行为取决于该 binding 的 `remote` 设置（以当前 `wrangler.local.jsonc` 为准）。
+- 本地 `wrangler dev` / `pnpm preview:local` 时，行为取决于该 binding 的 `remote` 设置（以当前 `wrangler.local.jsonc` 为准）。
 
 ---
 
@@ -180,5 +180,5 @@ npx wrangler d1 execute DB --local -c wrangler.local.jsonc --json --command "SEL
 ## 相关脚本速查
 
 - `scripts/cf-init.sh`：初始化 Cloudflare 资源并写入 `wrangler.local.jsonc`，远程执行 `db/schema.sql`。
-- `scripts/cf-local-db.sh`：初始化/重置/从远程导入到本地 D1（见脚本内 `--help`）。
+- `scripts/cf-local-init.sh`：初始化/重置/从远程导入到本地 D1（见脚本内 `--help`）。
 - `scripts/cf-deploy.sh`：部署流程中会对远程执行 `db/schema.sql`（以脚本内容为准）。

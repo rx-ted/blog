@@ -9,15 +9,22 @@ type CacheVersionEntry = {
 
 const cacheVersionMemory = new WeakMap<KVNamespace, CacheVersionEntry>()
 
-export function getCacheNamespace(env?: Partial<CloudflareEnv> | null): KVNamespace | undefined {
+export function getCacheNamespace(
+  env?: Partial<CloudflareEnv> | null,
+): KVNamespace | undefined {
   return env?.CACHE ?? env?.KV
 }
 
 function readFlag(value: string | undefined): boolean {
-  return typeof value === 'string' && ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  return (
+    typeof value === 'string' &&
+    ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  )
 }
 
-export function shouldUsePublicContentCache(env?: Partial<CloudflareEnv> | null): boolean {
+export function shouldUsePublicContentCache(
+  env?: Partial<CloudflareEnv> | null,
+): boolean {
   const cache = getCacheNamespace(env)
   if (!cache) return false
 
@@ -48,7 +55,7 @@ export async function getCached<T>(
   kv: KVNamespace,
   key: string,
   fetcher: () => Promise<T>,
-  ttl: number = 3600
+  ttl: number = 3600,
 ): Promise<T> {
   // 尝试从 KV 读取
   const cached = await kv.get(key, 'json')
@@ -85,7 +92,10 @@ export async function invalidateCache(kv: KVNamespace): Promise<void> {
 }
 
 // 获取带版本的缓存 key
-export async function getCacheKey(kv: KVNamespace, key: string): Promise<string> {
+export async function getCacheKey(
+  kv: KVNamespace,
+  key: string,
+): Promise<string> {
   const version = await getCacheVersion(kv)
   return version ? `${key}:v${version}` : key
 }
@@ -101,16 +111,19 @@ async function getCacheVersion(kv: KVNamespace): Promise<string | null> {
 
   if (cached?.inflight) return cached.inflight
 
-  const inflight = kv.get('cache:version').then((value) => {
-    cacheVersionMemory.set(kv, {
-      value,
-      expiresAt: Date.now() + CACHE_VERSION_MEMORY_TTL_MS,
+  const inflight = kv
+    .get('cache:version')
+    .then((value) => {
+      cacheVersionMemory.set(kv, {
+        value,
+        expiresAt: Date.now() + CACHE_VERSION_MEMORY_TTL_MS,
+      })
+      return value
     })
-    return value
-  }).catch(() => {
-    cacheVersionMemory.delete(kv)
-    return null
-  })
+    .catch(() => {
+      cacheVersionMemory.delete(kv)
+      return null
+    })
 
   cacheVersionMemory.set(kv, {
     value: cached?.value ?? null,

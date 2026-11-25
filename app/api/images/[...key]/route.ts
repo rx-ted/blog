@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 
 type StoredObject = {
@@ -11,8 +11,13 @@ type StoredObject = {
 }
 
 type ImageBucket = {
-  get: (key: string, options?: { range?: { offset: number; length: number } }) => Promise<StoredObject | null>
-  head: (key: string) => Promise<{ size: number; httpMetadata?: { contentType?: string } } | null>
+  get: (
+    key: string,
+    options?: { range?: { offset: number; length: number } },
+  ) => Promise<StoredObject | null>
+  head: (
+    key: string,
+  ) => Promise<{ size: number; httpMetadata?: { contentType?: string } } | null>
 }
 
 type RuntimeEnv = {
@@ -23,13 +28,29 @@ type RuntimeEnv = {
 type CloudflareImageFit = 'scale-down' | 'contain' | 'cover' | 'crop' | 'pad'
 type CloudflareImageFormat = 'auto' | 'avif' | 'webp' | 'json' | 'jpeg' | 'png'
 
-const TRANSFORM_QUERY_KEYS = ['w', 'width', 'h', 'height', 'q', 'quality', 'fit', 'format']
+const TRANSFORM_QUERY_KEYS = [
+  'w',
+  'width',
+  'h',
+  'height',
+  'q',
+  'quality',
+  'fit',
+  'format',
+]
 
 function readFlag(value: unknown): boolean {
-  return typeof value === 'string' && ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  return (
+    typeof value === 'string' &&
+    ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  )
 }
 
-function parseBoundedInt(value: string | null, min: number, max: number): number | undefined {
+function parseBoundedInt(
+  value: string | null,
+  min: number,
+  max: number,
+): number | undefined {
   if (!value) return undefined
 
   const parsed = Number.parseInt(value, 10)
@@ -66,9 +87,21 @@ function parseFormat(value: string | null): CloudflareImageFormat | undefined {
 }
 
 function getImageTransform(searchParams: URLSearchParams) {
-  const width = parseBoundedInt(searchParams.get('w') || searchParams.get('width'), 16, 4096)
-  const height = parseBoundedInt(searchParams.get('h') || searchParams.get('height'), 16, 4096)
-  const quality = parseBoundedInt(searchParams.get('q') || searchParams.get('quality'), 30, 100)
+  const width = parseBoundedInt(
+    searchParams.get('w') || searchParams.get('width'),
+    16,
+    4096,
+  )
+  const height = parseBoundedInt(
+    searchParams.get('h') || searchParams.get('height'),
+    16,
+    4096,
+  )
+  const quality = parseBoundedInt(
+    searchParams.get('q') || searchParams.get('quality'),
+    30,
+    100,
+  )
   const fit = parseFit(searchParams.get('fit'))
   const format = parseFormat(searchParams.get('format'))
 
@@ -87,7 +120,7 @@ function getImageTransform(searchParams: URLSearchParams) {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ key: string[] }> }
+  { params }: { params: Promise<{ key: string[] }> },
 ) {
   const { key } = await params
   const requestPath = key?.join('/') || ''
@@ -110,7 +143,10 @@ export async function GET(
   // Check for Range header (required for iOS Safari video playback)
   const rangeHeader = req.headers.get('Range')
   const isRawRequest = req.nextUrl.searchParams.get('__raw') === '1'
-  const transform = !rangeHeader && !isRawRequest ? getImageTransform(req.nextUrl.searchParams) : null
+  const transform =
+    !rangeHeader && !isRawRequest
+      ? getImageTransform(req.nextUrl.searchParams)
+      : null
 
   if (transform && readFlag(env.ENABLE_CF_IMAGE_PIPELINE)) {
     const headInfo = await env.IMAGES.head(objectKey)
@@ -120,7 +156,10 @@ export async function GET(
     }
 
     const contentType = headInfo.httpMetadata?.contentType || ''
-    const canTransform = contentType.startsWith('image/') && contentType !== 'image/gif' && contentType !== 'image/svg+xml'
+    const canTransform =
+      contentType.startsWith('image/') &&
+      contentType !== 'image/gif' &&
+      contentType !== 'image/svg+xml'
 
     if (canTransform) {
       try {
@@ -147,7 +186,10 @@ export async function GET(
           })
         }
       } catch (error) {
-        console.warn('Cloudflare image transform failed, falling back to original asset:', error)
+        console.warn(
+          'Cloudflare image transform failed, falling back to original asset:',
+          error,
+        )
       }
     }
   }
@@ -166,7 +208,9 @@ export async function GET(
       }
 
       const totalSize = headInfo.size
-      const end = endStr ? Math.min(parseInt(endStr, 10), totalSize - 1) : totalSize - 1
+      const end = endStr
+        ? Math.min(parseInt(endStr, 10), totalSize - 1)
+        : totalSize - 1
       const length = end - start + 1
 
       if (start >= totalSize || end < start) {

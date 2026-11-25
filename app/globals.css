@@ -26,8 +26,26 @@
   --article-quote-border: #cdb796;
   --article-quote-nested-border: #b8a68a;
   --article-quote-nested-bg: rgba(0, 0, 0, 0.02);
-  --article-body-font: var(--body-font, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Source Han Sans SC", Arial, sans-serif);
-  --article-heading-font: var(--body-font, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Source Han Sans SC", Arial, sans-serif);
+  --article-body-font: var(
+    --body-font,
+    "PingFang SC",
+    "Hiragino Sans GB",
+    "Microsoft YaHei",
+    "Noto Sans SC",
+    "Source Han Sans SC",
+    Arial,
+    sans-serif
+  );
+  --article-heading-font: var(
+    --body-font,
+    "PingFang SC",
+    "Hiragino Sans GB",
+    "Microsoft YaHei",
+    "Noto Sans SC",
+    "Source Han Sans SC",
+    Arial,
+    sans-serif
+  );
 }
 
 @theme inline {
@@ -103,7 +121,8 @@ textarea:focus-visible,
 input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
 textarea:focus {
   border-color: var(--editor-accent);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--editor-accent) 15%, transparent);
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--editor-accent) 15%, transparent);
 }
 
 /* Smooth scrolling */
@@ -132,6 +151,7 @@ textarea:focus {
 .ProseMirror {
   position: relative;
   white-space: pre-wrap;
+  /* biome-ignore lint/suspicious/noDuplicateProperties: break-spaces fallback after pre-wrap */
   white-space: break-spaces;
   word-wrap: break-word;
   font-variant-ligatures: none;
@@ -339,13 +359,21 @@ textarea:focus {
 
 /* 嵌套引用 */
 :is(.novel-prose, .rich-content) blockquote blockquote {
-  border-left-color: color-mix(in srgb, var(--article-quote-border) 68%, transparent);
+  border-left-color: color-mix(
+    in srgb,
+    var(--article-quote-border) 68%,
+    transparent
+  );
   background: var(--article-quote-nested-bg);
   margin-top: 0.6em;
 }
 
 :is(.novel-prose, .rich-content) blockquote blockquote blockquote {
-  border-left-color: color-mix(in srgb, var(--article-quote-border) 48%, transparent);
+  border-left-color: color-mix(
+    in srgb,
+    var(--article-quote-border) 48%,
+    transparent
+  );
 }
 
 /* 表格样式 */
@@ -416,7 +444,7 @@ textarea:focus {
 }
 
 :is(.novel-prose, .rich-content) pre::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 1rem;
   left: 1rem;
@@ -424,11 +452,13 @@ textarea:focus {
   height: 0.7rem;
   border-radius: 999px;
   background: #ff5f56;
-  box-shadow: 1.25rem 0 0 #ffbd2e, 2.5rem 0 0 #27c93f;
+  box-shadow:
+    1.25rem 0 0 #ffbd2e,
+    2.5rem 0 0 #27c93f;
 }
 
 :is(.novel-prose, .rich-content) pre::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 2.8rem;
   right: 0;
@@ -581,7 +611,9 @@ textarea:focus {
   background: var(--editor-code-bg);
   border: 1px solid var(--editor-code-border);
   padding: 0.08rem 0.3rem;
-  font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family:
+    var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, monospace;
   font-size: 0.86em;
 }
 
@@ -789,14 +821,16 @@ textarea:focus {
   opacity: 1 !important;
 }
 .drag-handle::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 6px;
   top: 0;
   width: 24px;
   height: 24px;
   border-radius: 7px;
-  transition: background 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease;
 }
 .drag-handle:hover::before,
 .drag-handle.menu-open::before {
@@ -810,7 +844,7 @@ textarea:focus {
   box-shadow: 0 0 0 1px var(--editor-line);
 }
 .drag-handle::after {
-  content: '';
+  content: "";
   position: relative;
   z-index: 1;
   display: block;
@@ -885,7 +919,9 @@ textarea:focus {
   padding: 0.65rem 0.8rem;
   font-size: 0.92rem;
   color: var(--editor-ink);
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .editor-image-menu-item:hover {
@@ -917,7 +953,9 @@ textarea:focus {
   flex: 1;
 }
 
-:is(.novel-prose, .rich-content) ul[data-type="taskList"] input[type="checkbox"] {
+:is(.novel-prose, .rich-content)
+  ul[data-type="taskList"]
+  input[type="checkbox"] {
   width: 1rem;
   height: 1rem;
   accent-color: var(--editor-accent);
@@ -934,12 +972,19 @@ textarea:focus {
 
 :is(.novel-prose, .rich-content) .wechat-editor-node {
   position: relative;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
 }
 
 :is(.novel-prose, .rich-content) .wechat-editor-node:hover,
 :is(.novel-prose, .rich-content) .wechat-editor-node-selected {
-  border-color: color-mix(in srgb, var(--editor-accent) 42%, var(--editor-line));
+  border-color: color-mix(
+    in srgb,
+    var(--editor-accent) 42%,
+    var(--editor-line)
+  );
   box-shadow: 0 12px 34px rgba(37, 32, 24, 0.08);
 }
 
@@ -1070,8 +1115,13 @@ textarea:focus {
 }
 
 .wechat-atom-editor-input:focus {
-  border-color: color-mix(in srgb, var(--editor-accent) 56%, var(--editor-line));
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--editor-accent) 12%, transparent);
+  border-color: color-mix(
+    in srgb,
+    var(--editor-accent) 56%,
+    var(--editor-line)
+  );
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--editor-accent) 12%, transparent);
 }
 
 :is(.novel-prose, .rich-content) .wechat-info-grid {
@@ -1131,7 +1181,9 @@ textarea:focus {
   justify-content: center;
   border: 0;
   color: var(--stone-gray);
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .wechat-info-grid-button {
@@ -1242,7 +1294,8 @@ textarea:focus {
 
 .mobile-preview-scroll {
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--stone-gray) 45%, transparent) transparent;
+  scrollbar-color: color-mix(in srgb, var(--stone-gray) 45%, transparent)
+    transparent;
 }
 
 .mobile-preview-content {
@@ -1382,7 +1435,6 @@ textarea:focus {
   }
 }
 
-
 /* 内联编辑器：去掉全页编辑器的 padding 和 min-height，融入文章详情页 */
 .inline-editor .novel-prose {
   min-height: auto;
@@ -1508,7 +1560,11 @@ textarea:focus {
 
 .editor-video-action:hover,
 .editor-video-icon-button:hover {
-  border-color: color-mix(in srgb, var(--editor-accent) 45%, var(--editor-line));
+  border-color: color-mix(
+    in srgb,
+    var(--editor-accent) 45%,
+    var(--editor-line)
+  );
   background: color-mix(in srgb, var(--editor-accent) 9%, var(--background));
   color: var(--editor-accent);
 }
@@ -1643,7 +1699,7 @@ textarea:focus {
 }
 .math-editor-input {
   width: 100%;
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: "SF Mono", "Fira Code", monospace;
   font-size: 0.9rem;
   border: 1px solid var(--editor-line);
   border-radius: 4px;
@@ -1654,7 +1710,8 @@ textarea:focus {
 }
 .math-editor-input:focus {
   border-color: var(--editor-accent);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--editor-accent) 15%, transparent);
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--editor-accent) 15%, transparent);
 }
 .math-node-rendered {
   margin: 1rem 0;

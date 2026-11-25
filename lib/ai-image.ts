@@ -34,7 +34,7 @@ type ImageBucket = {
         cacheControl?: string
       }
       customMetadata?: Record<string, string>
-    }
+    },
   ) => Promise<void>
 }
 
@@ -97,12 +97,18 @@ export interface GeneratedEditorImage {
 }
 
 function readFlag(value: unknown): boolean {
-  return typeof value === 'string' && ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  return (
+    typeof value === 'string' &&
+    ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  )
 }
 
 function sanitizeFilename(filename: string) {
   const trimmed = filename.trim().toLowerCase()
-  const safe = trimmed.replace(/[^a-z0-9._-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+  const safe = trimmed
+    .replace(/[^a-z0-9._-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
   return safe || 'image'
 }
 
@@ -120,7 +126,9 @@ function buildAssetUrls(encodedKey: string, cloudflareEnabled: boolean) {
     raw: baseUrl,
     content: cloudflareEnabled ? `${baseUrl}?w=1600&q=85&format=webp` : baseUrl,
     thumb: cloudflareEnabled ? `${baseUrl}?w=960&q=82&format=webp` : baseUrl,
-    cover: cloudflareEnabled ? `${baseUrl}?w=1600&h=900&fit=cover&q=84&format=webp` : baseUrl,
+    cover: cloudflareEnabled
+      ? `${baseUrl}?w=1600&h=900&fit=cover&q=84&format=webp`
+      : baseUrl,
   }
 }
 
@@ -132,14 +140,18 @@ function getNowPrefix() {
 }
 
 function toBytesFromBase64(input: string): Uint8Array {
-  const normalized = input.trim().replace(/^data:image\/[a-z0-9.+-]+;base64,/i, '')
+  const normalized = input
+    .trim()
+    .replace(/^data:image\/[a-z0-9.+-]+;base64,/i, '')
   if (!normalized) return new Uint8Array()
 
-  const BufferCtor = (globalThis as unknown as {
-    Buffer?: {
-      from: (input: string, encoding: string) => Uint8Array
+  const BufferCtor = (
+    globalThis as unknown as {
+      Buffer?: {
+        from: (input: string, encoding: string) => Uint8Array
+      }
     }
-  }).Buffer
+  ).Buffer
 
   if (BufferCtor) {
     return new Uint8Array(BufferCtor.from(normalized, 'base64'))
@@ -159,27 +171,43 @@ function buildTitleMaterial(articleTitle: string, allowReadableText: boolean) {
     : `文章主题参考（仅用于理解主题，不要作为画面文字）：${articleTitle}`
 }
 
-function buildContextText(articleTitle: string | undefined, contextText: string | undefined, allowReadableText: boolean) {
+function buildContextText(
+  articleTitle: string | undefined,
+  contextText: string | undefined,
+  allowReadableText: boolean,
+) {
   const sections: string[] = []
   const normalizedTitle = (articleTitle || '').trim()
   const normalizedContext = (contextText || '').trim()
 
-  if (normalizedTitle) sections.push(buildTitleMaterial(normalizedTitle, allowReadableText))
+  if (normalizedTitle)
+    sections.push(buildTitleMaterial(normalizedTitle, allowReadableText))
   if (normalizedContext) {
-    sections.push(allowReadableText
-      ? `当前位置上下文：${normalizedContext.slice(0, 500)}`
-      : `上下文参考（仅用于理解主题，不要作为画面文字）：${normalizedContext.slice(0, 500)}`)
+    sections.push(
+      allowReadableText
+        ? `当前位置上下文：${normalizedContext.slice(0, 500)}`
+        : `上下文参考（仅用于理解主题，不要作为画面文字）：${normalizedContext.slice(0, 500)}`,
+    )
   }
 
   return sections.join('\n')
 }
 
-export function shouldAllowReadableTextInGeneratedImage(actionPrompt?: string, userPrompt?: string) {
+export function shouldAllowReadableTextInGeneratedImage(
+  actionPrompt?: string,
+  userPrompt?: string,
+) {
   const normalized = `${actionPrompt || ''}\n${userPrompt || ''}`.toLowerCase()
-  return /信息图|图解|流程图|示意图|关系图|架构图|图表|表格|清单|列表|时间线|路线图|海报|标题|文字|文案|标签|标注|quote|typography|text|label|caption|infographic|diagram|chart|timeline|roadmap/.test(normalized)
+  return /信息图|图解|流程图|示意图|关系图|架构图|图表|表格|清单|列表|时间线|路线图|海报|标题|文字|文案|标签|标注|quote|typography|text|label|caption|infographic|diagram|chart|timeline|roadmap/.test(
+    normalized,
+  )
 }
 
-function buildSelectedTextMaterial(contextText: string, allowReadableText: boolean, strictUserPrompt: boolean) {
+function buildSelectedTextMaterial(
+  contextText: string,
+  allowReadableText: boolean,
+  strictUserPrompt: boolean,
+) {
   const normalizedContext = contextText.trim()
   if (!normalizedContext) return ''
 
@@ -204,14 +232,23 @@ function buildUserFacingPrompt(
 ) {
   const normalizedPrompt = (userPrompt || '').trim()
   const normalizedTitle = (articleTitle || '').trim()
-  const selectedMaterial = buildSelectedTextMaterial(contextText || '', allowReadableText, strictUserPrompt)
-  const titleMaterial = normalizedTitle ? buildTitleMaterial(normalizedTitle, allowReadableText) : ''
+  const selectedMaterial = buildSelectedTextMaterial(
+    contextText || '',
+    allowReadableText,
+    strictUserPrompt,
+  )
+  const titleMaterial = normalizedTitle
+    ? buildTitleMaterial(normalizedTitle, allowReadableText)
+    : ''
 
   if (normalizedPrompt && selectedMaterial) {
-    return [normalizedPrompt, titleMaterial, selectedMaterial].filter(Boolean).join('\n\n')
+    return [normalizedPrompt, titleMaterial, selectedMaterial]
+      .filter(Boolean)
+      .join('\n\n')
   }
   if (normalizedPrompt) return normalizedPrompt
-  if (selectedMaterial) return [titleMaterial, selectedMaterial].filter(Boolean).join('\n\n')
+  if (selectedMaterial)
+    return [titleMaterial, selectedMaterial].filter(Boolean).join('\n\n')
   return buildContextText(articleTitle, contextText, allowReadableText)
 }
 
@@ -227,7 +264,9 @@ export function buildFinalImagePrompt(
   } = {},
 ) {
   const strictUserPrompt = Boolean(options.strictUserPrompt)
-  const allowReadableText = strictUserPrompt || shouldAllowReadableTextInGeneratedImage(actionPrompt, userPrompt)
+  const allowReadableText =
+    strictUserPrompt ||
+    shouldAllowReadableTextInGeneratedImage(actionPrompt, userPrompt)
   const contentPrompt = buildUserFacingPrompt(
     userPrompt,
     articleTitle,
@@ -245,14 +284,17 @@ export function buildFinalImagePrompt(
 
   const context = buildContextText(articleTitle, contextText, allowReadableText)
   const contextAlreadyIncluded = Boolean(
-    contextText?.trim() && contentPrompt.includes(contextText.trim().slice(0, 200)),
+    contextText?.trim() &&
+      contentPrompt.includes(contextText.trim().slice(0, 200)),
   )
   if (context && context !== contentPrompt && !contextAlreadyIncluded) {
-    sections.push(strictUserPrompt
-      ? `补充上下文（只按用户自定义要求取用，不覆盖用户要求）：\n${context}`
-      : allowReadableText
-      ? `补充上下文（用于保持主题一致，可提炼成少量图中文字）：\n${context}`
-      : `补充上下文（仅用于理解主题，不要求逐字出现在画面）：\n${context}`)
+    sections.push(
+      strictUserPrompt
+        ? `补充上下文（只按用户自定义要求取用，不覆盖用户要求）：\n${context}`
+        : allowReadableText
+          ? `补充上下文（用于保持主题一致，可提炼成少量图中文字）：\n${context}`
+          : `补充上下文（仅用于理解主题，不要求逐字出现在画面）：\n${context}`,
+    )
   }
 
   const aspectRatioHint = buildAspectRatioPromptHint(aspectRatio)
@@ -265,11 +307,13 @@ export function buildFinalImagePrompt(
     sections.push(`输出精度偏好：\n${resolutionHint}`)
   }
 
-  sections.push(strictUserPrompt
-    ? '输出要求：用户自定义要求优先级最高。严格遵从用户自定义要求，不添加与其冲突的风格、禁令或内容限制。是否在图中出现可读文字，完全按用户自定义要求处理；若用户要求信息图、文字、标题、标签或排版，必须把输入素材中的关键文字渲染为可读文字；若用户要求不要文字，则不要加文字。避免无关 logo、签名或水印；如果当前模型不支持精确比例或分辨率，请优先遵守构图比例意图与细节等级。'
-    : allowReadableText
-      ? '输出要求：构图完整、主题清晰、适合中文文章配图。可以加入清晰可读的中文文字；如果是信息图/图解，优先把选中文本中的关键标题、数字、关系和步骤转成画面文字。本条优先级高于快捷模板中关于不加文字的默认限制。不要生成乱码、无关 logo、签名或水印；如果当前模型不支持精确比例或分辨率，请优先遵守构图比例意图与细节等级。'
-      : '输出要求：构图完整、主题清晰、适合中文文章配图。除非用户明确要求，不要在图片中加入可读文字、logo、签名或水印；如果当前模型不支持精确比例或分辨率，请优先遵守构图比例意图与细节等级。')
+  sections.push(
+    strictUserPrompt
+      ? '输出要求：用户自定义要求优先级最高。严格遵从用户自定义要求，不添加与其冲突的风格、禁令或内容限制。是否在图中出现可读文字，完全按用户自定义要求处理；若用户要求信息图、文字、标题、标签或排版，必须把输入素材中的关键文字渲染为可读文字；若用户要求不要文字，则不要加文字。避免无关 logo、签名或水印；如果当前模型不支持精确比例或分辨率，请优先遵守构图比例意图与细节等级。'
+      : allowReadableText
+        ? '输出要求：构图完整、主题清晰、适合中文文章配图。可以加入清晰可读的中文文字；如果是信息图/图解，优先把选中文本中的关键标题、数字、关系和步骤转成画面文字。本条优先级高于快捷模板中关于不加文字的默认限制。不要生成乱码、无关 logo、签名或水印；如果当前模型不支持精确比例或分辨率，请优先遵守构图比例意图与细节等级。'
+        : '输出要求：构图完整、主题清晰、适合中文文章配图。除非用户明确要求，不要在图片中加入可读文字、logo、签名或水印；如果当前模型不支持精确比例或分辨率，请优先遵守构图比例意图与细节等级。',
+  )
   return sections.join('\n\n')
 }
 
@@ -279,21 +323,20 @@ function buildAltText(
   articleTitle?: string,
   fallbackLabel?: string,
 ) {
-  const candidate = revisedPrompt.trim() || (userPrompt || '').trim() || (articleTitle || '').trim() || fallbackLabel || 'AI 生成配图'
+  const candidate =
+    revisedPrompt.trim() ||
+    (userPrompt || '').trim() ||
+    (articleTitle || '').trim() ||
+    fallbackLabel ||
+    'AI 生成配图'
   return candidate.slice(0, 120)
 }
 
-function resolveRequestedSize(
-  aspectRatio?: string,
-  legacySize?: string,
-) {
+function resolveRequestedSize(aspectRatio?: string, legacySize?: string) {
   return deriveLegacySizeFromAspectRatio(aspectRatio, legacySize)
 }
 
-function resolveRequestedQuality(
-  resolution?: string,
-  legacyQuality?: string,
-) {
+function resolveRequestedQuality(resolution?: string, legacyQuality?: string) {
   return deriveLegacyQualityFromResolution(resolution, legacyQuality)
 }
 
@@ -310,7 +353,9 @@ function parseWorkersAiErrorMessage(
         message?: string
       }
 
-      const firstWorkersError = parsed.errors?.find((item) => typeof item?.message === 'string' && item.message.trim())
+      const firstWorkersError = parsed.errors?.find(
+        (item) => typeof item?.message === 'string' && item.message.trim(),
+      )
       if (firstWorkersError?.message) {
         return firstWorkersError.message.trim()
       }
@@ -340,25 +385,33 @@ export function resolveWorkersAiImageSize(
   aspectRatio: AIImageAspectRatio,
   resolution: AIImageResolution,
 ) {
-  const sizeTier = resolution === '4k' ? 1536 : resolution === '2k' ? 1344 : 1024
+  const sizeTier =
+    resolution === '4k' ? 1536 : resolution === '2k' ? 1344 : 1024
   const normalizedAspectRatio = normalizeAiImageAspectRatio(aspectRatio)
-  const [ratioWidth, ratioHeight] = (normalizedAspectRatio === 'auto' ? '16:9' : normalizedAspectRatio)
+  const [ratioWidth, ratioHeight] = (
+    normalizedAspectRatio === 'auto' ? '16:9' : normalizedAspectRatio
+  )
     .split(':')
     .map((item) => Number(item))
 
-  if (!Number.isFinite(ratioWidth) || !Number.isFinite(ratioHeight) || ratioWidth <= 0 || ratioHeight <= 0) {
-    return { width: sizeTier, height: Math.round(sizeTier * 9 / 16) }
+  if (
+    !Number.isFinite(ratioWidth) ||
+    !Number.isFinite(ratioHeight) ||
+    ratioWidth <= 0 ||
+    ratioHeight <= 0
+  ) {
+    return { width: sizeTier, height: Math.round((sizeTier * 9) / 16) }
   }
 
   if (ratioWidth >= ratioHeight) {
     return {
       width: sizeTier,
-      height: Math.max(512, Math.round(sizeTier * ratioHeight / ratioWidth)),
+      height: Math.max(512, Math.round((sizeTier * ratioHeight) / ratioWidth)),
     }
   }
 
   return {
-    width: Math.max(512, Math.round(sizeTier * ratioWidth / ratioHeight)),
+    width: Math.max(512, Math.round((sizeTier * ratioWidth) / ratioHeight)),
     height: sizeTier,
   }
 }
@@ -369,11 +422,14 @@ async function resolveImageAction(
 ): Promise<ResolvedImageAction | null> {
   if (action === 'custom') return null
 
-  const row = await db.prepare(`
+  const row = await db
+    .prepare(`
     SELECT action_key, label, prompt, aspect_ratio, resolution, size, quality, profile_id
     FROM ai_image_actions
     WHERE action_key = ? AND is_enabled = 1
-  `).bind(action).first<ResolvedImageAction>()
+  `)
+    .bind(action)
+    .first<ResolvedImageAction>()
 
   if (!row) {
     throw new Error('不支持的图片快捷提示')
@@ -402,7 +458,7 @@ async function runGenerateWithFallback(
 
   for (const body of attempts) {
     try {
-      return await client.images.generate(body as never) as ImagesResponse
+      return (await client.images.generate(body as never)) as ImagesResponse
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error))
     }
@@ -432,9 +488,11 @@ function shouldPreferMinimalOpenAiImagePayload(
   model: string,
 ) {
   const normalizedModel = model.trim().toLowerCase()
-  return config.providerType === 'openai_images'
-    && isHiApiBaseUrl(config.baseURL)
-    && normalizedModel === 'gpt-image-2-beta'
+  return (
+    config.providerType === 'openai_images' &&
+    isHiApiBaseUrl(config.baseURL) &&
+    normalizedModel === 'gpt-image-2-beta'
+  )
 }
 
 export function buildOpenAiCompatGenerationAttempts(
@@ -538,7 +596,7 @@ async function runEditWithFallback(
 
   for (const body of attempts) {
     try {
-      return await client.images.edit(body as never) as ImagesResponse
+      return (await client.images.edit(body as never)) as ImagesResponse
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error))
     }
@@ -560,7 +618,9 @@ function parseOpenAiCompatImageErrorMessage(
         message?: string
       }
 
-      const firstError = parsed.errors?.find((item) => typeof item?.message === 'string' && item.message.trim())
+      const firstError = parsed.errors?.find(
+        (item) => typeof item?.message === 'string' && item.message.trim(),
+      )
       if (firstError?.message) {
         return firstError.message.trim()
       }
@@ -586,14 +646,19 @@ function parseOpenAiCompatImageErrorMessage(
   return `HTTP ${resStatus}: ${resStatusText}`
 }
 
-function shouldRetryWithMultipartFallback(error: Error | null, providerType?: string) {
+function shouldRetryWithMultipartFallback(
+  error: Error | null,
+  providerType?: string,
+) {
   if ((providerType || '').trim() === 'openai_images') return true
   if (!error) return false
 
   const normalized = error.message.toLowerCase()
-  return normalized.includes('multipart')
-    || normalized.includes('form-data')
-    || normalized.includes("required properties at '/' are 'multipart'")
+  return (
+    normalized.includes('multipart') ||
+    normalized.includes('form-data') ||
+    normalized.includes("required properties at '/' are 'multipart'")
+  )
 }
 
 async function runGenerateMultipartFallback(
@@ -671,7 +736,13 @@ async function runGenerateMultipartFallback(
 
       const rawBody = await response.text().catch(() => '')
       if (!response.ok) {
-        throw new Error(parseOpenAiCompatImageErrorMessage(response.status, response.statusText, rawBody))
+        throw new Error(
+          parseOpenAiCompatImageErrorMessage(
+            response.status,
+            response.statusText,
+            rawBody,
+          ),
+        )
       }
 
       const parsed = rawBody ? JSON.parse(rawBody) : null
@@ -688,9 +759,7 @@ async function runGenerateMultipartFallback(
   throw lastError || new Error('图片生成失败')
 }
 
-async function extractGeneratedImagePayload(
-  response: ImagesResponse,
-): Promise<{
+async function extractGeneratedImagePayload(response: ImagesResponse): Promise<{
   bytes: Uint8Array
   contentType: string
   extension: string
@@ -740,34 +809,37 @@ async function extractGeneratedImagePayload(
 }
 
 function inferImageTypeFromBytes(bytes: Uint8Array) {
-  const isPng = bytes.length >= 4
-    && bytes[0] === 0x89
-    && bytes[1] === 0x50
-    && bytes[2] === 0x4e
-    && bytes[3] === 0x47
+  const isPng =
+    bytes.length >= 4 &&
+    bytes[0] === 0x89 &&
+    bytes[1] === 0x50 &&
+    bytes[2] === 0x4e &&
+    bytes[3] === 0x47
 
   if (isPng) {
     return { contentType: 'image/png', extension: 'png' }
   }
 
-  const isJpeg = bytes.length >= 3
-    && bytes[0] === 0xff
-    && bytes[1] === 0xd8
-    && bytes[2] === 0xff
+  const isJpeg =
+    bytes.length >= 3 &&
+    bytes[0] === 0xff &&
+    bytes[1] === 0xd8 &&
+    bytes[2] === 0xff
 
   if (isJpeg) {
     return { contentType: 'image/jpeg', extension: 'jpg' }
   }
 
-  const isWebp = bytes.length >= 12
-    && bytes[0] === 0x52
-    && bytes[1] === 0x49
-    && bytes[2] === 0x46
-    && bytes[3] === 0x46
-    && bytes[8] === 0x57
-    && bytes[9] === 0x45
-    && bytes[10] === 0x42
-    && bytes[11] === 0x50
+  const isWebp =
+    bytes.length >= 12 &&
+    bytes[0] === 0x52 &&
+    bytes[1] === 0x49 &&
+    bytes[2] === 0x46 &&
+    bytes[3] === 0x46 &&
+    bytes[8] === 0x57 &&
+    bytes[9] === 0x45 &&
+    bytes[10] === 0x42 &&
+    bytes[11] === 0x50
 
   if (isWebp) {
     return { contentType: 'image/webp', extension: 'webp' }
@@ -787,14 +859,19 @@ function isReadableStreamLike(value: unknown): value is ReadableStream {
   return Boolean(value && typeof value === 'object' && 'getReader' in value)
 }
 
-export async function extractWorkersAiImageAsset(result: unknown, model: string): Promise<{
+export async function extractWorkersAiImageAsset(
+  result: unknown,
+  model: string,
+): Promise<{
   data: ReadableStream | Uint8Array
   contentType: string
   extension: string
 }> {
   if (result instanceof Response) {
     if (!result.body) throw new Error('Workers AI 未返回图片内容')
-    const contentType = result.headers.get('content-type') || getDefaultWorkersImageType(model).contentType
+    const contentType =
+      result.headers.get('content-type') ||
+      getDefaultWorkersImageType(model).contentType
     const extension = contentType.includes('jpeg')
       ? 'jpg'
       : contentType.includes('webp')
@@ -824,21 +901,27 @@ export async function extractWorkersAiImageAsset(result: unknown, model: string)
   }
 
   if (ArrayBuffer.isView(result)) {
-    const bytes = new Uint8Array(result.buffer.slice(result.byteOffset, result.byteOffset + result.byteLength))
+    const bytes = new Uint8Array(
+      result.buffer.slice(
+        result.byteOffset,
+        result.byteOffset + result.byteLength,
+      ),
+    )
     const inferred = inferImageTypeFromBytes(bytes)
     return { data: bytes, ...inferred }
   }
 
-  const payload = result && typeof result === 'object'
-    ? result as {
-        image?: string
-        result?: {
+  const payload =
+    result && typeof result === 'object'
+      ? (result as {
           image?: string
+          result?: {
+            image?: string
+            url?: string
+          }
           url?: string
-        }
-        url?: string
-      }
-    : null
+        })
+      : null
 
   const base64Image = payload?.image || payload?.result?.image || ''
   if (base64Image) {
@@ -849,12 +932,16 @@ export async function extractWorkersAiImageAsset(result: unknown, model: string)
 
   const remoteUrl = payload?.url || payload?.result?.url || ''
   if (remoteUrl) {
-    const response = await fetch(remoteUrl, { signal: AbortSignal.timeout(30000) })
+    const response = await fetch(remoteUrl, {
+      signal: AbortSignal.timeout(30000),
+    })
     if (!response.ok) {
       throw new Error(`拉取 Workers AI 图片失败：HTTP ${response.status}`)
     }
     const bytes = new Uint8Array(await response.arrayBuffer())
-    const contentType = response.headers.get('content-type') || getDefaultWorkersImageType(model).contentType
+    const contentType =
+      response.headers.get('content-type') ||
+      getDefaultWorkersImageType(model).contentType
     const extension = contentType.includes('jpeg')
       ? 'jpg'
       : contentType.includes('webp')
@@ -886,9 +973,13 @@ async function fetchReferenceImageFile(referenceImageUrl: string) {
   }
 
   const blob = await response.blob()
-  const urlFileName = referenceImageUrl.split('/').pop()?.split('?')[0]?.split('#')[0] || 'reference-image'
+  const urlFileName =
+    referenceImageUrl.split('/').pop()?.split('?')[0]?.split('#')[0] ||
+    'reference-image'
   const extension = inferExtensionFromContentType(blob.type)
-  const baseName = sanitizeFilename(urlFileName.replace(/\.[^.]+$/, '') || 'reference-image')
+  const baseName = sanitizeFilename(
+    urlFileName.replace(/\.[^.]+$/, '') || 'reference-image',
+  )
 
   return new File([blob], `${baseName}.${extension}`, {
     type: blob.type || `image/${extension}`,
@@ -902,9 +993,11 @@ function shouldRetryWorkersAiMultipart(error: Error | null, model: string) {
   if (!error) return false
 
   const message = error.message.toLowerCase()
-  return message.includes('multipart')
-    || message.includes('form-data')
-    || message.includes("required properties at '/' are 'multipart'")
+  return (
+    message.includes('multipart') ||
+    message.includes('form-data') ||
+    message.includes("required properties at '/' are 'multipart'")
+  )
 }
 
 async function parseWorkersAiRunResponse(response: Response) {
@@ -916,7 +1009,9 @@ async function parseWorkersAiRunResponse(response: Response) {
 
   const rawBody = await response.text().catch(() => '')
   if (!response.ok) {
-    throw new Error(parseWorkersAiErrorMessage(response.status, response.statusText, rawBody))
+    throw new Error(
+      parseWorkersAiErrorMessage(response.status, response.statusText, rawBody),
+    )
   }
 
   try {
@@ -987,7 +1082,9 @@ export async function generateEditorImage(
 ): Promise<GeneratedEditorImage> {
   await ensureAiImageConfigInfrastructure(input.db)
 
-  const secret = resolveAiConfigSecret(input.env as Record<string, unknown> | undefined)
+  const secret = resolveAiConfigSecret(
+    input.env as Record<string, unknown> | undefined,
+  )
   const action = await resolveImageAction(input.db, input.action)
   const seeded = getDefaultImageActionSeed(action?.action_key)
   const requestedAspectRatio = normalizeAiImageAspectRatio(
@@ -996,10 +1093,15 @@ export async function generateEditorImage(
   const requestedResolution = normalizeAiImageResolution(
     input.resolution || action?.resolution || seeded?.resolution,
   )
-  const selectedProfileId = Number.isFinite(input.profileId) && Number(input.profileId) > 0
-    ? Number(input.profileId)
-    : action?.profile_id ?? undefined
-  const profile = await resolveAiImageProfileConfig(input.db, secret, selectedProfileId)
+  const selectedProfileId =
+    Number.isFinite(input.profileId) && Number(input.profileId) > 0
+      ? Number(input.profileId)
+      : (action?.profile_id ?? undefined)
+  const profile = await resolveAiImageProfileConfig(
+    input.db,
+    secret,
+    selectedProfileId,
+  )
 
   if (!profile) {
     throw new Error('请先在后台配置图片模型')
@@ -1016,73 +1118,89 @@ export async function generateEditorImage(
       strictUserPrompt: input.strictUserPrompt ?? input.action === 'custom',
     },
   )
-  const hasReferenceImage = typeof input.referenceImageUrl === 'string' && input.referenceImageUrl.trim().length > 0
+  const hasReferenceImage =
+    typeof input.referenceImageUrl === 'string' &&
+    input.referenceImageUrl.trim().length > 0
 
-  const imagePayload = profile.provider === 'workers_ai' || isWorkersAiBaseUrl(profile.base_url)
-    ? await (async () => {
-        if (hasReferenceImage) {
-          throw new Error('当前图片模型通道暂不支持参考图生成，请切换到 OpenAI 兼容图片模型')
-        }
+  const imagePayload =
+    profile.provider === 'workers_ai' || isWorkersAiBaseUrl(profile.base_url)
+      ? await (async () => {
+          if (hasReferenceImage) {
+            throw new Error(
+              '当前图片模型通道暂不支持参考图生成，请切换到 OpenAI 兼容图片模型',
+            )
+          }
 
-        const { width, height } = resolveWorkersAiImageSize(requestedAspectRatio, requestedResolution)
-        const rawResult = await runWorkersAiCompatImageRequest(
-          {
+          const { width, height } = resolveWorkersAiImageSize(
+            requestedAspectRatio,
+            requestedResolution,
+          )
+          const rawResult = await runWorkersAiCompatImageRequest(
+            {
+              apiKey: profile.api_key,
+              baseURL: profile.base_url,
+              model: profile.model,
+            },
+            {
+              prompt: finalPrompt,
+              width,
+              height,
+            },
+          )
+          const asset = await extractWorkersAiImageAsset(
+            rawResult,
+            profile.model,
+          )
+          return {
+            bytes: await toUint8Array(asset.data),
+            contentType: asset.contentType,
+            extension: asset.extension,
+            revisedPrompt: finalPrompt,
+          }
+        })()
+      : await (async () => {
+          const client = new OpenAI({
             apiKey: profile.api_key,
-            baseURL: profile.base_url,
-            model: profile.model,
-          },
-          {
-            prompt: finalPrompt,
-            width,
-            height,
-          },
-        )
-        const asset = await extractWorkersAiImageAsset(rawResult, profile.model)
-        return {
-          bytes: await toUint8Array(asset.data),
-          contentType: asset.contentType,
-          extension: asset.extension,
-          revisedPrompt: finalPrompt,
-        }
-      })()
-    : await (async () => {
-        const client = new OpenAI({
-          apiKey: profile.api_key,
-          baseURL: normalizeBaseUrl(profile.base_url),
-        })
+            baseURL: normalizeBaseUrl(profile.base_url),
+          })
 
-        const size = resolveRequestedSize(requestedAspectRatio, action?.size || seeded?.size)
-        const quality = resolveRequestedQuality(requestedResolution, action?.quality || seeded?.quality)
+          const size = resolveRequestedSize(
+            requestedAspectRatio,
+            action?.size || seeded?.size,
+          )
+          const quality = resolveRequestedQuality(
+            requestedResolution,
+            action?.quality || seeded?.quality,
+          )
 
-        const response = hasReferenceImage
-          ? await runEditWithFallback(
-              client,
-              {
-                image: await fetchReferenceImageFile(String(input.referenceImageUrl).trim()),
+          const response = hasReferenceImage
+            ? await runEditWithFallback(client, {
+                image: await fetchReferenceImageFile(
+                  String(input.referenceImageUrl).trim(),
+                ),
                 inputFidelity: 'high',
                 model: profile.model,
                 prompt: finalPrompt,
                 size,
                 quality,
-              },
-            )
-          : await runGenerateWithFallback(
-              client,
-              {
-                apiKey: profile.api_key,
-                baseURL: profile.base_url,
-                providerType: profile.provider_type,
-              },
-              {
-                model: profile.model,
-                prompt: finalPrompt,
-                size,
-                quality,
-              },
-            )
+              })
+            : await runGenerateWithFallback(
+                client,
+                {
+                  apiKey: profile.api_key,
+                  baseURL: profile.base_url,
+                  providerType: profile.provider_type,
+                },
+                {
+                  model: profile.model,
+                  prompt: finalPrompt,
+                  size,
+                  quality,
+                },
+              )
 
-        return extractGeneratedImagePayload(response)
-      })()
+          return extractGeneratedImagePayload(response)
+        })()
   const alt = buildAltText(
     imagePayload.revisedPrompt,
     input.userPrompt,
@@ -1106,7 +1224,10 @@ export async function generateEditorImage(
   })
 
   const encodedKey = key.split('/').map(encodeURIComponent).join('/')
-  const variants = buildAssetUrls(encodedKey, readFlag(input.env?.ENABLE_CF_IMAGE_PIPELINE))
+  const variants = buildAssetUrls(
+    encodedKey,
+    readFlag(input.env?.ENABLE_CF_IMAGE_PIPELINE),
+  )
   const url = `/api/images/${encodedKey}`
   const asset = await upsertMediaAsset(input.db, {
     source: input.source || 'image_modal',
@@ -1134,7 +1255,10 @@ export async function generateEditorImage(
     actionLabel: input.actionLabel || action?.label || '自定义生成',
     aspectRatio: requestedAspectRatio,
     resolution: requestedResolution,
-    size: resolveRequestedSize(requestedAspectRatio, action?.size || seeded?.size),
+    size: resolveRequestedSize(
+      requestedAspectRatio,
+      action?.size || seeded?.size,
+    ),
     profileName: profile.name,
     model: profile.model,
     mimeType: imagePayload.contentType,

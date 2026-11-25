@@ -13,7 +13,10 @@ import {
 describe('editor shared helpers', () => {
   it('provides stable editor constants', () => {
     expect(AUTOSAVE_DEBOUNCE_MS).toBe(5 * 60 * 1000)
-    expect(EMPTY_DOCUMENT).toEqual({ type: 'doc', content: [{ type: 'paragraph' }] })
+    expect(EMPTY_DOCUMENT).toEqual({
+      type: 'doc',
+      content: [{ type: 'paragraph' }],
+    })
   })
 
   it('calculates read time', () => {
@@ -50,25 +53,43 @@ describe('editor shared section helpers', () => {
     },
   })
 
-  const p = (text: string) => schema.node('paragraph', null, text ? [schema.text(text)] : [])
-  const h = (level: number, text: string) => schema.node('heading', { level }, text ? [schema.text(text)] : [])
+  const p = (text: string) =>
+    schema.node('paragraph', null, text ? [schema.text(text)] : [])
+  const h = (level: number, text: string) =>
+    schema.node('heading', { level }, text ? [schema.text(text)] : [])
 
   it('finds insert position by section number', () => {
-    const doc = schema.node('doc', null, [h(2, 'Intro'), p('a'), h(3, 'Detail'), p('b')])
-    const pos = findSectionInsertPosition(doc, { mode: 'section', sectionNumber: 2 })
+    const doc = schema.node('doc', null, [
+      h(2, 'Intro'),
+      p('a'),
+      h(3, 'Detail'),
+      p('b'),
+    ])
+    const pos = findSectionInsertPosition(doc, {
+      mode: 'section',
+      sectionNumber: 2,
+    })
     const secondHeadingPos = doc.child(0).nodeSize + doc.child(1).nodeSize
     expect(pos).toBe(secondHeadingPos + doc.child(2).nodeSize)
   })
 
   it('finds insert position by normalized section title', () => {
     const doc = schema.node('doc', null, [h(2, 'Getting Started'), p('body')])
-    const pos = findSectionInsertPosition(doc, { mode: 'section', sectionTitle: '  getting   started  ' })
+    const pos = findSectionInsertPosition(doc, {
+      mode: 'section',
+      sectionTitle: '  getting   started  ',
+    })
     expect(pos).toBe(doc.child(0).nodeSize)
   })
 
   it('returns null for non-section targets or missing headings', () => {
     const doc = schema.node('doc', null, [h(2, 'Intro'), p('body')])
     expect(findSectionInsertPosition(doc, { mode: 'cursor' })).toBeNull()
-    expect(findSectionInsertPosition(doc, { mode: 'section', sectionTitle: 'Missing' })).toBeNull()
+    expect(
+      findSectionInsertPosition(doc, {
+        mode: 'section',
+        sectionTitle: 'Missing',
+      }),
+    ).toBeNull()
   })
 })

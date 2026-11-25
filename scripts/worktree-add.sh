@@ -6,8 +6,8 @@ BRANCH_NAME="${1:-}"
 BASE_REF="${2:-main}"
 
 if [[ -z "${BRANCH_NAME}" ]]; then
-  echo "Usage: npm run worktree:add -- <branch-name> [base-ref]"
-  echo "Example: npm run worktree:add -- feat/ask-ai-history"
+  echo "Usage: pnpm worktree:add -- <branch-name> [base-ref]"
+  echo "Example: pnpm worktree:add -- feat/ask-ai-history"
   exit 1
 fi
 
@@ -39,5 +39,5 @@ echo "  path:   ${TARGET_DIR}"
 echo
 echo "Next:"
 echo "  cd ${TARGET_DIR}"
-echo "  npm install   # if dependencies changed"
-echo "  npm run verify"
+echo "  pnpm install   # if dependencies changed"
+echo "  pnpm verify"

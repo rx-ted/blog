@@ -1,8 +1,11 @@
-import { processPost, getAiRuntimeEnv } from '@/lib/ai'
+import { getAiRuntimeEnv, processPost } from '@/lib/ai'
 import { invalidatePublicContentCache } from '@/lib/cache'
 import { getPostAiSnapshot, updatePost } from '@/lib/db'
 import { buildAutoDescription } from '@/lib/post-utils'
-import { deletePostFromRelatedIndex, syncPostToRelatedIndex } from '@/lib/related-content'
+import {
+  deletePostFromRelatedIndex,
+  syncPostToRelatedIndex,
+} from '@/lib/related-content'
 
 export type BackgroundJob =
   | {
@@ -40,7 +43,10 @@ interface EnqueueBackgroundJobOptions {
 }
 
 function readFlag(value: unknown): boolean {
-  return typeof value === 'string' && ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  return (
+    typeof value === 'string' &&
+    ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+  )
 }
 
 function shouldUseQueue(env?: BackgroundJobEnv | null): boolean {
@@ -53,7 +59,13 @@ async function runProcessPostAiJob(env: BackgroundJobEnv, postId: number) {
   const post = await getPostAiSnapshot(env.DB, postId)
   if (!post || post.deleted_at) return
 
-  const aiResult = await processPost(post.title, post.content, getAiRuntimeEnv(env), 2, env.DB)
+  const aiResult = await processPost(
+    post.title,
+    post.content,
+    getAiRuntimeEnv(env),
+    2,
+    env.DB,
+  )
   if (!aiResult) return
 
   const updates: Parameters<typeof updatePost>[2] = {}
@@ -79,15 +91,24 @@ async function runProcessPostAiJob(env: BackgroundJobEnv, postId: number) {
   await syncPostToRelatedIndex(env, postId)
 }
 
-async function runSyncPostRelatedIndexJob(env: BackgroundJobEnv, postId: number) {
+async function runSyncPostRelatedIndexJob(
+  env: BackgroundJobEnv,
+  postId: number,
+) {
   await syncPostToRelatedIndex(env, postId)
 }
 
-async function runDeletePostRelatedIndexJob(env: BackgroundJobEnv, postId: number) {
+async function runDeletePostRelatedIndexJob(
+  env: BackgroundJobEnv,
+  postId: number,
+) {
   await deletePostFromRelatedIndex(env, postId)
 }
 
-export async function runBackgroundJob(env: BackgroundJobEnv, job: BackgroundJob): Promise<void> {
+export async function runBackgroundJob(
+  env: BackgroundJobEnv,
+  job: BackgroundJob,
+): Promise<void> {
   switch (job.type) {
     case 'process-post-ai':
       await runProcessPostAiJob(env, job.postId)
@@ -108,10 +129,13 @@ export async function enqueueBackgroundJob(
 ): Promise<'queue' | 'waitUntil' | 'inline'> {
   if (shouldUseQueue(env)) {
     try {
-      await env.BACKGROUND_QUEUE!.send(job)
+      await env.BACKGROUND_QUEUE?.send(job)
       return 'queue'
     } catch (error) {
-      console.error('Failed to enqueue background job, falling back to inline execution:', error)
+      console.error(
+        'Failed to enqueue background job, falling back to inline execution:',
+        error,
+      )
     }
   }
 

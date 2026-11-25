@@ -9,9 +9,6 @@ export const EditorLink = TiptapLink.extend({
   },
 
   addProseMirrorPlugins() {
-    return [
-      ...(this.parent?.() || []),
-      createEditorAutolinkPlugin(this.type),
-    ]
+    return [...(this.parent?.() || []), createEditorAutolinkPlugin(this.type)]
   },
 })

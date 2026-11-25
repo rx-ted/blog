@@ -12,8 +12,10 @@ export interface WechatExportThemeConfig {
   themes: WechatExportTheme[]
 }
 
-export const WECHAT_EXPORT_THEME_CONFIG_SETTING_KEY = 'wechat_export_theme_config'
-export const WECHAT_EXPORT_THEME_LOCAL_STORAGE_KEY = 'qmblog:wechat-export-theme'
+export const WECHAT_EXPORT_THEME_CONFIG_SETTING_KEY =
+  'wechat_export_theme_config'
+export const WECHAT_EXPORT_THEME_LOCAL_STORAGE_KEY =
+  'qmblog:wechat-export-theme'
 
 const DEFAULT_THEME_ID = 'qm-default'
 
@@ -150,7 +152,8 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
   brandTheme({
     id: 'qiaomu-podcast',
     name: '木羽播客',
-    description: '白底中文长文阅读排版，大行高、大段距和轻字距，适合播客逐字稿与深度解读。',
+    description:
+      '白底中文长文阅读排版，大行高、大段距和轻字距，适合播客逐字稿与深度解读。',
     swatches: ['#ffffff', '#1a1a1a', '#576b95', '#f6f6f6'],
     css: buildEditorialCss({
       rootBg: '#ffffff',
@@ -161,16 +164,21 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       accentSoft: '#f6f6f6',
       border: '#e8e8e8',
       muted: '#555555',
-      bodyFont: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif',
+      bodyFont:
+        '-apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif',
       titleSize: '22px',
       titleWeight: '600',
       titleSpacing: '0.02em',
       articlePadding: '20px 8px 32px',
       articleRadius: '0',
-      h2Css: 'text-align: left; margin: 2.5em 0 1.2em; color: #111111; font-size: 20px; font-weight: 600; line-height: 1.5;',
-      h3Css: 'margin: 2.2em 0 1.2em; color: #111111; font-size: 18px; font-weight: 600; line-height: 1.55;',
-      quoteCss: 'padding: 0.85em 0 0.85em 1em; border-left-color: #dddddd; background: transparent; color: #555555;',
-      imageCss: 'display: block; width: 100%; border-radius: 8px; margin: 1.5em 0;',
+      h2Css:
+        'text-align: left; margin: 2.5em 0 1.2em; color: #111111; font-size: 20px; font-weight: 600; line-height: 1.5;',
+      h3Css:
+        'margin: 2.2em 0 1.2em; color: #111111; font-size: 18px; font-weight: 600; line-height: 1.55;',
+      quoteCss:
+        'padding: 0.85em 0 0.85em 1em; border-left-color: #dddddd; background: transparent; color: #555555;',
+      imageCss:
+        'display: block; width: 100%; border-radius: 8px; margin: 1.5em 0;',
       extraCss: `
 .wechat-export-article {
   max-width: 680px;
@@ -222,7 +230,8 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
   brandTheme({
     id: 'qiaomu-clean-reading',
     name: '木羽简阅',
-    description: '深青工程简报风：冷白纸面、通栏发线标题、浅青高亮重点和浅色纸面代码块。',
+    description:
+      '深青工程简报风：冷白纸面、通栏发线标题、浅青高亮重点和浅色纸面代码块。',
     swatches: ['#fbfdfe', '#25343f', '#0f7285', '#dff0f4'],
     css: buildEditorialCss({
       rootBg: '#fbfdfe',
@@ -233,18 +242,24 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       accentSoft: '#dff0f4',
       border: '#c3d9e0',
       muted: '#6b7f8c',
-      bodyFont: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif',
+      bodyFont:
+        '-apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif',
       titleSize: '22px',
       titleWeight: '600',
       titleSpacing: '0',
       articlePadding: '18px 8px 32px',
       articleRadius: '0',
-      h2Css: 'text-align: left; margin: 2.3em 0 1.1em; padding-bottom: 10px; border: 0; border-bottom: 1px solid #c3d9e0; color: #142530; font-size: 20px; font-weight: 600; line-height: 1.3; letter-spacing: 0;',
-      h3Css: 'text-align: left; margin: 1.8em 0 0.7em; color: #0f7285; font-size: 16px; font-weight: 600; line-height: 1.5; letter-spacing: 0.02em;',
-      quoteCss: 'margin: 1.4em 0; padding: 14px 2px; border: 0; border-top: 1px solid #c3d9e0; border-bottom: 1px solid #c3d9e0; border-radius: 0; background: transparent; color: #4d6472;',
-      codeCss: 'color: #0b5b6b; background: #f2f8fa; border: 1px solid #e2edf1;',
+      h2Css:
+        'text-align: left; margin: 2.3em 0 1.1em; padding-bottom: 10px; border: 0; border-bottom: 1px solid #c3d9e0; color: #142530; font-size: 20px; font-weight: 600; line-height: 1.3; letter-spacing: 0;',
+      h3Css:
+        'text-align: left; margin: 1.8em 0 0.7em; color: #0f7285; font-size: 16px; font-weight: 600; line-height: 1.5; letter-spacing: 0.02em;',
+      quoteCss:
+        'margin: 1.4em 0; padding: 14px 2px; border: 0; border-top: 1px solid #c3d9e0; border-bottom: 1px solid #c3d9e0; border-radius: 0; background: transparent; color: #4d6472;',
+      codeCss:
+        'color: #0b5b6b; background: #f2f8fa; border: 1px solid #e2edf1;',
       preCss: 'border-color: #d3e2e8; background: #f2f8fa;',
-      imageCss: 'display: block; width: 100%; margin: 1.4em auto; border-radius: 8px;',
+      imageCss:
+        'display: block; width: 100%; margin: 1.4em auto; border-radius: 8px;',
       extraCss: `
 .wechat-export-article {
   max-width: 680px;
@@ -370,13 +385,15 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       accentSoft: '#f0f7f2',
       border: '#d8e8dc',
       muted: '#4b5a50',
-      h2Css: 'padding-left: 0.8em; border-left: 4px solid #07c160; color: #111111;',
+      h2Css:
+        'padding-left: 0.8em; border-left: 4px solid #07c160; color: #111111;',
     }),
   }),
   brandTheme({
     id: 'apple-gallery',
     name: 'Apple Gallery',
-    description: 'Apple 式留白、SF 字体、蓝色链接和克制圆角，适合产品发布与摄影长文。',
+    description:
+      'Apple 式留白、SF 字体、蓝色链接和克制圆角，适合产品发布与摄影长文。',
     swatches: ['#ffffff', '#1d1d1f', '#0066cc', '#f5f5f7'],
     css: buildEditorialCss({
       rootBg: '#f5f5f7',
@@ -387,22 +404,26 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       accentSoft: '#f5f5f7',
       border: '#e0e0e0',
       muted: '#515154',
-      titleFont: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
+      titleFont:
+        '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
       bodyFont: '"SF Pro Text", -apple-system, BlinkMacSystemFont, sans-serif',
       titleSize: '22px',
       titleWeight: '650',
       articlePadding: '18px 16px 30px',
       articleRadius: '18px',
-      h2Css: 'margin-top: 2.4em; padding-top: 0.7em; border-top: 1px solid #d2d2d7; color: #1d1d1f;',
+      h2Css:
+        'margin-top: 2.4em; padding-top: 0.7em; border-top: 1px solid #d2d2d7; color: #1d1d1f;',
       h3Css: 'color: #515154; font-weight: 650;',
-      quoteCss: 'padding: 0.2em 0 0.2em 1em; border-left-color: #0066cc; background: transparent; color: #515154;',
+      quoteCss:
+        'padding: 0.2em 0 0.2em 1em; border-left-color: #0066cc; background: transparent; color: #515154;',
       imageCss: 'border-radius: 18px;',
     }),
   }),
   brandTheme({
     id: 'claude-warm',
     name: 'Claude Warm',
-    description: 'Anthropic/Claude 的暖色编辑感，奶油底、陶土强调和柔和引用块。',
+    description:
+      'Anthropic/Claude 的暖色编辑感，奶油底、陶土强调和柔和引用块。',
     swatches: ['#faf9f5', '#141413', '#cc785c', '#efe9de'],
     css: buildEditorialCss({
       rootBg: '#faf9f5',
@@ -417,15 +438,18 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       bodyFont: 'StyreneB, -apple-system, BlinkMacSystemFont, sans-serif',
       titleWeight: '400',
       titleSize: '22px',
-      h2Css: 'color: #cc785c; font-family: Copernicus, Georgia, serif; font-weight: 400;',
-      quoteCss: 'padding: 1em 1.1em; border-left-color: #cc785c; border-radius: 10px; background: #efe9de; color: #56514a;',
+      h2Css:
+        'color: #cc785c; font-family: Copernicus, Georgia, serif; font-weight: 400;',
+      quoteCss:
+        'padding: 1em 1.1em; border-left-color: #cc785c; border-radius: 10px; background: #efe9de; color: #56514a;',
       imageCss: 'border-radius: 12px;',
     }),
   }),
   brandTheme({
     id: 'vercel-mono',
     name: 'Vercel Mono',
-    description: 'Vercel 式黑白精度、Geist 字体和 shadow-as-border，适合技术发布。',
+    description:
+      'Vercel 式黑白精度、Geist 字体和 shadow-as-border，适合技术发布。',
     swatches: ['#ffffff', '#171717', '#0a72ef', '#ebebeb'],
     css: buildEditorialCss({
       rootBg: '#ffffff',
@@ -440,10 +464,14 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       bodyFont: 'Geist, Arial, sans-serif',
       titleSize: '21px',
       titleWeight: '650',
-      h2Css: 'padding: 0.65em 0; border-top: 1px solid #ebebeb; border-bottom: 1px solid #ebebeb; color: #171717;',
-      h3Css: 'color: #171717; font-family: "Geist Mono", ui-monospace, monospace; font-size: 0.98em;',
-      quoteCss: 'padding: 1em; border-left: 0; border-radius: 10px; background: #fafafa; color: #4d4d4d; box-shadow: 0 0 0 1px rgba(0,0,0,0.08);',
-      preCss: 'border-color: #ebebeb; background: #fafafa; box-shadow: 0 0 0 1px rgba(0,0,0,0.08);',
+      h2Css:
+        'padding: 0.65em 0; border-top: 1px solid #ebebeb; border-bottom: 1px solid #ebebeb; color: #171717;',
+      h3Css:
+        'color: #171717; font-family: "Geist Mono", ui-monospace, monospace; font-size: 0.98em;',
+      quoteCss:
+        'padding: 1em; border-left: 0; border-radius: 10px; background: #fafafa; color: #4d4d4d; box-shadow: 0 0 0 1px rgba(0,0,0,0.08);',
+      preCss:
+        'border-color: #ebebeb; background: #fafafa; box-shadow: 0 0 0 1px rgba(0,0,0,0.08);',
       imageCss: 'border-radius: 10px; box-shadow: 0 0 0 1px rgba(0,0,0,0.08);',
     }),
   }),
@@ -461,12 +489,15 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       accentSoft: '#18191a',
       border: '#34343a',
       muted: '#a8afbb',
-      titleFont: '"Linear Display", -apple-system, BlinkMacSystemFont, sans-serif',
+      titleFont:
+        '"Linear Display", -apple-system, BlinkMacSystemFont, sans-serif',
       bodyFont: '"Linear Text", -apple-system, BlinkMacSystemFont, sans-serif',
       articlePadding: '18px 16px 30px',
       articleRadius: '14px',
-      h2Css: 'padding-bottom: 0.5em; border-bottom: 1px solid #34343a; color: #f7f8f8;',
-      quoteCss: 'padding: 1em; border-left-color: #5e6ad2; border-radius: 8px; background: #141516; color: #d0d6e0;',
+      h2Css:
+        'padding-bottom: 0.5em; border-bottom: 1px solid #34343a; color: #f7f8f8;',
+      quoteCss:
+        'padding: 1em; border-left-color: #5e6ad2; border-radius: 8px; background: #141516; color: #d0d6e0;',
       imageCss: 'border-radius: 12px; border: 1px solid #23252a;',
     }),
   }),
@@ -487,9 +518,12 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       titleFont: '"Notion Sans", -apple-system, BlinkMacSystemFont, sans-serif',
       bodyFont: '"Notion Sans", -apple-system, BlinkMacSystemFont, sans-serif',
       articlePadding: '0 14px',
-      h2Css: 'padding: 0.55em 0.75em; border-radius: 10px; background: #f9e79f; color: #1a1a1a;',
-      h3Css: 'display: inline-block; padding: 0.18em 0.55em; border-radius: 6px; background: #e6e0f5; color: #391c57;',
-      quoteCss: 'padding: 0.9em 1em; border-left-color: #5645d4; border-radius: 10px; background: #f6f5f4; color: #5d5b54;',
+      h2Css:
+        'padding: 0.55em 0.75em; border-radius: 10px; background: #f9e79f; color: #1a1a1a;',
+      h3Css:
+        'display: inline-block; padding: 0.18em 0.55em; border-radius: 6px; background: #e6e0f5; color: #391c57;',
+      quoteCss:
+        'padding: 0.9em 1em; border-left-color: #5645d4; border-radius: 10px; background: #f6f5f4; color: #5d5b54;',
       imageCss: 'border-radius: 10px;',
     }),
   }),
@@ -513,10 +547,13 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       titleSize: '23px',
       articlePadding: '20px 16px 32px',
       articleRadius: '16px',
-      h2Css: 'color: #061b31; font-weight: 450; border-bottom: 2px solid #533afd; padding-bottom: 0.35em;',
+      h2Css:
+        'color: #061b31; font-weight: 450; border-bottom: 2px solid #533afd; padding-bottom: 0.35em;',
       h3Css: 'color: #533afd; font-weight: 500;',
-      quoteCss: 'padding: 1em 1.1em; border-left-color: #533afd; border-radius: 12px; background: #eef2ff; color: #425466;',
-      imageCss: 'border-radius: 14px; box-shadow: 0 12px 32px rgba(50,50,93,0.16);',
+      quoteCss:
+        'padding: 1em 1.1em; border-left-color: #533afd; border-radius: 12px; background: #eef2ff; color: #425466;',
+      imageCss:
+        'border-radius: 14px; box-shadow: 0 12px 32px rgba(50,50,93,0.16);',
     }),
   }),
   brandTheme({
@@ -533,10 +570,13 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       accentSoft: '#fff1f3',
       border: '#dddddd',
       muted: '#5f5f5f',
-      bodyFont: '"Airbnb Cereal VF", Circular, -apple-system, BlinkMacSystemFont, sans-serif',
+      bodyFont:
+        '"Airbnb Cereal VF", Circular, -apple-system, BlinkMacSystemFont, sans-serif',
       titleWeight: '600',
-      h2Css: 'display: inline-block; padding: 0.28em 0.78em; border-radius: 999px; background: #fff1f3; color: #ff385c;',
-      quoteCss: 'padding: 1em; border-left: 0; border-radius: 18px; background: #fff1f3; color: #5f5f5f;',
+      h2Css:
+        'display: inline-block; padding: 0.28em 0.78em; border-radius: 999px; background: #fff1f3; color: #ff385c;',
+      quoteCss:
+        'padding: 1em; border-left: 0; border-radius: 18px; background: #fff1f3; color: #5f5f5f;',
       imageCss: 'border-radius: 18px;',
     }),
   }),
@@ -561,8 +601,10 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       articlePadding: '20px 16px 34px',
       articleRadius: '18px',
       h2Css: 'color: #1db954; font-weight: 800;',
-      h3Css: 'color: #ffffff; border-left: 4px solid #1db954; padding-left: 0.7em;',
-      quoteCss: 'padding: 1em; border-left-color: #1db954; border-radius: 14px; background: #102a1a; color: #e7e7e7;',
+      h3Css:
+        'color: #ffffff; border-left: 4px solid #1db954; padding-left: 0.7em;',
+      quoteCss:
+        'padding: 1em; border-left-color: #1db954; border-radius: 14px; background: #102a1a; color: #e7e7e7;',
       imageCss: 'border-radius: 16px;',
     }),
   }),
@@ -584,9 +626,12 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       bodyFont: 'Georgia, "Times New Roman", serif',
       titleWeight: '700',
       titleSize: '24px',
-      h2Css: 'font-family: Newsreader, Georgia, serif; font-weight: 700; border-top: 3px solid #111111; padding-top: 0.45em; color: #111111;',
-      h3Css: 'font-family: ui-monospace, SFMono-Regular, monospace; color: #0057b8; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.92em;',
-      quoteCss: 'padding: 0.1em 0 0.1em 1em; border-left-color: #111111; background: transparent; color: #5c5348;',
+      h2Css:
+        'font-family: Newsreader, Georgia, serif; font-weight: 700; border-top: 3px solid #111111; padding-top: 0.45em; color: #111111;',
+      h3Css:
+        'font-family: ui-monospace, SFMono-Regular, monospace; color: #0057b8; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.92em;',
+      quoteCss:
+        'padding: 0.1em 0 0.1em 1em; border-left-color: #111111; background: transparent; color: #5c5348;',
       imageCss: 'border-radius: 2px;',
     }),
   }),
@@ -611,9 +656,11 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       titleTransform: 'uppercase',
       titleSpacing: '0.02em',
       articlePadding: '20px 16px 34px',
-      h2Css: 'padding: 0.32em 0.45em; background: #d7ff4f; color: #131313; text-transform: uppercase;',
+      h2Css:
+        'padding: 0.32em 0.45em; background: #d7ff4f; color: #131313; text-transform: uppercase;',
       h3Css: 'color: #ff3bd4; text-transform: uppercase;',
-      quoteCss: 'padding: 1em; border-left-color: #d7ff4f; background: #252a18; color: #f5f5f5;',
+      quoteCss:
+        'padding: 1em; border-left-color: #d7ff4f; background: #252a18; color: #f5f5f5;',
       imageCss: 'border-radius: 0;',
     }),
   }),
@@ -633,9 +680,12 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       muted: '#5f6368',
       titleFont: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
       bodyFont: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
-      h2Css: 'padding-left: 0.75em; border-left: 5px solid #a259ff; color: #1e1e1e;',
-      h3Css: 'display: inline-block; padding: 0.18em 0.55em; border-radius: 999px; background: #e9f8ff; color: #1abcfe;',
-      quoteCss: 'padding: 1em; border-left-color: #ff7262; border-radius: 10px; background: #fff2ef; color: #4a4a4a;',
+      h2Css:
+        'padding-left: 0.75em; border-left: 5px solid #a259ff; color: #1e1e1e;',
+      h3Css:
+        'display: inline-block; padding: 0.18em 0.55em; border-radius: 999px; background: #e9f8ff; color: #1abcfe;',
+      quoteCss:
+        'padding: 1em; border-left-color: #ff7262; border-radius: 10px; background: #fff2ef; color: #4a4a4a;',
       imageCss: 'border-radius: 12px; border: 1px solid #e6e6e6;',
     }),
   }),
@@ -657,9 +707,12 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       titleFont: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
       articlePadding: '18px 16px 32px',
       articleRadius: '12px',
-      h2Css: 'color: #e5efe9; border-bottom: 1px solid #2b3a33; padding-bottom: 0.45em;',
-      h3Css: 'font-family: ui-monospace, SFMono-Regular, monospace; color: #3ecf8e;',
-      quoteCss: 'padding: 1em; border-left-color: #3ecf8e; border-radius: 8px; background: #1c2b23; color: #c9d8d0;',
+      h2Css:
+        'color: #e5efe9; border-bottom: 1px solid #2b3a33; padding-bottom: 0.45em;',
+      h3Css:
+        'font-family: ui-monospace, SFMono-Regular, monospace; color: #3ecf8e;',
+      quoteCss:
+        'padding: 1em; border-left-color: #3ecf8e; border-radius: 8px; background: #1c2b23; color: #c9d8d0;',
       imageCss: 'border-radius: 10px; border: 1px solid #2b3a33;',
     }),
   }),
@@ -680,9 +733,11 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       bodyFont: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
       articlePadding: '18px 16px 32px',
       articleRadius: '16px',
-      h2Css: 'padding: 0.45em 0.65em; border-radius: 10px; background: #2a2a2d; color: #f4f4f5; box-shadow: inset 0 0 0 1px #333338;',
+      h2Css:
+        'padding: 0.45em 0.65em; border-radius: 10px; background: #2a2a2d; color: #f4f4f5; box-shadow: inset 0 0 0 1px #333338;',
       h3Css: 'color: #ff6363;',
-      quoteCss: 'padding: 1em; border-left-color: #ff6363; border-radius: 10px; background: #2a2020; color: #dadade;',
+      quoteCss:
+        'padding: 1em; border-left-color: #ff6363; border-radius: 10px; background: #2a2020; color: #dadade;',
       imageCss: 'border-radius: 14px;',
     }),
   }),
@@ -704,9 +759,12 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       bodyFont: 'ABC Diatype, -apple-system, BlinkMacSystemFont, sans-serif',
       articlePadding: '20px 16px 36px',
       articleRadius: '4px',
-      h2Css: 'color: #f2f2f0; border: 1px solid #323236; padding: 0.45em 0.65em; letter-spacing: 0.04em;',
-      h3Css: 'color: #b8ff5c; font-family: ui-monospace, SFMono-Regular, monospace;',
-      quoteCss: 'padding: 1em; border-left-color: #b8ff5c; background: #202418; color: #d9d9d6;',
+      h2Css:
+        'color: #f2f2f0; border: 1px solid #323236; padding: 0.45em 0.65em; letter-spacing: 0.04em;',
+      h3Css:
+        'color: #b8ff5c; font-family: ui-monospace, SFMono-Regular, monospace;',
+      quoteCss:
+        'padding: 1em; border-left-color: #b8ff5c; background: #202418; color: #d9d9d6;',
       imageCss: 'border-radius: 4px;',
     }),
   }),
@@ -728,9 +786,11 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       bodyFont: 'MarkForMC, -apple-system, BlinkMacSystemFont, sans-serif',
       articlePadding: '20px 16px 32px',
       articleRadius: '20px',
-      h2Css: 'position: relative; color: #241c15; padding-left: 0.9em; border-left: 6px solid #eb001b;',
+      h2Css:
+        'position: relative; color: #241c15; padding-left: 0.9em; border-left: 6px solid #eb001b;',
       h3Css: 'color: #ff5f00;',
-      quoteCss: 'padding: 1em; border-left-color: #f79e1b; border-radius: 16px; background: #ffe7cc; color: #6d5b4b;',
+      quoteCss:
+        'padding: 1em; border-left-color: #f79e1b; border-radius: 16px; background: #ffe7cc; color: #6d5b4b;',
       imageCss: 'border-radius: 18px;',
     }),
   }),
@@ -748,15 +808,19 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       accentSoft: '#eef3ff',
       border: '#d8d9da',
       muted: '#5c5e62',
-      titleFont: '"Universal Sans Display", -apple-system, BlinkMacSystemFont, sans-serif',
-      bodyFont: '"Universal Sans Text", -apple-system, BlinkMacSystemFont, sans-serif',
+      titleFont:
+        '"Universal Sans Display", -apple-system, BlinkMacSystemFont, sans-serif',
+      bodyFont:
+        '"Universal Sans Text", -apple-system, BlinkMacSystemFont, sans-serif',
       titleWeight: '500',
       titleSize: '20px',
       articlePadding: '18px 16px 30px',
       articleRadius: '4px',
-      h2Css: 'color: #171a20; border-bottom: 1px solid #d8d9da; padding-bottom: 0.4em;',
+      h2Css:
+        'color: #171a20; border-bottom: 1px solid #d8d9da; padding-bottom: 0.4em;',
       h3Css: 'color: #3e6ae1;',
-      quoteCss: 'padding: 0.85em 1em; border-left-color: #3e6ae1; border-radius: 4px; background: #eef3ff; color: #393c41;',
+      quoteCss:
+        'padding: 0.85em 1em; border-left-color: #3e6ae1; border-radius: 4px; background: #eef3ff; color: #393c41;',
       imageCss: 'border-radius: 4px;',
     }),
   }),
@@ -780,9 +844,11 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       titleTransform: 'uppercase',
       titleSpacing: '0.04em',
       articlePadding: '22px 16px 36px',
-      h2Css: 'color: #ffffff; padding-left: 0.8em; border-left: 4px solid #da291c; text-transform: uppercase;',
+      h2Css:
+        'color: #ffffff; padding-left: 0.8em; border-left: 4px solid #da291c; text-transform: uppercase;',
       h3Css: 'color: #da291c; text-transform: uppercase;',
-      quoteCss: 'padding: 1em; border-left-color: #da291c; background: #321f1d; color: #ffffff;',
+      quoteCss:
+        'padding: 1em; border-left-color: #da291c; background: #321f1d; color: #ffffff;',
       imageCss: 'border-radius: 2px;',
     }),
   }),
@@ -807,9 +873,11 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       titleSpacing: '0.06em',
       articlePadding: '22px 16px 36px',
       articleRadius: '0',
-      h2Css: 'color: #ffc000; text-transform: uppercase; border: 1px solid #ffc000; padding: 0.42em 0.65em;',
+      h2Css:
+        'color: #ffc000; text-transform: uppercase; border: 1px solid #ffc000; padding: 0.42em 0.65em;',
       h3Css: 'color: #ffffff; text-transform: uppercase;',
-      quoteCss: 'padding: 1em; border-left-color: #ffc000; background: #202020; color: #f2f2f2;',
+      quoteCss:
+        'padding: 1em; border-left-color: #ffc000; background: #202020; color: #f2f2f2;',
       imageCss: 'border-radius: 0;',
     }),
   }),
@@ -831,9 +899,11 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       bodyFont: 'NVIDIA-EMEA, Arial, sans-serif',
       titleWeight: '700',
       articleRadius: '2px',
-      h2Css: 'padding: 0.5em 0.65em; background: #1a1a1a; color: #ffffff; border-left: 6px solid #76b900;',
+      h2Css:
+        'padding: 0.5em 0.65em; background: #1a1a1a; color: #ffffff; border-left: 6px solid #76b900;',
       h3Css: 'color: #3f8500; font-weight: 700;',
-      quoteCss: 'padding: 0.9em 1em; border-left-color: #76b900; border-radius: 2px; background: #eef8df; color: #1a1a1a;',
+      quoteCss:
+        'padding: 0.9em 1em; border-left-color: #76b900; border-radius: 2px; background: #eef8df; color: #1a1a1a;',
       imageCss: 'border-radius: 2px;',
     }),
   }),
@@ -851,14 +921,18 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       accentSoft: '#edf5ff',
       border: '#e0e0e0',
       muted: '#525252',
-      titleFont: '"IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif',
-      bodyFont: '"IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+      titleFont:
+        '"IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+      bodyFont:
+        '"IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif',
       titleWeight: '300',
       titleSize: '23px',
       articleRadius: '0',
-      h2Css: 'padding: 0.55em 0; border-top: 1px solid #161616; border-bottom: 1px solid #e0e0e0; color: #161616; font-weight: 300;',
+      h2Css:
+        'padding: 0.55em 0; border-top: 1px solid #161616; border-bottom: 1px solid #e0e0e0; color: #161616; font-weight: 300;',
       h3Css: 'color: #0f62fe; font-weight: 400;',
-      quoteCss: 'padding: 1em; border-left-color: #0f62fe; border-radius: 0; background: #f4f4f4; color: #525252;',
+      quoteCss:
+        'padding: 1em; border-left-color: #0f62fe; border-radius: 0; background: #f4f4f4; color: #525252;',
       imageCss: 'border-radius: 0;',
     }),
   }),
@@ -883,8 +957,10 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       articlePadding: '22px 16px 36px',
       articleRadius: '18px',
       h2Css: 'color: #95bf47; font-weight: 400;',
-      h3Css: 'color: #f6fff8; padding-left: 0.75em; border-left: 3px solid #95bf47;',
-      quoteCss: 'padding: 1em; border-left-color: #95bf47; border-radius: 14px; background: #1f2c1a; color: #dce9df;',
+      h3Css:
+        'color: #f6fff8; padding-left: 0.75em; border-left: 3px solid #95bf47;',
+      quoteCss:
+        'padding: 1em; border-left-color: #95bf47; border-radius: 14px; background: #1f2c1a; color: #dce9df;',
       imageCss: 'border-radius: 16px;',
     }),
   }),
@@ -904,9 +980,12 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       muted: '#5f5f5f',
       titleFont: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
       bodyFont: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-      h2Css: 'display: inline-block; padding: 0.3em 0.8em; border-radius: 999px; background: #e60023; color: #ffffff;',
-      h3Css: 'color: #111111; border-left: 4px solid #e60023; padding-left: 0.65em;',
-      quoteCss: 'padding: 1em; border-left: 0; border-radius: 18px; background: #fff0f2; color: #5f5f5f;',
+      h2Css:
+        'display: inline-block; padding: 0.3em 0.8em; border-radius: 999px; background: #e60023; color: #ffffff;',
+      h3Css:
+        'color: #111111; border-left: 4px solid #e60023; padding-left: 0.65em;',
+      quoteCss:
+        'padding: 1em; border-left: 0; border-radius: 18px; background: #fff0f2; color: #5f5f5f;',
       imageCss: 'border-radius: 20px;',
     }),
   }),
@@ -929,9 +1008,11 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       titleWeight: '600',
       articlePadding: '20px 16px 32px',
       articleRadius: '18px',
-      h2Css: 'color: #1e3932; border-bottom: 2px solid #cba258; padding-bottom: 0.38em;',
+      h2Css:
+        'color: #1e3932; border-bottom: 2px solid #cba258; padding-bottom: 0.38em;',
       h3Css: 'color: #006241;',
-      quoteCss: 'padding: 1em; border-left-color: #cba258; border-radius: 16px; background: #efe7d4; color: #4c574f;',
+      quoteCss:
+        'padding: 1em; border-left-color: #cba258; border-radius: 16px; background: #efe7d4; color: #4c574f;',
       imageCss: 'border-radius: 16px;',
     }),
   }),
@@ -955,9 +1036,11 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       titleSpacing: '0.05em',
       articlePadding: '22px 16px 36px',
       articleRadius: '6px',
-      h2Css: 'color: #f4f6f8; border-top: 1px solid #c7ccd4; padding-top: 0.55em; letter-spacing: 0.04em;',
+      h2Css:
+        'color: #f4f6f8; border-top: 1px solid #c7ccd4; padding-top: 0.55em; letter-spacing: 0.04em;',
       h3Css: 'color: #8ba7e8;',
-      quoteCss: 'padding: 1em; border-left-color: #4b6fba; background: #182235; color: #d9dde5;',
+      quoteCss:
+        'padding: 1em; border-left-color: #4b6fba; background: #182235; color: #d9dde5;',
       imageCss: 'border-radius: 6px; border: 1px solid #303948;',
     }),
   }),
@@ -979,9 +1062,11 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       bodyFont: 'UberMoveText, -apple-system, BlinkMacSystemFont, sans-serif',
       titleWeight: '500',
       articleRadius: '0',
-      h2Css: 'color: #000000; border-left: 5px solid #276ef1; padding-left: 0.75em;',
+      h2Css:
+        'color: #000000; border-left: 5px solid #276ef1; padding-left: 0.75em;',
       h3Css: 'color: #000000; font-weight: 500;',
-      quoteCss: 'padding: 1em; border-left-color: #276ef1; border-radius: 0; background: #f3f3f3; color: #545454;',
+      quoteCss:
+        'padding: 1em; border-left-color: #276ef1; border-radius: 0; background: #f3f3f3; color: #545454;',
       imageCss: 'border-radius: 0;',
     }),
   }),
@@ -1003,9 +1088,11 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       bodyFont: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
       articlePadding: '18px 16px 32px',
       articleRadius: '12px',
-      h2Css: 'padding: 0.5em 0.7em; border: 1px solid #30323a; border-left: 5px solid #146ef5; color: #ffffff;',
+      h2Css:
+        'padding: 0.5em 0.7em; border: 1px solid #30323a; border-left: 5px solid #146ef5; color: #ffffff;',
       h3Css: 'color: #78a8ff;',
-      quoteCss: 'padding: 1em; border-left-color: #146ef5; border-radius: 10px; background: #17233a; color: #e2e5ea;',
+      quoteCss:
+        'padding: 1em; border-left-color: #146ef5; border-radius: 10px; background: #17233a; color: #e2e5ea;',
       imageCss: 'border-radius: 12px; border: 1px solid #30323a;',
     }),
   }),
@@ -1028,9 +1115,11 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       titleWeight: '600',
       articlePadding: '20px 16px 34px',
       articleRadius: '14px',
-      h2Css: 'color: #ffffff; border-bottom: 2px solid #0070cc; padding-bottom: 0.4em;',
+      h2Css:
+        'color: #ffffff; border-bottom: 2px solid #0070cc; padding-bottom: 0.4em;',
       h3Css: 'color: #66b7ff;',
-      quoteCss: 'padding: 1em; border-left-color: #0070cc; border-radius: 12px; background: #101a36; color: #dce8ff;',
+      quoteCss:
+        'padding: 1em; border-left-color: #0070cc; border-radius: 12px; background: #101a36; color: #dce8ff;',
       imageCss: 'border-radius: 14px;',
     }),
   }),
@@ -1050,9 +1139,12 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       muted: '#5f6570',
       titleFont: '"Metro Sans", -apple-system, BlinkMacSystemFont, sans-serif',
       bodyFont: '"Metro Sans", -apple-system, BlinkMacSystemFont, sans-serif',
-      h2Css: 'color: #1d1e20; border-left: 4px solid #844fba; padding-left: 0.75em;',
-      h3Css: 'color: #844fba; font-family: ui-monospace, SFMono-Regular, monospace;',
-      quoteCss: 'padding: 1em; border-left-color: #844fba; border-radius: 8px; background: #f6f5f8; color: #4b5058;',
+      h2Css:
+        'color: #1d1e20; border-left: 4px solid #844fba; padding-left: 0.75em;',
+      h3Css:
+        'color: #844fba; font-family: ui-monospace, SFMono-Regular, monospace;',
+      quoteCss:
+        'padding: 1em; border-left-color: #844fba; border-radius: 8px; background: #f6f5f8; color: #4b5058;',
       preCss: 'border-color: #ded9e7; background: #1d1e20;',
       codeCss: 'color: #844fba; background: #f6f1fb;',
       imageCss: 'border-radius: 8px; border: 1px solid #ded9e7;',
@@ -1072,12 +1164,15 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       accentSoft: '#eef3ff',
       border: '#dbe4f3',
       muted: '#536171',
-      titleFont: 'CoinbaseDisplay, -apple-system, BlinkMacSystemFont, sans-serif',
+      titleFont:
+        'CoinbaseDisplay, -apple-system, BlinkMacSystemFont, sans-serif',
       bodyFont: 'CoinbaseText, -apple-system, BlinkMacSystemFont, sans-serif',
       titleWeight: '500',
-      h2Css: 'color: #0a0b0d; border-bottom: 2px solid #0052ff; padding-bottom: 0.35em;',
+      h2Css:
+        'color: #0a0b0d; border-bottom: 2px solid #0052ff; padding-bottom: 0.35em;',
       h3Css: 'color: #0052ff;',
-      quoteCss: 'padding: 1em; border-left-color: #0052ff; border-radius: 12px; background: #eef3ff; color: #344054;',
+      quoteCss:
+        'padding: 1em; border-left-color: #0052ff; border-radius: 12px; background: #eef3ff; color: #344054;',
       imageCss: 'border-radius: 12px;',
     }),
   }),
@@ -1099,9 +1194,12 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       bodyFont: 'Formular, -apple-system, BlinkMacSystemFont, sans-serif',
       articlePadding: '20px 16px 32px',
       articleRadius: '20px',
-      h2Css: 'display: inline-block; padding: 0.35em 0.75em; border-radius: 8px; background: #ffdd33; color: #050038;',
-      h3Css: 'display: inline-block; padding: 0.18em 0.55em; border-radius: 999px; background: #ffe5e9; color: #d8233f;',
-      quoteCss: 'padding: 1em; border-left-color: #4262ff; border-radius: 14px; background: #f1f4ff; color: #4e4a68;',
+      h2Css:
+        'display: inline-block; padding: 0.35em 0.75em; border-radius: 8px; background: #ffdd33; color: #050038;',
+      h3Css:
+        'display: inline-block; padding: 0.18em 0.55em; border-radius: 999px; background: #ffe5e9; color: #d8233f;',
+      quoteCss:
+        'padding: 1em; border-left-color: #4262ff; border-radius: 14px; background: #f1f4ff; color: #4e4a68;',
       imageCss: 'border-radius: 16px; border: 1px solid #eee6b9;',
     }),
   }),
@@ -1120,13 +1218,16 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       border: '#cfe3c7',
       muted: '#4f6670',
       titleFont: 'MongoDB Value Serif, Georgia, serif',
-      bodyFont: '"MongoDB Value Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+      bodyFont:
+        '"MongoDB Value Sans", -apple-system, BlinkMacSystemFont, sans-serif',
       titleWeight: '500',
       articlePadding: '20px 16px 32px',
       articleRadius: '16px',
-      h2Css: 'color: #001e2b; border-left: 5px solid #00ed64; padding-left: 0.75em;',
+      h2Css:
+        'color: #001e2b; border-left: 5px solid #00ed64; padding-left: 0.75em;',
       h3Css: 'color: #00a35c;',
-      quoteCss: 'padding: 1em; border-left-color: #00ed64; border-radius: 12px; background: #e3f6dc; color: #284552;',
+      quoteCss:
+        'padding: 1em; border-left-color: #00ed64; border-radius: 12px; background: #e3f6dc; color: #284552;',
       imageCss: 'border-radius: 14px;',
     }),
   }),
@@ -1148,9 +1249,12 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       bodyFont: 'AirtableSans, -apple-system, BlinkMacSystemFont, sans-serif',
       articlePadding: '18px 16px 30px',
       articleRadius: '12px',
-      h2Css: 'padding: 0.45em 0.65em; border-radius: 8px; background: #eaf8ff; color: #0b5f84; border-left: 5px solid #18bfff;',
-      h3Css: 'display: inline-block; padding: 0.18em 0.5em; border-radius: 6px; background: #fff4d6; color: #936300;',
-      quoteCss: 'padding: 1em; border-left-color: #f82b60; border-radius: 10px; background: #fff0f5; color: #4a4f57;',
+      h2Css:
+        'padding: 0.45em 0.65em; border-radius: 8px; background: #eaf8ff; color: #0b5f84; border-left: 5px solid #18bfff;',
+      h3Css:
+        'display: inline-block; padding: 0.18em 0.5em; border-radius: 6px; background: #fff4d6; color: #936300;',
+      quoteCss:
+        'padding: 1em; border-left-color: #f82b60; border-radius: 10px; background: #fff0f5; color: #4a4f57;',
       imageCss: 'border-radius: 12px; border: 1px solid #dfe3ea;',
     }),
   }),
@@ -1173,9 +1277,11 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       titleWeight: '900',
       titleSize: '25px',
       titleTransform: 'uppercase',
-      h2Css: 'font-family: "Arial Black", Impact, sans-serif; text-transform: uppercase; color: #111111; border-top: 4px solid #111111; padding-top: 0.38em;',
+      h2Css:
+        'font-family: "Arial Black", Impact, sans-serif; text-transform: uppercase; color: #111111; border-top: 4px solid #111111; padding-top: 0.38em;',
       h3Css: 'color: #fa5400; text-transform: uppercase;',
-      quoteCss: 'padding: 1em; border-left-color: #fa5400; background: #f2f2f2; color: #242424;',
+      quoteCss:
+        'padding: 1em; border-left-color: #fa5400; background: #f2f2f2; color: #242424;',
       imageCss: 'border-radius: 0;',
     }),
   }),
@@ -1197,9 +1303,11 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       bodyFont: 'Matter, -apple-system, BlinkMacSystemFont, sans-serif',
       articlePadding: '18px 16px 32px',
       articleRadius: '8px',
-      h2Css: 'padding: 0.45em 0.65em; border: 2px solid #151515; background: #ffdf6b; color: #151515;',
+      h2Css:
+        'padding: 0.45em 0.65em; border: 2px solid #151515; background: #ffdf6b; color: #151515;',
       h3Css: 'color: #f54e00;',
-      quoteCss: 'padding: 1em; border: 2px solid #151515; border-left-width: 6px; border-radius: 8px; background: #ffe9c2; color: #28231d;',
+      quoteCss:
+        'padding: 1em; border: 2px solid #151515; border-left-width: 6px; border-radius: 8px; background: #ffe9c2; color: #28231d;',
       imageCss: 'border-radius: 8px; border: 2px solid #151515;',
     }),
   }),
@@ -1221,9 +1329,11 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       bodyFont: 'Rubik, -apple-system, BlinkMacSystemFont, sans-serif',
       articlePadding: '20px 16px 34px',
       articleRadius: '14px',
-      h2Css: 'color: #ffffff; border-left: 5px solid #f55442; padding-left: 0.75em;',
+      h2Css:
+        'color: #ffffff; border-left: 5px solid #f55442; padding-left: 0.75em;',
       h3Css: 'color: #ff9b8f;',
-      quoteCss: 'padding: 1em; border-left-color: #f55442; border-radius: 12px; background: #4a2a37; color: #eadff0;',
+      quoteCss:
+        'padding: 1em; border-left-color: #f55442; border-radius: 12px; background: #4a2a37; color: #eadff0;',
       imageCss: 'border-radius: 12px; border: 1px solid #574461;',
     }),
   }),
@@ -1246,9 +1356,11 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       titleWeight: '600',
       articlePadding: '18px 16px 32px',
       articleRadius: '10px',
-      h2Css: 'padding: 0.42em 0.65em; background: #f0b90b; color: #0b0e11; border-radius: 6px;',
+      h2Css:
+        'padding: 0.42em 0.65em; background: #f0b90b; color: #0b0e11; border-radius: 6px;',
       h3Css: 'color: #f0b90b;',
-      quoteCss: 'padding: 1em; border-left-color: #f0b90b; border-radius: 8px; background: #2b2611; color: #d6d9df;',
+      quoteCss:
+        'padding: 1em; border-left-color: #f0b90b; border-radius: 8px; background: #2b2611; color: #d6d9df;',
       imageCss: 'border-radius: 10px;',
     }),
   }),
@@ -1273,16 +1385,19 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       titleSpacing: '0.05em',
       articlePadding: '22px 16px 36px',
       articleRadius: '0',
-      h2Css: 'color: #ffffff; border-top: 1px solid #8f9aa7; border-bottom: 1px solid #2c2c2c; padding: 0.5em 0; text-transform: uppercase;',
+      h2Css:
+        'color: #ffffff; border-top: 1px solid #8f9aa7; border-bottom: 1px solid #2c2c2c; padding: 0.5em 0; text-transform: uppercase;',
       h3Css: 'color: #b8bec6; text-transform: uppercase;',
-      quoteCss: 'padding: 1em; border-left-color: #8f9aa7; background: #151515; color: #e4e6e8;',
+      quoteCss:
+        'padding: 1em; border-left-color: #8f9aa7; background: #151515; color: #e4e6e8;',
       imageCss: 'border-radius: 0; border: 1px solid #2c2c2c;',
     }),
   }),
   brandTheme({
     id: 'dacomming-editorial',
     name: '大聪明',
-    description: '公众号评论长文风格，白底、黑字、醒目小标题和轻量信息块，适合观点分析与知识型文章。',
+    description:
+      '公众号评论长文风格，白底、黑字、醒目小标题和轻量信息块，适合观点分析与知识型文章。',
     swatches: ['#ffffff', '#151515', '#2f5f8f', '#f7f7f4', '#fff3c4'],
     css: buildEditorialCss({
       rootBg: '#ffffff',
@@ -1293,18 +1408,23 @@ export const WECHAT_EXPORT_BUILTIN_THEMES: WechatExportTheme[] = [
       accentSoft: '#f7f7f4',
       border: '#e7e3d8',
       muted: '#5f5f5f',
-      bodyFont: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif',
+      bodyFont:
+        '-apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif',
       titleSize: '22px',
       titleWeight: '700',
       titleSpacing: '0.01em',
       articlePadding: '18px 18px 34px',
       articleRadius: '0',
-      h2Css: 'margin: 2.7em 0 1.2em; padding: 0.48em 0.72em; border-left: 5px solid #151515; background: #fff3c4; color: #151515; font-size: 19px; font-weight: 700; line-height: 1.55;',
-      h3Css: 'margin: 2.1em 0 1em; padding-bottom: 0.35em; border-bottom: 1px solid #e7e3d8; color: #151515; font-size: 17px; font-weight: 700; line-height: 1.55;',
-      quoteCss: 'margin: 1.5em 0; padding: 1em 1.1em; border-left: 0; border-radius: 8px; background: #f7f7f4; color: #4f4f4f;',
+      h2Css:
+        'margin: 2.7em 0 1.2em; padding: 0.48em 0.72em; border-left: 5px solid #151515; background: #fff3c4; color: #151515; font-size: 19px; font-weight: 700; line-height: 1.55;',
+      h3Css:
+        'margin: 2.1em 0 1em; padding-bottom: 0.35em; border-bottom: 1px solid #e7e3d8; color: #151515; font-size: 17px; font-weight: 700; line-height: 1.55;',
+      quoteCss:
+        'margin: 1.5em 0; padding: 1em 1.1em; border-left: 0; border-radius: 8px; background: #f7f7f4; color: #4f4f4f;',
       codeCss: 'color: #2f5f8f; background: #f2f6fa;',
       preCss: 'border-color: #d8e1ea; background: #f7fafc;',
-      imageCss: 'display: block; width: 100%; border-radius: 8px; margin: 1.55em 0;',
+      imageCss:
+        'display: block; width: 100%; border-radius: 8px; margin: 1.55em 0;',
       extraCss: `
 .wechat-export-article {
   max-width: 680px;
@@ -1394,7 +1514,9 @@ function normalizeThemeId(input: string, fallback = '') {
 
 function normalizeSwatchColor(input: unknown) {
   const color = String(input || '').trim()
-  return /^#[0-9a-f]{3}(?:[0-9a-f]{1})?(?:[0-9a-f]{2})?(?:[0-9a-f]{2})?$/i.test(color)
+  return /^#[0-9a-f]{3}(?:[0-9a-f]{1})?(?:[0-9a-f]{2})?(?:[0-9a-f]{2})?$/i.test(
+    color,
+  )
     ? color.toLowerCase()
     : ''
 }
@@ -1406,24 +1528,39 @@ function normalizeThemeSwatches(input: unknown, fallback: string[] = []) {
       ? input.split(',')
       : []
 
-  const swatches = values
-    .map(normalizeSwatchColor)
-    .filter(Boolean)
-    .slice(0, 6)
+  const swatches = values.map(normalizeSwatchColor).filter(Boolean).slice(0, 6)
 
   return swatches.length > 0 ? swatches : fallback
 }
 
-function normalizeTheme(input: unknown, fallbackId: string): WechatExportTheme | null {
+function normalizeTheme(
+  input: unknown,
+  fallbackId: string,
+): WechatExportTheme | null {
   if (!input || typeof input !== 'object') return null
 
   const record = input as Record<string, unknown>
   const id = normalizeThemeId(String(record.id || ''), fallbackId)
-  const builtinTheme = WECHAT_EXPORT_BUILTIN_THEMES.find(theme => theme.id === id)
-  const name = String(record.name || '').trim().slice(0, 48) || builtinTheme?.name || fallbackId
-  const description = String(record.description || '').trim().slice(0, 160) || builtinTheme?.description || ''
+  const builtinTheme = WECHAT_EXPORT_BUILTIN_THEMES.find(
+    (theme) => theme.id === id,
+  )
+  const name =
+    String(record.name || '')
+      .trim()
+      .slice(0, 48) ||
+    builtinTheme?.name ||
+    fallbackId
+  const description =
+    String(record.description || '')
+      .trim()
+      .slice(0, 160) ||
+    builtinTheme?.description ||
+    ''
   const css = String(record.css || '').trim() || builtinTheme?.css || ''
-  const swatches = normalizeThemeSwatches(record.swatches, builtinTheme?.swatches)
+  const swatches = normalizeThemeSwatches(
+    record.swatches,
+    builtinTheme?.swatches,
+  )
   const builtin = Boolean(builtinTheme)
 
   if (!id) return null
@@ -1440,7 +1577,11 @@ function normalizeTheme(input: unknown, fallbackId: string): WechatExportTheme |
 
 function parseStoredThemes(input: unknown) {
   if (Array.isArray(input)) return input
-  if (input && typeof input === 'object' && Array.isArray((input as { themes?: unknown }).themes)) {
+  if (
+    input &&
+    typeof input === 'object' &&
+    Array.isArray((input as { themes?: unknown }).themes)
+  ) {
     return (input as { themes: unknown[] }).themes
   }
   return []
@@ -1451,7 +1592,9 @@ function parseStoredDefaultThemeId(input: unknown) {
   return String((input as { defaultThemeId?: unknown }).defaultThemeId || '')
 }
 
-export function resolveWechatExportThemeConfig(rawConfig?: string | null): WechatExportThemeConfig {
+export function resolveWechatExportThemeConfig(
+  rawConfig?: string | null,
+): WechatExportThemeConfig {
   let parsed: unknown = null
 
   if (rawConfig) {
@@ -1474,7 +1617,7 @@ export function resolveWechatExportThemeConfig(rawConfig?: string | null): Wecha
 
   const themes = Array.from(themesById.values())
   const storedDefaultId = normalizeThemeId(parseStoredDefaultThemeId(parsed))
-  const defaultThemeId = themes.some(theme => theme.id === storedDefaultId)
+  const defaultThemeId = themes.some((theme) => theme.id === storedDefaultId)
     ? storedDefaultId
     : DEFAULT_THEME_ID
 
@@ -1484,15 +1627,22 @@ export function resolveWechatExportThemeConfig(rawConfig?: string | null): Wecha
   }
 }
 
-export function getWechatExportTheme(config: WechatExportThemeConfig, themeId?: string | null) {
+export function getWechatExportTheme(
+  config: WechatExportThemeConfig,
+  themeId?: string | null,
+) {
   const preferred = themeId ? normalizeThemeId(themeId) : ''
-  return config.themes.find(theme => theme.id === preferred)
-    || config.themes.find(theme => theme.id === config.defaultThemeId)
-    || config.themes[0]
-    || WECHAT_EXPORT_BUILTIN_THEMES[0]
+  return (
+    config.themes.find((theme) => theme.id === preferred) ||
+    config.themes.find((theme) => theme.id === config.defaultThemeId) ||
+    config.themes[0] ||
+    WECHAT_EXPORT_BUILTIN_THEMES[0]
+  )
 }
 
-export function serializeWechatExportThemeConfig(config: WechatExportThemeConfig) {
+export function serializeWechatExportThemeConfig(
+  config: WechatExportThemeConfig,
+) {
   const normalized = resolveWechatExportThemeConfig(JSON.stringify(config))
   return JSON.stringify({
     defaultThemeId: normalized.defaultThemeId,

@@ -59,34 +59,66 @@ describe('collage helpers', () => {
   })
 
   it('captures image paste and shields the editor while the modal is open', () => {
-    expect(shouldInterceptCollagePaste({ hasImageFiles: true, targetInsideModal: false })).toBe(true)
-    expect(shouldInterceptCollagePaste({ hasImageFiles: true, targetInsideModal: true })).toBe(true)
-    expect(shouldInterceptCollagePaste({ hasImageFiles: false, targetInsideModal: false })).toBe(true)
-    expect(shouldInterceptCollagePaste({ hasImageFiles: false, targetInsideModal: true })).toBe(false)
+    expect(
+      shouldInterceptCollagePaste({
+        hasImageFiles: true,
+        targetInsideModal: false,
+      }),
+    ).toBe(true)
+    expect(
+      shouldInterceptCollagePaste({
+        hasImageFiles: true,
+        targetInsideModal: true,
+      }),
+    ).toBe(true)
+    expect(
+      shouldInterceptCollagePaste({
+        hasImageFiles: false,
+        targetInsideModal: false,
+      }),
+    ).toBe(true)
+    expect(
+      shouldInterceptCollagePaste({
+        hasImageFiles: false,
+        targetInsideModal: true,
+      }),
+    ).toBe(false)
   })
 
   it('normalizes transformed image and text dimensions', () => {
-    expect(getTransformedSize({
-      width: 120,
-      height: 80,
-      scaleX: 2,
-      scaleY: 0.5,
-      minWidth: 40,
-      minHeight: 40,
-    })).toEqual({ width: 240, height: 40 })
+    expect(
+      getTransformedSize({
+        width: 120,
+        height: 80,
+        scaleX: 2,
+        scaleY: 0.5,
+        minWidth: 40,
+        minHeight: 40,
+      }),
+    ).toEqual({ width: 240, height: 40 })
 
     expect(getTransformedTextWidth(160, 0.25)).toBe(60)
   })
 
   it('lays images out with caller-provided ids', () => {
     let index = 0
-    const images = layoutImages([
-      { src: 'one', width: 400, height: 300 },
-      { src: 'two', width: 400, height: 300 },
-    ], 900, 675, () => `image-${index += 1}`)
+    const images = layoutImages(
+      [
+        { src: 'one', width: 400, height: 300 },
+        { src: 'two', width: 400, height: 300 },
+      ],
+      900,
+      675,
+      () => {
+        index += 1
+        return `image-${index}`
+      },
+    )
 
     expect(images.map((image) => image.id)).toEqual(['image-1', 'image-2'])
-    expect(images.every((image) => image.width > 0 && image.height > 0)).toBe(true)
+    expect(images.every((image) => image.width > 0 && image.height > 0)).toBe(
+      true,
+    )
     expect(images.every((image) => image.shadow.enabled === false)).toBe(true)
   })
 
@@ -96,11 +128,19 @@ describe('collage helpers', () => {
   })
 
   it('clamps custom canvas dimensions to supported bounds', () => {
-    expect(clampCanvasSize({ width: 0, height: 5000 })).toEqual({ width: 1, height: 2400 })
+    expect(clampCanvasSize({ width: 0, height: 5000 })).toEqual({
+      width: 1,
+      height: 2400,
+    })
   })
 
   it('offers an ultrawide canvas preset for collage covers', () => {
-    expect(CANVAS_PRESETS).toContainEqual({ key: 'ultrawide', label: '21:9', width: 2100, height: 900 })
+    expect(CANVAS_PRESETS).toContainEqual({
+      key: 'ultrawide',
+      label: '21:9',
+      width: 2100,
+      height: 900,
+    })
   })
 
   it('parses free-form canvas dimensions as bounded positive integers', () => {
@@ -145,7 +185,13 @@ describe('collage helpers', () => {
       shadow: createDefaultImageShadow(),
     }
 
-    expect(getItemBounds(image)).toEqual({ id: 'image-1', x: 20, y: 30, width: 200, height: 120 })
+    expect(getItemBounds(image)).toEqual({
+      id: 'image-1',
+      x: 20,
+      y: 30,
+      width: 200,
+      height: 120,
+    })
   })
 
   it('returns simple visual bounds for icon items', () => {
@@ -165,7 +211,13 @@ describe('collage helpers', () => {
       scaleY: 1,
     }
 
-    expect(getItemBounds(icon)).toEqual({ id: 'icon-1', x: 12, y: 18, width: 96, height: 96 })
+    expect(getItemBounds(icon)).toEqual({
+      id: 'icon-1',
+      x: 12,
+      y: 18,
+      width: 96,
+      height: 96,
+    })
   })
 
   it('provides typography defaults and open image presets for the collage editor', () => {
@@ -188,7 +240,13 @@ describe('collage helpers', () => {
     }
 
     expect(getKonvaTextFontStyle(text)).toBe('italic 700')
-    expect(getItemBounds(text)).toEqual({ id: 'text-1', x: 20, y: 30, width: 200, height: 120 })
+    expect(getItemBounds(text)).toEqual({
+      id: 'text-1',
+      x: 20,
+      y: 30,
+      width: 200,
+      height: 120,
+    })
     expect(COLLAGE_FONT_OPTIONS.map((font) => font.id)).toEqual([
       'tsanger-jinkai',
       'lxgw-wenkai',
@@ -200,13 +258,21 @@ describe('collage helpers', () => {
     ])
     expect(COLLAGE_FONT_OPTIONS[0]?.cssUrl).toBe('/fonts/jinkai/jinkai.css')
     expect(COLLAGE_FONT_OPTIONS.filter((font) => font.external)).toHaveLength(6)
-    expect(COLLAGE_OPEN_IMAGE_LIBRARY.every((item) => item.src.startsWith('https://'))).toBe(true)
+    expect(
+      COLLAGE_OPEN_IMAGE_LIBRARY.every((item) =>
+        item.src.startsWith('https://'),
+      ),
+    ).toBe(true)
   })
 
   it('provides searchable collage icons', () => {
     expect(COLLAGE_ICON_LIBRARY.length).toBeGreaterThan(50)
-    expect(searchCollageIcons('增长').map((icon) => icon.name)).toContain('TrendingUp')
-    expect(searchCollageIcons('', '商业').every((icon) => icon.category === '商业')).toBe(true)
+    expect(searchCollageIcons('增长').map((icon) => icon.name)).toContain(
+      'TrendingUp',
+    )
+    expect(
+      searchCollageIcons('', '商业').every((icon) => icon.category === '商业'),
+    ).toBe(true)
     expect(MAX_RECENT_COLLAGE_ICONS).toBe(8)
   })
 
@@ -220,8 +286,18 @@ describe('collage helpers', () => {
       y2: 90,
     })
 
-    expect(updateArrowEndpoint(arrow, 'start', 4, 5)).toMatchObject({ x1: 4, y1: 5, x2: 110, y2: 70 })
-    expect(updateArrowEndpoint(arrow, 'end', 130, 90)).toMatchObject({ x1: 10, y1: 20, x2: 130, y2: 90 })
+    expect(updateArrowEndpoint(arrow, 'start', 4, 5)).toMatchObject({
+      x1: 4,
+      y1: 5,
+      x2: 110,
+      y2: 70,
+    })
+    expect(updateArrowEndpoint(arrow, 'end', 130, 90)).toMatchObject({
+      x1: 10,
+      y1: 20,
+      x2: 130,
+      y2: 90,
+    })
   })
 
   it('keeps bounded undo snapshots and restores independent item copies', () => {
@@ -257,16 +333,26 @@ describe('collage helpers', () => {
     image.shadow.enabled = true
     image.x = 999
 
-    expect(snapshot.items[0]).toMatchObject({ x: 20, shadow: { enabled: false } })
+    expect(snapshot.items[0]).toMatchObject({
+      x: 20,
+      shadow: { enabled: false },
+    })
 
     const history = pushCollageHistorySnapshot(
       pushCollageHistorySnapshot([], snapshot, 2),
       createCollageHistorySnapshot({ ...original, background: '#111111' }),
       2,
     )
-    const bounded = pushCollageHistorySnapshot(history, createCollageHistorySnapshot({ ...original, background: '#222222' }), 2)
+    const bounded = pushCollageHistorySnapshot(
+      history,
+      createCollageHistorySnapshot({ ...original, background: '#222222' }),
+      2,
+    )
 
-    expect(bounded.map((item) => item.background)).toEqual(['#111111', '#222222'])
+    expect(bounded.map((item) => item.background)).toEqual([
+      '#111111',
+      '#222222',
+    ])
 
     const popped = popCollageHistorySnapshot(bounded)
     expect(popped.snapshot?.background).toBe('#222222')

@@ -8,7 +8,10 @@ export type BlockActionTarget = {
   textPos: number
 }
 
-export function getTopLevelTargetFromDoc(doc: ProseMirrorNode, rawPos: number): BlockActionTarget | null {
+export function getTopLevelTargetFromDoc(
+  doc: ProseMirrorNode,
+  rawPos: number,
+): BlockActionTarget | null {
   if (doc.childCount === 0) return null
 
   const safePos = Math.max(0, Math.min(rawPos, doc.content.size))
@@ -20,7 +23,8 @@ export function getTopLevelTargetFromDoc(doc: ProseMirrorNode, rawPos: number): 
     const from = offset
     const to = offset + node.nodeSize
     const isLast = index === doc.childCount - 1
-    const includesPos = safePos >= from && (safePos < to || (isLast && safePos <= to))
+    const includesPos =
+      safePos >= from && (safePos < to || (isLast && safePos <= to))
 
     if (!fallback && (safePos < to || isLast)) {
       fallback = {

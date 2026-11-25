@@ -2,7 +2,8 @@ import katex from 'katex'
 
 type DomRoot = Document | Element
 
-const MATH_SKIP_SELECTOR = 'pre, code, script, style, textarea, [data-math-latex], .katex, .katex-display'
+const MATH_SKIP_SELECTOR =
+  'pre, code, script, style, textarea, [data-math-latex], .katex, .katex-display'
 
 function shouldSkipTextNode(node: Text) {
   const parent = node.parentElement
@@ -24,13 +25,15 @@ function createMathElement(doc: Document, latex: string, displayMode: boolean) {
 }
 
 function getDomDocument(root: DomRoot) {
-  if (typeof document === 'undefined' || typeof NodeFilter === 'undefined') return null
-  return root.nodeType === 9 ? root as Document : root.ownerDocument
+  if (typeof document === 'undefined' || typeof NodeFilter === 'undefined')
+    return null
+  return root.nodeType === 9 ? (root as Document) : root.ownerDocument
 }
 
 function renderMathElement(element: HTMLElement) {
   const latex = element.getAttribute('data-math-latex') || ''
-  if (!latex.trim() || element.getAttribute('data-math-rendered') === 'true') return
+  if (!latex.trim() || element.getAttribute('data-math-rendered') === 'true')
+    return
 
   const displayMode = element.getAttribute('data-display-mode') !== 'false'
 
@@ -40,7 +43,9 @@ function renderMathElement(element: HTMLElement) {
       throwOnError: false,
       output: 'html',
     })
-    element.classList.add(displayMode ? 'math-block-wrapper' : 'math-inline-wrapper')
+    element.classList.add(
+      displayMode ? 'math-block-wrapper' : 'math-inline-wrapper',
+    )
     element.setAttribute('data-math-rendered', 'true')
   } catch {
     element.textContent = latex
@@ -96,9 +101,12 @@ function replaceRawInlineMath(root: DomRoot) {
     const matcher = /(^|[^$])\$([^$\n]+?)\$(?=$|[\s?!.,:;，。！？、；：)）\]])/g
     let cursor = 0
     let changed = false
-    let match: RegExpExecArray | null
 
-    while ((match = matcher.exec(text)) !== null) {
+    for (
+      let match = matcher.exec(text);
+      match !== null;
+      match = matcher.exec(text)
+    ) {
       const prefix = match[1] || ''
       const latex = match[2]?.trim() || ''
       const fullIndex = match.index
@@ -125,7 +133,9 @@ export function renderMathElements(root: DomRoot) {
     replaceRawInlineMath(root)
   }
 
-  for (const element of Array.from(root.querySelectorAll<HTMLElement>('[data-math-latex]'))) {
+  for (const element of Array.from(
+    root.querySelectorAll<HTMLElement>('[data-math-latex]'),
+  )) {
     renderMathElement(element)
   }
 }

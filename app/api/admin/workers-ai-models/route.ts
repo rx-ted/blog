@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/admin-auth'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import {
@@ -11,7 +11,10 @@ import {
   normalizeBaseUrl,
   resolveAiConfigSecret,
 } from '@/lib/ai-provider-profiles'
-import { extractCloudflareAccountId, fetchWorkersAiModels } from '@/lib/workers-ai-models'
+import {
+  extractCloudflareAccountId,
+  fetchWorkersAiModels,
+} from '@/lib/workers-ai-models'
 
 interface WorkersAiProfileRow {
   id: number
@@ -38,7 +41,10 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url)
   const kind = url.searchParams.get('kind') === 'image' ? 'image' : 'text'
   const requestedProfileId = Number(url.searchParams.get('profile_id') || '')
-  const fallbackModels = kind === 'image' ? WORKERS_AI_IMAGE_MODEL_SUGGESTIONS : WORKERS_AI_TEXT_MODEL_SUGGESTIONS
+  const fallbackModels =
+    kind === 'image'
+      ? WORKERS_AI_IMAGE_MODEL_SUGGESTIONS
+      : WORKERS_AI_TEXT_MODEL_SUGGESTIONS
 
   const secret = resolveAiConfigSecret(env)
   await ensureAiConfigInfrastructure(db, secret)
@@ -46,7 +52,8 @@ export async function GET(req: NextRequest) {
   let selectedProfile: WorkersAiProfileRow | null = null
 
   if (Number.isFinite(requestedProfileId) && requestedProfileId > 0) {
-    selectedProfile = await db.prepare(`
+    selectedProfile = await db
+      .prepare(`
       SELECT id, provider, base_url, api_key_encrypted, is_default
       FROM ai_provider_profiles
       WHERE id = ?
@@ -55,34 +62,41 @@ export async function GET(req: NextRequest) {
           OR base_url LIKE '%api.cloudflare.com/client/v4/accounts/%/ai/%'
         )
       LIMIT 1
-    `).bind(requestedProfileId).first<WorkersAiProfileRow>()
+    `)
+      .bind(requestedProfileId)
+      .first<WorkersAiProfileRow>()
   }
 
   if (!selectedProfile) {
-    selectedProfile = await db.prepare(`
+    selectedProfile = await db
+      .prepare(`
       SELECT id, provider, base_url, api_key_encrypted, is_default
       FROM ai_provider_profiles
       WHERE provider = 'workers_ai'
          OR base_url LIKE '%api.cloudflare.com/client/v4/accounts/%/ai/%'
       ORDER BY is_default DESC, updated_at DESC, id DESC
       LIMIT 1
-    `).first<WorkersAiProfileRow>()
+    `)
+      .first<WorkersAiProfileRow>()
   }
 
   const profileBaseUrl = normalizeBaseUrl(selectedProfile?.base_url || '')
   const profileApiToken = selectedProfile?.api_key_encrypted
     ? await decryptApiKey(selectedProfile.api_key_encrypted, secret)
     : ''
-  const storedKeyUnavailable = Boolean(selectedProfile?.api_key_encrypted?.trim()) && !profileApiToken
+  const storedKeyUnavailable =
+    Boolean(selectedProfile?.api_key_encrypted?.trim()) && !profileApiToken
 
-  const accountId = extractCloudflareAccountId(profileBaseUrl)
-    || env?.CLOUDFLARE_ACCOUNT_ID
-    || process.env.CLOUDFLARE_ACCOUNT_ID
-    || ''
-  const apiToken = profileApiToken
-    || env?.CLOUDFLARE_API_TOKEN
-    || process.env.CLOUDFLARE_API_TOKEN
-    || ''
+  const accountId =
+    extractCloudflareAccountId(profileBaseUrl) ||
+    env?.CLOUDFLARE_ACCOUNT_ID ||
+    process.env.CLOUDFLARE_ACCOUNT_ID ||
+    ''
+  const apiToken =
+    profileApiToken ||
+    env?.CLOUDFLARE_API_TOKEN ||
+    process.env.CLOUDFLARE_API_TOKEN ||
+    ''
 
   if (!accountId || !apiToken) {
     const warning = storedKeyUnavailable
@@ -99,7 +113,12 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const models = await fetchWorkersAiModels(accountId, apiToken, kind, fallbackModels)
+    const models = await fetchWorkersAiModels(
+      accountId,
+      apiToken,
+      kind,
+      fallbackModels,
+    )
     if (models.length === 0) {
       return NextResponse.json({
         models: toModelOptions(fallbackModels),
@@ -111,10 +130,16 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       models,
       source: 'provider',
-      ...(storedKeyUnavailable ? { warning: '当前已改用环境变量中的 Workers AI 凭证拉取模型；已保存配置中的 API Token 无法解密' } : {}),
+      ...(storedKeyUnavailable
+        ? {
+            warning:
+              '当前已改用环境变量中的 Workers AI 凭证拉取模型；已保存配置中的 API Token 无法解密',
+          }
+        : {}),
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : '获取 Workers AI 模型失败'
+    const message =
+      error instanceof Error ? error.message : '获取 Workers AI 模型失败'
     return NextResponse.json({
       models: toModelOptions(fallbackModels),
       source: 'preset',

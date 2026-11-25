@@ -12,8 +12,14 @@ describe('AI provider presets', () => {
   })
 
   it('keeps caller-owned aggregator DeepSeek models unchanged', () => {
-    expect(AI_PROVIDER_MAP.openrouter.quickModels).toContain('deepseek/deepseek-chat')
-    expect(AI_PROVIDER_MAP.together.defaultModel).toBe('deepseek-ai/DeepSeek-R1-0528')
-    expect(AI_PROVIDER_MAP.siliconflow.quickModels).toContain('deepseek-ai/DeepSeek-V3')
+    expect(AI_PROVIDER_MAP.openrouter.quickModels).toContain(
+      'deepseek/deepseek-chat',
+    )
+    expect(AI_PROVIDER_MAP.together.defaultModel).toBe(
+      'deepseek-ai/DeepSeek-R1-0528',
+    )
+    expect(AI_PROVIDER_MAP.siliconflow.quickModels).toContain(
+      'deepseek-ai/DeepSeek-V3',
+    )
   })
 })

@@ -34,16 +34,21 @@ export function Dropdown({
   const dropdownRef = useRef<HTMLDivElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const selectedOption = options.find(opt => opt.value === value)
+  const selectedOption = options.find((opt) => opt.value === value)
 
-  const filteredOptions = options.filter(opt =>
-    `${opt.label} ${opt.searchText || ''}`.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredOptions = options.filter((opt) =>
+    `${opt.label} ${opt.searchText || ''}`
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase()),
   )
 
   // 点击外部关闭
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false)
         setSearchQuery('')
       }
@@ -90,9 +95,10 @@ export function Dropdown({
           w-full px-3 py-2 rounded-lg border text-sm text-left
           flex items-center justify-between gap-2
           transition-colors
-          ${disabled
-            ? 'bg-[var(--editor-soft)] text-[var(--stone-gray)] cursor-not-allowed'
-            : 'bg-[var(--background)] border-[var(--editor-line)] text-[var(--editor-ink)] hover:border-[var(--editor-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--editor-accent)]/20'
+          ${
+            disabled
+              ? 'bg-[var(--editor-soft)] text-[var(--stone-gray)] cursor-not-allowed'
+              : 'bg-[var(--background)] border-[var(--editor-line)] text-[var(--editor-ink)] hover:border-[var(--editor-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--editor-accent)]/20'
           }
         `}
       >
@@ -147,9 +153,10 @@ export function Dropdown({
                     w-full px-3 py-2 text-sm text-left
                     flex items-center justify-between gap-2
                     transition-colors
-                    ${option.value === value
-                      ? 'bg-[var(--editor-accent)]/10 text-[var(--editor-accent)]'
-                      : 'text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]'
+                    ${
+                      option.value === value
+                        ? 'bg-[var(--editor-accent)]/10 text-[var(--editor-accent)]'
+                        : 'text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]'
                     }
                   `}
                 >

@@ -68,7 +68,9 @@ function isSingleSlugPath(pathname: string) {
 
 function isCategoryPath(pathname: string) {
   const segments = pathname.split('/').filter(Boolean)
-  return segments.length === 2 && segments[0] === 'category' && Boolean(segments[1])
+  return (
+    segments.length === 2 && segments[0] === 'category' && Boolean(segments[1])
+  )
 }
 
 export function isPublicEdgeCacheableRequest(request: Request) {
@@ -83,7 +85,8 @@ export function isPublicEdgeCacheableRequest(request: Request) {
   }
 
   if (BYPASS_EXACT_PATHS.has(pathname)) return false
-  if (BYPASS_PREFIXES.some((prefix) => pathname.startsWith(prefix))) return false
+  if (BYPASS_PREFIXES.some((prefix) => pathname.startsWith(prefix)))
+    return false
 
   const pageParams = new Set(['page', '_rsc'])
   const rscParams = new Set(['_rsc'])
@@ -144,7 +147,10 @@ export function isPublicEdgeCacheableResponse(response: Response) {
   )
 }
 
-function cloneWithCacheHeaders(response: Response, cacheState: 'hit' | 'miss' | 'bypass') {
+function cloneWithCacheHeaders(
+  response: Response,
+  cacheState: 'hit' | 'miss' | 'bypass',
+) {
   const next = new Response(response.body, response)
   next.headers.set(EDGE_CACHE_HEADER, cacheState)
   return next
@@ -152,7 +158,10 @@ function cloneWithCacheHeaders(response: Response, cacheState: 'hit' | 'miss' | 
 
 function cloneForStorage(response: Response) {
   const cached = new Response(response.body, response)
-  cached.headers.set('Cache-Control', `public, max-age=${EDGE_CACHE_TTL_SECONDS}`)
+  cached.headers.set(
+    'Cache-Control',
+    `public, max-age=${EDGE_CACHE_TTL_SECONDS}`,
+  )
   cached.headers.set(EDGE_CACHE_HEADER, 'stored')
   cached.headers.delete('Set-Cookie')
   return cached

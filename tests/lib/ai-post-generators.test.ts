@@ -24,13 +24,16 @@ vi.mock('openai', () => ({
 }))
 
 vi.mock('@/lib/ai-post-generator/storage', () => ({
-  ensureAiPostGeneratorInfrastructure: mocks.ensureAiPostGeneratorInfrastructure,
+  ensureAiPostGeneratorInfrastructure:
+    mocks.ensureAiPostGeneratorInfrastructure,
   getAiPostGeneratorByTarget: mocks.getAiPostGeneratorByTarget,
   listAiPostGenerators: mocks.listAiPostGenerators,
 }))
 
 vi.mock('@/lib/ai-provider-profiles', async () => {
-  const actual = await vi.importActual<typeof import('@/lib/ai-provider-profiles')>('@/lib/ai-provider-profiles')
+  const actual = await vi.importActual<
+    typeof import('@/lib/ai-provider-profiles')
+  >('@/lib/ai-provider-profiles')
   return {
     ...actual,
     resolveAiProfileConfig: mocks.resolveAiProfileConfig,
@@ -38,7 +41,9 @@ vi.mock('@/lib/ai-provider-profiles', async () => {
 })
 
 vi.mock('@/lib/ai-image-config', async () => {
-  const actual = await vi.importActual<typeof import('@/lib/ai-image-config')>('@/lib/ai-image-config')
+  const actual = await vi.importActual<typeof import('@/lib/ai-image-config')>(
+    '@/lib/ai-image-config',
+  )
   return {
     ...actual,
     resolveAiImageProfileConfig: mocks.resolveAiImageProfileConfig,
@@ -46,14 +51,18 @@ vi.mock('@/lib/ai-image-config', async () => {
 })
 
 vi.mock('@/lib/ai-image', async () => {
-  const actual = await vi.importActual<typeof import('@/lib/ai-image')>('@/lib/ai-image')
+  const actual =
+    await vi.importActual<typeof import('@/lib/ai-image')>('@/lib/ai-image')
   return {
     ...actual,
     generateEditorImage: mocks.generateEditorImage,
   }
 })
 
-import { generatePostCover, generatePostMetadata } from '@/lib/ai-post-generators'
+import {
+  generatePostCover,
+  generatePostMetadata,
+} from '@/lib/ai-post-generators'
 
 describe('ai-post-generators', () => {
   beforeEach(() => {
@@ -338,7 +347,8 @@ describe('ai-post-generators', () => {
         raw: '/api/images/image%2F2026%2F06%2Fai-cover-test.webp',
         content: '/api/images/image%2F2026%2F06%2Fai-cover-test.webp?w=1600',
         thumb: '/api/images/image%2F2026%2F06%2Fai-cover-test.webp?w=320',
-        cover: '/api/images/image%2F2026%2F06%2Fai-cover-test.webp?w=1600&h=900',
+        cover:
+          '/api/images/image%2F2026%2F06%2Fai-cover-test.webp?w=1600&h=900',
       },
       prompt: '封面 prompt',
       revisedPrompt: '封面 prompt',
@@ -420,18 +430,24 @@ describe('ai-post-generators', () => {
 
       expect(result.image).toBe(generatedImage)
       expect(mocks.generateEditorImage).toHaveBeenCalledTimes(2)
-      expect(mocks.generateEditorImage).toHaveBeenNthCalledWith(1, expect.objectContaining({
-        action: 'custom',
-        articleTitle: 'Ask AI 封面',
-        profileId: 3,
-        source: 'cover_generator',
-      }))
-      expect(mocks.generateEditorImage).toHaveBeenNthCalledWith(2, expect.objectContaining({
-        action: 'custom',
-        articleTitle: 'Ask AI 封面',
-        profileId: 4,
-        source: 'cover_generator',
-      }))
+      expect(mocks.generateEditorImage).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          action: 'custom',
+          articleTitle: 'Ask AI 封面',
+          profileId: 3,
+          source: 'cover_generator',
+        }),
+      )
+      expect(mocks.generateEditorImage).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          action: 'custom',
+          articleTitle: 'Ask AI 封面',
+          profileId: 4,
+          source: 'cover_generator',
+        }),
+      )
       expect(warn).toHaveBeenCalledWith(
         '[ai-post-cover] Primary image profile failed; retrying with default profile',
         expect.objectContaining({

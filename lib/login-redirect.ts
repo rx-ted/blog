@@ -4,7 +4,12 @@ const EXTERNAL_RETURN_ORIGINS = ['https://www.19981204.xyz']
 
 export function resolveLoginRedirect(value: string | null): string {
   if (!value) return '/dashboard'
-  if (value.startsWith('/') && !value.startsWith('//') && !value.startsWith('/\\')) return value
+  if (
+    value.startsWith('/') &&
+    !value.startsWith('//') &&
+    !value.startsWith('/\\')
+  )
+    return value
   try {
     const url = new URL(value)
     if (EXTERNAL_RETURN_ORIGINS.includes(url.origin)) return url.href

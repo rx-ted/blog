@@ -12,7 +12,11 @@ export {
   type SettingRow,
   type StatsRow,
 } from '@/lib/repositories/types'
-export { mapPostWithTags, normalizePostStatus, parsePostTags } from '@/lib/repositories/post-mappers'
+export {
+  mapPostWithTags,
+  normalizePostStatus,
+  parsePostTags,
+} from '@/lib/repositories/post-mappers'
 export {
   createPost,
   deletePost,
@@ -39,7 +43,11 @@ export {
   getPublicCategories,
   updateCategory,
 } from '@/lib/repositories/categories'
-export { getSetting, getSettings, setSetting } from '@/lib/repositories/settings'
+export {
+  getSetting,
+  getSettings,
+  setSetting,
+} from '@/lib/repositories/settings'
 export {
   getMediaAssetByUrl,
   linkMediaAssetToArticle,

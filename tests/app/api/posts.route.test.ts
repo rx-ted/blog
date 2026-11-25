@@ -35,7 +35,8 @@ vi.mock('@/lib/db', () => ({
 vi.mock('@/lib/server/route-helpers', () => ({
   ensureAuthenticatedRequest: mocks.ensureAuthenticatedRequest,
   getRouteContextWithDb: mocks.getRouteContextWithDb,
-  jsonError: (message: string, status = 500) => Response.json({ error: message }, { status }),
+  jsonError: (message: string, status = 500) =>
+    Response.json({ error: message }, { status }),
   jsonOk: (data: unknown, status = 200) => Response.json(data, { status }),
   parseJsonBody: mocks.parseJsonBody,
 }))
@@ -51,7 +52,8 @@ vi.mock('@/lib/background-jobs', () => ({
 vi.mock('@/lib/remote-image-localization', () => ({
   localizeRemotePostImages: mocks.localizeRemotePostImages,
   recordLocalizedRemoteAssets: mocks.recordLocalizedRemoteAssets,
-  remoteImageResponse: (report: { found: number }) => report.found > 0 ? { remote_images: report } : {},
+  remoteImageResponse: (report: { found: number }) =>
+    report.found > 0 ? { remote_images: report } : {},
 }))
 
 vi.mock('nanoid', () => ({
@@ -77,7 +79,14 @@ describe('/api/posts route', () => {
       html: input.html,
       coverImage: input.coverImage,
       assets: [],
-      report: { found: 0, localized: 0, reused: 0, skipped: 0, failures: [], replacements: {} },
+      report: {
+        found: 0,
+        localized: 0,
+        reused: 0,
+        skipped: 0,
+        failures: [],
+        replacements: {},
+      },
     }))
     mocks.recordLocalizedRemoteAssets.mockResolvedValue(undefined)
     mocks.getPostById.mockResolvedValue({ id: 42, slug: 'old-slug' })
@@ -92,7 +101,9 @@ describe('/api/posts route', () => {
       description: '旧摘要',
       cover_image: null,
     })
-    mocks.getPosts.mockResolvedValue([{ id: 7, slug: 'old-slug', title: '旧标题' }])
+    mocks.getPosts.mockResolvedValue([
+      { id: 7, slug: 'old-slug', title: '旧标题' },
+    ])
     mocks.getCategories.mockResolvedValue([
       { name: '未分类', slug: 'uncategorized', post_count: 0 },
       { name: 'AI', slug: 'ai', post_count: 0 },
@@ -111,7 +122,19 @@ describe('/api/posts route', () => {
       content: '  正文内容  ',
       html: '<p>正文</p>',
       category: '  AI  ',
-      tags: [' AI ', '', '提示词', '编辑器', '产品', '设计', '测试', '额外', '更多', '仍然', '超出'],
+      tags: [
+        ' AI ',
+        '',
+        '提示词',
+        '编辑器',
+        '产品',
+        '设计',
+        '测试',
+        '额外',
+        '更多',
+        '仍然',
+        '超出',
+      ],
       description: '',
       cover_image: ' /covers/test.webp ',
       slug: 'custom_slug',
@@ -136,7 +159,18 @@ describe('/api/posts route', () => {
         password: 'secret',
         is_hidden: 1,
         description: '正文内容',
-        tags: ['AI', '提示词', '编辑器', '产品', '设计', '测试', '额外', '更多', '仍然', '超出'],
+        tags: [
+          'AI',
+          '提示词',
+          '编辑器',
+          '产品',
+          '设计',
+          '测试',
+          '额外',
+          '更多',
+          '仍然',
+          '超出',
+        ],
         cover_image: '/covers/test.webp',
       }),
     )
@@ -191,7 +225,9 @@ describe('/api/posts route', () => {
       [{ url: localizedUrl }],
       { postId: 88, slug: 'remote-image-post' },
     )
-    expect(body.remote_images).toEqual(expect.objectContaining({ found: 1, localized: 1 }))
+    expect(body.remote_images).toEqual(
+      expect.objectContaining({ found: 1, localized: 1 }),
+    )
   })
 
   it('stores a category slug as the matching category name when creating posts', async () => {
@@ -213,10 +249,12 @@ describe('/api/posts route', () => {
         category: 'AI资讯',
       }),
     )
-    expect(body).toEqual(expect.objectContaining({
-      success: true,
-      category: 'AI资讯',
-    }))
+    expect(body).toEqual(
+      expect.objectContaining({
+        success: true,
+        category: 'AI资讯',
+      }),
+    )
   })
 
   it('upserts an existing post by slug when explicitly requested', async () => {
@@ -248,12 +286,14 @@ describe('/api/posts route', () => {
       }),
     )
     expect(mocks.enqueueBackgroundJob).toHaveBeenCalledTimes(2)
-    expect(body).toEqual(expect.objectContaining({
-      success: true,
-      action: 'updated',
-      id: 7,
-      slug: 'old-slug',
-    }))
+    expect(body).toEqual(
+      expect.objectContaining({
+        success: true,
+        action: 'updated',
+        id: 7,
+        slug: 'old-slug',
+      }),
+    )
   })
 
   it('stores a category slug as the matching category name when updating posts', async () => {
@@ -277,14 +317,18 @@ describe('/api/posts route', () => {
   })
 
   it('reads a post by slug for external publishing tools', async () => {
-    const response = await GET(new Request('https://example.com/api/posts?slug=old-slug') as never)
+    const response = await GET(
+      new Request('https://example.com/api/posts?slug=old-slug') as never,
+    )
     const body = await response.json()
 
     expect(mocks.getPostBySlug).toHaveBeenCalledWith({ kind: 'db' }, 'old-slug')
-    expect(body).toEqual(expect.objectContaining({
-      success: true,
-      post: expect.objectContaining({ slug: 'old-slug' }),
-    }))
+    expect(body).toEqual(
+      expect.objectContaining({
+        success: true,
+        post: expect.objectContaining({ slug: 'old-slug' }),
+      }),
+    )
   })
 
   it('patches a post with fallback description and normalized next slug', async () => {
@@ -347,7 +391,10 @@ describe('/api/posts route', () => {
       title: '更新标题',
       content: '更新正文',
     })
-    mocks.getPostById.mockResolvedValue({ id: 100, slug: 'why-effort-isnt-enough' })
+    mocks.getPostById.mockResolvedValue({
+      id: 100,
+      slug: 'why-effort-isnt-enough',
+    })
 
     const response = await PATCH({} as never)
     const body = await response.json()
@@ -369,13 +416,19 @@ describe('/api/posts route', () => {
       '2026-05-02-dh5wth',
       'why-effort-isnt-enough',
     )
-    expect(body).toEqual({ success: true, id: 100, slug: 'why-effort-isnt-enough' })
+    expect(body).toEqual({
+      success: true,
+      id: 100,
+      slug: 'why-effort-isnt-enough',
+    })
   })
 
   it('deletes a post by slug for external publishing tools', async () => {
-    const response = await DELETE(new Request('https://example.com/api/posts?slug=old-slug', {
-      method: 'DELETE',
-    }) as never)
+    const response = await DELETE(
+      new Request('https://example.com/api/posts?slug=old-slug', {
+        method: 'DELETE',
+      }) as never,
+    )
     const body = await response.json()
 
     expect(mocks.deletePost).toHaveBeenCalledWith({ kind: 'db' }, 'old-slug')

@@ -131,12 +131,14 @@ describe('editor autosave draft state', () => {
 
 describe('editor save metadata normalization', () => {
   it('normalizes title, slug, and description for manual save', () => {
-    expect(resolveEditorSaveMetadata({
-      title: '  My Title  ',
-      slug: '  My Slug! ',
-      description: '  explicit  ',
-      fallbackContent: 'ignored',
-    })).toEqual({
+    expect(
+      resolveEditorSaveMetadata({
+        title: '  My Title  ',
+        slug: '  My Slug! ',
+        description: '  explicit  ',
+        fallbackContent: 'ignored',
+      }),
+    ).toEqual({
       normalizedTitle: 'My Title',
       normalizedSlug: 'myslug',
       normalizedDescription: 'explicit',
@@ -144,20 +146,24 @@ describe('editor save metadata normalization', () => {
   })
 
   it('falls back to content-derived description only when description is empty', () => {
-    expect(resolveEditorSaveMetadata({
-      title: 'T',
-      slug: '',
-      description: '',
-      fallbackContent: '  Some   content  ',
-    }).normalizedDescription).toBe('Some content')
+    expect(
+      resolveEditorSaveMetadata({
+        title: 'T',
+        slug: '',
+        description: '',
+        fallbackContent: '  Some   content  ',
+      }).normalizedDescription,
+    ).toBe('Some content')
 
     // Whitespace-only description is treated as explicit input and does not fall back.
-    expect(resolveEditorSaveMetadata({
-      title: 'T',
-      slug: '',
-      description: '   ',
-      fallbackContent: '  Some   content  ',
-    }).normalizedDescription).toBe('')
+    expect(
+      resolveEditorSaveMetadata({
+        title: 'T',
+        slug: '',
+        description: '   ',
+        fallbackContent: '  Some   content  ',
+      }).normalizedDescription,
+    ).toBe('')
   })
 })
 

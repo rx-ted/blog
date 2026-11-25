@@ -11,7 +11,8 @@ import { promisify } from 'node:util'
 const HOST = process.env.HOST || '0.0.0.0'
 const PORT = Number(process.env.PORT || 8788)
 const BRIDGE_TOKEN = (process.env.BRIDGE_TOKEN || '').trim()
-const ACCOUNTS_FILE = process.env.WECHAT_ACCOUNTS_FILE || '/etc/qmblog-wechat-bridge/accounts.json'
+const ACCOUNTS_FILE =
+  process.env.WECHAT_ACCOUNTS_FILE || '/etc/qmblog-wechat-bridge/accounts.json'
 const REQUEST_BODY_LIMIT = 2.5 * 1024 * 1024
 const REMOTE_IMAGE_LIMIT = 1024 * 1024
 const COVER_IMAGE_LIMIT = 1024 * 1024
@@ -23,16 +24,28 @@ const WECHAT_DRAFT_AUTHOR_MAX_CHARS = 16
 const WECHAT_DRAFT_DIGEST_MAX_CHARS = 128
 const WECHAT_DRAFT_DIGEST_MAX_BYTES = 120
 const WECHAT_ACCESS_TOKEN_ERROR_CODES = new Set([40001, 40014, 42001])
-export const WECHAT_ARTICLE_IMAGE_TYPES = Object.freeze(['image/jpeg', 'image/png', 'image/gif'])
-const IMAGE_MAGICK_CONVERT_TIMEOUT_MS = readPositiveIntegerEnv('WECHAT_IMAGE_CONVERT_TIMEOUT_MS', 60_000)
-const IMAGE_MAGICK_INSPECT_TIMEOUT_MS = readPositiveIntegerEnv('WECHAT_IMAGE_INSPECT_TIMEOUT_MS', 10_000)
+export const WECHAT_ARTICLE_IMAGE_TYPES = Object.freeze([
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+])
+const IMAGE_MAGICK_CONVERT_TIMEOUT_MS = readPositiveIntegerEnv(
+  'WECHAT_IMAGE_CONVERT_TIMEOUT_MS',
+  60_000,
+)
+const IMAGE_MAGICK_INSPECT_TIMEOUT_MS = readPositiveIntegerEnv(
+  'WECHAT_IMAGE_INSPECT_TIMEOUT_MS',
+  10_000,
+)
 // Official draft/add docs still say 32 chars, but the live API accepts 64
 // and rejects 65 with errcode 45003. Verified on 2026-06-16.
-const WECHAT_DRAFT_TITLE_LIMIT_HINT = '微信草稿 add API 实测支持 64 个字符，65 个字符会返回 45003；官方文档仍写 32，发布前以实测接口边界为准。'
+const WECHAT_DRAFT_TITLE_LIMIT_HINT =
+  '微信草稿 add API 实测支持 64 个字符，65 个字符会返回 45003；官方文档仍写 32，发布前以实测接口边界为准。'
 const convertFile = promisify(execFile)
 const IMAGE_MAGICK_BIN = process.env.IMAGEMAGICK_CONVERT || 'convert'
 const IS_MAIN_MODULE = Boolean(
-  process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url),
+  process.argv[1] &&
+    path.resolve(process.argv[1]) === fileURLToPath(import.meta.url),
 )
 
 function readPositiveIntegerEnv(name, fallback) {
@@ -83,7 +96,8 @@ function formatByteLimit(maxBytes) {
 
 function buildWxErrorMessage(payload, fallback, apiPath) {
   const message = String(payload?.errmsg || '').trim() || fallback
-  const errcode = typeof payload?.errcode === 'number' ? ` errcode=${payload.errcode}` : ''
+  const errcode =
+    typeof payload?.errcode === 'number' ? ` errcode=${payload.errcode}` : ''
   const hint = explainWxError(payload)
   const raw = `${message}${errcode} path=${apiPath}`
   return hint ? `${hint}（${raw}）` : raw
@@ -145,7 +159,10 @@ async function loadAccounts() {
       appid: String(account?.appid || '').trim(),
       secret: String(account?.secret || '').trim(),
     }))
-    .filter(account => account.id && account.name && account.appid && account.secret)
+    .filter(
+      (account) =>
+        account.id && account.name && account.appid && account.secret,
+    )
 }
 
 async function readJsonBody(req, maxBytes = REQUEST_BODY_LIMIT) {
@@ -172,7 +189,7 @@ function requireAuth(req) {
 
 async function getAccount(accountId) {
   const accounts = await loadAccounts()
-  const account = accounts.find(item => item.id === accountId)
+  const account = accounts.find((item) => item.id === accountId)
   if (!account) {
     throw new Error(`Unknown account_id: ${accountId}`)
   }
@@ -191,26 +208,31 @@ export async function getAccessToken(account, { forceRefresh = false } = {}) {
     return cached.token
   }
 
-  const response = await fetch('https://api.weixin.qq.com/cgi-bin/stable_token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      grant_type: 'client_credential',
-      appid: account.appid,
-      secret: account.secret,
-      force_refresh: forceRefresh,
-    }),
-    signal: AbortSignal.timeout(15_000),
-  })
+  const response = await fetch(
+    'https://api.weixin.qq.com/cgi-bin/stable_token',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        grant_type: 'client_credential',
+        appid: account.appid,
+        secret: account.secret,
+        force_refresh: forceRefresh,
+      }),
+      signal: AbortSignal.timeout(15_000),
+    },
+  )
   const payload = await response.json().catch(() => ({}))
   const accessToken = String(payload?.access_token || '').trim()
 
   if (!response.ok || payload?.errcode || !accessToken) {
-    throw new Error(buildWxErrorMessage(
-      payload,
-      `stable access_token request failed: HTTP ${response.status}`,
-      '/cgi-bin/stable_token',
-    ))
+    throw new Error(
+      buildWxErrorMessage(
+        payload,
+        `stable access_token request failed: HTTP ${response.status}`,
+        '/cgi-bin/stable_token',
+      ),
+    )
   }
 
   const expiresIn = Number(payload?.expires_in || 7200)
@@ -224,7 +246,9 @@ export async function getAccessToken(account, { forceRefresh = false } = {}) {
 
 async function requestWithAccessTokenRetry(account, request) {
   for (let attempt = 0; attempt < 2; attempt += 1) {
-    const accessToken = await getAccessToken(account, { forceRefresh: attempt > 0 })
+    const accessToken = await getAccessToken(account, {
+      forceRefresh: attempt > 0,
+    })
     const result = await request(accessToken)
 
     if (!isWechatAccessTokenError(result.payload) || attempt > 0) {
@@ -232,60 +256,78 @@ async function requestWithAccessTokenRetry(account, request) {
     }
 
     tokenCache.delete(account.id)
-    console.warn(`[wechat-bridge] refreshing stable access token account=${account.id} errcode=${result.payload.errcode}`)
+    console.warn(
+      `[wechat-bridge] refreshing stable access token account=${account.id} errcode=${result.payload.errcode}`,
+    )
   }
 
   throw new Error('WeChat access token retry exhausted')
 }
 
 export async function wxApiJson(account, path, { method = 'POST', body } = {}) {
-  const { response, payload } = await requestWithAccessTokenRetry(account, async (accessToken) => {
-    const url = new URL(`https://api.weixin.qq.com${path}`)
-    url.searchParams.set('access_token', accessToken)
+  const { response, payload } = await requestWithAccessTokenRetry(
+    account,
+    async (accessToken) => {
+      const url = new URL(`https://api.weixin.qq.com${path}`)
+      url.searchParams.set('access_token', accessToken)
 
-    const response = await fetch(url, {
-      method,
-      headers: body ? { 'Content-Type': 'application/json' } : undefined,
-      body: body ? JSON.stringify(body) : undefined,
-      signal: AbortSignal.timeout(20_000),
-    })
+      const response = await fetch(url, {
+        method,
+        headers: body ? { 'Content-Type': 'application/json' } : undefined,
+        body: body ? JSON.stringify(body) : undefined,
+        signal: AbortSignal.timeout(20_000),
+      })
 
-    return {
-      response,
-      payload: await response.json().catch(() => ({})),
-    }
-  })
+      return {
+        response,
+        payload: await response.json().catch(() => ({})),
+      }
+    },
+  )
 
-  if (!response.ok || (typeof payload?.errcode === 'number' && payload.errcode !== 0)) {
-    throw new Error(buildWxErrorMessage(payload, `WeChat API request failed: ${path}`, path))
+  if (
+    !response.ok ||
+    (typeof payload?.errcode === 'number' && payload.errcode !== 0)
+  ) {
+    throw new Error(
+      buildWxErrorMessage(payload, `WeChat API request failed: ${path}`, path),
+    )
   }
 
   return payload
 }
 
 export async function wxUploadForm(account, path, searchParams, formData) {
-  const { response, payload } = await requestWithAccessTokenRetry(account, async (accessToken) => {
-    const url = new URL(`https://api.weixin.qq.com${path}`)
-    url.searchParams.set('access_token', accessToken)
+  const { response, payload } = await requestWithAccessTokenRetry(
+    account,
+    async (accessToken) => {
+      const url = new URL(`https://api.weixin.qq.com${path}`)
+      url.searchParams.set('access_token', accessToken)
 
-    for (const [key, value] of Object.entries(searchParams || {})) {
-      url.searchParams.set(key, value)
-    }
+      for (const [key, value] of Object.entries(searchParams || {})) {
+        url.searchParams.set(key, value)
+      }
 
-    const response = await fetch(url, {
-      method: 'POST',
-      body: formData,
-      signal: AbortSignal.timeout(30_000),
-    })
+      const response = await fetch(url, {
+        method: 'POST',
+        body: formData,
+        signal: AbortSignal.timeout(30_000),
+      })
 
-    return {
-      response,
-      payload: await response.json().catch(() => ({})),
-    }
-  })
+      return {
+        response,
+        payload: await response.json().catch(() => ({})),
+      }
+    },
+  )
 
-  if (!response.ok || (typeof payload?.errcode === 'number' && payload.errcode !== 0)) {
-    throw new Error(buildWxErrorMessage(payload, `WeChat upload failed: ${path}`, path))
+  if (
+    !response.ok ||
+    (typeof payload?.errcode === 'number' && payload.errcode !== 0)
+  ) {
+    throw new Error(
+      buildWxErrorMessage(payload, `WeChat upload failed: ${path}`, path),
+    )
   }
 
   return payload
@@ -409,7 +451,10 @@ function shouldAttemptLocalTranscode(error) {
 }
 
 export function shouldPassThroughOversizedGif(kind, contentType) {
-  return kind === 'content' && String(contentType || '').toLowerCase() === 'image/gif'
+  return (
+    kind === 'content' &&
+    String(contentType || '').toLowerCase() === 'image/gif'
+  )
 }
 
 function isOptimizableBlogImageUrl(url) {
@@ -436,48 +481,49 @@ function buildImageFetchCandidates(inputUrl, kind) {
     return candidates
   }
 
-  const presets = kind === 'cover'
-    ? [
-      { w: '1280', h: '720', fit: 'cover', q: '92', format: 'jpeg' },
-      { w: '1280', h: '720', fit: 'cover', q: '88', format: 'jpeg' },
-      { w: '1280', h: '720', fit: 'cover', q: '84', format: 'jpeg' },
-      { w: '1280', h: '720', fit: 'cover', q: '80', format: 'jpeg' },
-      { w: '1280', h: '720', fit: 'cover', q: '76', format: 'jpeg' },
-      { w: '1200', h: '675', fit: 'cover', q: '92', format: 'jpeg' },
-      { w: '1200', h: '675', fit: 'cover', q: '86', format: 'jpeg' },
-      { w: '1200', h: '675', fit: 'cover', q: '80', format: 'jpeg' },
-      { w: '1080', h: '608', fit: 'cover', q: '90', format: 'jpeg' },
-      { w: '1080', h: '608', fit: 'cover', q: '84', format: 'jpeg' },
-      { w: '1080', h: '608', fit: 'cover', q: '78', format: 'jpeg' },
-      { w: '960', h: '540', fit: 'cover', q: '90', format: 'jpeg' },
-      { w: '960', h: '540', fit: 'cover', q: '84', format: 'jpeg' },
-      { w: '960', h: '540', fit: 'cover', q: '78', format: 'jpeg' },
-      { w: '960', h: '540', fit: 'cover', q: '72', format: 'jpeg' },
-      { w: '800', h: '450', fit: 'cover', q: '88', format: 'jpeg' },
-      { w: '800', h: '450', fit: 'cover', q: '82', format: 'jpeg' },
-      { w: '800', h: '450', fit: 'cover', q: '76', format: 'jpeg' },
-      { w: '640', h: '360', fit: 'cover', q: '86', format: 'jpeg' },
-      { w: '640', h: '360', fit: 'cover', q: '78', format: 'jpeg' },
-      { w: '640', h: '360', fit: 'cover', q: '70', format: 'jpeg' },
-      { w: '560', h: '315', fit: 'cover', q: '84', format: 'jpeg' },
-      { w: '560', h: '315', fit: 'cover', q: '76', format: 'jpeg' },
-      { w: '560', h: '315', fit: 'cover', q: '68', format: 'jpeg' },
-      { w: '480', h: '270', fit: 'cover', q: '82', format: 'jpeg' },
-      { w: '480', h: '270', fit: 'cover', q: '74', format: 'jpeg' },
-      { w: '480', h: '270', fit: 'cover', q: '66', format: 'jpeg' },
-      { w: '400', h: '225', fit: 'cover', q: '80', format: 'jpeg' },
-      { w: '400', h: '225', fit: 'cover', q: '70', format: 'jpeg' },
-      { w: '320', h: '180', fit: 'cover', q: '74', format: 'jpeg' },
-      { w: '320', h: '180', fit: 'cover', q: '64', format: 'jpeg' },
-    ]
-    : [
-      { w: '1280', q: '82', format: 'jpeg' },
-      { w: '1080', q: '76', format: 'jpeg' },
-      { w: '960', q: '70', format: 'jpeg' },
-      { w: '840', q: '64', format: 'jpeg' },
-      { w: '720', q: '58', format: 'jpeg' },
-      { w: '640', q: '52', format: 'jpeg' },
-    ]
+  const presets =
+    kind === 'cover'
+      ? [
+          { w: '1280', h: '720', fit: 'cover', q: '92', format: 'jpeg' },
+          { w: '1280', h: '720', fit: 'cover', q: '88', format: 'jpeg' },
+          { w: '1280', h: '720', fit: 'cover', q: '84', format: 'jpeg' },
+          { w: '1280', h: '720', fit: 'cover', q: '80', format: 'jpeg' },
+          { w: '1280', h: '720', fit: 'cover', q: '76', format: 'jpeg' },
+          { w: '1200', h: '675', fit: 'cover', q: '92', format: 'jpeg' },
+          { w: '1200', h: '675', fit: 'cover', q: '86', format: 'jpeg' },
+          { w: '1200', h: '675', fit: 'cover', q: '80', format: 'jpeg' },
+          { w: '1080', h: '608', fit: 'cover', q: '90', format: 'jpeg' },
+          { w: '1080', h: '608', fit: 'cover', q: '84', format: 'jpeg' },
+          { w: '1080', h: '608', fit: 'cover', q: '78', format: 'jpeg' },
+          { w: '960', h: '540', fit: 'cover', q: '90', format: 'jpeg' },
+          { w: '960', h: '540', fit: 'cover', q: '84', format: 'jpeg' },
+          { w: '960', h: '540', fit: 'cover', q: '78', format: 'jpeg' },
+          { w: '960', h: '540', fit: 'cover', q: '72', format: 'jpeg' },
+          { w: '800', h: '450', fit: 'cover', q: '88', format: 'jpeg' },
+          { w: '800', h: '450', fit: 'cover', q: '82', format: 'jpeg' },
+          { w: '800', h: '450', fit: 'cover', q: '76', format: 'jpeg' },
+          { w: '640', h: '360', fit: 'cover', q: '86', format: 'jpeg' },
+          { w: '640', h: '360', fit: 'cover', q: '78', format: 'jpeg' },
+          { w: '640', h: '360', fit: 'cover', q: '70', format: 'jpeg' },
+          { w: '560', h: '315', fit: 'cover', q: '84', format: 'jpeg' },
+          { w: '560', h: '315', fit: 'cover', q: '76', format: 'jpeg' },
+          { w: '560', h: '315', fit: 'cover', q: '68', format: 'jpeg' },
+          { w: '480', h: '270', fit: 'cover', q: '82', format: 'jpeg' },
+          { w: '480', h: '270', fit: 'cover', q: '74', format: 'jpeg' },
+          { w: '480', h: '270', fit: 'cover', q: '66', format: 'jpeg' },
+          { w: '400', h: '225', fit: 'cover', q: '80', format: 'jpeg' },
+          { w: '400', h: '225', fit: 'cover', q: '70', format: 'jpeg' },
+          { w: '320', h: '180', fit: 'cover', q: '74', format: 'jpeg' },
+          { w: '320', h: '180', fit: 'cover', q: '64', format: 'jpeg' },
+        ]
+      : [
+          { w: '1280', q: '82', format: 'jpeg' },
+          { w: '1080', q: '76', format: 'jpeg' },
+          { w: '960', q: '70', format: 'jpeg' },
+          { w: '840', q: '64', format: 'jpeg' },
+          { w: '720', q: '58', format: 'jpeg' },
+          { w: '640', q: '52', format: 'jpeg' },
+        ]
 
   for (const preset of presets) {
     const next = new URL(input.toString())
@@ -507,7 +553,8 @@ async function fetchRemoteImageOnce(inputUrl, maxBytes) {
 
     if (response.status >= 300 && response.status < 400) {
       const location = response.headers.get('location')
-      if (!location) throw new Error('Redirect response without Location header')
+      if (!location)
+        throw new Error('Redirect response without Location header')
       url = new URL(location, url)
       continue
     }
@@ -516,7 +563,10 @@ async function fetchRemoteImageOnce(inputUrl, maxBytes) {
       throw new Error(`Failed to download image: HTTP ${response.status}`)
     }
 
-    const contentType = (response.headers.get('content-type') || '').split(';')[0].trim().toLowerCase()
+    const contentType = (response.headers.get('content-type') || '')
+      .split(';')[0]
+      .trim()
+      .toLowerCase()
     const data = await readResponseBuffer(response, maxBytes).catch((error) => {
       if (error instanceof RemoteFileTooLargeError) {
         error.url = url.toString()
@@ -550,7 +600,9 @@ async function fetchRemoteImage(inputUrl, maxBytes, kind, allowedTypes = []) {
           kind === 'content' &&
           isAnimationCapableImage(download.contentType, candidate)
         ) {
-          throw new Error(`Unsupported image type: ${download.contentType || 'unknown'}`)
+          throw new Error(
+            `Unsupported image type: ${download.contentType || 'unknown'}`,
+          )
         }
         lastUnsupportedType = download.contentType || 'unknown'
         continue
@@ -574,14 +626,18 @@ async function fetchRemoteImage(inputUrl, maxBytes, kind, allowedTypes = []) {
 
   if (lastTooLargeError) {
     const limitLabel = formatByteLimit(maxBytes)
-    throw new Error(`图片在自动压缩后仍超过微信 ${limitLabel} 限制（来源：${describeImageSource(lastTooLargeError.url || inputUrl)}）`)
+    throw new Error(
+      `图片在自动压缩后仍超过微信 ${limitLabel} 限制（来源：${describeImageSource(lastTooLargeError.url || inputUrl)}）`,
+    )
   }
 
   if (lastUnsupportedType) {
     throw new Error(`Unsupported image type: ${lastUnsupportedType}`)
   }
 
-  throw new Error(`Failed to download image from ${describeImageSource(inputUrl)}`)
+  throw new Error(
+    `Failed to download image from ${describeImageSource(inputUrl)}`,
+  )
 }
 
 export function normalizeImageFile(download, allowedTypes) {
@@ -592,7 +648,9 @@ export function normalizeImageFile(download, allowedTypes) {
   }
 
   if (!allowedTypes.includes(download.contentType)) {
-    throw new Error(`Unsupported image type: ${download.contentType || 'unknown'}`)
+    throw new Error(
+      `Unsupported image type: ${download.contentType || 'unknown'}`,
+    )
   }
 
   const extension = extensionMap[download.contentType] || 'img'
@@ -677,7 +735,7 @@ function isMissingFileError(error) {
 
 function summarizeProcessOutput(stdout, stderr) {
   const output = [stderr, stdout]
-    .map(value => String(value || '').trim())
+    .map((value) => String(value || '').trim())
     .filter(Boolean)
     .join('\n')
     .replace(/\s+/g, ' ')
@@ -690,9 +748,8 @@ function describeTranscodePreset(kind, preset) {
     return `${preset.width}x> colors=${preset.colors}`
   }
 
-  const size = kind === 'cover'
-    ? `${preset.width}x${preset.height}`
-    : `${preset.width}x>`
+  const size =
+    kind === 'cover' ? `${preset.width}x${preset.height}` : `${preset.width}x>`
   return `${size} q=${preset.quality}`
 }
 
@@ -708,12 +765,17 @@ function describeExecError(error) {
 function isExecTimeoutError(error) {
   return Boolean(
     error &&
-    typeof error === 'object' &&
-    (error.killed === true || error.code === 'ETIMEDOUT'),
+      typeof error === 'object' &&
+      (error.killed === true || error.code === 'ETIMEDOUT'),
   )
 }
 
-async function runImageMagickConvert(args, outputPath, context, format = 'jpeg') {
+async function runImageMagickConvert(
+  args,
+  outputPath,
+  context,
+  format = 'jpeg',
+) {
   const outputTargets = [`${format}:${outputPath}`, outputPath]
   let lastMissingOutput = null
 
@@ -731,38 +793,53 @@ async function runImageMagickConvert(args, outputPath, context, format = 'jpeg')
       if (isExecTimeoutError(error)) {
         const seconds = Math.ceil(IMAGE_MAGICK_CONVERT_TIMEOUT_MS / 1000)
         const imageKind = format === 'gif' ? '动图' : '图片'
-        throw new Error(`${imageKind}转换超过 ${seconds} 秒，已停止处理以避免发布超时。请先把这张图片压缩到 1MB 以内后重试。`)
+        throw new Error(
+          `${imageKind}转换超过 ${seconds} 秒，已停止处理以避免发布超时。请先把这张图片压缩到 1MB 以内后重试。`,
+        )
       }
-      throw new Error(`ImageMagick 图片转换失败（${context}）：${describeExecError(error)}`)
+      throw new Error(
+        `ImageMagick 图片转换失败（${context}）：${describeExecError(error)}`,
+      )
     }
 
     try {
       const outputBuffer = await readFile(outputPath)
       if (outputBuffer.byteLength === 0) {
-        lastMissingOutput = new Error(`ImageMagick 图片转换生成了空文件（${context}）。${summarizeProcessOutput(result?.stdout, result?.stderr)}`)
+        lastMissingOutput = new Error(
+          `ImageMagick 图片转换生成了空文件（${context}）。${summarizeProcessOutput(result?.stdout, result?.stderr)}`,
+        )
         continue
       }
       return outputBuffer
     } catch (error) {
       if (!isMissingFileError(error)) throw error
-      lastMissingOutput = new Error(`ImageMagick 图片转换没有生成输出文件（${context}）。${summarizeProcessOutput(result?.stdout, result?.stderr)}`)
+      lastMissingOutput = new Error(
+        `ImageMagick 图片转换没有生成输出文件（${context}）。${summarizeProcessOutput(result?.stdout, result?.stderr)}`,
+      )
     }
   }
 
-  throw lastMissingOutput || new Error(`ImageMagick 图片转换没有生成输出文件（${context}）。`)
+  throw (
+    lastMissingOutput ||
+    new Error(`ImageMagick 图片转换没有生成输出文件（${context}）。`)
+  )
 }
 
 async function getImageFrameCount(inputPath) {
   try {
-    const result = await convertFile(IMAGE_MAGICK_BIN, [inputPath, '-format', '%n\n', 'info:'], {
-      timeout: IMAGE_MAGICK_INSPECT_TIMEOUT_MS,
-      killSignal: 'SIGKILL',
-      maxBuffer: 1024 * 1024,
-    })
+    const result = await convertFile(
+      IMAGE_MAGICK_BIN,
+      [inputPath, '-format', '%n\n', 'info:'],
+      {
+        timeout: IMAGE_MAGICK_INSPECT_TIMEOUT_MS,
+        killSignal: 'SIGKILL',
+        maxBuffer: 1024 * 1024,
+      },
+    )
     const frameCounts = String(result?.stdout || '')
       .split(/\s+/)
       .map(Number)
-      .filter(value => Number.isInteger(value) && value > 0)
+      .filter((value) => Number.isInteger(value) && value > 0)
 
     return frameCounts.length ? Math.max(...frameCounts) : 1
   } catch (error) {
@@ -780,9 +857,13 @@ export async function transcodeImageLocally(download, { kind, maxBytes }) {
   try {
     await writeFile(inputPath, download.buffer)
 
-    const frameCount = kind === 'content' ? await getImageFrameCount(inputPath) : 1
+    const frameCount =
+      kind === 'content' ? await getImageFrameCount(inputPath) : 1
     const isAnimated = kind === 'content' && frameCount > 1
-    const outputPath = path.join(tempDir, isAnimated ? 'output.gif' : 'output.jpg')
+    const outputPath = path.join(
+      tempDir,
+      isAnimated ? 'output.gif' : 'output.jpg',
+    )
     const presets = isAnimated
       ? [pickAnimatedGifTranscodePreset(download.buffer.byteLength)]
       : buildLocalTranscodePresets(kind)
@@ -790,40 +871,55 @@ export async function transcodeImageLocally(download, { kind, maxBytes }) {
     for (const preset of presets) {
       const resizeArgs = isAnimated
         ? [
-          '-coalesce',
-          '-thumbnail', `${preset.width}x>`,
-          '-colors', String(preset.colors),
-          '-layers', 'Optimize',
-        ]
+            '-coalesce',
+            '-thumbnail',
+            `${preset.width}x>`,
+            '-colors',
+            String(preset.colors),
+            '-layers',
+            'Optimize',
+          ]
         : kind === 'cover'
-        ? [
-          '-thumbnail', `${preset.width}x${preset.height}^`,
-          '-gravity', 'center',
-          '-extent', `${preset.width}x${preset.height}`,
-        ]
-        : [
-          '-thumbnail', `${preset.width}x>`,
-        ]
+          ? [
+              '-thumbnail',
+              `${preset.width}x${preset.height}^`,
+              '-gravity',
+              'center',
+              '-extent',
+              `${preset.width}x${preset.height}`,
+            ]
+          : ['-thumbnail', `${preset.width}x>`]
 
       const context = `${kind} ${describeTranscodePreset(kind, preset)}`
-      const outputBuffer = await runImageMagickConvert([
-        isAnimated ? inputPath : `${inputPath}[0]`,
-        '-auto-orient',
-        '-strip',
-        ...resizeArgs,
-        ...(isAnimated
-          ? []
-          : [
-            '-interlace', 'Plane',
-            '-sampling-factor', '4:2:0',
-            '-quality', String(preset.quality),
-          ]),
-      ], outputPath, context, isAnimated ? 'gif' : 'jpeg')
+      const outputBuffer = await runImageMagickConvert(
+        [
+          isAnimated ? inputPath : `${inputPath}[0]`,
+          '-auto-orient',
+          '-strip',
+          ...resizeArgs,
+          ...(isAnimated
+            ? []
+            : [
+                '-interlace',
+                'Plane',
+                '-sampling-factor',
+                '4:2:0',
+                '-quality',
+                String(preset.quality),
+              ]),
+        ],
+        outputPath,
+        context,
+        isAnimated ? 'gif' : 'jpeg',
+      )
 
       if (outputBuffer.byteLength <= maxBytes) {
-        const baseName = download.fileName.replace(/\.[a-z0-9]+$/i, '') || 'image'
+        const baseName =
+          download.fileName.replace(/\.[a-z0-9]+$/i, '') || 'image'
         return {
-          blob: new Blob([outputBuffer], { type: isAnimated ? 'image/gif' : 'image/jpeg' }),
+          blob: new Blob([outputBuffer], {
+            type: isAnimated ? 'image/gif' : 'image/jpeg',
+          }),
           fileName: `${baseName}.${isAnimated ? 'gif' : 'jpg'}`,
           contentType: isAnimated ? 'image/gif' : 'image/jpeg',
         }
@@ -834,12 +930,19 @@ export async function transcodeImageLocally(download, { kind, maxBytes }) {
   }
 
   const limitLabel = formatByteLimit(maxBytes)
-  throw new Error(`图片在本地重压后仍超过微信 ${limitLabel} 限制（来源：${describeImageSource(download.url)}）`)
+  throw new Error(
+    `图片在本地重压后仍超过微信 ${limitLabel} 限制（来源：${describeImageSource(download.url)}）`,
+  )
 }
 
 export async function buildWechatUploadFile(sourceUrl, options) {
   try {
-    const optimized = await fetchRemoteImage(sourceUrl, options.maxBytes, options.kind, options.allowedTypes)
+    const optimized = await fetchRemoteImage(
+      sourceUrl,
+      options.maxBytes,
+      options.kind,
+      options.allowedTypes,
+    )
     return normalizeImageFile(optimized, options.allowedTypes)
   } catch (error) {
     if (
@@ -878,7 +981,12 @@ async function uploadArticleImage(account, sourceUrl) {
   const formData = new FormData()
   formData.append('media', normalized.blob, normalized.fileName)
 
-  const payload = await wxUploadForm(account, '/cgi-bin/media/uploadimg', {}, formData)
+  const payload = await wxUploadForm(
+    account,
+    '/cgi-bin/media/uploadimg',
+    {},
+    formData,
+  )
   const resultUrl = String(payload?.url || '').trim()
   if (!resultUrl) {
     throw new Error('WeChat uploadimg did not return url')
@@ -886,7 +994,11 @@ async function uploadArticleImage(account, sourceUrl) {
   return resultUrl
 }
 
-async function uploadCoverMaterial(account, sourceUrl, { materialType, maxBytes }) {
+async function uploadCoverMaterial(
+  account,
+  sourceUrl,
+  { materialType, maxBytes },
+) {
   const normalized = await buildWechatUploadFile(sourceUrl, {
     kind: 'cover',
     maxBytes,
@@ -894,9 +1006,18 @@ async function uploadCoverMaterial(account, sourceUrl, { materialType, maxBytes 
     fallbackSourceLimit: FALLBACK_SOURCE_COVER_LIMIT,
   })
   const formData = new FormData()
-  formData.append('media', normalized.blob, normalized.fileName.endsWith('.jpg') ? normalized.fileName : 'cover.jpg')
+  formData.append(
+    'media',
+    normalized.blob,
+    normalized.fileName.endsWith('.jpg') ? normalized.fileName : 'cover.jpg',
+  )
 
-  const payload = await wxUploadForm(account, '/cgi-bin/material/add_material', { type: materialType }, formData)
+  const payload = await wxUploadForm(
+    account,
+    '/cgi-bin/material/add_material',
+    { type: materialType },
+    formData,
+  )
   const mediaId = String(payload?.media_id || '').trim()
   if (!mediaId) {
     throw new Error('WeChat add_material did not return media_id')
@@ -940,14 +1061,16 @@ async function replaceHtmlImageSources(html, replacer) {
   const regex = /<img\b[^>]*?\bsrc=(['"])(.*?)\1/gi
   let result = ''
   let lastIndex = 0
-  let match
 
-  while ((match = regex.exec(html)) !== null) {
+  for (let match = regex.exec(html); match !== null; match = regex.exec(html)) {
     const [fullMatch, quote, src] = match
     const start = match.index
     const end = start + fullMatch.length
     const newSrc = await replacer(src)
-    const updatedTag = fullMatch.replace(`${quote}${src}${quote}`, `${quote}${newSrc}${quote}`)
+    const updatedTag = fullMatch.replace(
+      `${quote}${src}${quote}`,
+      `${quote}${newSrc}${quote}`,
+    )
 
     result += html.slice(lastIndex, start)
     result += updatedTag
@@ -962,9 +1085,8 @@ function collectArticleImageAssets(html) {
   const regex = /<img\b[^>]*?\bsrc=(['"])(.*?)\1/gi
   const assets = []
   const bySource = new Map()
-  let match
 
-  while ((match = regex.exec(html)) !== null) {
+  for (let match = regex.exec(html); match !== null; match = regex.exec(html)) {
     const source = decodeHtmlEntities(match[2] || '').trim()
 
     if (!source || source.startsWith('data:')) {
@@ -988,7 +1110,7 @@ function collectArticleImageAssets(html) {
 }
 
 function insertAssetPlaceholders(html, assets) {
-  const bySource = new Map(assets.map(asset => [asset.source, asset]))
+  const bySource = new Map(assets.map((asset) => [asset.source, asset]))
 
   return replaceHtmlImageSources(html, async (src) => {
     const source = decodeHtmlEntities(src).trim()
@@ -1024,7 +1146,9 @@ async function publishArticle(account, body) {
   if (!accountId) throw new Error('Missing account_id')
   if (!title) throw new Error('Missing title')
   if (isWechatTextOverCharLimit(title, WECHAT_DRAFT_TITLE_MAX_CHARS)) {
-    throw new Error(`微信草稿 API 标题超出限制，请把标题控制在 ${WECHAT_DRAFT_TITLE_MAX_CHARS} 个字以内后重试。${WECHAT_DRAFT_TITLE_LIMIT_HINT}`)
+    throw new Error(
+      `微信草稿 API 标题超出限制，请把标题控制在 ${WECHAT_DRAFT_TITLE_MAX_CHARS} 个字以内后重试。${WECHAT_DRAFT_TITLE_LIMIT_HINT}`,
+    )
   }
   if (!contentHtml) throw new Error('Missing content_html')
 
@@ -1037,17 +1161,25 @@ async function publishArticle(account, body) {
 
   rewrittenContent = replaceAssetPlaceholders(rewrittenContent, imageAssets)
 
-  const coverImageUrl = decodeHtmlEntities(String(body?.cover_image_url || '').trim()) || extractFirstImageSource(contentHtml)
+  const coverImageUrl =
+    decodeHtmlEntities(String(body?.cover_image_url || '').trim()) ||
+    extractFirstImageSource(contentHtml)
   if (!coverImageUrl) {
-    throw new Error('Missing cover_image_url and no image found in article content')
+    throw new Error(
+      'Missing cover_image_url and no image found in article content',
+    )
   }
 
-  const buildDraftBody = thumbMediaId => ({
+  const buildDraftBody = (thumbMediaId) => ({
     articles: [
       {
         title,
         author: truncateWechatText(body?.author, WECHAT_DRAFT_AUTHOR_MAX_CHARS),
-        digest: truncateWechatText(body?.digest, WECHAT_DRAFT_DIGEST_MAX_CHARS, WECHAT_DRAFT_DIGEST_MAX_BYTES),
+        digest: truncateWechatText(
+          body?.digest,
+          WECHAT_DRAFT_DIGEST_MAX_CHARS,
+          WECHAT_DRAFT_DIGEST_MAX_BYTES,
+        ),
         content: rewrittenContent,
         content_source_url: String(body?.content_source_url || '').trim(),
         thumb_media_id: thumbMediaId,
@@ -1073,7 +1205,10 @@ async function publishArticle(account, body) {
       body: buildDraftBody(coverUpload.mediaId),
     })
   } catch (error) {
-    if (coverUpload.materialType === 'thumb' || !shouldRetryCoverAsThumb(error)) {
+    if (
+      coverUpload.materialType === 'thumb' ||
+      !shouldRetryCoverAsThumb(error)
+    ) {
       throw error
     }
     coverUpload = await uploadCoverThumb(account, coverImageUrl)
@@ -1097,7 +1232,8 @@ async function publishArticle(account, body) {
     publish_now: publishNow,
     assets: {
       image_count: imageAssets.length,
-      uploaded_image_count: imageAssets.filter(asset => asset.publicUrl).length,
+      uploaded_image_count: imageAssets.filter((asset) => asset.publicUrl)
+        .length,
       cover_upload_type: coverUpload.materialType,
       cover_upload_limit: formatByteLimit(coverUpload.maxBytes),
     },
@@ -1107,9 +1243,13 @@ async function publishArticle(account, body) {
     return response
   }
 
-  const publishPayload = await wxApiJson(account, '/cgi-bin/freepublish/submit', {
-    body: { media_id: mediaId },
-  })
+  const publishPayload = await wxApiJson(
+    account,
+    '/cgi-bin/freepublish/submit',
+    {
+      body: { media_id: mediaId },
+    },
+  )
 
   return {
     ...response,
@@ -1121,7 +1261,10 @@ async function publishArticle(account, body) {
 const server = http.createServer(async (req, res) => {
   try {
     const method = req.method || 'GET'
-    const requestUrl = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`)
+    const requestUrl = new URL(
+      req.url || '/',
+      `http://${req.headers.host || 'localhost'}`,
+    )
 
     if (method === 'GET' && requestUrl.pathname === '/health') {
       const accounts = await loadAccounts().catch(() => [])
@@ -1145,7 +1288,9 @@ const server = http.createServer(async (req, res) => {
 
     if (method === 'POST' && requestUrl.pathname === '/v1/wechat/publish') {
       const body = await readJsonBody(req)
-      const { account } = await getAccount(String(body?.account_id || '').trim())
+      const { account } = await getAccount(
+        String(body?.account_id || '').trim(),
+      )
       const result = await publishArticle(account, body)
       return json(res, 200, result)
     }

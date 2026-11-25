@@ -16,18 +16,23 @@ describe('wechat publish inspect', () => {
       normalizedDigest: '摘'.repeat(40),
       contentHtml: '<h1>题题</h1><ul><li>Item</li></ul>',
       coverImageUrl: '',
-      resolvedCoverImageUrl: 'https://blog.19981204.xyz/default-covers/qm-cover-1.jpg',
+      resolvedCoverImageUrl:
+        'https://blog.19981204.xyz/default-covers/qm-cover-1.jpg',
     })
 
-    expect(inspect.checks.map(check => check.code)).toEqual(expect.arrayContaining([
-      'MISSING_ACCOUNT',
-      'TITLE_TOO_LONG',
-      'AUTHOR_TOO_LONG',
-      'DIGEST_TOO_LONG',
-      'LIST_MARKERS_MISSING',
-      'COVER_FALLBACK_DEFAULT',
-    ]))
-    expect(inspect.checks.find(check => check.code === 'TITLE_TOO_LONG')).toMatchObject({
+    expect(inspect.checks.map((check) => check.code)).toEqual(
+      expect.arrayContaining([
+        'MISSING_ACCOUNT',
+        'TITLE_TOO_LONG',
+        'AUTHOR_TOO_LONG',
+        'DIGEST_TOO_LONG',
+        'LIST_MARKERS_MISSING',
+        'COVER_FALLBACK_DEFAULT',
+      ]),
+    )
+    expect(
+      inspect.checks.find((check) => check.code === 'TITLE_TOO_LONG'),
+    ).toMatchObject({
       level: 'error',
       message: expect.stringContaining('微信草稿 API'),
     })
@@ -44,15 +49,20 @@ describe('wechat publish inspect', () => {
       resolvedCoverImageUrl: 'https://example.com/cover.jpg',
     })
 
-    expect(inspect.checks.map(check => check.code)).toContain('DATA_URL_IMAGE')
-    expect(getBlockingWechatPublishChecks(inspect.checks).map(check => check.code)).toEqual(['DATA_URL_IMAGE'])
+    expect(inspect.checks.map((check) => check.code)).toContain(
+      'DATA_URL_IMAGE',
+    )
+    expect(
+      getBlockingWechatPublishChecks(inspect.checks).map((check) => check.code),
+    ).toEqual(['DATA_URL_IMAGE'])
     expect(inspect.readiness.upload_ready).toBe(false)
   })
 
   it('warns when many images may make WeChat upload slow', () => {
-    const contentHtml = Array.from({ length: 12 }, (_, index) => (
-      `<img src="https://example.com/${index}.jpg">`
-    )).join('')
+    const contentHtml = Array.from(
+      { length: 12 },
+      (_, index) => `<img src="https://example.com/${index}.jpg">`,
+    ).join('')
 
     const inspect = inspectWechatPublishInput({
       accountId: 'main',
@@ -63,7 +73,9 @@ describe('wechat publish inspect', () => {
     })
 
     expect(inspect.summary.image_count).toBe(12)
-    expect(inspect.checks.map(check => check.code)).toContain('IMAGE_TIMEOUT_RISK')
+    expect(inspect.checks.map((check) => check.code)).toContain(
+      'IMAGE_TIMEOUT_RISK',
+    )
     expect(inspect.readiness.draft_ready).toBe(true)
   })
 
@@ -72,10 +84,13 @@ describe('wechat publish inspect', () => {
       accountId: 'main',
       title: 'Title',
       normalizedTitle: 'Title',
-      contentHtml: '<style>.wechat-list-marker{display:inline}</style><ul><li>Item</li></ul>',
+      contentHtml:
+        '<style>.wechat-list-marker{display:inline}</style><ul><li>Item</li></ul>',
       resolvedCoverImageUrl: 'https://example.com/cover.jpg',
     })
 
-    expect(inspect.checks.map(check => check.code)).toContain('LIST_MARKERS_MISSING')
+    expect(inspect.checks.map((check) => check.code)).toContain(
+      'LIST_MARKERS_MISSING',
+    )
   })
 })

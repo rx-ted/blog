@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/admin-auth'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { generateEditorImage } from '@/lib/ai-image'
@@ -15,7 +15,7 @@ type ImageBucket = {
         cacheControl?: string
       }
       customMetadata?: Record<string, string>
-    }
+    },
   ) => Promise<void>
 }
 
@@ -62,9 +62,11 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const normalizedReferenceImageUrl = typeof body.referenceImageUrl === 'string' && body.referenceImageUrl.trim()
-      ? new URL(body.referenceImageUrl.trim(), req.nextUrl.origin).toString()
-      : undefined
+    const normalizedReferenceImageUrl =
+      typeof body.referenceImageUrl === 'string' &&
+      body.referenceImageUrl.trim()
+        ? new URL(body.referenceImageUrl.trim(), req.nextUrl.origin).toString()
+        : undefined
 
     const result = await generateEditorImage({
       action,

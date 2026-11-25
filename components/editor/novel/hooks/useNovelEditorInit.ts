@@ -1,4 +1,9 @@
-import { useEffect, type Dispatch, type MutableRefObject, type SetStateAction } from 'react'
+import {
+  useEffect,
+  type Dispatch,
+  type MutableRefObject,
+  type SetStateAction,
+} from 'react'
 import type { JSONContent } from 'novel'
 import { EMPTY_DOCUMENT, SIDEBAR_KEY } from '@/components/editor/shared'
 import { normalizeWechatPublishingHtml } from '@/lib/wechat-publishing-enhancements'

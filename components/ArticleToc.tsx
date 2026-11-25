@@ -1,7 +1,12 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ChevronDown, ListTree, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import {
+  ChevronDown,
+  ListTree,
+  PanelLeftClose,
+  PanelLeftOpen,
+} from 'lucide-react'
 import {
   createTocAnchorId,
   normalizeTocTitle,
@@ -39,7 +44,8 @@ function getActiveAnchorLine() {
 }
 
 function scrollElementIntoView(element: HTMLElement) {
-  const top = element.getBoundingClientRect().top + window.scrollY - getOffsetTop()
+  const top =
+    element.getBoundingClientRect().top + window.scrollY - getOffsetTop()
   window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
 }
 
@@ -101,9 +107,10 @@ function useActiveHeadingId(
         const headings = getHeadingElements(root)
         const current = items
           .map((item, index) => {
-            const element = root?.querySelector<HTMLElement>(`#${CSS.escape(item.id)}`)
-              || document.getElementById(item.id)
-              || headings[index]
+            const element =
+              root?.querySelector<HTMLElement>(`#${CSS.escape(item.id)}`) ||
+              document.getElementById(item.id) ||
+              headings[index]
             return element
               ? {
                   id: item.id,
@@ -155,19 +162,25 @@ export function ArticleToc({
   const navRef = useRef<HTMLElement | null>(null)
   const inferredActiveId = useActiveHeadingId(items, root, onActiveIdChange)
   const resolvedActiveId = inferredActiveId || activeId || ''
-  const visibleItems = useMemo(() => items.filter((item) => item.title), [items])
+  const visibleItems = useMemo(
+    () => items.filter((item) => item.title),
+    [items],
+  )
 
-  const handleSelect = useCallback((item: ArticleTocItem) => {
-    onActiveIdChange?.(item.id)
+  const handleSelect = useCallback(
+    (item: ArticleTocItem) => {
+      onActiveIdChange?.(item.id)
 
-    if (onItemSelect) {
-      onItemSelect(item)
-      return
-    }
+      if (onItemSelect) {
+        onItemSelect(item)
+        return
+      }
 
-    const element = document.getElementById(item.id)
-    if (element) scrollElementIntoView(element)
-  }, [onActiveIdChange, onItemSelect])
+      const element = document.getElementById(item.id)
+      if (element) scrollElementIntoView(element)
+    },
+    [onActiveIdChange, onItemSelect],
+  )
 
   if (visibleItems.length === 0) return null
 
@@ -188,7 +201,9 @@ export function ArticleToc({
           <ListTree className="h-3.5 w-3.5" />
           {showTitle ? title : <span className="sr-only">{title}</span>}
         </span>
-        <ChevronDown className={`h-3.5 w-3.5 transition ${collapsed ? '-rotate-90' : ''}`} />
+        <ChevronDown
+          className={`h-3.5 w-3.5 transition ${collapsed ? '-rotate-90' : ''}`}
+        />
       </button>
 
       {!collapsed ? (

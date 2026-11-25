@@ -24,6 +24,8 @@ describe('markdown unified entry', () => {
 
   it('re-exports frontmatter helpers', () => {
     expect(extractFirstMarkdownH1('# Hello\n\nBody')?.title).toBe('Hello')
-    expect(parseImportedMarkdown('---\ntitle: Test\n---\n\nBody').title).toBe('Test')
+    expect(parseImportedMarkdown('---\ntitle: Test\n---\n\nBody').title).toBe(
+      'Test',
+    )
   })
 })

@@ -23,12 +23,14 @@ export async function GET() {
   try {
     await ensureAiImageConfigInfrastructure(db)
 
-    const { results } = await db.prepare(`
+    const { results } = await db
+      .prepare(`
       SELECT id, action_key, label, description, aspect_ratio, resolution, size, profile_id
       FROM ai_image_actions
       WHERE is_enabled = 1
       ORDER BY sort_order ASC
-    `).all<AiImageActionPublic>()
+    `)
+      .all<AiImageActionPublic>()
 
     return NextResponse.json({ actions: results })
   } catch {

@@ -1,4 +1,8 @@
-export type AIProviderCategory = '海外大模型' | '海外聚合' | '国内大模型' | '国内聚合'
+export type AIProviderCategory =
+  | '海外大模型'
+  | '海外聚合'
+  | '国内大模型'
+  | '国内聚合'
 
 export interface AIProviderPreset {
   id: string
@@ -29,7 +33,8 @@ export const AI_PROVIDER_PRESETS: AIProviderPreset[] = [
       '@cf/deepseek-ai/deepseek-r1-distill-qwen-32b',
     ],
     apiKeyUrl: 'https://dash.cloudflare.com/profile/api-tokens',
-    description: 'Cloudflare 官方 Workers AI。使用 API Token，Base URL 里的 <ACCOUNT_ID> 需替换为你的账号 ID。',
+    description:
+      'Cloudflare 官方 Workers AI。使用 API Token，Base URL 里的 <ACCOUNT_ID> 需替换为你的账号 ID。',
   },
   {
     id: 'openrouter',
@@ -88,7 +93,10 @@ export const AI_PROVIDER_PRESETS: AIProviderPreset[] = [
     category: '海外聚合',
     baseUrl: 'https://api.together.xyz/v1',
     defaultModel: 'deepseek-ai/DeepSeek-R1-0528',
-    quickModels: ['deepseek-ai/DeepSeek-R1-0528', 'meta-llama/Llama-3.3-70B-Instruct-Turbo'],
+    quickModels: [
+      'deepseek-ai/DeepSeek-R1-0528',
+      'meta-llama/Llama-3.3-70B-Instruct-Turbo',
+    ],
     apiKeyUrl: 'https://api.together.ai/settings/api-keys',
     description: '开源模型聚合',
   },
@@ -167,12 +175,10 @@ export const AI_PROVIDER_PRESETS: AIProviderPreset[] = [
     category: '国内聚合',
     baseUrl: 'https://api.aigocode.com/v1',
     defaultModel: 'claude-opus-4-8',
-    quickModels: [
-      'claude-opus-4-8',
-      'claude-opus-4-7',
-    ],
+    quickModels: ['claude-opus-4-8', 'claude-opus-4-7'],
     apiKeyUrl: 'https://aigocode.com',
-    description: 'AIGoCode 的 Anthropic 兼容协议，默认使用已通过连接测试的 Claude Opus 模型。',
+    description:
+      'AIGoCode 的 Anthropic 兼容协议，默认使用已通过连接测试的 Claude Opus 模型。',
     recommended: true,
   },
   {
@@ -182,14 +188,18 @@ export const AI_PROVIDER_PRESETS: AIProviderPreset[] = [
     category: '国内聚合',
     baseUrl: 'https://aihubmix.com/v1',
     defaultModel: 'claude-sonnet-4-20250514',
-    quickModels: ['claude-sonnet-4-20250514', 'o3-mini', 'gemini-2.5-pro-search'],
+    quickModels: [
+      'claude-sonnet-4-20250514',
+      'o3-mini',
+      'gemini-2.5-pro-search',
+    ],
     apiKeyUrl: 'https://aihubmix.com/token',
     description: '国内聚合平台',
   },
 ]
 
 export const AI_PROVIDER_MAP = Object.fromEntries(
-  AI_PROVIDER_PRESETS.map(preset => [preset.id, preset]),
+  AI_PROVIDER_PRESETS.map((preset) => [preset.id, preset]),
 ) as Record<string, AIProviderPreset>
 
 export const AI_PROVIDER_CATEGORIES: AIProviderCategory[] = [

@@ -47,22 +47,30 @@ export async function ensureMemosTable(db: Database) {
     )
     .run()
   await db
-    .prepare('CREATE INDEX IF NOT EXISTS idx_memos_visibility_created ON memos(visibility, created_at DESC)')
+    .prepare(
+      'CREATE INDEX IF NOT EXISTS idx_memos_visibility_created ON memos(visibility, created_at DESC)',
+    )
     .run()
   memosTableReady = true
 }
 
 export function isMemoVisibility(value: unknown): value is MemoVisibility {
-  return typeof value === 'string' && (MEMO_VISIBILITIES as readonly string[]).includes(value)
+  return (
+    typeof value === 'string' &&
+    (MEMO_VISIBILITIES as readonly string[]).includes(value)
+  )
 }
 
 function parseSyndication(value: string | null): Record<string, string> {
   if (!value) return {}
   try {
     const parsed = JSON.parse(value) as unknown
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed))
+      return {}
     return Object.fromEntries(
-      Object.entries(parsed).filter((entry): entry is [string, string] => typeof entry[1] === 'string'),
+      Object.entries(parsed).filter(
+        (entry): entry is [string, string] => typeof entry[1] === 'string',
+      ),
     )
   } catch {
     return {}
@@ -84,7 +92,9 @@ function mapMemo(row: MemoRow): Memo {
 
 // Short, time-ordered and unguessable enough for unlisted links: base36 seconds + 4 random chars.
 export function generateMemoSlug(now = Date.now()) {
-  const random = Array.from(crypto.getRandomValues(new Uint8Array(4)), (byte) => (byte % 36).toString(36)).join('')
+  const random = Array.from(crypto.getRandomValues(new Uint8Array(4)), (byte) =>
+    (byte % 36).toString(36),
+  ).join('')
   return `${Math.floor(now / 1000).toString(36)}${random}`
 }
 
@@ -94,7 +104,10 @@ export interface ListMemosOptions {
   before?: number | null
 }
 
-export async function listMemos(db: Database, options: ListMemosOptions): Promise<Memo[]> {
+export async function listMemos(
+  db: Database,
+  options: ListMemosOptions,
+): Promise<Memo[]> {
   await ensureMemosTable(db)
   if (options.visibilities.length === 0) return []
   const limit = Math.min(Math.max(options.limit ?? 50, 1), 500)
@@ -106,15 +119,23 @@ export async function listMemos(db: Database, options: ListMemosOptions): Promis
     binds.push(options.before)
   }
   const { results } = await db
-    .prepare(`SELECT * FROM memos WHERE ${where} ORDER BY created_at DESC, id DESC LIMIT ?`)
+    .prepare(
+      `SELECT * FROM memos WHERE ${where} ORDER BY created_at DESC, id DESC LIMIT ?`,
+    )
     .bind(...binds, limit)
     .all<MemoRow>()
   return (results ?? []).map(mapMemo)
 }
 
-export async function getMemoBySlug(db: Database, slug: string): Promise<Memo | null> {
+export async function getMemoBySlug(
+  db: Database,
+  slug: string,
+): Promise<Memo | null> {
   await ensureMemosTable(db)
-  const row = await db.prepare('SELECT * FROM memos WHERE slug = ?').bind(slug).first<MemoRow>()
+  const row = await db
+    .prepare('SELECT * FROM memos WHERE slug = ?')
+    .bind(slug)
+    .first<MemoRow>()
   return row ? mapMemo(row) : null
 }
 
@@ -125,7 +146,10 @@ export interface MemoWriteInput {
   syndication?: Record<string, string>
 }
 
-export async function createMemo(db: Database, input: MemoWriteInput): Promise<Memo> {
+export async function createMemo(
+  db: Database,
+  input: MemoWriteInput,
+): Promise<Memo> {
   await ensureMemosTable(db)
   const now = Math.floor(Date.now() / 1000)
   for (let attempt = 0; attempt < 3; attempt += 1) {
@@ -155,7 +179,11 @@ export async function createMemo(db: Database, input: MemoWriteInput): Promise<M
   throw new Error('无法生成唯一的 memo slug')
 }
 
-export async function updateMemo(db: Database, slug: string, input: MemoWriteInput): Promise<Memo | null> {
+export async function updateMemo(
+  db: Database,
+  slug: string,
+  input: MemoWriteInput,
+): Promise<Memo | null> {
   await ensureMemosTable(db)
   const sets: string[] = []
   const binds: unknown[] = []
@@ -177,13 +205,19 @@ export async function updateMemo(db: Database, slug: string, input: MemoWriteInp
   }
   if (sets.length > 0) {
     sets.push("updated_at = strftime('%s', 'now')")
-    await db.prepare(`UPDATE memos SET ${sets.join(', ')} WHERE slug = ?`).bind(...binds, slug).run()
+    await db
+      .prepare(`UPDATE memos SET ${sets.join(', ')} WHERE slug = ?`)
+      .bind(...binds, slug)
+      .run()
   }
   return getMemoBySlug(db, slug)
 }
 
 export async function deleteMemo(db: Database, slug: string): Promise<boolean> {
   await ensureMemosTable(db)
-  const result = await db.prepare('DELETE FROM memos WHERE slug = ?').bind(slug).run()
+  const result = await db
+    .prepare('DELETE FROM memos WHERE slug = ?')
+    .bind(slug)
+    .run()
   return ((result.meta as { changes?: number } | undefined)?.changes ?? 0) > 0
 }

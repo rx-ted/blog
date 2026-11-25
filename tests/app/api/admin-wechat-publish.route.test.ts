@@ -12,7 +12,8 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@/lib/server/route-helpers', () => ({
   ensureAuthenticatedRequest: mocks.ensureAuthenticatedRequest,
   getRouteEnvWithDb: mocks.getRouteEnvWithDb,
-  jsonError: (message: string, status = 500) => Response.json({ error: message }, { status }),
+  jsonError: (message: string, status = 500) =>
+    Response.json({ error: message }, { status }),
   jsonOk: (data: unknown, status = 200) => Response.json(data, { status }),
   parseJsonBody: mocks.parseJsonBody,
 }))
@@ -50,7 +51,9 @@ describe('/api/admin/wechat-publish route', () => {
 
     const response = await POST({} as never)
     expect(response.status).toBe(400)
-    await expect(response.json()).resolves.toEqual({ error: '请选择公众号账号' })
+    await expect(response.json()).resolves.toEqual({
+      error: '请选择公众号账号',
+    })
     expect(mocks.fetchWechatBridgeJson).not.toHaveBeenCalled()
   })
 
@@ -66,12 +69,16 @@ describe('/api/admin/wechat-publish route', () => {
     const body = await response.json()
 
     expect(response.status).toBe(200)
-    expect(body.inspect.checks.map((check: { code: string }) => check.code)).toEqual(expect.arrayContaining([
-      'MISSING_ACCOUNT',
-      'TITLE_TOO_LONG',
-      'DIGEST_TOO_LONG',
-      'LIST_MARKERS_MISSING',
-    ]))
+    expect(
+      body.inspect.checks.map((check: { code: string }) => check.code),
+    ).toEqual(
+      expect.arrayContaining([
+        'MISSING_ACCOUNT',
+        'TITLE_TOO_LONG',
+        'DIGEST_TOO_LONG',
+        'LIST_MARKERS_MISSING',
+      ]),
+    )
     expect(body.inspect.readiness.draft_ready).toBe(false)
     expect(mocks.getWechatBridgeConfig).not.toHaveBeenCalled()
     expect(mocks.fetchWechatBridgeJson).not.toHaveBeenCalled()
@@ -79,7 +86,9 @@ describe('/api/admin/wechat-publish route', () => {
 
   it('forwards publish payload to bridge', async () => {
     const timeoutSignal = new AbortController().signal
-    const timeoutSpy = vi.spyOn(AbortSignal, 'timeout').mockReturnValue(timeoutSignal)
+    const timeoutSpy = vi
+      .spyOn(AbortSignal, 'timeout')
+      .mockReturnValue(timeoutSignal)
 
     mocks.parseJsonBody.mockResolvedValue({
       account_id: 'main',
@@ -217,7 +226,9 @@ describe('/api/admin/wechat-publish route', () => {
     expect(forwarded.author).toBe('rx-ted')
     expect(forwarded.need_open_comment).toBe(true)
     expect(forwarded.only_fans_can_comment).toBe(false)
-    expect(forwarded.cover_image_url).toMatch(/^https:\/\/blog\.19981204\.xyz\/default-covers\/qm-cover-[1-3]\.jpg$/)
+    expect(forwarded.cover_image_url).toMatch(
+      /^https:\/\/blog\.19981204\.xyz\/default-covers\/qm-cover-[1-3]\.jpg$/,
+    )
   })
 
   it('returns a clear timeout error when bridge publish takes too long', async () => {
@@ -234,7 +245,8 @@ describe('/api/admin/wechat-publish route', () => {
 
     expect(response.status).toBe(504)
     await expect(response.json()).resolves.toEqual({
-      error: '提交公众号发布超时，文章图片较多时可能需要更久。请稍后查看公众号草稿，或重试。',
+      error:
+        '提交公众号发布超时，文章图片较多时可能需要更久。请稍后查看公众号草稿，或重试。',
     })
   })
 
@@ -245,14 +257,17 @@ describe('/api/admin/wechat-publish route', () => {
       content_html: '<p>Hello</p>',
     })
     mocks.fetchWechatBridgeJson.mockRejectedValue(
-      new Error('description size out of limit hint errcode=45004 path=/cgi-bin/draft/add'),
+      new Error(
+        'description size out of limit hint errcode=45004 path=/cgi-bin/draft/add',
+      ),
     )
 
     const response = await POST({} as never)
 
     expect(response.status).toBe(500)
     await expect(response.json()).resolves.toEqual({
-      error: '微信公众号摘要/描述超出限制，请把摘要控制在 120 bytes 以内后重试。',
+      error:
+        '微信公众号摘要/描述超出限制，请把摘要控制在 120 bytes 以内后重试。',
     })
   })
 })

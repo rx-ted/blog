@@ -20,7 +20,15 @@ export default async function AdminPostsPage({
   if (env?.DB) {
     try {
       if (q && q.trim()) {
-        sourcePosts = await searchPosts(env.DB, q.trim(), 200, true, true, true, true) // includeDrafts, includeEncrypted, includeHidden, includeDeleted
+        sourcePosts = await searchPosts(
+          env.DB,
+          q.trim(),
+          200,
+          true,
+          true,
+          true,
+          true,
+        ) // includeDrafts, includeEncrypted, includeHidden, includeDeleted
       } else {
         sourcePosts = await getPosts(env.DB, 200, 0, true, true, true, true) // includeDrafts, includeEncrypted, includeHidden, includeDeleted
       }
@@ -34,13 +42,13 @@ export default async function AdminPostsPage({
   if (env?.DB) {
     try {
       const cats = await getCategories(env.DB)
-      dbCategories = cats.map(c => c.name).filter(n => n !== '未分类')
+      dbCategories = cats.map((c) => c.name).filter((n) => n !== '未分类')
     } catch {}
   }
 
   // 从文章数据提取分类（用于 FilterBar 筛选）
   const postCategories = Array.from(
-    new Set(sourcePosts.map((p) => p.category).filter(Boolean))
+    new Set(sourcePosts.map((p) => p.category).filter(Boolean)),
   ) as string[]
 
   const stats = {
@@ -88,7 +96,17 @@ export default async function AdminPostsPage({
         <div className="bg-[var(--editor-panel)] rounded-xl border border-[var(--editor-line)] p-20 text-center">
           <div className="max-w-xs mx-auto">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--editor-soft)] flex items-center justify-center">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--stone-gray)]">
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-[var(--stone-gray)]"
+              >
                 <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
                 <line x1="12" y1="18" x2="12" y2="12"></line>

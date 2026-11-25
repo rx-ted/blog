@@ -4,13 +4,35 @@ import { resolvePostCoverImage } from '@/lib/default-cover-images'
 import { normalizePostSlug } from '@/lib/post-utils'
 import type { EditorInstance } from 'novel'
 import type { EditorImageActionTarget } from '@/lib/resizable-image'
-import type { EditorAiModalState, EditorImageModalState, EditorInputModalState } from '@/lib/editor-ui'
+import type {
+  EditorAiModalState,
+  EditorImageModalState,
+  EditorInputModalState,
+} from '@/lib/editor-ui'
 
-const ImageGenerationModal = dynamic(() => import('@/components/ImageGenerationModal').then(m => m.ImageGenerationModal), { ssr: false })
-const ImageCropModal = dynamic(() => import('@/components/ImageCropModal').then(m => m.ImageCropModal), { ssr: false })
-const ImageToolModal = dynamic(() => import('@/components/ImageToolModal').then(m => m.ImageToolModal), { ssr: false })
-const WeChatPublishModal = dynamic(() => import('@/components/WeChatPublishModal').then(m => m.WeChatPublishModal), { ssr: false })
-const AIModal = dynamic(() => import('@/lib/ai-modal').then(m => m.AIModal), { ssr: false })
+const ImageGenerationModal = dynamic(
+  () =>
+    import('@/components/ImageGenerationModal').then(
+      (m) => m.ImageGenerationModal,
+    ),
+  { ssr: false },
+)
+const ImageCropModal = dynamic(
+  () => import('@/components/ImageCropModal').then((m) => m.ImageCropModal),
+  { ssr: false },
+)
+const ImageToolModal = dynamic(
+  () => import('@/components/ImageToolModal').then((m) => m.ImageToolModal),
+  { ssr: false },
+)
+const WeChatPublishModal = dynamic(
+  () =>
+    import('@/components/WeChatPublishModal').then((m) => m.WeChatPublishModal),
+  { ssr: false },
+)
+const AIModal = dynamic(() => import('@/lib/ai-modal').then((m) => m.AIModal), {
+  ssr: false,
+})
 
 interface NovelEditorModalsProps {
   wechatPublishOpen: boolean
@@ -33,10 +55,17 @@ interface NovelEditorModalsProps {
   onInsertCollageImage: (file: File, insertPos: number | null) => Promise<void>
   referenceImageTarget: EditorImageActionTarget | null
   onCloseReferenceImage: () => void
-  onApplyReferenceImage: (imageUrl: string, alt: string, placementMode?: 'insert' | 'replace') => void
+  onApplyReferenceImage: (
+    imageUrl: string,
+    alt: string,
+    placementMode?: 'insert' | 'replace',
+  ) => void
   cropImageTarget: EditorImageActionTarget | null
   onCloseCrop: () => void
-  onApplyCrop: (file: File, placementMode: 'insert' | 'replace') => Promise<void>
+  onApplyCrop: (
+    file: File,
+    placementMode: 'insert' | 'replace',
+  ) => Promise<void>
   aiModal: EditorAiModalState
   editor: EditorInstance | null
   onCloseAiModal: () => void
@@ -65,7 +94,13 @@ export function NovelEditorModals(props: NovelEditorModalsProps) {
         />
       )}
 
-      <InputModal open={props.inputModal.open} title={props.inputModal.title} placeholder={props.inputModal.placeholder} onConfirm={props.onInputModalConfirm} onCancel={props.onInputModalCancel} />
+      <InputModal
+        open={props.inputModal.open}
+        title={props.inputModal.title}
+        placeholder={props.inputModal.placeholder}
+        onConfirm={props.onInputModalConfirm}
+        onCancel={props.onInputModalCancel}
+      />
 
       {props.imageModal.open && (
         <ImageToolModal
@@ -99,7 +134,11 @@ export function NovelEditorModals(props: NovelEditorModalsProps) {
           onClose={props.onCloseReferenceImage}
           onInsert={(imageUrl, alt, placementMode) => {
             if (!props.referenceImageTarget) return
-            props.onApplyReferenceImage(imageUrl, alt, placementMode ?? 'replace')
+            props.onApplyReferenceImage(
+              imageUrl,
+              alt,
+              placementMode ?? 'replace',
+            )
           }}
         />
       )}

@@ -63,7 +63,13 @@ function hashString(value: string) {
   return Math.abs(hash).toString(36)
 }
 
-function createDiagramContainer(doc: Document, className: string, codeAttribute: string, code: string, label: string) {
+function createDiagramContainer(
+  doc: Document,
+  className: string,
+  codeAttribute: string,
+  code: string,
+  label: string,
+) {
   const container = doc.createElement('section')
   container.className = className
   container.setAttribute(codeAttribute, code)
@@ -72,32 +78,61 @@ function createDiagramContainer(doc: Document, className: string, codeAttribute:
 }
 
 function createMermaidContainer(doc: Document, code: string) {
-  return createDiagramContainer(doc, 'mermaid-diagram', 'data-mermaid-code', code, 'Mermaid')
+  return createDiagramContainer(
+    doc,
+    'mermaid-diagram',
+    'data-mermaid-code',
+    code,
+    'Mermaid',
+  )
 }
 
 function createPlantUmlContainer(doc: Document, code: string) {
-  return createDiagramContainer(doc, 'plantuml-diagram', 'data-plantuml-code', code, 'PlantUML')
+  return createDiagramContainer(
+    doc,
+    'plantuml-diagram',
+    'data-plantuml-code',
+    code,
+    'PlantUML',
+  )
 }
 
 function createInfographicContainer(doc: Document, code: string) {
-  return createDiagramContainer(doc, 'infographic-diagram', 'data-infographic-code', code, 'Infographic')
+  return createDiagramContainer(
+    doc,
+    'infographic-diagram',
+    'data-infographic-code',
+    code,
+    'Infographic',
+  )
 }
 
 function getMermaidTargets(root: DomRoot) {
   const targets: HTMLElement[] = []
 
-  for (const element of Array.from(root.querySelectorAll<HTMLElement>('[data-mermaid-code]'))) {
-    if (element.getAttribute('data-mermaid-rendered') === 'true' && element.querySelector('svg')) continue
+  for (const element of Array.from(
+    root.querySelectorAll<HTMLElement>('[data-mermaid-code]'),
+  )) {
+    if (
+      element.getAttribute('data-mermaid-rendered') === 'true' &&
+      element.querySelector('svg')
+    )
+      continue
     targets.push(element)
   }
 
-  for (const code of Array.from(root.querySelectorAll<HTMLElement>('pre > code'))) {
+  for (const code of Array.from(
+    root.querySelectorAll<HTMLElement>('pre > code'),
+  )) {
     const language = getCodeLanguage(code)
     if (!isMermaidLanguage(language)) continue
     const pre = code.closest('pre')
     if (!pre || pre.closest('[data-mermaid-code]')) continue
 
-    const container = createMermaidContainer(code.ownerDocument, code.textContent || '')
+    const container = createMermaidContainer(
+      code.ownerDocument,
+      code.textContent || '',
+    )
     pre.replaceWith(container)
     targets.push(container)
   }
@@ -108,18 +143,29 @@ function getMermaidTargets(root: DomRoot) {
 function getPlantUmlTargets(root: DomRoot) {
   const targets: HTMLElement[] = []
 
-  for (const element of Array.from(root.querySelectorAll<HTMLElement>('[data-plantuml-code]'))) {
-    if (element.getAttribute('data-plantuml-rendered') === 'true' && element.querySelector('svg, img')) continue
+  for (const element of Array.from(
+    root.querySelectorAll<HTMLElement>('[data-plantuml-code]'),
+  )) {
+    if (
+      element.getAttribute('data-plantuml-rendered') === 'true' &&
+      element.querySelector('svg, img')
+    )
+      continue
     targets.push(element)
   }
 
-  for (const code of Array.from(root.querySelectorAll<HTMLElement>('pre > code'))) {
+  for (const code of Array.from(
+    root.querySelectorAll<HTMLElement>('pre > code'),
+  )) {
     const language = getCodeLanguage(code)
     if (!isPlantUmlLanguage(language)) continue
     const pre = code.closest('pre')
     if (!pre || pre.closest('[data-plantuml-code]')) continue
 
-    const container = createPlantUmlContainer(code.ownerDocument, code.textContent || '')
+    const container = createPlantUmlContainer(
+      code.ownerDocument,
+      code.textContent || '',
+    )
     pre.replaceWith(container)
     targets.push(container)
   }
@@ -130,18 +176,29 @@ function getPlantUmlTargets(root: DomRoot) {
 function getInfographicTargets(root: DomRoot) {
   const targets: HTMLElement[] = []
 
-  for (const element of Array.from(root.querySelectorAll<HTMLElement>('[data-infographic-code]'))) {
-    if (element.getAttribute('data-infographic-rendered') === 'true' && element.querySelector('svg')) continue
+  for (const element of Array.from(
+    root.querySelectorAll<HTMLElement>('[data-infographic-code]'),
+  )) {
+    if (
+      element.getAttribute('data-infographic-rendered') === 'true' &&
+      element.querySelector('svg')
+    )
+      continue
     targets.push(element)
   }
 
-  for (const code of Array.from(root.querySelectorAll<HTMLElement>('pre > code'))) {
+  for (const code of Array.from(
+    root.querySelectorAll<HTMLElement>('pre > code'),
+  )) {
     const language = getCodeLanguage(code)
     if (!isInfographicLanguage(language)) continue
     const pre = code.closest('pre')
     if (!pre || pre.closest('[data-infographic-code]')) continue
 
-    const container = createInfographicContainer(code.ownerDocument, code.textContent || '')
+    const container = createInfographicContainer(
+      code.ownerDocument,
+      code.textContent || '',
+    )
     pre.replaceWith(container)
     targets.push(container)
   }
@@ -150,7 +207,9 @@ function getInfographicTargets(root: DomRoot) {
 }
 
 export function highlightArticleCodeBlocks(root: DomRoot) {
-  for (const code of Array.from(root.querySelectorAll<HTMLElement>('pre > code'))) {
+  for (const code of Array.from(
+    root.querySelectorAll<HTMLElement>('pre > code'),
+  )) {
     highlightCodeElement(code)
   }
 }
@@ -163,23 +222,27 @@ export async function renderMermaidDiagrams(root: DomRoot) {
 
   const mermaid = await getMermaid()
 
-  await Promise.all(targets.map(async (target) => {
-    const code = target.getAttribute('data-mermaid-code') || target.textContent || ''
-    const normalized = code.trim()
-    if (!normalized) return
+  await Promise.all(
+    targets.map(async (target) => {
+      const code =
+        target.getAttribute('data-mermaid-code') || target.textContent || ''
+      const normalized = code.trim()
+      if (!normalized) return
 
-    try {
-      const id = `mermaid-${hashString(normalized)}-${Math.random().toString(36).slice(2)}`
-      const result = await mermaid.render(id, normalized)
-      target.innerHTML = result.svg
-      target.setAttribute('data-mermaid-rendered', 'true')
-    } catch (error) {
-      target.textContent = error instanceof Error
-        ? `Mermaid 渲染失败：${error.message}`
-        : 'Mermaid 渲染失败'
-      target.setAttribute('data-mermaid-rendered', 'false')
-    }
-  }))
+      try {
+        const id = `mermaid-${hashString(normalized)}-${Math.random().toString(36).slice(2)}`
+        const result = await mermaid.render(id, normalized)
+        target.innerHTML = result.svg
+        target.setAttribute('data-mermaid-rendered', 'true')
+      } catch (error) {
+        target.textContent =
+          error instanceof Error
+            ? `Mermaid 渲染失败：${error.message}`
+            : 'Mermaid 渲染失败'
+        target.setAttribute('data-mermaid-rendered', 'false')
+      }
+    }),
+  )
 }
 
 function sanitizeSvgMarkup(svgText: string) {
@@ -231,31 +294,36 @@ export async function renderPlantUmlDiagrams(root: DomRoot) {
   const targets = getPlantUmlTargets(root)
   if (targets.length === 0) return
 
-  await Promise.all(targets.map(async (target) => {
-    const code = target.getAttribute('data-plantuml-code') || target.textContent || ''
-    const normalized = code.trim()
-    if (!normalized) return
+  await Promise.all(
+    targets.map(async (target) => {
+      const code =
+        target.getAttribute('data-plantuml-code') || target.textContent || ''
+      const normalized = code.trim()
+      if (!normalized) return
 
-    const cacheKey = hashString(normalized)
-    const url = buildPlantUmlSvgUrl(normalized)
-    target.setAttribute('data-plantuml-url', url)
+      const cacheKey = hashString(normalized)
+      const url = buildPlantUmlSvgUrl(normalized)
+      target.setAttribute('data-plantuml-url', url)
 
-    try {
-      const cached = plantUmlSvgCache.get(cacheKey)
-      const svg = cached || await fetchPlantUmlSvg(url)
-      plantUmlSvgCache.set(cacheKey, svg)
-      target.innerHTML = svg
-      target.setAttribute('data-plantuml-rendered', 'true')
-    } catch {
-      createPlantUmlImageFallback(target, url)
-      target.setAttribute('data-plantuml-rendered', 'fallback')
-    }
-  }))
+      try {
+        const cached = plantUmlSvgCache.get(cacheKey)
+        const svg = cached || (await fetchPlantUmlSvg(url))
+        plantUmlSvgCache.set(cacheKey, svg)
+        target.innerHTML = svg
+        target.setAttribute('data-plantuml-rendered', 'true')
+      } catch {
+        createPlantUmlImageFallback(target, url)
+        target.setAttribute('data-plantuml-rendered', 'fallback')
+      }
+    }),
+  )
 }
 
 function getInfographicThemeMode() {
   if (typeof document === 'undefined') return 'default'
-  return document.documentElement.classList.contains('dark') ? 'dark' : 'default'
+  return document.documentElement.classList.contains('dark')
+    ? 'dark'
+    : 'default'
 }
 
 async function renderInfographicSvg(code: string) {
@@ -263,15 +331,13 @@ async function renderInfographicSvg(code: string) {
   const cached = infographicSvgCache.get(cacheKey)
   if (cached) return cached
 
-  const {
-    Infographic,
-    exportToSVG,
-    setDefaultFont,
-    setFontExtendFactor,
-  } = await import('@antv/infographic')
+  const { Infographic, exportToSVG, setDefaultFont, setFontExtendFactor } =
+    await import('@antv/infographic')
 
   setFontExtendFactor(1.1)
-  setDefaultFont('-apple-system-font, system-ui, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", Arial, sans-serif')
+  setDefaultFont(
+    '-apple-system-font, system-ui, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", Arial, sans-serif',
+  )
 
   const host = document.createElement('div')
   host.id = `infographic-render-${cacheKey}-${Math.random().toString(36).slice(2)}`
@@ -357,7 +423,10 @@ async function renderInfographicSvg(code: string) {
       })
 
       const renderResult = activeInstance.render(code) as unknown
-      if (renderResult && typeof (renderResult as PromiseLike<void>).then === 'function') {
+      if (
+        renderResult &&
+        typeof (renderResult as PromiseLike<void>).then === 'function'
+      ) {
         void (renderResult as PromiseLike<void>).then(() => finish(), fail)
       }
       pollForSvg()
@@ -387,7 +456,8 @@ export async function renderInfographicDiagrams(root: DomRoot) {
   if (targets.length === 0) return
 
   for (const target of targets) {
-    const code = target.getAttribute('data-infographic-code') || target.textContent || ''
+    const code =
+      target.getAttribute('data-infographic-code') || target.textContent || ''
     const normalized = code.trim()
     if (!normalized) continue
 
@@ -396,9 +466,10 @@ export async function renderInfographicDiagrams(root: DomRoot) {
       target.innerHTML = svg
       target.setAttribute('data-infographic-rendered', 'true')
     } catch (error) {
-      target.textContent = error instanceof Error
-        ? `Infographic 渲染失败：${error.message}`
-        : 'Infographic 渲染失败'
+      target.textContent =
+        error instanceof Error
+          ? `Infographic 渲染失败：${error.message}`
+          : 'Infographic 渲染失败'
       target.setAttribute('data-infographic-rendered', 'false')
     }
   }
@@ -441,14 +512,17 @@ function normalizeCssValue(value: string) {
 
 function shouldInlineSvgValue(property: string, value: string) {
   const normalized = normalizeCssValue(value)
-  if ((property === 'fill' || property === 'stroke') && normalized === 'none') return true
+  if ((property === 'fill' || property === 'stroke') && normalized === 'none')
+    return true
 
-  return normalized
-    && normalized !== 'auto'
-    && normalized !== 'normal'
-    && normalized !== 'none'
-    && normalized !== '0px'
-    && normalized !== 'rgba(0, 0, 0, 0)'
+  return (
+    normalized &&
+    normalized !== 'auto' &&
+    normalized !== 'normal' &&
+    normalized !== 'none' &&
+    normalized !== '0px' &&
+    normalized !== 'rgba(0, 0, 0, 0)'
+  )
 }
 
 function copyComputedSvgStyles(source: Element, target: Element) {
@@ -501,7 +575,9 @@ function inlineSvgComputedStyles(svg: SVGSVGElement) {
 }
 
 function normalizeWechatDiagramSvg(root: DomRoot) {
-  for (const svg of root.querySelectorAll<SVGSVGElement>('.mermaid-diagram svg, .plantuml-diagram svg, .infographic-diagram svg')) {
+  for (const svg of root.querySelectorAll<SVGSVGElement>(
+    '.mermaid-diagram svg, .plantuml-diagram svg, .infographic-diagram svg',
+  )) {
     inlineSvgComputedStyles(svg)
 
     for (const style of svg.querySelectorAll('style')) {
@@ -525,7 +601,8 @@ function normalizeWechatDiagramSvg(root: DomRoot) {
 }
 
 export async function renderVisualDiagramsInHtml(html: string) {
-  if (typeof window === 'undefined' || typeof document === 'undefined') return html
+  if (typeof window === 'undefined' || typeof document === 'undefined')
+    return html
 
   const doc = new DOMParser().parseFromString(html, 'text/html')
   await renderMathElementsAsSvg(doc)

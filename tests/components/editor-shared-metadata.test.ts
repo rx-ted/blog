@@ -15,14 +15,16 @@ describe('createEmptyDraftMetaState', () => {
   })
 
   it('maps initial data to draft meta state', () => {
-    expect(createEmptyDraftMetaState({
-      id: 42,
-      slug: 'hello-world',
-      category: 'Tech',
-      tags: ['a'],
-      description: 'desc',
-      cover_image: 'https://example.com/c.png',
-    })).toEqual({
+    expect(
+      createEmptyDraftMetaState({
+        id: 42,
+        slug: 'hello-world',
+        category: 'Tech',
+        tags: ['a'],
+        description: 'desc',
+        cover_image: 'https://example.com/c.png',
+      }),
+    ).toEqual({
       postId: 42,
       editSlug: 'hello-world',
       slug: 'hello-world',

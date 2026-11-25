@@ -101,37 +101,40 @@ function stripIpv6Brackets(hostname: string) {
 
 function isPrivateIpv4(hostname: string) {
   const parts = hostname.split('.')
-  if (parts.length !== 4 || parts.some((part) => !/^\d+$/.test(part))) return false
+  if (parts.length !== 4 || parts.some((part) => !/^\d+$/.test(part)))
+    return false
 
   const octets = parts.map(Number)
   if (octets.some((octet) => octet < 0 || octet > 255)) return true
 
   const [a, b] = octets
   return (
-    a === 0
-    || a === 10
-    || a === 127
-    || (a === 100 && b >= 64 && b <= 127)
-    || (a === 169 && b === 254)
-    || (a === 172 && b >= 16 && b <= 31)
-    || (a === 192 && b === 0)
-    || (a === 192 && b === 168)
-    || (a === 198 && (b === 18 || b === 19))
-    || a >= 224
+    a === 0 ||
+    a === 10 ||
+    a === 127 ||
+    (a === 100 && b >= 64 && b <= 127) ||
+    (a === 169 && b === 254) ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 0) ||
+    (a === 192 && b === 168) ||
+    (a === 198 && (b === 18 || b === 19)) ||
+    a >= 224
   )
 }
 
 function isPrivateIpv6(hostname: string) {
   const normalized = stripIpv6Brackets(hostname).toLowerCase()
-  return normalized === '::'
-    || normalized === '::1'
-    || normalized.startsWith('fc')
-    || normalized.startsWith('fd')
-    || /^fe[89ab]/.test(normalized)
-    || normalized.startsWith('::ffff:127.')
-    || normalized.startsWith('::ffff:10.')
-    || normalized.startsWith('::ffff:192.168.')
-    || /^::ffff:172\.(1[6-9]|2\d|3[01])\./.test(normalized)
+  return (
+    normalized === '::' ||
+    normalized === '::1' ||
+    normalized.startsWith('fc') ||
+    normalized.startsWith('fd') ||
+    /^fe[89ab]/.test(normalized) ||
+    normalized.startsWith('::ffff:127.') ||
+    normalized.startsWith('::ffff:10.') ||
+    normalized.startsWith('::ffff:192.168.') ||
+    /^::ffff:172\.(1[6-9]|2\d|3[01])\./.test(normalized)
+  )
 }
 
 function assertSafeRemoteUrl(value: string) {
@@ -145,13 +148,13 @@ function assertSafeRemoteUrl(value: string) {
 
   const hostname = stripIpv6Brackets(url.hostname.toLowerCase())
   if (
-    hostname === 'localhost'
-    || hostname.endsWith('.localhost')
-    || hostname.endsWith('.local')
-    || hostname.endsWith('.internal')
-    || hostname === 'metadata.google.internal'
-    || isPrivateIpv4(hostname)
-    || hostname.includes(':') && isPrivateIpv6(hostname)
+    hostname === 'localhost' ||
+    hostname.endsWith('.localhost') ||
+    hostname.endsWith('.local') ||
+    hostname.endsWith('.internal') ||
+    hostname === 'metadata.google.internal' ||
+    isPrivateIpv4(hostname) ||
+    (hostname.includes(':') && isPrivateIpv6(hostname))
   ) {
     throw new Error('不允许访问本机或私有网络图片')
   }
@@ -209,15 +212,27 @@ function collectImageCandidates(input: {
 }) {
   const candidates = new Map<string, RemoteImageCandidate>()
   const scanInlineText = (text: string) => {
-    const htmlPattern = /<img\b[^>]*\bsrc\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s>]+))/gi
-    const markdownPattern = /!\[[^\]]*]\(\s*(?:<([^>]+)>|(https?:\/\/[^\s)]+))/gi
+    const htmlPattern =
+      /<img\b[^>]*\bsrc\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s>]+))/gi
+    const markdownPattern =
+      /!\[[^\]]*]\(\s*(?:<([^>]+)>|(https?:\/\/[^\s)]+))/gi
     const jsonPattern = /"src"\s*:\s*"(https?:\/\/[^"\\]+)"/gi
 
     for (const match of text.matchAll(htmlPattern)) {
-      addCandidate(candidates, match[1] || match[2] || match[3] || '', 'inline', input.siteUrl)
+      addCandidate(
+        candidates,
+        match[1] || match[2] || match[3] || '',
+        'inline',
+        input.siteUrl,
+      )
     }
     for (const match of text.matchAll(markdownPattern)) {
-      addCandidate(candidates, match[1] || match[2] || '', 'inline', input.siteUrl)
+      addCandidate(
+        candidates,
+        match[1] || match[2] || '',
+        'inline',
+        input.siteUrl,
+      )
     }
     for (const match of text.matchAll(jsonPattern)) {
       addCandidate(candidates, match[1] || '', 'inline', input.siteUrl)
@@ -226,13 +241,17 @@ function collectImageCandidates(input: {
 
   if (input.content) scanInlineText(input.content)
   if (input.html) scanInlineText(input.html)
-  if (input.coverImage) addCandidate(candidates, input.coverImage, 'cover', input.siteUrl)
+  if (input.coverImage)
+    addCandidate(candidates, input.coverImage, 'cover', input.siteUrl)
 
   return [...candidates.values()]
 }
 
 async function hashRemoteUrl(url: string) {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(url))
+  const digest = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(url),
+  )
   return Array.from(new Uint8Array(digest))
     .map((byte) => byte.toString(16).padStart(2, '0'))
     .join('')
@@ -240,24 +259,29 @@ async function hashRemoteUrl(url: string) {
 }
 
 function inferRemoteImageName(url: URL, contentType: string | null) {
-  const pathName = decodeURIComponent(url.pathname.split('/').pop() || '').trim()
-  const extension = contentType?.split('/')[1]?.replace('jpeg', 'jpg') || 'image'
+  const pathName = decodeURIComponent(
+    url.pathname.split('/').pop() || '',
+  ).trim()
+  const extension =
+    contentType?.split('/')[1]?.replace('jpeg', 'jpg') || 'image'
   const fallback = `remote-image.${extension}`
   const candidate = pathName || fallback
   const safe = candidate.replace(/[\r\n"\\]+/g, '-').slice(0, 180)
   return safe || fallback
 }
 
-async function fetchRemoteImage(
-  sourceUrl: string,
-  fetchImpl: typeof fetch,
-) {
+async function fetchRemoteImage(sourceUrl: string, fetchImpl: typeof fetch) {
   let currentUrl = assertSafeRemoteUrl(sourceUrl)
 
-  for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount += 1) {
+  for (
+    let redirectCount = 0;
+    redirectCount <= MAX_REDIRECTS;
+    redirectCount += 1
+  ) {
     const response = await fetchImpl(currentUrl.toString(), {
       headers: {
-        Accept: 'image/avif,image/webp,image/png,image/jpeg,image/gif;q=0.9,*/*;q=0.1',
+        Accept:
+          'image/avif,image/webp,image/png,image/jpeg,image/gif;q=0.9,*/*;q=0.1',
         'User-Agent': 'QiaomuBlog-RemoteImage/1.0',
       },
       redirect: 'manual',
@@ -266,7 +290,8 @@ async function fetchRemoteImage(
 
     if (response.status >= 300 && response.status < 400) {
       const location = response.headers.get('location')
-      if (!location) throw new Error(`图片重定向缺少 Location（HTTP ${response.status}）`)
+      if (!location)
+        throw new Error(`图片重定向缺少 Location（HTTP ${response.status}）`)
       if (redirectCount === MAX_REDIRECTS) throw new Error('图片重定向次数过多')
       currentUrl = assertSafeRemoteUrl(new URL(location, currentUrl).toString())
       continue
@@ -274,18 +299,32 @@ async function fetchRemoteImage(
 
     if (!response.ok) throw new Error(`下载图片失败（HTTP ${response.status}）`)
 
-    const contentType = response.headers.get('content-type')?.split(';')[0].trim().toLowerCase() || ''
+    const contentType =
+      response.headers
+        .get('content-type')
+        ?.split(';')[0]
+        .trim()
+        .toLowerCase() || ''
     if (!SAFE_IMAGE_TYPES.has(contentType)) {
-      throw new Error(`远程资源不是受支持的图片（${contentType || '未知类型'}）`)
+      throw new Error(
+        `远程资源不是受支持的图片（${contentType || '未知类型'}）`,
+      )
     }
 
-    const declaredSize = Number.parseInt(response.headers.get('content-length') || '', 10)
-    if (Number.isFinite(declaredSize) && declaredSize > MAX_REMOTE_IMAGE_BYTES) {
+    const declaredSize = Number.parseInt(
+      response.headers.get('content-length') || '',
+      10,
+    )
+    if (
+      Number.isFinite(declaredSize) &&
+      declaredSize > MAX_REMOTE_IMAGE_BYTES
+    ) {
       throw new Error('远程图片超过 15MB')
     }
 
     const buffer = await response.arrayBuffer()
-    if (buffer.byteLength > MAX_REMOTE_IMAGE_BYTES) throw new Error('远程图片超过 15MB')
+    if (buffer.byteLength > MAX_REMOTE_IMAGE_BYTES)
+      throw new Error('远程图片超过 15MB')
 
     return {
       buffer,
@@ -317,14 +356,19 @@ async function localizeCandidate(
       key,
       mimeType: existing.httpMetadata?.contentType || null,
       sizeBytes: existing.size ?? null,
-      alt: existing.customMetadata?.originalName || inferRemoteImageName(new URL(candidate.sourceUrl), null),
+      alt:
+        existing.customMetadata?.originalName ||
+        inferRemoteImageName(new URL(candidate.sourceUrl), null),
       role: candidate.role,
       reused: true,
     }
   }
 
   const downloaded = await fetchRemoteImage(candidate.sourceUrl, fetchImpl)
-  const originalName = inferRemoteImageName(downloaded.finalUrl, downloaded.contentType)
+  const originalName = inferRemoteImageName(
+    downloaded.finalUrl,
+    downloaded.contentType,
+  )
 
   await bucket.put(key, downloaded.buffer, {
     httpMetadata: {
@@ -365,11 +409,16 @@ async function mapWithConcurrency<T, R>(
     }
   }
 
-  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, () => worker()))
+  await Promise.all(
+    Array.from({ length: Math.min(concurrency, items.length) }, () => worker()),
+  )
   return results
 }
 
-function replaceAllLiteral(text: string | undefined, replacements: Map<string, string>) {
+function replaceAllLiteral(
+  text: string | undefined,
+  replacements: Map<string, string>,
+) {
   if (text === undefined) return undefined
   let result = text
   for (const [source, target] of replacements) {
@@ -393,16 +442,28 @@ export async function localizeRemotePostImages(
   const assets: LocalizedRemoteImage[] = []
 
   if (input.bucket) {
-    const outcomes = await mapWithConcurrency(selected, DOWNLOAD_CONCURRENCY, async (candidate) => {
-      try {
-        return { candidate, asset: await localizeCandidate(candidate, input.bucket!, input.fetchImpl || fetch) }
-      } catch (error) {
-        return {
-          candidate,
-          error: error instanceof Error ? error.message : '远程图片本地化失败',
+    const outcomes = await mapWithConcurrency(
+      selected,
+      DOWNLOAD_CONCURRENCY,
+      async (candidate) => {
+        try {
+          return {
+            candidate,
+            asset: await localizeCandidate(
+              candidate,
+              input.bucket!,
+              input.fetchImpl || fetch,
+            ),
+          }
+        } catch (error) {
+          return {
+            candidate,
+            error:
+              error instanceof Error ? error.message : '远程图片本地化失败',
+          }
         }
-      }
-    })
+      },
+    )
 
     for (const outcome of outcomes) {
       if ('asset' in outcome && outcome.asset) {
@@ -418,10 +479,12 @@ export async function localizeRemotePostImages(
       }
     }
   } else {
-    failures.push(...selected.map((candidate) => ({
-      sourceUrl: candidate.sourceUrl,
-      error: '图片存储未配置，已保留远程链接',
-    })))
+    failures.push(
+      ...selected.map((candidate) => ({
+        sourceUrl: candidate.sourceUrl,
+        error: '图片存储未配置，已保留远程链接',
+      })),
+    )
   }
 
   const replacementRecord = Object.fromEntries(replacements)
@@ -431,9 +494,10 @@ export async function localizeRemotePostImages(
   return {
     content: replaceAllLiteral(input.content, replacements),
     html: replaceAllLiteral(input.html, replacements),
-    coverImage: input.coverImage === null
-      ? null
-      : replaceAllLiteral(input.coverImage, replacements),
+    coverImage:
+      input.coverImage === null
+        ? null
+        : replaceAllLiteral(input.coverImage, replacements),
     assets,
     report: {
       found: candidates.length,

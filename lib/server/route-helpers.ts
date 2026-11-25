@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/admin-auth'
 import { getAppCloudflareContext, getAppCloudflareEnv } from '@/lib/cloudflare'
 
@@ -40,13 +40,15 @@ export async function parseJsonBody<T>(
   invalidMessage = '请求体不是有效 JSON',
 ): Promise<T> {
   try {
-    return await req.json() as T
+    return (await req.json()) as T
   } catch {
     throw new Error(invalidMessage)
   }
 }
 
-export async function getRouteEnvWithDb(missingDbMessage = 'DB unavailable'): Promise<RouteEnvWithDbResult> {
+export async function getRouteEnvWithDb(
+  missingDbMessage = 'DB unavailable',
+): Promise<RouteEnvWithDbResult> {
   const env = await getAppCloudflareEnv()
   const db = env?.DB as D1Database | undefined
 

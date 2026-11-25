@@ -26,8 +26,14 @@ function normalizeSearchValue(value: unknown): string {
   if (typeof value === 'string') return value
   if (!value || typeof value !== 'object') return ''
 
-  const candidate = value as { name?: string; description?: string; id?: string }
-  return [candidate.name, candidate.description, candidate.id].filter(Boolean).join(' ')
+  const candidate = value as {
+    name?: string
+    description?: string
+    id?: string
+  }
+  return [candidate.name, candidate.description, candidate.id]
+    .filter(Boolean)
+    .join(' ')
 }
 
 function isModelLikeValue(value: string): boolean {
@@ -57,7 +63,11 @@ function resolveModelId(item: RawWorkersAiModelItem): string {
   return ''
 }
 
-function buildProviderErrorMessage(resStatus: number, resStatusText: string, rawBody: string): string {
+function buildProviderErrorMessage(
+  resStatus: number,
+  resStatusText: string,
+  rawBody: string,
+): string {
   try {
     if (rawBody) {
       const parsed = JSON.parse(rawBody) as {
@@ -84,12 +94,17 @@ function buildProviderErrorMessage(resStatus: number, resStatusText: string, raw
 }
 
 export function extractCloudflareAccountId(baseUrl: string): string {
-  const match = baseUrl.trim().replace(/\/+$/, '').match(/accounts\/([^/]+)\/ai(?:\/|$)/i)
+  const match = baseUrl
+    .trim()
+    .replace(/\/+$/, '')
+    .match(/accounts\/([^/]+)\/ai(?:\/|$)/i)
   const accountId = match?.[1] || ''
   return /<account_id>/i.test(accountId) ? '' : accountId
 }
 
-export function extractWorkersAiModelItems(payload: unknown): RawWorkersAiModelItem[] {
+export function extractWorkersAiModelItems(
+  payload: unknown,
+): RawWorkersAiModelItem[] {
   if (Array.isArray(payload)) return payload as RawWorkersAiModelItem[]
   if (!payload || typeof payload !== 'object') return []
 
@@ -100,8 +115,14 @@ export function extractWorkersAiModelItems(payload: unknown): RawWorkersAiModelI
     models?: unknown
   }
 
-  return [candidate.result, candidate.data, candidate.items, candidate.models]
-    .flatMap((value) => (Array.isArray(value) ? value as RawWorkersAiModelItem[] : []))
+  return [
+    candidate.result,
+    candidate.data,
+    candidate.items,
+    candidate.models,
+  ].flatMap((value) =>
+    Array.isArray(value) ? (value as RawWorkersAiModelItem[]) : [],
+  )
 }
 
 export function filterWorkersAiModels(
@@ -113,8 +134,12 @@ export function filterWorkersAiModels(
 
     if (typeof item === 'string') {
       return kind === 'image'
-        ? /(image|text-to-image|diffusion|flux|sdxl|dreamshaper|vision)/.test(resolvedId)
-        : !/(image|text-to-image|diffusion|flux|sdxl|dreamshaper|embedding|bge|rerank|audio|tts|whisper)/.test(resolvedId)
+        ? /(image|text-to-image|diffusion|flux|sdxl|dreamshaper|vision)/.test(
+            resolvedId,
+          )
+        : !/(image|text-to-image|diffusion|flux|sdxl|dreamshaper|embedding|bge|rerank|audio|tts|whisper)/.test(
+            resolvedId,
+          )
     }
 
     const haystacks = [
@@ -134,11 +159,25 @@ export function filterWorkersAiModels(
       .map((value) => String(value).toLowerCase())
 
     if (kind === 'image') {
-      return haystacks.some((value) => /(image generation|text-to-image|image|diffusion|flux|sdxl|dreamshaper|vision)/.test(value))
+      return haystacks.some((value) =>
+        /(image generation|text-to-image|image|diffusion|flux|sdxl|dreamshaper|vision)/.test(
+          value,
+        ),
+      )
     }
 
-    return haystacks.some((value) => /(text generation|text-generation|chat|llm|language|reasoning)/.test(value))
-      || !haystacks.some((value) => /(image|text-to-image|diffusion|flux|sdxl|dreamshaper|embedding|bge|rerank|audio|tts|whisper)/.test(value))
+    return (
+      haystacks.some((value) =>
+        /(text generation|text-generation|chat|llm|language|reasoning)/.test(
+          value,
+        ),
+      ) ||
+      !haystacks.some((value) =>
+        /(image|text-to-image|diffusion|flux|sdxl|dreamshaper|embedding|bge|rerank|audio|tts|whisper)/.test(
+          value,
+        ),
+      )
+    )
   })
 
   return filtered.length > 0 ? filtered : items
@@ -181,7 +220,9 @@ export async function fetchWorkersAiModels(
 
   if (!res.ok) {
     const rawBody = await res.text().catch(() => '')
-    throw new Error(buildProviderErrorMessage(res.status, res.statusText, rawBody))
+    throw new Error(
+      buildProviderErrorMessage(res.status, res.statusText, rawBody),
+    )
   }
 
   const data = await res.json().catch(() => null)

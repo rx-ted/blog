@@ -1,6 +1,10 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getPostsByCategory, getPostsCountByCategory, getPublicCategories } from '@/lib/db'
+import {
+  getPostsByCategory,
+  getPostsCountByCategory,
+  getPublicCategories,
+} from '@/lib/db'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { SiteHeader } from '@/components/SiteHeader'
 import { SiteFooter } from '@/components/SiteFooter'
@@ -73,7 +77,12 @@ export default async function CategoryPage({
       if (!category) return null
 
       const [posts, totalCount, headerData] = await Promise.all([
-        getPostsByCategory(db, category.name, PAGE_SIZE, (currentPage - 1) * PAGE_SIZE),
+        getPostsByCategory(
+          db,
+          category.name,
+          PAGE_SIZE,
+          (currentPage - 1) * PAGE_SIZE,
+        ),
         getPostsCountByCategory(db, category.name),
         getSiteHeaderData(db),
       ])
@@ -111,7 +120,9 @@ export default async function CategoryPage({
 
         {posts.length === 0 ? (
           <div className="py-20 text-center">
-            <p className="text-[var(--editor-muted)] mb-2">这个分类下还没有公开文章</p>
+            <p className="text-[var(--editor-muted)] mb-2">
+              这个分类下还没有公开文章
+            </p>
             <Link
               href="/"
               className="text-sm text-[var(--editor-accent)] hover:underline underline-offset-2"
@@ -126,7 +137,9 @@ export default async function CategoryPage({
                 <article
                   key={post.slug}
                   className="group border-t border-[var(--editor-line)] first:border-t-0"
-                  style={{ animation: `fadeInUp 0.4s ease-out ${index * 0.05}s both` }}
+                  style={{
+                    animation: `fadeInUp 0.4s ease-out ${index * 0.05}s both`,
+                  }}
                 >
                   <Link
                     href={`/${post.slug}`}

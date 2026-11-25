@@ -21,7 +21,8 @@ export async function searchPosts(
   if (!includeEncrypted) conditions.push('posts.password IS NULL')
   if (!includeHidden) conditions.push('posts.is_hidden = 0')
   if (!includeDeleted) conditions.push('posts.deleted_at IS NULL')
-  const whereClause = conditions.length > 0 ? `AND ${conditions.join(' AND ')}` : ''
+  const whereClause =
+    conditions.length > 0 ? `AND ${conditions.join(' AND ')}` : ''
 
   try {
     const ftsResult = await db

@@ -21,7 +21,12 @@ describe('ai-post-generator/metadata-fallbacks', () => {
       `,
     })
 
-    expect(tags).toEqual(['OpenAI Agents SDK', '工具调用', 'Agent 编排', '多轮对话'])
+    expect(tags).toEqual([
+      'OpenAI Agents SDK',
+      '工具调用',
+      'Agent 编排',
+      '多轮对话',
+    ])
   })
 
   it('falls back to title and category tags when no AI output is available', () => {

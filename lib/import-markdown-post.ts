@@ -20,9 +20,12 @@ function asTrimmedString(value: unknown): string | undefined {
   return trimmed ? trimmed : undefined
 }
 
-function pickFirstString(data: Record<string, unknown>, keys: string[]): { provided: boolean; value?: string } {
+function pickFirstString(
+  data: Record<string, unknown>,
+  keys: string[],
+): { provided: boolean; value?: string } {
   for (const key of keys) {
-    if (!Object.prototype.hasOwnProperty.call(data, key)) continue
+    if (!Object.hasOwn(data, key)) continue
     const raw = data[key]
     if (Array.isArray(raw)) {
       for (const item of raw) {
@@ -69,7 +72,9 @@ function normalizeTags(value: unknown): string[] | undefined {
   return deduped
 }
 
-export function extractFirstMarkdownH1(markdown: string): { title: string; body: string } | null {
+export function extractFirstMarkdownH1(
+  markdown: string,
+): { title: string; body: string } | null {
   const normalized = markdown.replace(/\r\n?/g, '\n')
   const match = normalized.match(/^#\s+(.+?)\s*#*\s*$/m)
   if (!match || match.index === undefined) return null
@@ -90,14 +95,17 @@ export function extractFirstMarkdownH1(markdown: string): { title: string; body:
   return { title, body: normalized }
 }
 
-export function parseImportedMarkdown(markdownSource: string): ParsedImportedMarkdownPost {
+export function parseImportedMarkdown(
+  markdownSource: string,
+): ParsedImportedMarkdownPost {
   const source = stripBom(markdownSource || '')
   let data: Record<string, unknown> = {}
   let body = source
 
   try {
     const parsed = matter(source)
-    const hasFrontmatter = typeof parsed.matter === 'string' && parsed.matter.trim().length > 0
+    const hasFrontmatter =
+      typeof parsed.matter === 'string' && parsed.matter.trim().length > 0
     if (hasFrontmatter) {
       data = (parsed.data || {}) as Record<string, unknown>
       body = parsed.content || ''
@@ -132,20 +140,31 @@ export function parseImportedMarkdown(markdownSource: string): ParsedImportedMar
     result.slug = slug.value
   }
 
-  const description = pickFirstString(data, ['description', 'desc', 'summary', 'excerpt'])
+  const description = pickFirstString(data, [
+    'description',
+    'desc',
+    'summary',
+    'excerpt',
+  ])
   if (description.provided && description.value) {
     result.description = description.value
   }
 
-  if (Object.prototype.hasOwnProperty.call(data, 'tags') || Object.prototype.hasOwnProperty.call(data, 'tag')) {
-    const raw = Object.prototype.hasOwnProperty.call(data, 'tags') ? data.tags : data.tag
+  if (Object.hasOwn(data, 'tags') || Object.hasOwn(data, 'tag')) {
+    const raw = Object.hasOwn(data, 'tags') ? data.tags : data.tag
     const tags = normalizeTags(raw)
     if (tags) {
       result.tags = tags
     }
   }
 
-  const cover = pickFirstString(data, ['cover', 'cover_image', 'coverImage', 'image', 'banner'])
+  const cover = pickFirstString(data, [
+    'cover',
+    'cover_image',
+    'coverImage',
+    'image',
+    'banner',
+  ])
   if (cover.provided && cover.value) {
     result.coverImage = cover.value
   }

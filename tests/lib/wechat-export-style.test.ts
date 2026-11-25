@@ -33,7 +33,8 @@ const TOKENS: WechatExportStyleTokens = {
 
 describe('wechat export helpers', () => {
   it('preserves intentional empty paragraphs for wechat paste', () => {
-    const html = '<p>第一段</p><p><br class="ProseMirror-trailingBreak"></p><p>第二段</p><p>   </p>'
+    const html =
+      '<p>第一段</p><p><br class="ProseMirror-trailingBreak"></p><p>第二段</p><p>   </p>'
 
     const normalized = normalizeWechatExportHtml(html)
 
@@ -50,7 +51,9 @@ describe('wechat export helpers', () => {
     expect(css).toContain('.wechat-export-article')
     expect(css).toContain('.wechat-export-content pre')
     expect(css).toContain('font-family: Georgia, serif;')
-    expect(css).toContain('background: linear-gradient(to right, transparent, #f0eee6, transparent);')
+    expect(css).toContain(
+      'background: linear-gradient(to right, transparent, #f0eee6, transparent);',
+    )
     expect(css).toContain('height: 1px;')
     expect(css).toContain('opacity: 0.8;')
     expect(css).toContain('pre.code__pre > code')
@@ -86,8 +89,12 @@ describe('wechat export helpers', () => {
     expect(css).toContain('.wechat-export-content .wechat-info-grid')
     expect(css).toContain('.wechat-export-content .wechat-image-slider-track')
     expect(css).toContain('.wechat-export-content .wechat-link-references')
-    expect(css).toContain('.wechat-export-content .wechat-inline-mark-highlight')
-    expect(css).toContain('.wechat-export-content .wechat-inline-mark-underline')
+    expect(css).toContain(
+      '.wechat-export-content .wechat-inline-mark-highlight',
+    )
+    expect(css).toContain(
+      '.wechat-export-content .wechat-inline-mark-underline',
+    )
     expect(css).toContain('.wechat-export-content .wechat-inline-mark-wavy')
     expect(css).toContain('.wechat-list-block[data-wechat-list="task"]')
     expect(css).toContain('margin: 0.68em 0;')
@@ -101,7 +108,9 @@ describe('wechat export helpers', () => {
     expect(css).toContain('.wechat-export-content ruby')
     expect(css).toContain('.wechat-export-content rt')
     expect(css).toContain('.wechat-export-content .math-svg-wrapper')
-    expect(css).toContain('.wechat-export-content .math-block-wrapper.math-svg-wrapper')
+    expect(css).toContain(
+      '.wechat-export-content .math-block-wrapper.math-svg-wrapper',
+    )
     expect(css).toContain('.wechat-export-content .math-svg-wrapper svg')
     expect(css).toContain('.wechat-export-content pre.code__pre > .mac-sign')
     expect(css).toContain('.wechat-export-content .mac-sign svg')
@@ -146,7 +155,9 @@ describe('wechat export helpers', () => {
     expect(css).toContain('min-width: 6.5em !important;')
     expect(css).toContain('.wechat-export-content .katex .op-symbol.large-op')
     expect(css).toContain('.wechat-export-content .katex .op-limits > .vlist-t')
-    expect(css).toContain('.wechat-export-content .katex .sizing.reset-size6.size3')
+    expect(css).toContain(
+      '.wechat-export-content .katex .sizing.reset-size6.size3',
+    )
     expect(css).toContain('font-size: 0.7em;')
     expect(css).toContain('.wechat-export-content .katex .mfrac .frac-line')
     expect(css).toContain('border-bottom-style: solid;')
@@ -171,20 +182,30 @@ describe('wechat export helpers', () => {
     expect(css).toMatch(/\.wechat-export-content pre \{[^}]*margin: 1\.7em 0;/)
 
     // 沿用 doocs/md 的紧凑 SVG 圆点结构，不再叠加独立标题栏和底部分隔线
-    expect(css).toMatch(/pre > \.mac-sign \{[^}]*padding: 10px 14px 0;[^}]*background: #242628;/)
+    expect(css).toMatch(
+      /pre > \.mac-sign \{[^}]*padding: 10px 14px 0;[^}]*background: #242628;/,
+    )
     expect(css).toMatch(/\.mac-sign svg \{[^}]*width: 45px;[^}]*height: 13px;/)
     expect(css).not.toMatch(/pre > \.mac-sign \{[^}]*border-bottom:/)
 
     // 每行把行号与代码放进同一个 flex row，长代码换行时行号仍与该逻辑行对齐
     expect(css).toMatch(/\.wechat-code-scroll \{[^}]*padding: 8px 14px 14px;/)
-    expect(css).toMatch(/\.wechat-code-row \{[^}]*display: flex;[^}]*align-items: flex-start;/)
-    expect(css).toMatch(/\.wechat-code-line-number \{[^}]*flex: 0 0 2\.4em;[^}]*text-align: right;/)
-    expect(css).toMatch(/\.wechat-code-line \{[^}]*white-space: pre-wrap;[^}]*word-break: break-word;[^}]*overflow-wrap: anywhere;/)
+    expect(css).toMatch(
+      /\.wechat-code-row \{[^}]*display: flex;[^}]*align-items: flex-start;/,
+    )
+    expect(css).toMatch(
+      /\.wechat-code-line-number \{[^}]*flex: 0 0 2\.4em;[^}]*text-align: right;/,
+    )
+    expect(css).toMatch(
+      /\.wechat-code-line \{[^}]*white-space: pre-wrap;[^}]*word-break: break-word;[^}]*overflow-wrap: anywhere;/,
+    )
     expect(css).toContain('white-space: pre-wrap !important;')
 
     // 代码文字统一单色，不再有语法彩色、斜体注释或 diff 红绿强调
     expect(css).toMatch(/\.wechat-code-lines \{[^}]*color: #f8f8f2;/)
-    expect(css).not.toMatch(/hljs-(keyword|selector-tag|literal|title|string|regexp|addition|number|attribute|variable|comment|quote)/)
+    expect(css).not.toMatch(
+      /hljs-(keyword|selector-tag|literal|title|string|regexp|addition|number|attribute|variable|comment|quote)/,
+    )
     expect(css).not.toContain('wechat-code-line-add')
     expect(css).not.toContain('wechat-code-line-remove')
   })
@@ -212,16 +233,22 @@ describe('wechat export helpers', () => {
     )
 
     // 外层容器确实内联了 text-align-last: left，是行号居中被破坏的根因
-    const rootMatch = html.match(/class="wechat-export-content"[^>]*style="([^"]*)"/)
+    const rootMatch = html.match(
+      /class="wechat-export-content"[^>]*style="([^"]*)"/,
+    )
     expect(rootMatch).not.toBeNull()
     expect(rootMatch![1]).toContain('text-align-last: left')
 
-    const rowStyles = [...html.matchAll(/class="wechat-code-row"[^>]*style="([^"]*)"/g)]
+    const rowStyles = [
+      ...html.matchAll(/class="wechat-code-row"[^>]*style="([^"]*)"/g),
+    ]
     expect(rowStyles).toHaveLength(2)
     expect(rowStyles[0][1]).toContain('display: flex')
     expect(rowStyles[0][1]).toContain('align-items: flex-start')
 
-    const numberStyles = [...html.matchAll(/class="wechat-code-line-number"[^>]*style="([^"]*)"/g)]
+    const numberStyles = [
+      ...html.matchAll(/class="wechat-code-line-number"[^>]*style="([^"]*)"/g),
+    ]
     expect(numberStyles.length).toBe(2)
     for (const match of numberStyles) {
       expect(match[1]).toContain('display: block')
@@ -230,7 +257,9 @@ describe('wechat export helpers', () => {
       expect(match[1]).toContain('text-align-last: right')
     }
 
-    const codeStyles = [...html.matchAll(/class="wechat-code-line"[^>]*style="([^"]*)"/g)]
+    const codeStyles = [
+      ...html.matchAll(/class="wechat-code-line"[^>]*style="([^"]*)"/g),
+    ]
     expect(codeStyles).toHaveLength(2)
     for (const match of codeStyles) {
       expect(match[1]).toContain('white-space: pre-wrap')
@@ -262,16 +291,18 @@ describe('wechat export helpers', () => {
 
     expect(css).toContain('.wechat-export-content table')
     expect(css).toContain('.wechat-export-title { color: #123456; }')
-    expect(css.indexOf('.wechat-export-title { color: #123456; }')).toBeLessThan(
-      css.indexOf('border-top-left-radius: 0 !important;'),
-    )
+    expect(
+      css.indexOf('.wechat-export-title { color: #123456; }'),
+    ).toBeLessThan(css.indexOf('border-top-left-radius: 0 !important;'))
   })
 
   it('adds a restrained text-stroke heading boost for the default body and inlines it via juice', () => {
     const css = buildWechatExportCss(TOKENS)
 
     // 基础 700 之上叠加极轻描边，H1-H6 同规则保持层级一致；非重要级， Juice 可内联
-    expect(css).toMatch(/\.wechat-export-content h1,\s*\.wechat-export-content h2,\s*\.wechat-export-content h3,\s*\.wechat-export-content h4,\s*\.wechat-export-content h5,\s*\.wechat-export-content h6 \{[^}]*-webkit-text-stroke: 0\.3px currentColor;[^}]*paint-order: stroke fill;/)
+    expect(css).toMatch(
+      /\.wechat-export-content h1,\s*\.wechat-export-content h2,\s*\.wechat-export-content h3,\s*\.wechat-export-content h4,\s*\.wechat-export-content h5,\s*\.wechat-export-content h6 \{[^}]*-webkit-text-stroke: 0\.3px currentColor;[^}]*paint-order: stroke fill;/,
+    )
     expect(css).not.toContain('font-weight: 800')
     expect(css).not.toContain('font-weight: 900')
 
@@ -301,7 +332,9 @@ describe('wechat export helpers', () => {
     // 显式主题（NVIDIA/Apple/Claude 等）自带标题处理，默认增重不得污染
     expect(themedCss).not.toContain('-webkit-text-stroke')
     expect(themedCss).not.toContain('paint-order: stroke fill')
-    expect(themedCss).toContain('.wechat-export-content h2 { font-weight: 600; }')
+    expect(themedCss).toContain(
+      '.wechat-export-content h2 { font-weight: 600; }',
+    )
 
     const html = juice.inlineContent(
       `<div class="wechat-export-content"><h2>主题标题</h2></div>`,
@@ -312,7 +345,9 @@ describe('wechat export helpers', () => {
   })
 
   it('keeps blueprint light code overrides, mac sign, and wrapping when qiaomu-clean-reading is selected', () => {
-    const theme = WECHAT_EXPORT_BUILTIN_THEMES.find(theme => theme.id === 'qiaomu-clean-reading')
+    const theme = WECHAT_EXPORT_BUILTIN_THEMES.find(
+      (theme) => theme.id === 'qiaomu-clean-reading',
+    )
     const css = buildWechatExportCss(TOKENS, theme)
 
     // 主题浅色代码覆盖写在 compat 层之前，靠更高特异性 + !important 生效
@@ -320,7 +355,9 @@ describe('wechat export helpers', () => {
     const compatIndex = css.indexOf('background: #242628 !important;')
     expect(overrideIndex).toBeGreaterThan(-1)
     expect(compatIndex).toBeGreaterThan(overrideIndex)
-    expect(css).toContain('.wechat-export-root .wechat-export-article .wechat-export-content pre')
+    expect(css).toContain(
+      '.wechat-export-root .wechat-export-article .wechat-export-content pre',
+    )
 
     // mac 三色 SVG 尺寸与顶部紧凑间距不回退
     expect(css).toContain('.mac-sign svg')
@@ -342,9 +379,15 @@ describe('wechat export helpers', () => {
     const preStyle = html.match(/<pre[^>]*style="([^"]*)"/)?.[1] ?? ''
     expect(preStyle).toContain('background: #f2f8fa')
     expect(preStyle).not.toContain('#242628')
-    expect(html.match(/class="mac-sign"[^>]*style="([^"]*)"/)?.[1]).toContain('background: #e2edf1')
-    expect(html.match(/<code[^>]*style="([^"]*)"/)?.[1]).toContain('color: #2a3b46')
-    expect(html.match(/class="wechat-code-line"[^>]*style="([^"]*)"/)?.[1]).toContain('white-space: pre-wrap')
+    expect(html.match(/class="mac-sign"[^>]*style="([^"]*)"/)?.[1]).toContain(
+      'background: #e2edf1',
+    )
+    expect(html.match(/<code[^>]*style="([^"]*)"/)?.[1]).toContain(
+      'color: #2a3b46',
+    )
+    expect(
+      html.match(/class="wechat-code-line"[^>]*style="([^"]*)"/)?.[1],
+    ).toContain('white-space: pre-wrap')
 
     // 图注 Juice 内联后 text-align 与 text-align-last 都保持居中（单行图注靠后者对齐）
     const captionHtml = juice.inlineContent(
@@ -352,7 +395,8 @@ describe('wechat export helpers', () => {
       css,
       { removeStyleTags: true, preserveImportant: true },
     )
-    const captionStyle = captionHtml.match(/<figcaption[^>]*style="([^"]*)"/)?.[1] ?? ''
+    const captionStyle =
+      captionHtml.match(/<figcaption[^>]*style="([^"]*)"/)?.[1] ?? ''
     expect(captionStyle).toContain('text-align: center')
     expect(captionStyle).toContain('text-align-last: center')
   })
@@ -360,8 +404,12 @@ describe('wechat export helpers', () => {
   it('keeps wrapping code layout consistent across base and compat css', () => {
     const css = buildWechatExportCss(TOKENS)
 
-    expect(css).toMatch(/\.wechat-code-scroll \{[^}]*overflow: hidden;[^}]*padding: 8px 14px 14px;/)
-    expect(css).toMatch(/\.wechat-code-lines \{[^}]*min-width: 0;[^}]*white-space: normal;/)
+    expect(css).toMatch(
+      /\.wechat-code-scroll \{[^}]*overflow: hidden;[^}]*padding: 8px 14px 14px;/,
+    )
+    expect(css).toMatch(
+      /\.wechat-code-lines \{[^}]*min-width: 0;[^}]*white-space: normal;/,
+    )
     expect(css).toContain('padding: 8px 14px 14px !important;')
     expect(css).toContain('min-width: 0 !important;')
     expect(css).toContain('white-space: pre-wrap !important;')

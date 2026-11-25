@@ -12,7 +12,9 @@ export interface EditorAutosaveSnapshotPayload {
   coverImage: string
 }
 
-export function buildEditorAutosaveSnapshot(payload: EditorAutosaveSnapshotPayload): string {
+export function buildEditorAutosaveSnapshot(
+  payload: EditorAutosaveSnapshotPayload,
+): string {
   return JSON.stringify({
     currentSlug: payload.currentSlug,
     nextSlug: payload.nextSlug,
@@ -50,20 +52,26 @@ export interface EditorAutosaveDraftState {
   blockedSaveState: 'saved' | 'dirty'
 }
 
-export function resolveEditorAutosaveDraftState(input: EditorAutosaveDraftInput): EditorAutosaveDraftState {
+export function resolveEditorAutosaveDraftState(
+  input: EditorAutosaveDraftInput,
+): EditorAutosaveDraftState {
   const trimmedTitle = input.title.trim()
   const hasMedia = editorHtmlHasMedia(input.html)
   const hasBody = Boolean(input.plainText || hasMedia)
-  const normalizedDescription = (input.description || buildAutoDescription(input.plainText) || '').trim()
+  const normalizedDescription = (
+    input.description ||
+    buildAutoDescription(input.plainText) ||
+    ''
+  ).trim()
   const canAutosave = Boolean(trimmedTitle) && hasBody
   const hasAnyDraftInput = Boolean(
     trimmedTitle ||
-    hasBody ||
-    normalizedDescription ||
-    input.coverImage ||
-    (input.tags && input.tags.length > 0) ||
-    (input.category && input.category !== '未分类') ||
-    input.nextSlug,
+      hasBody ||
+      normalizedDescription ||
+      input.coverImage ||
+      (input.tags && input.tags.length > 0) ||
+      (input.category && input.category !== '未分类') ||
+      input.nextSlug,
   )
 
   return {
@@ -90,11 +98,17 @@ export interface EditorSaveMetadata {
   normalizedDescription: string
 }
 
-export function resolveEditorSaveMetadata(input: EditorSaveMetadataInput): EditorSaveMetadata {
+export function resolveEditorSaveMetadata(
+  input: EditorSaveMetadataInput,
+): EditorSaveMetadata {
   return {
     normalizedTitle: input.title.trim(),
     normalizedSlug: normalizePostSlug(input.slug),
-    normalizedDescription: (input.description || buildAutoDescription(input.fallbackContent) || '').trim(),
+    normalizedDescription: (
+      input.description ||
+      buildAutoDescription(input.fallbackContent) ||
+      ''
+    ).trim(),
   }
 }
 

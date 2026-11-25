@@ -35,7 +35,8 @@ const DEFAULT_ACTIONS: DefaultActionSeed[] = [
     action_key: 'improve',
     label: '润色',
     description: '让表达更顺更自然',
-    prompt: '你是专业的中文写作助手。对下面的文字进行润色，让表达更顺畅自然，保持原意、语气和信息密度不变，直接返回润色后的文字，不要解释。',
+    prompt:
+      '你是专业的中文写作助手。对下面的文字进行润色，让表达更顺畅自然，保持原意、语气和信息密度不变，直接返回润色后的文字，不要解释。',
     temperature: 0.6,
     sort_order: 10,
   },
@@ -43,7 +44,8 @@ const DEFAULT_ACTIONS: DefaultActionSeed[] = [
     action_key: 'shorten',
     label: '缩写',
     description: '压缩成更短版本',
-    prompt: '你是专业的中文写作助手。在不丢失核心意思的前提下，把下面的文字压缩得更简短精炼，直接返回结果，不要解释。',
+    prompt:
+      '你是专业的中文写作助手。在不丢失核心意思的前提下，把下面的文字压缩得更简短精炼，直接返回结果，不要解释。',
     temperature: 0.6,
     sort_order: 20,
   },
@@ -51,7 +53,8 @@ const DEFAULT_ACTIONS: DefaultActionSeed[] = [
     action_key: 'expand',
     label: '扩写',
     description: '补充为更完整表述',
-    prompt: '你是专业的中文写作助手。对下面的文字进行扩写，让表达更完整自然，保持原有风格和语气，直接返回结果，不要解释。',
+    prompt:
+      '你是专业的中文写作助手。对下面的文字进行扩写，让表达更完整自然，保持原有风格和语气，直接返回结果，不要解释。',
     temperature: 0.6,
     sort_order: 30,
   },
@@ -59,7 +62,8 @@ const DEFAULT_ACTIONS: DefaultActionSeed[] = [
     action_key: 'summarize',
     label: '总结',
     description: '提炼为清晰摘要',
-    prompt: '你是专业的中文写作助手。把下面的文字总结为简洁清晰的摘要，直接返回结果，不要解释。',
+    prompt:
+      '你是专业的中文写作助手。把下面的文字总结为简洁清晰的摘要，直接返回结果，不要解释。',
     temperature: 0.6,
     sort_order: 40,
   },
@@ -67,7 +71,8 @@ const DEFAULT_ACTIONS: DefaultActionSeed[] = [
     action_key: 'translate_zh',
     label: '译成中文',
     description: '翻成简体中文',
-    prompt: '你是专业翻译。把下面的内容翻译成简体中文，保持原文风格，直接返回翻译结果，不要解释。',
+    prompt:
+      '你是专业翻译。把下面的内容翻译成简体中文，保持原文风格，直接返回翻译结果，不要解释。',
     temperature: 0.2,
     sort_order: 50,
   },
@@ -75,7 +80,8 @@ const DEFAULT_ACTIONS: DefaultActionSeed[] = [
     action_key: 'translate_en',
     label: '译成英文',
     description: '翻成自然英文',
-    prompt: '你是专业翻译。把下面的内容翻译成自然流畅的英文，保持原文风格，直接返回翻译结果，不要解释。',
+    prompt:
+      '你是专业翻译。把下面的内容翻译成自然流畅的英文，保持原文风格，直接返回翻译结果，不要解释。',
     temperature: 0.2,
     sort_order: 60,
   },
@@ -84,11 +90,16 @@ const DEFAULT_ACTIONS: DefaultActionSeed[] = [
 const keyCache = new Map<string, Promise<CryptoKey>>()
 
 function toBase64(bytes: Uint8Array): string {
-  const BufferCtor = (globalThis as unknown as {
-    Buffer?: {
-      from: (input: Uint8Array | string, encoding?: string) => { toString: (encoding?: string) => string }
+  const BufferCtor = (
+    globalThis as unknown as {
+      Buffer?: {
+        from: (
+          input: Uint8Array | string,
+          encoding?: string,
+        ) => { toString: (encoding?: string) => string }
+      }
     }
-  }).Buffer
+  ).Buffer
 
   if (BufferCtor) {
     return BufferCtor.from(bytes).toString('base64')
@@ -101,11 +112,13 @@ function toBase64(bytes: Uint8Array): string {
 }
 
 function fromBase64(input: string): Uint8Array {
-  const BufferCtor = (globalThis as unknown as {
-    Buffer?: {
-      from: (input: Uint8Array | string, encoding?: string) => Uint8Array
+  const BufferCtor = (
+    globalThis as unknown as {
+      Buffer?: {
+        from: (input: Uint8Array | string, encoding?: string) => Uint8Array
+      }
     }
-  }).Buffer
+  ).Buffer
 
   if (BufferCtor) {
     return new Uint8Array(BufferCtor.from(input, 'base64'))
@@ -126,7 +139,10 @@ async function deriveAesKey(secret: string): Promise<CryptoKey> {
   const promise = (async () => {
     const encoded = new TextEncoder().encode(normalized)
     const digest = await crypto.subtle.digest('SHA-256', encoded)
-    return crypto.subtle.importKey('raw', digest, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt'])
+    return crypto.subtle.importKey('raw', digest, { name: 'AES-GCM' }, false, [
+      'encrypt',
+      'decrypt',
+    ])
   })()
 
   keyCache.set(normalized, promise)
@@ -139,7 +155,9 @@ export function normalizeBaseUrl(input: string): string {
 
 export function isWorkersAiBaseUrl(input: string): boolean {
   const normalized = normalizeBaseUrl(input || '')
-  return /api\.cloudflare\.com\/client\/v4\/accounts\/[^/]+\/ai(?:\/|$)/i.test(normalized)
+  return /api\.cloudflare\.com\/client\/v4\/accounts\/[^/]+\/ai(?:\/|$)/i.test(
+    normalized,
+  )
 }
 
 export function buildWorkersAiRunUrl(baseUrl: string, model: string): string {
@@ -163,18 +181,19 @@ export function clampMaxTokens(value: number): number {
 export function maskApiKey(apiKey: string): string {
   const trimmed = apiKey.trim()
   if (!trimmed) return ''
-  if (trimmed.length <= 10) return `${trimmed.slice(0, 2)}...${trimmed.slice(-2)}`
+  if (trimmed.length <= 10)
+    return `${trimmed.slice(0, 2)}...${trimmed.slice(-2)}`
   return `${trimmed.slice(0, 6)}...${trimmed.slice(-4)}`
 }
 
 export function resolveAiConfigSecret(env?: unknown): string {
   const e = env as Record<string, unknown> | undefined
-  const envSecret = typeof e?.AI_CONFIG_ENCRYPTION_SECRET === 'string'
-    ? e.AI_CONFIG_ENCRYPTION_SECRET
-    : ''
-  const envSalt = typeof e?.ADMIN_TOKEN_SALT === 'string'
-    ? e.ADMIN_TOKEN_SALT
-    : ''
+  const envSecret =
+    typeof e?.AI_CONFIG_ENCRYPTION_SECRET === 'string'
+      ? e.AI_CONFIG_ENCRYPTION_SECRET
+      : ''
+  const envSalt =
+    typeof e?.ADMIN_TOKEN_SALT === 'string' ? e.ADMIN_TOKEN_SALT : ''
 
   return (
     envSecret ||
@@ -185,20 +204,30 @@ export function resolveAiConfigSecret(env?: unknown): string {
   )
 }
 
-export async function encryptApiKey(apiKey: string, secret: string): Promise<string> {
+export async function encryptApiKey(
+  apiKey: string,
+  secret: string,
+): Promise<string> {
   const normalized = apiKey.trim()
   if (!normalized) return ''
 
   const key = await deriveAesKey(secret)
   const iv = crypto.getRandomValues(new Uint8Array(12))
   const payload = new TextEncoder().encode(normalized)
-  const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, payload)
+  const encrypted = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    payload,
+  )
   const cipherBytes = new Uint8Array(encrypted)
 
   return `${ENCRYPTION_PREFIX}:${toBase64(iv)}:${toBase64(cipherBytes)}`
 }
 
-export async function decryptApiKey(value: string, secret: string): Promise<string> {
+export async function decryptApiKey(
+  value: string,
+  secret: string,
+): Promise<string> {
   const normalized = (value || '').trim()
   if (!normalized) return ''
 
@@ -224,8 +253,11 @@ export async function decryptApiKey(value: string, secret: string): Promise<stri
   }
 }
 
-export async function ensureAiProviderProfilesTable(db: D1Database): Promise<void> {
-  await db.prepare(`
+export async function ensureAiProviderProfilesTable(
+  db: D1Database,
+): Promise<void> {
+  await db
+    .prepare(`
     CREATE TABLE IF NOT EXISTS ai_provider_profiles (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -244,11 +276,13 @@ export async function ensureAiProviderProfilesTable(db: D1Database): Promise<voi
       created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
       updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
     )
-  `).run()
+  `)
+    .run()
 }
 
 async function ensureAiActionsTable(db: D1Database): Promise<void> {
-  await db.prepare(`
+  await db
+    .prepare(`
     CREATE TABLE IF NOT EXISTS ai_actions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       action_key TEXT UNIQUE NOT NULL,
@@ -263,53 +297,89 @@ async function ensureAiActionsTable(db: D1Database): Promise<void> {
       created_at INTEGER DEFAULT (strftime('%s', 'now')),
       updated_at INTEGER DEFAULT (strftime('%s', 'now'))
     )
-  `).run()
+  `)
+    .run()
 
-  const tableInfo = await db.prepare('PRAGMA table_info(ai_actions)').all<{ name: string }>()
-  const hasProfileId = (tableInfo.results || []).some(col => col.name === 'profile_id')
+  const tableInfo = await db
+    .prepare('PRAGMA table_info(ai_actions)')
+    .all<{ name: string }>()
+  const hasProfileId = (tableInfo.results || []).some(
+    (col) => col.name === 'profile_id',
+  )
   if (!hasProfileId) {
-    await db.prepare('ALTER TABLE ai_actions ADD COLUMN profile_id INTEGER').run()
+    await db
+      .prepare('ALTER TABLE ai_actions ADD COLUMN profile_id INTEGER')
+      .run()
   }
 
-  const countRow = await db.prepare('SELECT COUNT(*) as count FROM ai_actions').first<{ count: number }>()
+  const countRow = await db
+    .prepare('SELECT COUNT(*) as count FROM ai_actions')
+    .first<{ count: number }>()
   if ((countRow?.count ?? 0) > 0) return
 
   for (const seed of DEFAULT_ACTIONS) {
-    await db.prepare(
-      'INSERT INTO ai_actions (action_key, label, description, prompt, temperature, sort_order, is_builtin) VALUES (?, ?, ?, ?, ?, ?, 1)'
-    ).bind(
-      seed.action_key,
-      seed.label,
-      seed.description,
-      seed.prompt,
-      seed.temperature,
-      seed.sort_order,
-    ).run()
+    await db
+      .prepare(
+        'INSERT INTO ai_actions (action_key, label, description, prompt, temperature, sort_order, is_builtin) VALUES (?, ?, ?, ?, ?, ?, 1)',
+      )
+      .bind(
+        seed.action_key,
+        seed.label,
+        seed.description,
+        seed.prompt,
+        seed.temperature,
+        seed.sort_order,
+      )
+      .run()
   }
 }
 
-export async function ensureDefaultProfileId(db: D1Database): Promise<number | null> {
-  const defaultRow = await db.prepare('SELECT id FROM ai_provider_profiles WHERE is_default = 1 ORDER BY id ASC LIMIT 1').first<{ id: number }>()
+export async function ensureDefaultProfileId(
+  db: D1Database,
+): Promise<number | null> {
+  const defaultRow = await db
+    .prepare(
+      'SELECT id FROM ai_provider_profiles WHERE is_default = 1 ORDER BY id ASC LIMIT 1',
+    )
+    .first<{ id: number }>()
   if (defaultRow?.id) return defaultRow.id
 
-  const firstRow = await db.prepare('SELECT id FROM ai_provider_profiles ORDER BY id ASC LIMIT 1').first<{ id: number }>()
+  const firstRow = await db
+    .prepare('SELECT id FROM ai_provider_profiles ORDER BY id ASC LIMIT 1')
+    .first<{ id: number }>()
   if (!firstRow?.id) return null
 
   await db.prepare('UPDATE ai_provider_profiles SET is_default = 0').run()
-  await db.prepare("UPDATE ai_provider_profiles SET is_default = 1, updated_at = strftime('%s', 'now') WHERE id = ?")
+  await db
+    .prepare(
+      "UPDATE ai_provider_profiles SET is_default = 1, updated_at = strftime('%s', 'now') WHERE id = ?",
+    )
     .bind(firstRow.id)
     .run()
 
   return firstRow.id
 }
 
-async function migrateLegacyConfigIfNeeded(db: D1Database, secret: string): Promise<void> {
-  const profileCount = await db.prepare('SELECT COUNT(*) as count FROM ai_provider_profiles').first<{ count: number }>()
+async function migrateLegacyConfigIfNeeded(
+  db: D1Database,
+  secret: string,
+): Promise<void> {
+  const profileCount = await db
+    .prepare('SELECT COUNT(*) as count FROM ai_provider_profiles')
+    .first<{ count: number }>()
   if ((profileCount?.count ?? 0) > 0) return
 
   const [cfgRow, keyRow] = await Promise.all([
-    db.prepare("SELECT value FROM site_settings WHERE key = 'ai_provider_config'").first<{ value: string }>(),
-    db.prepare("SELECT value FROM site_settings WHERE key = 'ai_provider_api_key'").first<{ value: string }>(),
+    db
+      .prepare(
+        "SELECT value FROM site_settings WHERE key = 'ai_provider_config'",
+      )
+      .first<{ value: string }>(),
+    db
+      .prepare(
+        "SELECT value FROM site_settings WHERE key = 'ai_provider_api_key'",
+      )
+      .first<{ value: string }>(),
   ])
 
   if (!cfgRow?.value) return
@@ -337,38 +407,47 @@ async function migrateLegacyConfigIfNeeded(db: D1Database, secret: string): Prom
 
   const rawKey = (keyRow?.value || '').trim()
   const encryptedKey = rawKey ? await encryptApiKey(rawKey, secret) : ''
-  const masked = rawKey ? maskApiKey(rawKey) : (cfg.api_key_masked || '')
+  const masked = rawKey ? maskApiKey(rawKey) : cfg.api_key_masked || ''
 
-  await db.prepare(`
+  await db
+    .prepare(`
     INSERT INTO ai_provider_profiles (
       name, provider, provider_name, provider_type, provider_category, api_key_url,
       base_url, model, temperature, max_tokens,
       api_key_encrypted, api_key_masked, is_default, created_at, updated_at
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, strftime('%s', 'now'), strftime('%s', 'now'))
-  `).bind(
-    DEFAULT_PROFILE_NAME,
-    cfg.provider || 'custom',
-    cfg.provider_name || '',
-    cfg.provider_type || 'openai_compatible',
-    cfg.provider_category || '',
-    cfg.api_key_url || '',
-    normalizeBaseUrl(cfg.base_url),
-    cfg.model,
-    clampTemperature(Number(cfg.temperature)),
-    clampMaxTokens(Number(cfg.max_tokens)),
-    encryptedKey,
-    masked,
-  ).run()
+  `)
+    .bind(
+      DEFAULT_PROFILE_NAME,
+      cfg.provider || 'custom',
+      cfg.provider_name || '',
+      cfg.provider_type || 'openai_compatible',
+      cfg.provider_category || '',
+      cfg.api_key_url || '',
+      normalizeBaseUrl(cfg.base_url),
+      cfg.model,
+      clampTemperature(Number(cfg.temperature)),
+      clampMaxTokens(Number(cfg.max_tokens)),
+      encryptedKey,
+      masked,
+    )
+    .run()
 }
 
-export async function ensureAiConfigInfrastructure(db: D1Database, secret: string): Promise<void> {
+export async function ensureAiConfigInfrastructure(
+  db: D1Database,
+  secret: string,
+): Promise<void> {
   await ensureAiProviderProfilesTable(db)
   await ensureAiActionsTable(db)
   await migrateLegacyConfigIfNeeded(db, secret)
 
   const defaultProfileId = await ensureDefaultProfileId(db)
   if (defaultProfileId) {
-    await db.prepare('UPDATE ai_actions SET profile_id = ? WHERE profile_id IS NULL').bind(defaultProfileId).run()
+    await db
+      .prepare('UPDATE ai_actions SET profile_id = ? WHERE profile_id IS NULL')
+      .bind(defaultProfileId)
+      .run()
   }
 }
 
@@ -394,19 +473,25 @@ export async function resolveAiProfileConfig(
 } | null> {
   await ensureAiConfigInfrastructure(db, secret)
 
-  const selected = Number.isFinite(profileId) && Number(profileId) > 0
-    ? await db.prepare(`
+  const selected =
+    Number.isFinite(profileId) && Number(profileId) > 0
+      ? await db
+          .prepare(`
         SELECT *
         FROM ai_provider_profiles
         WHERE id = ?
         LIMIT 1
-      `).bind(Number(profileId)).first<AIProviderProfileRow & { api_key_encrypted: string }>()
-    : await db.prepare(`
+      `)
+          .bind(Number(profileId))
+          .first<AIProviderProfileRow & { api_key_encrypted: string }>()
+      : await db
+          .prepare(`
         SELECT *
         FROM ai_provider_profiles
         ORDER BY is_default DESC, id ASC
         LIMIT 1
-      `).first<AIProviderProfileRow & { api_key_encrypted: string }>()
+      `)
+          .first<AIProviderProfileRow & { api_key_encrypted: string }>()
 
   if (!selected?.base_url || !selected.model) return null
 

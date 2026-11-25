@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import {
   verifyPassword,
   getSessionToken,
@@ -23,7 +23,10 @@ export async function POST(req: NextRequest) {
 
     const token = await getSessionToken()
     if (!token) {
-      return NextResponse.json({ error: '管理员鉴权初始化失败，请检查环境变量配置' }, { status: 503 })
+      return NextResponse.json(
+        { error: '管理员鉴权初始化失败，请检查环境变量配置' },
+        { status: 503 },
+      )
     }
     const response = NextResponse.json({ success: true })
 

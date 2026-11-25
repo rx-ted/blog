@@ -65,14 +65,19 @@ export const FONT_CONFIG: Record<string, { family: string; link?: string }> = {
     link: '/fonts/jinkai/jinkai.css',
   },
   serif: { family: 'Georgia, "Noto Serif SC", "Source Han Serif SC", serif' },
-  heiti: { family: '"PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif' },
+  heiti: {
+    family: '"PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif',
+  },
 }
 
 export function isTheme(value: string | null | undefined): value is Theme {
   return THEME_OPTIONS.some((option) => option.id === value)
 }
 
-export function normalizeTheme(value: string | null | undefined, fallback: Theme = 'default'): Theme {
+export function normalizeTheme(
+  value: string | null | undefined,
+  fallback: Theme = 'default',
+): Theme {
   return isTheme(value) ? value : fallback
 }
 

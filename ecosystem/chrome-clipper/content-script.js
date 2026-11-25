@@ -5,15 +5,15 @@
  * Returns { title, markdown, images, url } back to the caller.
  */
 
-(function () {
+;(function () {
   try {
     // 1. Extract article with Readability
-    const documentClone = document.cloneNode(true);
-    const article = new Readability(documentClone).parse();
+    const documentClone = document.cloneNode(true)
+    const article = new Readability(documentClone).parse()
 
-    const title = article ? (article.title || document.title) : document.title;
-    const htmlContent = article ? article.content : document.body.innerHTML;
-    const pageUrl = location.href;
+    const title = article ? article.title || document.title : document.title
+    const htmlContent = article ? article.content : document.body.innerHTML
+    const pageUrl = location.href
 
     // 2. Convert HTML to Markdown with Turndown
     const turndownService = new TurndownService({
@@ -21,45 +21,48 @@
       codeBlockStyle: 'fenced',
       emDelimiter: '*',
       bulletListMarker: '-',
-    });
+    })
 
     // Keep iframes as links
     turndownService.addRule('iframe', {
       filter: 'iframe',
-      replacement: function (content, node) {
-        var src = node.getAttribute('src') || '';
-        return src ? '\n\n[嵌入视频](' + src + ')\n\n' : '';
+      replacement: function (_content, node) {
+        var src = node.getAttribute('src') || ''
+        return src ? `\n\n[嵌入视频](${src})\n\n` : ''
       },
-    });
+    })
 
-    var markdown = turndownService.turndown(htmlContent);
+    var markdown = turndownService.turndown(htmlContent)
 
     // Prepend source URL
-    markdown = '> 原文: [' + title + '](' + pageUrl + ')\n\n' + markdown;
+    markdown = `> 原文: [${title}](${pageUrl})\n\n${markdown}`
 
     // 3. Collect all image URLs from the markdown
-    var images = [];
-    var seen = {};
+    var images = []
+    var seen = {}
 
     // Markdown image syntax: ![alt](url)
-    var mdRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
-    var m;
-    while ((m = mdRegex.exec(markdown)) !== null) {
-      var url = m[2];
+    var mdRegex = /!\[([^\]]*)\]\(([^)]+)\)/g
+    var m = mdRegex.exec(markdown)
+    while (m !== null) {
+      var url = m[2]
       if (!seen[url]) {
-        seen[url] = true;
-        images.push(url);
+        seen[url] = true
+        images.push(url)
       }
+      m = mdRegex.exec(markdown)
     }
 
     // Also check for leftover <img> tags
-    var imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
-    while ((m = imgRegex.exec(markdown)) !== null) {
-      var url = m[1];
+    var imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi
+    m = imgRegex.exec(markdown)
+    while (m !== null) {
+      url = m[1]
       if (!seen[url]) {
-        seen[url] = true;
-        images.push(url);
+        seen[url] = true
+        images.push(url)
       }
+      m = imgRegex.exec(markdown)
     }
 
     return {
@@ -67,7 +70,7 @@
       markdown: markdown,
       images: images,
       url: pageUrl,
-    };
+    }
   } catch (err) {
     // Fallback: return raw content
     return {
@@ -76,6 +79,6 @@
       images: [],
       url: location.href,
       error: err.message,
-    };
+    }
   }
-})();
+})()

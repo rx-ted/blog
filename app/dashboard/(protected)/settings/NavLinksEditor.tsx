@@ -22,28 +22,55 @@ const defaultLinks: NavLink[] = [
 ]
 
 export function NavLinksEditor({ initialValue, onSave, saving }: Props) {
-  const parsed = initialValue ? (() => { try { return JSON.parse(initialValue) } catch { return null } })() : null
-  const [links, setLinks] = useState<NavLink[]>(parsed && Array.isArray(parsed) ? parsed : defaultLinks)
+  const parsed = initialValue
+    ? (() => {
+        try {
+          return JSON.parse(initialValue)
+        } catch {
+          return null
+        }
+      })()
+    : null
+  const [links, setLinks] = useState<NavLink[]>(
+    parsed && Array.isArray(parsed) ? parsed : defaultLinks,
+  )
 
-  const update = (idx: number, field: keyof NavLink, value: string | boolean) => {
-    setLinks((prev) => prev.map((l, i) => (i === idx ? { ...l, [field]: value } : l)))
+  const update = (
+    idx: number,
+    field: keyof NavLink,
+    value: string | boolean,
+  ) => {
+    setLinks((prev) =>
+      prev.map((l, i) => (i === idx ? { ...l, [field]: value } : l)),
+    )
   }
 
-  const remove = (idx: number) => setLinks((prev) => prev.filter((_, i) => i !== idx))
+  const remove = (idx: number) =>
+    setLinks((prev) => prev.filter((_, i) => i !== idx))
 
-  const add = () => setLinks((prev) => [...prev, { label: '', url: '', openInNewTab: false }])
+  const add = () =>
+    setLinks((prev) => [...prev, { label: '', url: '', openInNewTab: false }])
 
   const moveUp = (idx: number) => {
     if (idx <= 0) return
-    setLinks((prev) => { const n = [...prev]; [n[idx - 1], n[idx]] = [n[idx], n[idx - 1]]; return n })
+    setLinks((prev) => {
+      const n = [...prev]
+      ;[n[idx - 1], n[idx]] = [n[idx], n[idx - 1]]
+      return n
+    })
   }
 
   const moveDown = (idx: number) => {
     if (idx >= links.length - 1) return
-    setLinks((prev) => { const n = [...prev]; [n[idx], n[idx + 1]] = [n[idx + 1], n[idx]]; return n })
+    setLinks((prev) => {
+      const n = [...prev]
+      ;[n[idx], n[idx + 1]] = [n[idx + 1], n[idx]]
+      return n
+    })
   }
 
-  const inputCls = 'h-9 rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 text-sm text-[var(--editor-ink)] placeholder:text-[var(--editor-muted)] outline-none focus:border-[var(--editor-accent)] transition-colors'
+  const inputCls =
+    'h-9 rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 text-sm text-[var(--editor-ink)] placeholder:text-[var(--editor-muted)] outline-none focus:border-[var(--editor-accent)] transition-colors'
   const btnCls = 'h-9 px-3 rounded-lg text-sm font-medium transition-colors'
 
   return (
@@ -71,14 +98,34 @@ export function NavLinksEditor({ initialValue, onSave, saving }: Props) {
             />
             新窗口
           </label>
-          <button onClick={() => moveUp(idx)} disabled={idx === 0} className={`${btnCls} bg-[var(--editor-soft)] text-[var(--editor-muted)] hover:text-[var(--editor-ink)] disabled:opacity-30`}>↑</button>
-          <button onClick={() => moveDown(idx)} disabled={idx === links.length - 1} className={`${btnCls} bg-[var(--editor-soft)] text-[var(--editor-muted)] hover:text-[var(--editor-ink)] disabled:opacity-30`}>↓</button>
-          <button onClick={() => remove(idx)} className={`${btnCls} text-red-500 hover:bg-rose-500/10`}>删除</button>
+          <button
+            onClick={() => moveUp(idx)}
+            disabled={idx === 0}
+            className={`${btnCls} bg-[var(--editor-soft)] text-[var(--editor-muted)] hover:text-[var(--editor-ink)] disabled:opacity-30`}
+          >
+            ↑
+          </button>
+          <button
+            onClick={() => moveDown(idx)}
+            disabled={idx === links.length - 1}
+            className={`${btnCls} bg-[var(--editor-soft)] text-[var(--editor-muted)] hover:text-[var(--editor-ink)] disabled:opacity-30`}
+          >
+            ↓
+          </button>
+          <button
+            onClick={() => remove(idx)}
+            className={`${btnCls} text-red-500 hover:bg-rose-500/10`}
+          >
+            删除
+          </button>
         </div>
       ))}
 
       <div className="flex items-center gap-3 pt-2">
-        <button onClick={add} className={`${btnCls} bg-[var(--editor-soft)] text-[var(--editor-ink)] hover:bg-[var(--border-warm)]`}>
+        <button
+          onClick={add}
+          className={`${btnCls} bg-[var(--editor-soft)] text-[var(--editor-ink)] hover:bg-[var(--border-warm)]`}
+        >
           + 添加链接
         </button>
         <button

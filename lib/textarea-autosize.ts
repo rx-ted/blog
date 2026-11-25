@@ -7,7 +7,9 @@ export function resizeTextareaHeight(element: HTMLTextAreaElement | null) {
   element.style.height = `${element.scrollHeight}px`
 }
 
-export function useAutoResizeTextarea(ref: RefObject<HTMLTextAreaElement | null>) {
+export function useAutoResizeTextarea(
+  ref: RefObject<HTMLTextAreaElement | null>,
+) {
   useEffect(() => {
     const element = ref.current
     if (!element) return
@@ -20,9 +22,10 @@ export function useAutoResizeTextarea(ref: RefObject<HTMLTextAreaElement | null>
 
     scheduleResize()
 
-    const resizeObserver = typeof ResizeObserver !== 'undefined'
-      ? new ResizeObserver(scheduleResize)
-      : null
+    const resizeObserver =
+      typeof ResizeObserver !== 'undefined'
+        ? new ResizeObserver(scheduleResize)
+        : null
 
     resizeObserver?.observe(element)
     if (element.parentElement) {

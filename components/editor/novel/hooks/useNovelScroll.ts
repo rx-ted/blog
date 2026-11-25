@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { WechatExportTheme } from '@/lib/wechat-themes'
-import { resizeTextareaHeight, useAutoResizeTextarea } from '@/lib/textarea-autosize'
+import {
+  resizeTextareaHeight,
+  useAutoResizeTextarea,
+} from '@/lib/textarea-autosize'
 
 interface UseNovelScrollOptions {
   title: string
@@ -21,7 +24,8 @@ export function useNovelScroll({
 }: UseNovelScrollOptions) {
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false)
   const [mobileWechatPreviewHtml, setMobileWechatPreviewHtml] = useState('')
-  const [mobileWechatPreviewError, setMobileWechatPreviewError] = useState(false)
+  const [mobileWechatPreviewError, setMobileWechatPreviewError] =
+    useState(false)
   const [mobileWechatPreviewRetry, setMobileWechatPreviewRetry] = useState(0)
   const editorScrollAreaRef = useRef<HTMLDivElement>(null)
   const mobilePreviewScrollRef = useRef<HTMLDivElement>(null)
@@ -44,9 +48,15 @@ export function useNovelScroll({
     const sourceScrollable = Math.max(1, source.scrollHeight - sourceViewport)
     const sourceProgress = Math.min(
       1,
-      Math.max(0, (window.scrollY + headerOffset - sourceTop) / sourceScrollable),
+      Math.max(
+        0,
+        (window.scrollY + headerOffset - sourceTop) / sourceScrollable,
+      ),
     )
-    const targetScrollable = Math.max(0, target.scrollHeight - target.clientHeight)
+    const targetScrollable = Math.max(
+      0,
+      target.scrollHeight - target.clientHeight,
+    )
     target.scrollTop = targetScrollable * sourceProgress
   }, [])
 
@@ -82,11 +92,17 @@ export function useNovelScroll({
     void import('@/lib/wechat-copy')
       .then(async ({ buildWechatPreviewArticleHtml }) => {
         if (cancelled) return
-        const baseHtml = buildWechatPreviewArticleHtml(title.trim() || '无标题', previewHtml || '<p></p>', {
-          theme: selectedWechatTheme,
-        })
+        const baseHtml = buildWechatPreviewArticleHtml(
+          title.trim() || '无标题',
+          previewHtml || '<p></p>',
+          {
+            theme: selectedWechatTheme,
+          },
+        )
         setMobileWechatPreviewHtml(baseHtml)
-        const { renderVisualDiagramsInHtml } = await import('@/lib/content-enhancers')
+        const { renderVisualDiagramsInHtml } = await import(
+          '@/lib/content-enhancers'
+        )
         const renderedHtml = await renderVisualDiagramsInHtml(baseHtml)
         if (!cancelled) setMobileWechatPreviewHtml(renderedHtml)
       })
@@ -97,7 +113,13 @@ export function useNovelScroll({
     return () => {
       cancelled = true
     }
-  }, [mobilePreviewOpen, previewHtml, selectedWechatTheme, title, mobileWechatPreviewRetry])
+  }, [
+    mobilePreviewOpen,
+    previewHtml,
+    selectedWechatTheme,
+    title,
+    mobileWechatPreviewRetry,
+  ])
 
   return {
     mobilePreviewOpen,
