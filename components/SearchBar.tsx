@@ -137,7 +137,7 @@ export function SearchBar() {
 
             {/* 搜索面板 */}
             <div className="relative mx-auto mt-[12vh] sm:mt-[18vh] w-[92vw] max-w-[560px]">
-              <div className="bg-white rounded-2xl shadow-[0_25px_60px_-12px_rgba(0,0,0,0.25)] border border-black/[0.06] overflow-hidden">
+              <div className="bg-[var(--editor-panel)] rounded-2xl shadow-[0_25px_60px_-12px_rgba(0,0,0,0.25)] border border-[var(--editor-line)] overflow-hidden">
                 {/* 输入区 */}
                 <form onSubmit={handleSubmit} onKeyDown={handleKeyNav}>
                   <div className="flex items-center gap-3 px-5 py-4">
@@ -234,19 +234,19 @@ export function SearchBar() {
                 {results.length > 0 && (
                   <div className="flex items-center gap-4 px-5 py-2.5 border-t border-[var(--editor-line)] bg-[var(--editor-panel)]/50">
                     <div className="flex items-center gap-1.5 text-[11px] text-[var(--stone-gray)]">
-                      <kbd className="px-1 py-0.5 bg-white border border-[var(--editor-line)] rounded text-[10px] font-mono">
+                      <kbd className="px-1 py-0.5 bg-[var(--background)] border border-[var(--editor-line)] rounded text-[10px] font-mono">
                         ↑↓
                       </kbd>
                       <span>选择</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-[11px] text-[var(--stone-gray)]">
-                      <kbd className="px-1 py-0.5 bg-white border border-[var(--editor-line)] rounded text-[10px] font-mono">
+                      <kbd className="px-1 py-0.5 bg-[var(--background)] border border-[var(--editor-line)] rounded text-[10px] font-mono">
                         ↵
                       </kbd>
                       <span>打开</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-[11px] text-[var(--stone-gray)]">
-                      <kbd className="px-1 py-0.5 bg-white border border-[var(--editor-line)] rounded text-[10px] font-mono">
+                      <kbd className="px-1 py-0.5 bg-[var(--background)] border border-[var(--editor-line)] rounded text-[10px] font-mono">
                         esc
                       </kbd>
                       <span>关闭</span>

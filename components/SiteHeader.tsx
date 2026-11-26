@@ -139,12 +139,19 @@ export function SiteHeader({
         >
           <Link
             href="/"
-            className="text-lg tracking-tight text-[var(--editor-ink)] hover:text-[var(--editor-accent)] transition-colors duration-200 font-bold"
+            className="inline-flex items-center gap-2 text-lg tracking-tight text-[var(--editor-ink)] hover:text-[var(--editor-accent)] transition-colors duration-200 font-bold"
             style={{
               fontFamily: 'var(--logo-font, "Noto Serif SC", Georgia, serif)',
             }}
           >
-            木羽博客
+            <img
+              src="/icon-192.png"
+              alt=""
+              width={28}
+              height={28}
+              className="rounded-md"
+            />
+            木羽
           </Link>
           <span
             style={{
@@ -163,12 +170,19 @@ export function SiteHeader({
     return (
       <Link
         href="/"
-        className="text-lg tracking-tight text-[var(--editor-ink)] hover:text-[var(--editor-accent)] transition-colors duration-200 flex-shrink-0 font-bold"
+        className="inline-flex items-center gap-2 text-lg tracking-tight text-[var(--editor-ink)] hover:text-[var(--editor-accent)] transition-colors duration-200 flex-shrink-0 font-bold"
         style={{
           fontFamily: 'var(--logo-font, Georgia, "Noto Serif SC", serif)',
         }}
       >
-        木羽博客
+        <img
+          src="/icon-192.png"
+          alt=""
+          width={28}
+          height={28}
+          className="rounded-md"
+        />
+        木羽
       </Link>
     )
   }
