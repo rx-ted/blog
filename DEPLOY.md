@@ -92,7 +92,7 @@ pnpm cf:local:init -- --from-remote   # 会覆盖本地 D1 数据
 ```bash
 git pull
 pnpm install
-pnpm verify
+pnpm check && pnpm typecheck && pnpm test:run && pnpm build
 pnpm deploy
 ```
 

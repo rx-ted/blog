@@ -56,3 +56,6 @@ worker-configuration.d.ts
 .gitkeep
 
 docs/superpowers
+
+# Lefthook
+lefthook-local.yml

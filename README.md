@@ -153,8 +153,10 @@ pnpm preview:prod     # 生产资源预览（不部署，会连接远程资源�
 | -------------------- | ---------------------------------------- |
 | `pnpm dev`           | Next.js 本地开发                         |
 | `pnpm build`         | OpenNext 构建（Cloudflare Workers 产物） |
-| `pnpm verify:quick`  | 跑 lint、test、build                     |
-| `pnpm verify`        | 跑完整验证链路                           |
+| `pnpm lint`          | Biome lint 检查                          |
+| `pnpm check`         | Biome lint + format 检查                 |
+| `pnpm typecheck`     | TypeScript 类型检查                      |
+| `pnpm test:run`      | 运行 Vitest 测试                         |
 | `pnpm cf:local:init` | 初始化本地 D1（支持 `-- --from-remote`） |
 | `pnpm preview:local` | 本地预览（本地模拟资源）                 |
 | `pnpm preview:prod`  | 生产资源预览（不部署，连接远程资源）     |

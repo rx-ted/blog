@@ -1,4 +1,4 @@
-name: Verify
+name: CI
 
 on:
   pull_request:
@@ -10,13 +10,13 @@ on:
       - chore/**
 
 concurrency:
-  group: verify-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
@@ -36,8 +36,24 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run quick verification
+      - name: Biome check
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: pnpm check
+
+      - name: Typecheck
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: pnpm typecheck
+
+      - name: Test
         env:
           CI: true
           NEXT_TELEMETRY_DISABLED: "1"
-        run: pnpm verify:quick
+        run: pnpm test:run
+
+      - name: Build
+        env:
+          CI: true
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: pnpm build

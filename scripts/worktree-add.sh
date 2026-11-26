@@ -40,4 +40,4 @@ echo
 echo "Next:"
 echo "  cd ${TARGET_DIR}"
 echo "  pnpm install   # if dependencies changed"
-echo "  pnpm verify"
+echo "  pnpm check && pnpm typecheck && pnpm test:run && pnpm build"
