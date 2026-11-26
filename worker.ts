@@ -1,4 +1,5 @@
-// open-next generates this module during the Cloudflare build step.
+// 参考：https://opennext.js.org/cloudflare/howtos/custom-worker
+// @ts-expect-error `.open-next/worker.js` is generated at build time
 import { default as handler } from './.open-next/worker.js'
 import {
   consumeBackgroundJobBatch,
@@ -40,4 +41,5 @@ const customWorker = {
 
 export default customWorker
 
+// @ts-expect-error `.open-next/worker.js` is generated at build time
 export { DOQueueHandler, DOShardedTagCache } from './.open-next/worker.js'

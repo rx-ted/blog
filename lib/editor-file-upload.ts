@@ -328,6 +328,7 @@ export function insertUploadedFileIntoEditor(
     editor
       .chain()
       .focus()
+      // @ts-expect-error - setVideo is defined in video-extension.tsx
       .setVideo({ src: uploaded.url, title: uploaded.name || file.name })
       .run()
     return
