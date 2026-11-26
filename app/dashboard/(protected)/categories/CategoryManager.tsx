@@ -186,7 +186,7 @@ export function CategoryManager({
           <button
             type="submit"
             disabled={loading || !name.trim() || !slug.trim()}
-            className="px-4 py-2 text-sm rounded-lg bg-[var(--editor-ink)] text-white font-medium hover:brightness-110 transition disabled:opacity-50"
+            className="px-4 py-2 text-sm rounded-lg bg-[var(--editor-accent)] text-white font-medium hover:brightness-110 transition disabled:opacity-50"
           >
             {loading ? '添加中…' : '添加'}
           </button>

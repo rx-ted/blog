@@ -129,7 +129,7 @@ export function UnsplashManager() {
         ) : null}
       </div>
 
-      <div className="rounded-xl border border-[var(--editor-line)] bg-white p-4">
+      <div className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-4">
         <label className="block text-sm font-medium text-[var(--editor-ink)]">
           Access Key
           <input
