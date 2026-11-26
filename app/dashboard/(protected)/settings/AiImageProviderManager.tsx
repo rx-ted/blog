@@ -283,8 +283,8 @@ export function AiImageProviderManager() {
     }
   }
 
-  const handleDelete = async () => {
-    if (!deleteTarget) return
+  const handleDelete = async (): Promise<boolean | undefined> => {
+    if (!deleteTarget) return false
 
     try {
       const res = await fetch('/api/admin/ai-image-provider', {
@@ -299,7 +299,9 @@ export function AiImageProviderManager() {
       await loadProfiles()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : '删除失败')
+      return false
     }
+    return undefined
   }
 
   const setAsDefault = async (profile: ProviderProfile) => {

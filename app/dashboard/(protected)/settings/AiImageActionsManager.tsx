@@ -160,8 +160,8 @@ export function AiImageActionsManager() {
     }
   }
 
-  const handleDelete = async () => {
-    if (!deleteTarget) return
+  const handleDelete = async (): Promise<boolean | undefined> => {
+    if (!deleteTarget) return false
 
     try {
       const res = await fetch(
@@ -177,7 +177,9 @@ export function AiImageActionsManager() {
       await loadData()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : '删除失败')
+      return false
     }
+    return undefined
   }
 
   const toggleEnabled = async (action: AiImageAction) => {

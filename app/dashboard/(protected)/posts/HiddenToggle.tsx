@@ -20,7 +20,7 @@ export function HiddenToggle({ slug, isHidden }: HiddenToggleProps) {
 
   const newHidden = hidden === 1 ? 0 : 1
 
-  const handleToggle = async () => {
+  const handleToggle = async (): Promise<boolean | undefined> => {
     setLoading(true)
 
     try {
@@ -39,9 +39,11 @@ export function HiddenToggle({ slug, isHidden }: HiddenToggleProps) {
       router.refresh()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : '隐藏状态更新失败')
+      return false
     } finally {
       setLoading(false)
     }
+    return undefined
   }
 
   return (

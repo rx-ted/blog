@@ -22,7 +22,7 @@ export function DeleteButton({
 
   const isDeleted = status === 'deleted'
 
-  const handleSoftDelete = async () => {
+  const handleSoftDelete = async (): Promise<boolean | undefined> => {
     setLoading(true)
     try {
       const res = await fetch(`/api/admin/posts/${slug}`, {
@@ -35,12 +35,15 @@ export function DeleteButton({
         router.refresh()
       } else {
         toast.error('删除失败，请重试')
+        return false
       }
     } catch {
       toast.error('网络错误，请重试')
+      return false
     } finally {
       setLoading(false)
     }
+    return undefined
   }
 
   const handleRestore = async () => {
@@ -64,7 +67,7 @@ export function DeleteButton({
     }
   }
 
-  const handlePermanentDelete = async () => {
+  const handlePermanentDelete = async (): Promise<boolean | undefined> => {
     setLoading(true)
     try {
       const res = await fetch(`/api/admin/posts/${slug}`, { method: 'DELETE' })
@@ -73,12 +76,15 @@ export function DeleteButton({
         router.refresh()
       } else {
         toast.error('删除失败，请重试')
+        return false
       }
     } catch {
       toast.error('网络错误，请重试')
+      return false
     } finally {
       setLoading(false)
     }
+    return undefined
   }
 
   if (isDeleted) {

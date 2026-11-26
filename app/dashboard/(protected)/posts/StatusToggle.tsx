@@ -19,7 +19,7 @@ export function StatusToggle({ slug, currentStatus }: StatusToggleProps) {
 
   const newStatus = status === 'draft' ? 'published' : 'draft'
 
-  const handleToggle = async () => {
+  const handleToggle = async (): Promise<boolean | undefined> => {
     setLoading(true)
 
     try {
@@ -38,9 +38,11 @@ export function StatusToggle({ slug, currentStatus }: StatusToggleProps) {
       router.refresh()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : '状态更新失败')
+      return false
     } finally {
       setLoading(false)
     }
+    return undefined
   }
 
   return (

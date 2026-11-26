@@ -205,7 +205,8 @@ export const AI_PROVIDER_PRESETS: AIProviderPreset[] = [
     baseUrl: 'http://localhost:11434/v1',
     defaultModel: 'llama3.2',
     quickModels: ['llama3.2', 'qwen2.5:7b', 'deepseek-r1:8b'],
-    description: '本地 Ollama 服务，默认无需 API Key',
+    description:
+      'Ollama 服务，默认无需 API Key。若应用部署在远程服务器，请将 Base URL 改为服务器可访问的 Ollama 地址（如公网 IP/域名或隧道地址）。',
   },
 ]
 

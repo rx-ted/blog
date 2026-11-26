@@ -386,8 +386,8 @@ export function AiProviderManager() {
     }
   }
 
-  const handleDelete = async () => {
-    if (!deleteTarget) return
+  const handleDelete = async (): Promise<boolean | undefined> => {
+    if (!deleteTarget) return false
 
     try {
       const res = await fetch('/api/admin/ai-provider', {
@@ -403,7 +403,9 @@ export function AiProviderManager() {
       await loadProfiles()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : '删除失败')
+      return false
     }
+    return undefined
   }
 
   const setAsDefault = async (profile: ProviderProfile) => {

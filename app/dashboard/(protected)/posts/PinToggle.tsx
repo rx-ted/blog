@@ -19,7 +19,7 @@ export function PinToggle({ slug, isPinned }: PinToggleProps) {
 
   const newPinned = pinned === 1 ? 0 : 1
 
-  const handleToggle = async () => {
+  const handleToggle = async (): Promise<boolean | undefined> => {
     setLoading(true)
 
     try {
@@ -38,9 +38,11 @@ export function PinToggle({ slug, isPinned }: PinToggleProps) {
       router.refresh()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : '置顶状态更新失败')
+      return false
     } finally {
       setLoading(false)
     }
+    return undefined
   }
 
   return (
