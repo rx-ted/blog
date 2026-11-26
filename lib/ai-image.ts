@@ -1160,7 +1160,7 @@ export async function generateEditorImage(
         })()
       : await (async () => {
           const client = new OpenAI({
-            apiKey: profile.api_key,
+            apiKey: profile.api_key || 'no-key-required',
             baseURL: normalizeBaseUrl(profile.base_url),
           })
 

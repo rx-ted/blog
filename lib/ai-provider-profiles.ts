@@ -495,8 +495,9 @@ export async function resolveAiProfileConfig(
 
   if (!selected?.base_url || !selected.model) return null
 
-  const apiKey = await decryptApiKey(selected.api_key_encrypted || '', secret)
-  if (!apiKey) return null
+  const encryptedKey = selected.api_key_encrypted || ''
+  const apiKey = await decryptApiKey(encryptedKey, secret)
+  if (encryptedKey.trim() && !apiKey) return null
 
   return {
     id: selected.id,

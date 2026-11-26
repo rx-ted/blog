@@ -171,10 +171,9 @@ export async function GET(req: NextRequest) {
   if (!baseUrl)
     return NextResponse.json({ error: '缺少 base_url 参数' }, { status: 400 })
 
-  if (!apiKey && provider !== 'openrouter') {
-    const warning = storedKeyUnavailable
-      ? '已保存 API Key 无法解密，请重新输入 API Key，或检查 AI_CONFIG_ENCRYPTION_SECRET / ADMIN_TOKEN_SALT 是否与保存时一致'
-      : '未提供 API Key，返回预设模型列表'
+  if (storedKeyUnavailable) {
+    const warning =
+      '已保存 API Key 无法解密，请重新输入 API Key，或检查 AI_CONFIG_ENCRYPTION_SECRET / ADMIN_TOKEN_SALT 是否与保存时一致'
     if (fallbackModels.length > 0) {
       return NextResponse.json({
         models: fallbackModels.map((id) => ({ id, name: id })),
@@ -182,8 +181,12 @@ export async function GET(req: NextRequest) {
         warning,
       })
     }
+    return NextResponse.json({ error: warning }, { status: 400 })
+  }
+
+  if (provider !== 'ollama' && !apiKey) {
     return NextResponse.json(
-      { error: storedKeyUnavailable ? warning : '缺少 API Key' },
+      { error: '当前平台需要填写 API Key' },
       { status: 400 },
     )
   }

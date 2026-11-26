@@ -197,8 +197,18 @@ export async function POST(req: NextRequest) {
     })
   }
 
-  if (!normalizedBaseUrl || !key || !normalizedModel) {
-    return NextResponse.json({ error: '缺少必要参数' }, { status: 400 })
+  if (!normalizedBaseUrl || !normalizedModel) {
+    return NextResponse.json(
+      { error: '缺少必要参数（Base URL / 模型）' },
+      { status: 400 },
+    )
+  }
+
+  if (provider !== 'ollama' && !key) {
+    return NextResponse.json(
+      { error: '当前平台需要填写 API Key' },
+      { status: 400 },
+    )
   }
 
   try {
@@ -233,12 +243,15 @@ export async function POST(req: NextRequest) {
       })
       res = new Response('{}')
     } else {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      }
+      if (key) {
+        headers.Authorization = `Bearer ${key}`
+      }
       res = await fetch(`${normalizedBaseUrl}/chat/completions`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${key}`,
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({
           model: normalizedModel,
           messages: [{ role: 'user', content: 'Say "OK"' }],

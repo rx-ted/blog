@@ -166,7 +166,10 @@ export function getAiRuntimeEnv(env?: Partial<CloudflareEnv> | null): AIEnv {
 function getClientFromConfig(
   config: Extract<ResolvedConfig, { strategy: 'external-provider' }>,
 ) {
-  return new OpenAI({ apiKey: config.apiKey, baseURL: config.baseURL })
+  return new OpenAI({
+    apiKey: config.apiKey || 'no-key-required',
+    baseURL: config.baseURL,
+  })
 }
 
 function extractWorkersAiPayload(result: unknown): unknown {
@@ -516,11 +519,9 @@ export async function resolveConfig(
               }>()
 
       if (selected?.base_url && selected.model) {
-        const key = await decryptApiKey(
-          selected.api_key_encrypted || '',
-          secret,
-        )
-        if (key) {
+        const encryptedKey = selected.api_key_encrypted || ''
+        const key = await decryptApiKey(encryptedKey, secret)
+        if (!encryptedKey.trim() || key) {
           return {
             strategy: 'external-provider',
             apiKey: key,

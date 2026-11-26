@@ -201,6 +201,16 @@ export function AiProviderManager() {
       return
     }
 
+    if (
+      editing.provider !== 'ollama' &&
+      !editing.api_key.trim() &&
+      !editing.api_key_masked &&
+      !editing.id
+    ) {
+      toast.error('当前平台需要填写 API Key')
+      return
+    }
+
     setLoadingModels(true)
     setModelsWarning('')
 
@@ -264,6 +274,15 @@ export function AiProviderManager() {
       return
     }
 
+    if (
+      editing.provider !== 'ollama' &&
+      !editing.api_key.trim() &&
+      !editing.api_key_masked
+    ) {
+      toast.error('当前平台需要填写 API Key')
+      return
+    }
+
     setTesting(true)
     setTestResult(null)
 
@@ -316,6 +335,15 @@ export function AiProviderManager() {
       !editing.model.trim()
     ) {
       toast.error('请填写名称、Base URL、模型')
+      return
+    }
+
+    if (
+      editing.provider !== 'ollama' &&
+      !editing.api_key.trim() &&
+      !editing.api_key_masked
+    ) {
+      toast.error('当前平台需要填写 API Key')
       return
     }
 

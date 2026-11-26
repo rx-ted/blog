@@ -3,6 +3,7 @@ export type AIProviderCategory =
   | '海外聚合'
   | '国内大模型'
   | '国内聚合'
+  | '本地部署'
 
 export interface AIProviderPreset {
   id: string
@@ -196,6 +197,16 @@ export const AI_PROVIDER_PRESETS: AIProviderPreset[] = [
     apiKeyUrl: 'https://aihubmix.com/token',
     description: '国内聚合平台',
   },
+  {
+    id: 'ollama',
+    name: 'Ollama',
+    providerType: 'openai_compatible',
+    category: '本地部署',
+    baseUrl: 'http://localhost:11434/v1',
+    defaultModel: 'llama3.2',
+    quickModels: ['llama3.2', 'qwen2.5:7b', 'deepseek-r1:8b'],
+    description: '本地 Ollama 服务，默认无需 API Key',
+  },
 ]
 
 export const AI_PROVIDER_MAP = Object.fromEntries(
@@ -207,4 +218,5 @@ export const AI_PROVIDER_CATEGORIES: AIProviderCategory[] = [
   '海外聚合',
   '国内大模型',
   '国内聚合',
+  '本地部署',
 ]

@@ -106,6 +106,12 @@ export async function POST(req: NextRequest) {
   }
 
   const rawApiKey = (body.api_key || '').trim()
+  if (payload.provider !== 'ollama' && !rawApiKey) {
+    return NextResponse.json(
+      { error: '当前平台需要填写 API Key' },
+      { status: 400 },
+    )
+  }
   const encrypted = rawApiKey ? await encryptApiKey(rawApiKey, secret) : ''
   const masked = rawApiKey ? maskApiKey(rawApiKey) : ''
 
@@ -184,10 +190,15 @@ export async function PUT(req: NextRequest) {
 
   const exists = await db
     .prepare(
-      'SELECT id, api_key_masked, is_default FROM ai_provider_profiles WHERE id = ?',
+      'SELECT id, api_key_encrypted, api_key_masked, is_default FROM ai_provider_profiles WHERE id = ?',
     )
     .bind(id)
-    .first<{ id: number; api_key_masked: string; is_default: number }>()
+    .first<{
+      id: number
+      api_key_encrypted: string
+      api_key_masked: string
+      is_default: number
+    }>()
   if (!exists) {
     return NextResponse.json({ error: '配置不存在' }, { status: 404 })
   }
@@ -198,6 +209,15 @@ export async function PUT(req: NextRequest) {
   }
 
   const rawApiKey = (body.api_key || '').trim()
+  const hasExistingKey =
+    Boolean(exists.api_key_encrypted?.trim()) ||
+    Boolean(exists.api_key_masked?.trim())
+  if (payload.provider !== 'ollama' && !rawApiKey && !hasExistingKey) {
+    return NextResponse.json(
+      { error: '当前平台需要填写 API Key' },
+      { status: 400 },
+    )
+  }
   const encrypted = rawApiKey ? await encryptApiKey(rawApiKey, secret) : null
   const masked = rawApiKey ? maskApiKey(rawApiKey) : exists.api_key_masked
 

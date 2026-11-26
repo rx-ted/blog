@@ -601,7 +601,7 @@ export function ProviderBasicFields<T extends BaseProviderFormState>({
       <div className="sm:col-span-2">
         <div className="mb-1 flex items-center justify-between gap-2">
           <label className="block text-sm font-medium text-[var(--editor-ink)]">
-            API Key
+            {editing.provider === 'ollama' ? 'API Key（可选）' : 'API Key'}
           </label>
           {editing.api_key_url ? (
             <a
@@ -620,11 +620,17 @@ export function ProviderBasicFields<T extends BaseProviderFormState>({
           onChange={(event) =>
             onChange({ api_key: event.target.value } as Partial<T>)
           }
+          placeholder={editing.provider === 'ollama' ? '本地 Ollama 通常无需填写' : ''}
           className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
         />
         {editing.api_key_masked ? (
           <div className="mt-1 text-xs text-[var(--editor-muted)]">
             已保存：{editing.api_key_masked}
+          </div>
+        ) : null}
+        {editing.provider === 'ollama' ? (
+          <div className="mt-1 text-xs text-[var(--editor-muted)]">
+            本地部署默认不需要 API Key；如你为 Ollama 配置了反向代理鉴权，可在此填写。
           </div>
         ) : null}
       </div>

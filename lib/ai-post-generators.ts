@@ -359,7 +359,7 @@ async function runTextGenerator(
   }
 
   const client = new OpenAI({
-    apiKey: config.apiKey,
+    apiKey: config.apiKey || 'no-key-required',
     baseURL: config.baseURL,
   })
 
