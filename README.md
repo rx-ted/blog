@@ -28,7 +28,7 @@ Qiaomu Blog Open Source 不是一个只会渲染 Markdown 的静态模板，而�
 - 图片右键菜单：下载、设为封面、对齐、裁剪、参考生图
 - 发布状态：公开、草稿、密码访问、链接访问
 - 默认初始化配置：主题、导航、字体、AI 文本模型模板、AI 生图模型模板
-- Cloudflare Workers + D1 + R2 部署，不需要自己维护服务器和 CDN
+- Cloudflare Workers + D1 + R2 部署，不需要自己维护服务器和CDN
 
 ## 截图预览
 
